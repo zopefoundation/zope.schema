@@ -28,7 +28,7 @@ from zope.testing import testrunner
 
 defaults = [
     '--path', src,
-    '--package', 'zope.i18nmessageid',
+    '--package', 'zope.schema',
     '--tests-pattern', '^tests$',
     ]
 
