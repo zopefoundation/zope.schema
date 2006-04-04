@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2004 Zope Corporation and Contributors.
+# Copyright (c) 2006 Zope Corporation and Contributors.
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
@@ -30,7 +30,6 @@ setup(name='zope.schema',
       description='Zope3 Data Schemas',
       author='Zope Corporation and Contributors',
       author_email='zope3-dev@zope.org',
-      long_description='',
       
       packages=['zope', 'zope.schema'],
       package_dir = {'': os.path.join(os.path.dirname(__file__), 'src')},
