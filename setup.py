@@ -24,8 +24,8 @@ except ImportError, e:
     from distutils.core import setup, Extension
 
 setup(name='zope.schema',
-      version='3.0.0',
-      url='http://svn.zope.org/zope.schema/tags/3.0.0',
+      version='1.0',
+      url='http://svn.zope.org/zope.schema',
       license='ZPL 2.1',
       description='Zope3 Data Schemas',
       author='Zope Corporation and Contributors',
