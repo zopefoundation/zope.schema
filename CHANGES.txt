@@ -1,6 +1,11 @@
 zope.schema Package Changelog
 =============================
 
+zope.schema version 3.2.1.2 (2006/04/16)
+----------------------------------------
+
+- Fix packaging bug:  'package_dir' must be a *relative* path.
+
 zope.schema version 3.2.1.1 (2006/04/14)
 ----------------------------------------
 
