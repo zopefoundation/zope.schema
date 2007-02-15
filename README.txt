@@ -1,0 +1,15 @@
+zope.schema Package Readme
+==========================
+
+Overview
+--------
+
+Schemas extend the notion of interfaces to detailed descriptions of Attributes
+(but not methods). Every schema is an interface and specifies the public
+fields of an object. A *field* roughly corresponds to an attribute of a
+python object. But a Field provides space for at least a title and a
+description. It can also constrain its value and provide a validation method.
+Besides you can optionally specify characteristics such as its value being
+read-only or not required.
+
+See 'src/zope/schema/README.txt' for more information.
