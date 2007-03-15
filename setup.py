@@ -11,7 +11,7 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""Setup for zope.i18nmessageid package
+"""Setup for zope.schema package
 
 $Id$
 """
@@ -20,14 +20,28 @@ import os
 
 from setuptools import setup, find_packages
 
+def read(*rnames):
+    return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
+
 setup(name='zope.schema',
-      version='3.3dev',
+      version='3.3.0',
       url='http://svn.zope.org/zope.schema',
       license='ZPL 2.1',
       description='Zope3 Data Schemas',
       author='Zope Corporation and Contributors',
       author_email='zope3-dev@zope.org',
-      
+      long_description=(
+        read('README.txt')
+        + '\n' +
+        'Detailed Documentation\n'
+        '**********************\n'
+        + '\n' +
+        read('src', 'zope', 'schema', 'README.txt')
+        + '\n' +
+        'Download\n'
+        '**********************\n'
+        ),
+
       packages=find_packages('src'),
       package_dir = {'': 'src'},
 
