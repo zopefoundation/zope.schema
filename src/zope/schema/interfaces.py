@@ -404,31 +404,31 @@ class IUnorderedCollection(ICollection):
 
 class IAbstractSet(IUnorderedCollection):
     u"""An unordered collection of unique values."""
-    
+
     unique = Attribute(u"This ICollection interface attribute must be True")
 
 class IAbstractBag(IUnorderedCollection):
     u"""An unordered collection of values, with no limitations on whether
     members are unique"""
-    
+
     unique = Attribute(u"This ICollection interface attribute must be False")
 
 # Concrete
 
 class ITuple(ISequence):
-    u"""Field containing a value that implements the API of a conventional 
+    u"""Field containing a value that implements the API of a conventional
     Python tuple."""
 
 class IList(ISequence):
-    u"""Field containing a value that implements the API of a conventional 
+    u"""Field containing a value that implements the API of a conventional
     Python list."""
 
 class ISet(IAbstractSet):
-    u"""Field containing a value that implements the API of a conventional 
+    u"""Field containing a value that implements the API of a conventional
     Python standard library sets.Set or a Python 2.4+ set."""
 
 class IFrozenSet(IAbstractSet):
-    u"""Field containing a value that implements the API of a conventional 
+    u"""Field containing a value that implements the API of a conventional
     Python 2.4+ frozenset."""
 
 # (end Collections)
@@ -478,7 +478,7 @@ class ITokenizedTerm(ITerm):
 
 class ITitledTokenizedTerm(ITokenizedTerm):
     """A tokenized term that includes a title."""
-    
+
     title = TextLine(title=_(u"Title"))
 
 class ISource(Interface):
@@ -489,7 +489,7 @@ class ISource(Interface):
 
     Sources can be large (even infinite), in which case, they need to
     be queried to find out what their values are.
-    
+
     """
 
     def __contains__(value):
@@ -523,7 +523,7 @@ class IContextSourceBinder(Interface):
     def __call__(context):
         """Return a context-bound instance that implements ISource.
         """
-    
+
 
 class IBaseVocabulary(ISource):
     """Representation of a vocabulary.
