@@ -50,6 +50,7 @@ setup(name='zope.schema',
       install_requires=['setuptools',
                         'zope.i18nmessageid',
                         'zope.interface',
+                        'zope.event',
                        ],
       include_package_data = True,
 

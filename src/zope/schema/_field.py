@@ -23,6 +23,8 @@ import decimal
 from datetime import datetime, date, timedelta, time
 from sets import Set as SetType
 
+from zope.event import notify
+
 from zope.interface import classImplements, implements
 from zope.interface.interfaces import IInterface, IMethod
 
@@ -33,7 +35,8 @@ from zope.schema.interfaces import IInterfaceField
 from zope.schema.interfaces import IBytes, IASCII, IBytesLine, IASCIILine
 from zope.schema.interfaces import IBool, IInt, IFloat, IDatetime, IFrozenSet
 from zope.schema.interfaces import IChoice, ITuple, IList, ISet, IDict
-from zope.schema.interfaces import IPassword, IObject, IDate, ITimedelta
+from zope.schema.interfaces import IPassword, IDate, ITimedelta
+from zope.schema.interfaces import IObject, IBeforeObjectAssignedEvent
 from zope.schema.interfaces import ITime, IDecimal
 from zope.schema.interfaces import IURI, IId, IFromUnicode
 from zope.schema.interfaces import ISource, IBaseVocabulary
@@ -464,6 +467,26 @@ class Object(Field):
         if errors:
             raise WrongContainedType(errors)
 
+    def set(self, object, value):
+        # Announce that we're going to assign the value to the object.
+        # Motivation: Widgets typically like to take care of policy-specific
+        # actions, like establishing location.
+        event = BeforeObjectAssignedEvent(value, self.__name__, object)
+        notify(event)
+        # The event subscribers are allowed to replace the object, thus we need
+        # to replace our previous value.
+        value = event.object
+        super(Object, self).set(object, value)
+
+class BeforeObjectAssignedEvent(object):
+    """An object is going to be assigned to an attribute on another object."""
+
+    implements(IBeforeObjectAssignedEvent)
+
+    def __init__(self, object, name, context):
+        self.object = object
+        self.name = name
+        self.context = context
 
 class Dict(MinMaxLen, Iterable):
     """A field representing a Dict."""
