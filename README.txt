@@ -20,14 +20,14 @@ Releases
 3.3.0 (2007/03/15)
 ==================
 
-Corresponds to the verison of the zope.schema package shipped as part of
+Corresponds to the version of the zope.schema package shipped as part of
 the Zope 3.3.0 release.
 
 ==================
 3.2.1 (2006/03/26)
 ==================
 
-Corresponds to the verison of the zope.schema package shipped as part of
+Corresponds to the version of the zope.schema package shipped as part of
 the Zope 3.2.1 release.
 
 Fixed missing import of 'VocabularyRegistryError'.  See
@@ -37,7 +37,7 @@ http://www.zope.org/Collectors/Zope3-dev/544 .
 3.2.0 (2006/01/05)
 ==================
 
-Corresponds to the verison of the zope.schema package shipped as part of
+Corresponds to the version of the zope.schema package shipped as part of
 the Zope 3.2.0 release.
 
 Added "iterable" sources to replace vocabularies, which are now deprecated
@@ -47,7 +47,7 @@ and scheduled for removal in Zope 3.3.
 3.1.0 (2005/10/03)
 ==================
 
-Corresponds to the verison of the zope.schema package shipped as part of
+Corresponds to the version of the zope.schema package shipped as part of
 the Zope 3.1.0 release.
 
 Allowed 'Choice' fields to take either a 'vocabulary' or a 'source'
@@ -59,5 +59,5 @@ Added 'TimeDelta' and 'ASCIILine' field types.
 3.0.0 (2004/11/07)
 ==================
 
-Corresponds to the verison of the zope.schema package shipped as part of
+Corresponds to the version of the zope.schema package shipped as part of
 the Zope X3.0.0 release.
