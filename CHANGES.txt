@@ -1,15 +1,15 @@
 =======
 Changes
 =======
-Next Version
-------------
--  zope.schema now works on Python2.5
 
-After 3.4.0a1
-=============
+
+3.4.0b1
+=======
 
  - Added BeforeObjectAssignedEvent that is triggered before the object field
    sets a value.
+
+ -  zope.schema now works on Python2.5
 
 
 Before 3.4
