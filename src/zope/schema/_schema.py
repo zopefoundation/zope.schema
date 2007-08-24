@@ -16,6 +16,9 @@
 $Id$
 """
 
+import zope.interface.verify
+
+
 def getFieldNames(schema):
     """Return a list of all the Field names in a schema.
     """
@@ -48,3 +51,46 @@ def getFieldNamesInOrder(schema):
     """Return a list of all the Field names in a schema in schema order.
     """
     return [ name for name, field in getFieldsInOrder(schema) ]
+
+
+def getValidationErrors(schema, object):
+    """Return a list of all validation errors.
+
+    """
+    errors = getSchemaValidationErrors(schema, object)
+    if errors:
+        return errors
+
+    # Only validate invariants if there were no previous errors. Previous
+    # errors could be missing attributes which would most likely make an
+    # invariant raise an AttributeError.
+    invariant_errors = []
+    try:
+        schema.validateInvariants(object, invariant_errors)
+    except zope.interface.exceptions.Invalid:
+        # Just collect errors
+        pass
+    errors = [(None, e) for e in invariant_errors]
+    return errors
+
+
+def getSchemaValidationErrors(schema, object):
+    errors = []
+    for name in schema.names(all=True):
+        if zope.interface.interfaces.IMethod.providedBy(schema[name]):
+            continue
+        attribute = schema[name]
+        if not zope.schema.interfaces.IField.providedBy(attribute):
+            continue
+        try:
+            value = getattr(object, name)
+        except AttributeError, error:
+            # property for the given name is not implemented
+            errors.append((
+                name, zope.schema.interfaces.SchemaNotFullyImplemented(error)))
+        else:
+            try:
+                attribute.bind(object).validate(value)
+            except zope.schema.ValidationError, e:
+                errors.append((name, e))
+    return errors

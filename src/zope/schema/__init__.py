@@ -24,7 +24,8 @@ from zope.schema._field import Password, Dict, Datetime, Date, Timedelta
 from zope.schema._field import Time, SourceText
 from zope.schema._field import Object, URI, Id, DottedName
 from zope.schema._field import InterfaceField
-from zope.schema._schema import getFields, getFieldsInOrder
-from zope.schema._schema import getFieldNames, getFieldNamesInOrder
+from zope.schema._schema import (
+    getFields, getFieldsInOrder, getFieldNames, getFieldNamesInOrder,
+    getValidationErrors, getSchemaValidationErrors)
 from zope.schema.accessors import accessors
 from zope.schema.interfaces import ValidationError

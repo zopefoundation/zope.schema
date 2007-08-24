@@ -1,0 +1,93 @@
+================
+Schema Valiation
+================
+
+
+There are two helper methods to verify schemas and interfaces:
+
+getValidationErrors
+    first validates via the zope.schema field validators. If that succeeds the
+    invariants are checked.
+getSchemaValidationErrors
+    *only* validateds via the zope.schema field validators. The invariants are
+    *not* checked.
+
+
+Create an interface to validate against:
+
+>>> import zope.interface
+>>> import zope.schema
+>>> class ITwoInts(zope.interface.Interface):
+...     a = zope.schema.Int(max=10)
+...     b = zope.schema.Int(min=5)
+...
+...     @zope.interface.invariant
+...     def a_greater_b(obj):
+...         print "Checking if a > b"
+...         if obj.a <= obj.b:
+...             raise zope.interface.Invalid("%s<=%s" % (obj.a, obj.b))
+...     
+
+Create a silly model:
+
+>>> class TwoInts(object):
+...     pass
+
+
+Create an instance of TwoInts but do not set attributes. We get two errors:
+
+>>> ti = TwoInts()
+>>> zope.schema.getValidationErrors(ITwoInts, ti)
+[('a', 'TwoInts' object has no attribute 'a'),
+ ('b', 'TwoInts' object has no attribute 'b')]
+
+The `getSchemaValidationErrors` function returns the same result:
+
+>>> zope.schema.getSchemaValidationErrors(ITwoInts, ti)
+[('a', 'TwoInts' object has no attribute 'a'),
+ ('b', 'TwoInts' object has no attribute 'b')]
+
+Note that see no error from the invariant because the invariants are not
+vaildated if there are other schema errors.
+
+When we set an invalid value for `a` we still get the same error for `b`:
+
+>>> ti.a = 11
+>>> errors = zope.schema.getValidationErrors(ITwoInts, ti)
+>>> errors
+[('a', 11 10),
+ ('b', 'TwoInts' object has no attribute 'b')]
+>>> errors[0][1].doc()
+u'Value is too big'
+
+
+After setting a valid value for `a` there is only the error for the missing `b`
+left:
+
+>>> ti.a = 8
+>>> zope.schema.getValidationErrors(ITwoInts, ti)
+[('b', 'TwoInts' object has no attribute 'b')]
+
+
+After setting valid value for `b` the schema is valid so the invariants are
+checked. As `b>a` the invariant fails:
+
+>>> ti.b = 10
+>>> errors = zope.schema.getValidationErrors(ITwoInts, ti)
+Checking if a > b
+>>> errors
+[(None, <zope.interface.exceptions.Invalid instance at 0x...>)]
+
+
+When using `getSchemaValidationErrors` we do not get an error any more:
+
+>>> zope.schema.getSchemaValidationErrors(ITwoInts, ti)
+[]
+
+
+Set `b=5` so everything is fine:
+
+>>> ti.b = 5
+>>> zope.schema.getValidationErrors(ITwoInts, ti)
+Checking if a > b
+[]

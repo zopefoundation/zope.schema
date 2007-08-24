@@ -13,7 +13,7 @@
 ##############################################################################
 """Tests for the schema package's documentation files
 
-$Id: tests.py 29143 2005-02-14 22:43:16Z srichter $
+$Id$
 """
 import unittest
 from zope.testing import doctest
@@ -23,6 +23,9 @@ def test_suite():
         doctest.DocFileSuite('../sources.txt', optionflags=doctest.ELLIPSIS),
         doctest.DocFileSuite('../fields.txt'),
         doctest.DocFileSuite('../README.txt'),
+        doctest.DocFileSuite(
+            '../validation.txt',
+            optionflags=doctest.NORMALIZE_WHITESPACE|doctest.ELLIPSIS),
         ))
 
 if __name__ == '__main__':

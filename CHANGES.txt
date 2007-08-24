@@ -2,6 +2,12 @@
 Changes
 =======
 
+3.5a1
+=====
+
+ - Added helper methods for schema validation: `getValidationErrors` and
+   `getSchemaValidationErrors`.
+
 
 3.4.0b1
 =======
