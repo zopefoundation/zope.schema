@@ -1,3 +1,31 @@
+========
+Concepts
+========
+
+Sources are designed with three concepts:
+
+- The source itself - an iterable
+
+  This can return any kind of object it wants. It doesn't have to care
+  for browser representation, encoding, ...
+
+- A way to map a value from the iterable to something that can be used
+  for form *values* - this is called a token. A token is commonly a
+  (unique) 7bit representation of the value.
+
+- A way to map a value to something that can be displayed to the user -
+  this is called a title
+
+The last two elements are dispatched using a so called `term`. The
+ITitleTokenizedTerm interface contains a triple of (value, token, term).
+
+Additionally there are some lookup functions to perform the mapping
+between values and terms and tokens and terms.
+
+Sources that require context use a special factory: a context source
+binder that is called with the context and instanciates the source when
+it is actually used.
+
 =================
 Sources in Fields
 =================
