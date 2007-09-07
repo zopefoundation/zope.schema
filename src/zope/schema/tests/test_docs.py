@@ -16,15 +16,20 @@
 $Id$
 """
 import unittest
-from zope.testing import doctest
+import re
+from zope.testing import doctest, renormalizing
 
 def test_suite():
+    checker = renormalizing.RENormalizing([
+        (re.compile(r"\[\(None, Invalid\('8<=10',\)\)\]"),
+                    r"[(None, <zope.interface.exceptions.Invalid instance at 0x...>)]",)
+      ])
     return unittest.TestSuite((
         doctest.DocFileSuite('../sources.txt', optionflags=doctest.ELLIPSIS),
         doctest.DocFileSuite('../fields.txt'),
         doctest.DocFileSuite('../README.txt'),
         doctest.DocFileSuite(
-            '../validation.txt',
+            '../validation.txt', checker=checker,
             optionflags=doctest.NORMALIZE_WHITESPACE|doctest.ELLIPSIS),
         ))
 
