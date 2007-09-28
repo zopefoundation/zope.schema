@@ -1,7 +1,7 @@
 Changes
 =======
 
-3.4.0 (unreleased)
+3.4.0 (2007/09/28)
 ------------------
 
 Added BeforeObjectAssignedEvent that is triggered before the object
