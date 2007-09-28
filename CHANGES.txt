@@ -7,10 +7,13 @@ Changes
 - Added helper methods for schema validation: ``getValidationErrors``
   and ``getSchemaValidationErrors``.
 
-- Added BeforeObjectAssignedEvent that is triggered before the object field
-  sets a value.
-
 - zope.schema now works on Python2.5
+
+3.4.0 (2007/09/28)
+------------------
+
+Added BeforeObjectAssignedEvent that is triggered before the object
+field sets a value.
 
 3.3.0 (2007/03/15)
 ------------------
