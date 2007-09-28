@@ -15,9 +15,7 @@
 
 $Id$
 """
-
 import os
-
 from setuptools import setup, find_packages
 
 def read(*rnames):
@@ -30,29 +28,20 @@ setup(name='zope.schema',
       description='Zope3 Data Schemas',
       author='Zope Corporation and Contributors',
       author_email='zope3-dev@zope.org',
-      long_description=(
-        read('README.txt')
-        + '\n' +
-        'Detailed Documentation\n'
-        '**********************\n'
-        + '\n' +
-        read('src', 'zope', 'schema', 'README.txt')
-        + '\n' +
-        'Download\n'
-        '**********************\n'
-        ),
+      long_description=(read('src', 'zope', 'schema', 'README.txt')
+                        + '\n\n' +
+                        read('CHANGES.txt')),
 
       packages=find_packages('src'),
       package_dir = {'': 'src'},
-
       namespace_packages=['zope',],
-      tests_require = ['zope.testing'],
       install_requires=['setuptools',
                         'zope.i18nmessageid',
                         'zope.interface',
                         'zope.event',
+                        # testing dependencies
+                        'zope.testing',
                        ],
       include_package_data = True,
-
       zip_safe = False,
       )
