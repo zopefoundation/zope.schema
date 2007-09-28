@@ -15,19 +15,11 @@ read-only or not required.
 
 Zope 3 schemas were born when Jim Fulton and Martijn Faassen thought
 about Formulator for Zope 3 and ``PropertySets`` while at the `Zope 3
-sprint`_ at the `Zope BBQ`_ in Berlin. They realized that if you strip
+sprint`_ at the Zope BBQ in Berlin. They realized that if you strip
 all view logic from forms then you have something similar to interfaces. And
 thus schemas were born.
 
 .. _Zope 3 sprint: http://dev.zope.org/Zope3/ZopeBBQ2002Sprint
-.. _Zope BBQ: http://www.beehive.de/zope/Events/ZopeBBQ2002.html
-
-
-Dependencies
-------------
-
-The ``zope.schema`` package only depends on the ``zope.interface``
-package.
 
 
 Simple Usage
