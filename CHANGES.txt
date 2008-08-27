@@ -4,6 +4,8 @@ Changes
 3.5.0a1 (unreleased)
 --------------------
 
+- Added support to bootstrap on Jython.
+
 - Added helper methods for schema validation: ``getValidationErrors``
   and ``getSchemaValidationErrors``.
 
