@@ -4,6 +4,10 @@ Changes
 3.5.0a1 (unreleased)
 --------------------
 
+- Removed use of deprecated 'sets' module when running under Python 2.6.
+
+- Removed spurious doctest failure when running under Python 2.6.
+
 - Added support to bootstrap on Jython.
 
 - Added helper methods for schema validation: ``getValidationErrors``
