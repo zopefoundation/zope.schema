@@ -21,7 +21,12 @@ __docformat__ = 'restructuredtext'
 import re
 import decimal
 from datetime import datetime, date, timedelta, time
-from sets import Set as SetType
+import sys
+if sys.version_info < (2, 6): # deprecation warnings
+    from sets import Set as SetType
+    SET_TYPES = set, SetType
+else:
+    SET_TYPES = set,
 
 from zope.event import notify
 
@@ -182,8 +187,11 @@ class Decimal(Orderable, Field):
     def fromUnicode(self, u):
         """
         >>> f = Decimal()
-        >>> f.fromUnicode("1.25")
-        Decimal("1.25")
+        >>> import decimal
+        >>> isinstance(f.fromUnicode("1.25"), decimal.Decimal)
+        True
+        >>> float(f.fromUnicode("1.25"))
+        1.25
         >>> f.fromUnicode("1.25.6")
         Traceback (most recent call last):
         ...
@@ -410,7 +418,7 @@ class List(AbstractCollection):
 class Set(AbstractCollection):
     """A field representing a set."""
     implements(ISet)
-    _type = SetType, set
+    _type = SET_TYPES
     def __init__(self, **kw):
         if 'unique' in kw: # set members are always unique
             raise TypeError(
