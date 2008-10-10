@@ -22,7 +22,7 @@ def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
 setup(name='zope.schema',
-      version = '3.5.0a1',
+      version = '3.5.1dev',
       url='http://pypi.python.org/pypi/zope.schema',
       license='ZPL 2.1',
       description='Zope3 Data Schemas',
