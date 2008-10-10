@@ -1,8 +1,11 @@
-Changes
-=======
+=========
+ Changes
+=========
 
-3.5.0a1 (unreleased)
+3.5.0a1 (2008/10/10)
 --------------------
+
+- Added the doctests to the long description.
 
 - Removed use of deprecated 'sets' module when running under Python 2.6.
 
@@ -15,8 +18,10 @@ Changes
 
 - zope.schema now works on Python2.5
 
+
 3.4.0 (2007/09/28)
 ------------------
+
 
 Added BeforeObjectAssignedEvent that is triggered before the object
 field sets a value.

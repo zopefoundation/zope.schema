@@ -21,6 +21,7 @@ thus schemas were born.
 
 .. _Zope 3 sprint: http://dev.zope.org/Zope3/ZopeBBQ2002Sprint
 
+.. contents::
 
 Simple Usage
 ------------

@@ -30,8 +30,13 @@ setup(name='zope.schema',
       author_email='zope3-dev@zope.org',
       long_description=(read('src', 'zope', 'schema', 'README.txt')
                         + '\n\n' +
+                        read('src', 'zope', 'schema', 'fields.txt')
+                        + '\n\n' +
+                        read('src', 'zope', 'schema', 'sources.txt')
+                        + '\n\n' +
+                        read('src', 'zope', 'schema', 'validation.txt')
+                        + '\n\n' +
                         read('CHANGES.txt')),
-
       packages=find_packages('src'),
       package_dir = {'': 'src'},
       namespace_packages=['zope',],
