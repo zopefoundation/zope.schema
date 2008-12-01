@@ -5,7 +5,8 @@
 3.5.0a2 (unreleased)
 --------------------
 
-- 
+- Move zope.testing to "test" extras_require, as it is not needed
+  for zope.schema itself.
 
 
 3.5.0a1 (2008/10/10)
