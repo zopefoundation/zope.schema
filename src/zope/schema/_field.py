@@ -24,7 +24,7 @@ from datetime import datetime, date, timedelta, time
 import sys
 if sys.version_info < (2, 6): # deprecation warnings
     from sets import Set as SetType
-    SET_TYPES = set, SetType
+    SET_TYPES = SetType, set
 else:
     SET_TYPES = set,
 
