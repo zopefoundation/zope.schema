@@ -2,7 +2,7 @@
  Changes
 =========
 
-3.5.0a2 (unreleased)
+3.5.0a2 (2008/12/11)
 --------------------
 
 - Move zope.testing to "test" extras_require, as it is not needed
