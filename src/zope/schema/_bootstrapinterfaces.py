@@ -34,6 +34,8 @@ class ValidationError(zope.interface.Invalid):
         return self.__class__.__doc__
 
     def __cmp__(self, other):
+        if not hasattr(other, 'args'):
+            return -1
         return cmp(self.args, other.args)
 
     def __repr__(self):

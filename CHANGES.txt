@@ -2,10 +2,11 @@
  Changes
 =========
 
-unreleased
-----------
+3.5.1dev (unreleased)
+---------------------
 
-- 
+- Fix __cmp__ method in ValidationError. Show some side effects based on the
+  existing __cmp__ implementation. See validation.txt
 
 
 3.5.0a2 (2008/12/11)
