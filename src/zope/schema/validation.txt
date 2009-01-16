@@ -36,15 +36,15 @@ Create an instance of TwoInts but do not set attributes. We get two errors:
 
   >>> ti = TwoInts()
   >>> zope.schema.getValidationErrors(ITwoInts, ti)
-  [('a', 'TwoInts' object has no attribute 'a'),
-   ('b', 'TwoInts' object has no attribute 'b')]
+  [('a', SchemaNotFullyImplemented(AttributeError("'TwoInts' object has no attribute 'a'",))),
+   ('b', SchemaNotFullyImplemented(AttributeError("'TwoInts' object has no attribute 'b'",)))]
 
 The `getSchemaValidationErrors` function returns the same result:
 
   >>> zope.schema.getSchemaValidationErrors(ITwoInts, ti)
-  [('a', 'TwoInts' object has no attribute 'a'),
-   ('b', 'TwoInts' object has no attribute 'b')]
-
+  [('a', SchemaNotFullyImplemented(AttributeError("'TwoInts' object has no attribute 'a'",))),
+   ('b', SchemaNotFullyImplemented(AttributeError("'TwoInts' object has no attribute 'b'",)))]
+ 
 Note that see no error from the invariant because the invariants are not
 vaildated if there are other schema errors.
 
@@ -53,8 +53,8 @@ When we set an invalid value for `a` we still get the same error for `b`:
   >>> ti.a = 11
   >>> errors = zope.schema.getValidationErrors(ITwoInts, ti)
   >>> errors
-  [('a', 11 10),
-   ('b', 'TwoInts' object has no attribute 'b')]
+  [('a', TooBig(11, 10)),
+   ('b', SchemaNotFullyImplemented(AttributeError("'TwoInts' object has no attribute 'b'",)))]
   >>> errors[0][1].doc()
   u'Value is too big'
 
@@ -64,7 +64,7 @@ left:
 
   >>> ti.a = 8
   >>> zope.schema.getValidationErrors(ITwoInts, ti)
-  [('b', 'TwoInts' object has no attribute 'b')]
+  [('b', SchemaNotFullyImplemented(AttributeError("'TwoInts' object has no attribute 'b'",)))]
 
 
 After setting valid value for `b` the schema is valid so the invariants are

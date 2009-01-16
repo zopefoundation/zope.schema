@@ -344,7 +344,7 @@ def _validate_sequence(value_type, value, errors=None):
 
             >>> errors = _validate_sequence(field, ('foo', u'bar', 1))
             >>> errors
-            [foo <type 'unicode'>, 1 <type 'unicode'>]
+            [WrongType('foo', <type 'unicode'>), WrongType(1, <type 'unicode'>)]
 
         The only valid value in the sequence is the second item. The others
         generated errors.
@@ -354,7 +354,7 @@ def _validate_sequence(value_type, value, errors=None):
 
         >>> errors = _validate_sequence(field, (2, u'baz'), errors)
         >>> errors
-        [foo <type 'unicode'>, 1 <type 'unicode'>, 2 <type 'unicode'>]
+        [WrongType('foo', <type 'unicode'>), WrongType(1, <type 'unicode'>), WrongType(2, <type 'unicode'>)]
 
     """
     if errors is None:

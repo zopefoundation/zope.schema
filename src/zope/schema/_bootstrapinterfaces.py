@@ -39,7 +39,7 @@ class ValidationError(zope.interface.Invalid):
         return cmp(self.args, other.args)
 
     def __repr__(self):
-        return ' '.join(map(str, self.args))
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(repr(arg) for arg in self.args))
 
 class RequiredMissing(ValidationError):
     __doc__ = _("""Required input is missing.""")

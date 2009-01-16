@@ -8,6 +8,10 @@
 - Fix __cmp__ method in ValidationError. Show some side effects based on the
   existing __cmp__ implementation. See validation.txt
 
+- Make 'repr' of the ValidationError and its subclasses more sensible. This
+  may require you to adapt your doctests for the new style, but now it makes
+  much more sense for debugging for developers.
+
 
 3.5.0a2 (2008/12/11)
 --------------------
