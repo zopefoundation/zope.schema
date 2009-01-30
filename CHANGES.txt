@@ -1,9 +1,13 @@
-=========
- Changes
-=========
+=======
+Changes
+=======
 
 3.5.1dev (unreleased)
 ---------------------
+
+- Stop using the old old set type.
+
+- Make tests compatible and silent with Python 2.4.
 
 - Fix __cmp__ method in ValidationError. Show some side effects based on the
   existing __cmp__ implementation. See validation.txt

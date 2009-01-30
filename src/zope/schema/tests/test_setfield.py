@@ -27,13 +27,6 @@ from zope.schema.interfaces import WrongContainedType, WrongType, NotUnique
 from zope.schema.interfaces import TooShort, TooLong
 from zope.schema.tests.test_field import CollectionFieldTestBase
 
-def _oldSet(values=()):
-    # Avoid importing 'sets' in Python 2.6, where it generates deprectaions.
-    import sys
-    if sys.version_info < (2, 6): # deprecation warnings
-        from sets import Set as SetType
-        return SetType(values)
-    return set(values)
 
 class SetTest(CollectionFieldTestBase):
     """Test the Tuple Field."""
@@ -44,9 +37,9 @@ class SetTest(CollectionFieldTestBase):
         field = Set(title=u'Set field', description=u'',
                     readonly=False, required=False)
         field.validate(None)
-        field.validate(_oldSet())
-        field.validate(_oldSet((1, 2)))
-        field.validate(_oldSet((3,)))
+        field.validate(set())
+        field.validate(set((1, 2)))
+        field.validate(set((3,)))
         field.validate(set())
         field.validate(set((1, 2)))
         field.validate(set((3,)))
@@ -61,9 +54,9 @@ class SetTest(CollectionFieldTestBase):
     def testValidateRequired(self):
         field = Set(title=u'Set field', description=u'',
                     readonly=False, required=True)
-        field.validate(_oldSet())
-        field.validate(_oldSet((1, 2)))
-        field.validate(_oldSet((3,)))
+        field.validate(set())
+        field.validate(set((1, 2)))
+        field.validate(set((3,)))
         field.validate(set())
         field.validate(set((1, 2)))
         field.validate(set((3,)))
@@ -73,7 +66,7 @@ class SetTest(CollectionFieldTestBase):
     def testValidateRequiredAltMissingValue(self):
         missing = object()
         field = Set(required=True, missing_value=missing)
-        field.validate(_oldSet())
+        field.validate(set())
         field.validate(set())
 
         self.assertRaises(RequiredMissing, field.validate, missing)
@@ -91,13 +84,13 @@ class SetTest(CollectionFieldTestBase):
         field = Set(title=u'Set field', description=u'',
                     readonly=False, required=False, min_length=2)
         field.validate(None)
-        field.validate(_oldSet((1, 2)))
-        field.validate(_oldSet((1, 2, 3)))
+        field.validate(set((1, 2)))
+        field.validate(set((1, 2, 3)))
         field.validate(set((1, 2)))
         field.validate(set((1, 2, 3)))
 
-        self.assertRaises(TooShort, field.validate, _oldSet(()))
-        self.assertRaises(TooShort, field.validate, _oldSet((3,)))
+        self.assertRaises(TooShort, field.validate, set(()))
+        self.assertRaises(TooShort, field.validate, set((3,)))
         self.assertRaises(TooShort, field.validate, set(()))
         self.assertRaises(TooShort, field.validate, set((3,)))
 
@@ -105,13 +98,13 @@ class SetTest(CollectionFieldTestBase):
         field = Set(title=u'Set field', description=u'',
                     readonly=False, required=False, max_length=2)
         field.validate(None)
-        field.validate(_oldSet())
-        field.validate(_oldSet((1, 2)))
+        field.validate(set())
+        field.validate(set((1, 2)))
         field.validate(set())
         field.validate(set((1, 2)))
 
-        self.assertRaises(TooLong, field.validate, _oldSet((1, 2, 3, 4)))
-        self.assertRaises(TooLong, field.validate, _oldSet((1, 2, 3)))
+        self.assertRaises(TooLong, field.validate, set((1, 2, 3, 4)))
+        self.assertRaises(TooLong, field.validate, set((1, 2, 3)))
         self.assertRaises(TooLong, field.validate, set((1, 2, 3, 4)))
         self.assertRaises(TooLong, field.validate, set((1, 2, 3)))
 
@@ -120,13 +113,13 @@ class SetTest(CollectionFieldTestBase):
                     readonly=False, required=False,
                     min_length=1, max_length=2)
         field.validate(None)
-        field.validate(_oldSet((3,)))
-        field.validate(_oldSet((1, 2)))
+        field.validate(set((3,)))
+        field.validate(set((1, 2)))
         field.validate(set((3,)))
         field.validate(set((1, 2)))
 
-        self.assertRaises(TooShort, field.validate, _oldSet())
-        self.assertRaises(TooLong, field.validate, _oldSet((1, 2, 3)))
+        self.assertRaises(TooShort, field.validate, set())
+        self.assertRaises(TooLong, field.validate, set((1, 2, 3)))
         self.assertRaises(TooShort, field.validate, set())
         self.assertRaises(TooLong, field.validate, set((1, 2, 3)))
 
@@ -135,15 +128,15 @@ class SetTest(CollectionFieldTestBase):
                     readonly=False, required=False,
                     value_type=Int())
         field.validate(None)
-        field.validate(_oldSet((5,)))
-        field.validate(_oldSet((2, 3)))
+        field.validate(set((5,)))
+        field.validate(set((2, 3)))
         field.validate(set((5,)))
         field.validate(set((2, 3)))
 
         self.assertRaises(WrongContainedType, field.validate,
-                          _oldSet(('',)))
+                          set(('',)))
         self.assertRaises(WrongContainedType, 
-                          field.validate, _oldSet((3.14159,)))
+                          field.validate, set((3.14159,)))
         self.assertRaises(WrongContainedType, field.validate, set(('',)))
         self.assertRaises(WrongContainedType, 
                           field.validate, set((3.14159,)))
@@ -193,7 +186,7 @@ class FrozenSetTest(CollectionFieldTestBase):
         self.assertRaises(WrongType, field.validate, {})
         self.assertRaises(WrongType, field.validate, (1, 2, 3))
         self.assertRaises(WrongType, field.validate, set((1, 2, 3)))
-        self.assertRaises(WrongType, field.validate, _oldSet((1, 2, 3)))
+        self.assertRaises(WrongType, field.validate, set((1, 2, 3)))
 
     def testValidateRequired(self):
         field = FrozenSet(title=u'Set field', description=u'',

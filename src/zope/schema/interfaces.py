@@ -424,8 +424,8 @@ class IList(ISequence):
     Python list."""
 
 class ISet(IAbstractSet):
-    u"""Field containing a value that implements the API of a conventional
-    Python standard library sets.Set or a Python 2.4+ set."""
+    u"""Field containing a value that implements the API of a Python2.4+ set.
+    """
 
 class IFrozenSet(IAbstractSet):
     u"""Field containing a value that implements the API of a conventional

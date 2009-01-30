@@ -22,11 +22,6 @@ import re
 import decimal
 from datetime import datetime, date, timedelta, time
 import sys
-if sys.version_info < (2, 6): # deprecation warnings
-    from sets import Set as SetType
-    SET_TYPES = SetType, set
-else:
-    SET_TYPES = set,
 
 from zope.event import notify
 
@@ -418,7 +413,7 @@ class List(AbstractCollection):
 class Set(AbstractCollection):
     """A field representing a set."""
     implements(ISet)
-    _type = SET_TYPES
+    _type = set
     def __init__(self, **kw):
         if 'unique' in kw: # set members are always unique
             raise TypeError(
