@@ -2,8 +2,8 @@
 Changes
 =======
 
-3.5.1dev (unreleased)
----------------------
+3.5.1 (2009/01/31)
+------------------
 
 - Stop using the old old set type.
 
