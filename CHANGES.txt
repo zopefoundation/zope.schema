@@ -5,7 +5,8 @@ Changes
 3.5.2 (unreleased)
 ------------------
 
-- ...
+- Made validation tests compatible with Python 2.5 again (hopefully not
+  breaking Python 2.4)
 
 3.5.1 (2009/01/31)
 ------------------

@@ -37,8 +37,8 @@ Create an instance of TwoInts but do not set attributes. We get two errors:
   >>> ti = TwoInts()
   >>> r = zope.schema.getValidationErrors(ITwoInts, ti)
   >>> r
-  [('a', SchemaNotFullyImplemented(<exceptions.AttributeError instance at 0x...>)),
-   ('b', SchemaNotFullyImplemented(<exceptions.AttributeError instance at 0x...>))]
+  [('a', SchemaNotFullyImplemented(...AttributeError...)),
+   ('b', SchemaNotFullyImplemented(...AttributeError...))]
   >>> r[0][1].args[0].args
   ("'TwoInts' object has no attribute 'a'",)
   >>> r[1][1].args[0].args
@@ -48,8 +48,8 @@ The `getSchemaValidationErrors` function returns the same result:
 
   >>> r = zope.schema.getSchemaValidationErrors(ITwoInts, ti)
   >>> r
-  [('a', SchemaNotFullyImplemented(<exceptions.AttributeError instance at 0x...>)),
-   ('b', SchemaNotFullyImplemented(<exceptions.AttributeError instance at 0x...>))]
+  [('a', SchemaNotFullyImplemented(...AttributeError...)),
+   ('b', SchemaNotFullyImplemented(...AttributeError...))]
   >>> r[0][1].args[0].args
   ("'TwoInts' object has no attribute 'a'",)
   >>> r[1][1].args[0].args
@@ -64,7 +64,7 @@ When we set a valid value for `a` we still get the same error for `b`:
   >>> errors = zope.schema.getValidationErrors(ITwoInts, ti)
   >>> errors
   [('a', TooBig(11, 10)),
-   ('b', SchemaNotFullyImplemented(<exceptions.AttributeError instance at 0x...>))]
+   ('b', SchemaNotFullyImplemented(...AttributeError...))]
   >>> errors[1][1].args[0].args
   ("'TwoInts' object has no attribute 'b'",)
 
@@ -78,7 +78,7 @@ left:
   >>> ti.a = 8
   >>> r = zope.schema.getValidationErrors(ITwoInts, ti)
   >>> r
-  [('b', SchemaNotFullyImplemented(<exceptions.AttributeError instance at 0x...>))]
+  [('b', SchemaNotFullyImplemented(...AttributeError...))]
   >>> r[0][1].args[0].args
   ("'TwoInts' object has no attribute 'b'",)
 
