@@ -8,6 +8,8 @@ Changes
 - Made validation tests compatible with Python 2.5 again (hopefully not
   breaking Python 2.4)
 
+- Added an __all__ package attribute to expose documentation.
+
 3.5.1 (2009/01/31)
 ------------------
 
