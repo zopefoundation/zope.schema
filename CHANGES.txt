@@ -2,7 +2,12 @@
 Changes
 =======
 
-3.5.2 (unreleased)
+3.5.3 (unreleased)
+------------------
+
+- ...
+
+3.5.2 (2009-02-04)
 ------------------
 
 - Made validation tests compatible with Python 2.5 again (hopefully not
