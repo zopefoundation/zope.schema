@@ -288,6 +288,8 @@ class Choice(Field):
         >>> from vocabulary import SimpleVocabulary
         >>> t = Choice(
         ...     vocabulary=SimpleVocabulary.fromValues([u'foo',u'bar']))
+        >>> IFromUnicode.providedBy(t)
+        True
         >>> t.fromUnicode(u"baz")
         Traceback (most recent call last):
         ...

@@ -358,6 +358,8 @@ class Bool(Field):
     def fromUnicode(self, str):
         """
         >>> b = Bool()
+        >>> IFromUnicode.providedBy(b)
+        True
         >>> b.fromUnicode('True')
         True
         >>> b.fromUnicode('')
