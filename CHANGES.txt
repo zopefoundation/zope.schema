@@ -5,7 +5,8 @@ Changes
 3.5.3 (unreleased)
 ------------------
 
-- ...
+- Make Choice and Bool fields implement IFromUnicode interface, because
+  they do provide the ``fromUnicode`` method.
 
 3.5.2 (2009-02-04)
 ------------------

@@ -231,7 +231,7 @@ class Choice(Field):
     """Choice fields can have a value found in a constant or dynamic set of
     values given by the field definition.
     """
-    implements(IChoice)
+    implements(IChoice, IFromUnicode)
 
     def __init__(self, values=None, vocabulary=None, source=None, **kw):
         """Initialize object."""

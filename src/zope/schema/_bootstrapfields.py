@@ -333,6 +333,9 @@ class Password(TextLine):
 
 class Bool(Field):
     """A field representing a Bool."""
+    
+    implements(IFromUnicode)
+    
     _type = type(True)
 
     if _type is not type(1):
