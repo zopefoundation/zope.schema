@@ -13,6 +13,8 @@ CHANGES
 
 - Fix package's documentation formatting. Change package's description.
 
+- Add buildout part that builds Sphinx-generated documentation.
+
 - Remove zpkg-related file.
 
 3.5.2 (2009-02-04)
