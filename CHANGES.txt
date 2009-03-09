@@ -1,5 +1,5 @@
 =======
-Changes
+CHANGES
 =======
 
 3.5.3 (unreleased)
@@ -7,6 +7,13 @@ Changes
 
 - Make Choice and Bool fields implement IFromUnicode interface, because
   they do provide the ``fromUnicode`` method.
+
+- Change package's mailing list address to zope-dev at zope.org, as
+  zope3-dev at zope.org is now retired.
+
+- Fix package's documentation formatting.
+
+- Remove zpkg-related file.
 
 3.5.2 (2009-02-04)
 ------------------
@@ -16,7 +23,7 @@ Changes
 
 - Added an __all__ package attribute to expose documentation.
 
-3.5.1 (2009/01/31)
+3.5.1 (2009-01-31)
 ------------------
 
 - Stop using the old old set type.
@@ -30,8 +37,7 @@ Changes
   may require you to adapt your doctests for the new style, but now it makes
   much more sense for debugging for developers.
 
-
-3.5.0a2 (2008/12/11)
+3.5.0a2 (2008-12-11)
 --------------------
 
 - Move zope.testing to "test" extras_require, as it is not needed
@@ -42,7 +48,7 @@ Changes
   third-party code could be dependent on that order. The one
   example is z3c.form's converter.
 
-3.5.0a1 (2008/10/10)
+3.5.0a1 (2008-10-10)
 --------------------
 
 - Added the doctests to the long description.
@@ -58,21 +64,19 @@ Changes
 
 - zope.schema now works on Python2.5
 
-
-3.4.0 (2007/09/28)
+3.4.0 (2007-09-28)
 ------------------
-
 
 Added BeforeObjectAssignedEvent that is triggered before the object
 field sets a value.
 
-3.3.0 (2007/03/15)
+3.3.0 (2007-03-15)
 ------------------
 
 Corresponds to the version of the zope.schema package shipped as part of
 the Zope 3.3.0 release.
 
-3.2.1 (2006/03/26)
+3.2.1 (2006-03-26)
 ------------------
 
 Corresponds to the version of the zope.schema package shipped as part of
@@ -81,7 +85,7 @@ the Zope 3.2.1 release.
 Fixed missing import of 'VocabularyRegistryError'.  See
 http://www.zope.org/Collectors/Zope3-dev/544 .
 
-3.2.0 (2006/01/05)
+3.2.0 (2006-01-05)
 ------------------
 
 Corresponds to the version of the zope.schema package shipped as part of
@@ -90,7 +94,7 @@ the Zope 3.2.0 release.
 Added "iterable" sources to replace vocabularies, which are now deprecated
 and scheduled for removal in Zope 3.3.
 
-3.1.0 (2005/10/03)
+3.1.0 (2005-10-03)
 ------------------
 
 Corresponds to the version of the zope.schema package shipped as part of
@@ -101,7 +105,7 @@ argument (sources are a simpler implementation).
 
 Added 'TimeDelta' and 'ASCIILine' field types.
 
-3.0.0 (2004/11/07)
+3.0.0 (2004-11-07)
 ------------------
 
 Corresponds to the version of the zope.schema package shipped as part of

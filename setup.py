@@ -25,9 +25,9 @@ setup(name='zope.schema',
       version = '3.5.3dev',
       url='http://pypi.python.org/pypi/zope.schema',
       license='ZPL 2.1',
-      description='Zope3 Data Schemas',
+      description='Zope Data Schemas',
       author='Zope Corporation and Contributors',
-      author_email='zope3-dev@zope.org',
+      author_email='zope-dev@zope.org',
       long_description=(read('src', 'zope', 'schema', 'README.txt')
                         + '\n\n' +
                         read('src', 'zope', 'schema', 'fields.txt')

@@ -1,6 +1,9 @@
-========
+=======
+Sources
+=======
+
 Concepts
-========
+--------
 
 Sources are designed with three concepts:
 
@@ -26,9 +29,8 @@ Sources that require context use a special factory: a context source
 binder that is called with the context and instanciates the source when
 it is actually used.
 
-=================
 Sources in Fields
-=================
+-----------------
 
 A choice field can be constructed with a source or source name.  When a source
 is used, it will be used as the source for valid values.
