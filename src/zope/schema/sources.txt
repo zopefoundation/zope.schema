@@ -77,3 +77,21 @@ result must implement ISource and will be used as the source.
     <...MySource...>
     >>> bound.vocabulary.divisor
     3
+
+When using IContextSourceBinder together with default value, it's
+impossible to validate it on field initialization. Let's check if
+initalization doesn't fail in that case.
+
+    >>> choice = Choice(__name__='number', source=my_binder, default=2)
+
+    >>> bound = choice.bind(Context())
+    Binder was called.
+
+    >>> bound.validate(bound.default)
+    >>> bound.validate(3)
+    Traceback (most recent call last):
+    ...
+    ConstraintNotSatisfied: 3
+
+It's developer's responsibility to provide a default value that fits the
+constraints when using context-based sources.

@@ -1,4 +1,4 @@
-# -*- coding: ISO-8859-1 -*-
+# -*- coding: utf-8 -*-
 ##############################################################################
 # Copyright (c) 2002 Zope Corporation and Contributors.
 # All Rights Reserved.
@@ -119,7 +119,7 @@ class ASCII(Bytes):
         >>> alphanumeric = "Bob\'s my 23rd uncle"
         >>> ascii._validate(alphanumeric)
 
-        >>> umlauts = "Köhlerstraße"
+        >>> umlauts = "KÃ¶hlerstraÃŸe"
         >>> ascii._validate(umlauts)
         Traceback (most recent call last):
         ...
@@ -263,7 +263,8 @@ class Choice(Field):
         # initialized. Therefore signal the validation method to ignore
         # default value checks during initialization of a Choice tied to a
         # registered vocabulary.
-        self._init_field = bool(self.vocabularyName)
+        self._init_field = bool(self.vocabularyName) or \
+                           IContextSourceBinder.providedBy(self.vocabulary)
         super(Choice, self).__init__(**kw)
         self._init_field = False
 

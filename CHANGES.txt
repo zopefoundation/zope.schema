@@ -5,6 +5,10 @@ CHANGES
 3.5.4 (unreleased)
 ------------------
 
+- Don't fail trying to validate default value for Choice fields with
+  IContextSourceBinder object given as a source. See
+  https://bugs.launchpad.net/zope3/+bug/340416. 
+
 - Add an interface for ``DottedName`` field.
 
 - Add ``vocabularyName`` attribute to the ``IChoice`` interface, change
