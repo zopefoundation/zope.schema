@@ -263,8 +263,8 @@ class Choice(Field):
         # initialized. Therefore signal the validation method to ignore
         # default value checks during initialization of a Choice tied to a
         # registered vocabulary.
-        self._init_field = bool(self.vocabularyName) or \
-                           IContextSourceBinder.providedBy(self.vocabulary)
+        self._init_field = (bool(self.vocabularyName) or
+                            IContextSourceBinder.providedBy(self.vocabulary))
         super(Choice, self).__init__(**kw)
         self._init_field = False
 
