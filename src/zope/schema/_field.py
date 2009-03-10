@@ -38,7 +38,7 @@ from zope.schema.interfaces import IChoice, ITuple, IList, ISet, IDict
 from zope.schema.interfaces import IPassword, IDate, ITimedelta
 from zope.schema.interfaces import IObject, IBeforeObjectAssignedEvent
 from zope.schema.interfaces import ITime, IDecimal
-from zope.schema.interfaces import IURI, IId, IFromUnicode
+from zope.schema.interfaces import IURI, IId, IDottedName, IFromUnicode
 from zope.schema.interfaces import ISource, IBaseVocabulary
 from zope.schema.interfaces import IContextSourceBinder
 
@@ -646,6 +646,8 @@ class DottedName(BytesLine):
     Values of DottedName fields must be Python-style dotted names.
     """
 
+    implements(IDottedName)
+
     def __init__(self, *args, **kw):
         """
         >>> DottedName(min_dots=-1)
@@ -664,6 +666,10 @@ class DottedName(BytesLine):
         ValueError: max_dots cannot be less than min_dots
 
         >>> dotted_name = DottedName(max_dots=1, min_dots=1)
+
+        >>> from zope.interface.verify import verifyObject
+        >>> verifyObject(IDottedName, dotted_name)
+        True
 
         >>> dotted_name = DottedName(max_dots=1)
         >>> dotted_name.min_dots

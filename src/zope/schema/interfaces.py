@@ -362,6 +362,25 @@ class IId(IBytesLine):
     If it's a dotted name, it should have a module/package name as a prefix.
     """
 
+class IDottedName(IBytesLine):
+    """Dotted name field.
+
+    Values of DottedName fields must be Python-style dotted names.
+    """
+
+    min_dots = Int(
+        title=_(u"Minimum number of dots"),
+        required=True,
+        min=0,
+        default=0
+        )
+
+    min_dots = Int(
+        title=_(u"Maximum number of dots (should not be less than min_dots)"),
+        required=False,
+        default=None
+        )
+
 class IChoice(IField):
     u"""Field whose value is contained in a predefined set
 
