@@ -375,7 +375,7 @@ class IDottedName(IBytesLine):
         default=0
         )
 
-    min_dots = Int(
+    max_dots = Int(
         title=_(u"Maximum number of dots (should not be less than min_dots)"),
         required=False,
         default=None
