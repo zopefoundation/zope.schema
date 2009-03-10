@@ -386,13 +386,20 @@ class IChoice(IField):
 
     Only one, values or vocabulary, may be specified for a given choice.
     """
-    vocabulary = Attribute(
-        "vocabulary",
-        ("IBaseVocabulary to be used, or vocabulary name, or None.\n"
-         "\n"
-         "If a string, the vocabulary name should be used by an\n"
-         "IVocabularyRegistry to locate an appropriate\n"
-         "IBaseVocabulary object."))
+    vocabulary = Field(
+        title=_(u"Vocabulary or source providing values"),
+        description=_(u"The ISource, IContextSourceBinder or IBaseVocabulary "
+                      u"object that provides values for this field."),
+        required=False,
+        default=None
+        )
+
+    vocabularyName = TextLine(
+        title=_(u"Vocabulary name"),
+        description=_(u"Vocabulary name to lookup in the vocabulary registry"),
+        required=False,
+        default=None
+        )
 
 # Collections:
 
