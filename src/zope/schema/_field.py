@@ -392,7 +392,7 @@ class AbstractCollection(MinMaxLen, Iterable):
         # binding value_type is necessary for choices with named vocabularies,
         # and possibly also for other fields.
         if clone.value_type is not None:
-           clone.value_type = clone.value_type.bind(object)
+            clone.value_type = clone.value_type.bind(object)
         return clone
 
     def _validate(self, value):
