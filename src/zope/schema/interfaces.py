@@ -553,11 +553,11 @@ class ISourceQueriables(Interface):
         - A unicode id
 
           The id must uniquely identify the queriable object within
-          the set of queryable objects. Furthermore, in subsequent
+          the set of queriable objects. Furthermore, in subsequent
           calls, the same id should be used for a given queriable
           object.
 
-        - A queryable object
+        - A queriable object
 
           This is an object for which there is a view provided for
           searching for items.
