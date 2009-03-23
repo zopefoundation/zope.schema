@@ -333,9 +333,9 @@ class Password(TextLine):
 
 class Bool(Field):
     """A field representing a Bool."""
-    
+
     implements(IFromUnicode)
-    
+
     _type = type(True)
 
     if _type is not type(1):
@@ -354,7 +354,7 @@ class Bool(Field):
             if isinstance(value, int):
                 value = bool(value)
             Field.set(self, object, value)
-            
+
     def fromUnicode(self, str):
         """
         >>> b = Bool()
@@ -372,7 +372,7 @@ class Bool(Field):
         v = str == 'True' or str == 'true'
         self.validate(v)
         return v
-        
+
 
 class Int(Orderable, Field):
     """A field representing an Integer."""
