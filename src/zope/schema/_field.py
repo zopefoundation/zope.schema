@@ -72,6 +72,7 @@ classImplements(Text, IText)
 classImplements(TextLine, ITextLine)
 classImplements(Password, IPassword)
 classImplements(Bool, IBool)
+classImplements(Bool, IFromUnicode)
 classImplements(Int, IInt)
 
 class SourceText(Text):

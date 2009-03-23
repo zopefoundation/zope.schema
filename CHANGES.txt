@@ -15,6 +15,11 @@ CHANGES
   "vocabulary" attribute description to be more sensible, making it
   ``zope.schema.Field`` instead of plain ``zope.interface.Attribute``.
 
+- Make IBool interface of Bool more important than IFromUnicode so adapters
+  registered for IBool take precendence over adapters registered for
+  IFromUnicode.
+
+
 3.5.3 (2009-03-10)
 ------------------
 

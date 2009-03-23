@@ -17,8 +17,11 @@ $Id$
 """
 from unittest import main, makeSuite
 from zope.schema import Bool
-from zope.schema.interfaces import RequiredMissing
+from zope.schema.interfaces import RequiredMissing, IBool, IFromUnicode
 from zope.schema.tests.test_field import FieldTestBase
+import zope.interface.adapter
+import zope.interface
+
 
 class BoolTest(FieldTestBase):
     """Test the Bool Field."""
@@ -39,6 +42,26 @@ class BoolTest(FieldTestBase):
         field.validate(False)
 
         self.assertRaises(RequiredMissing, field.validate, None)
+
+    def testIBoolIsMoreImportantThanIFromUnicode(self):
+        registry = zope.interface.adapter.AdapterRegistry()
+
+        def adapt_bool(context):
+            return 'bool'
+
+        def adapt_from_unicode(context):
+            return 'unicode'
+
+        class IAdaptTo(zope.interface.Interface):
+            pass
+
+        registry.register((IBool,), IAdaptTo, u'', adapt_bool)
+        registry.register((IFromUnicode,), IAdaptTo, u'', adapt_from_unicode)
+
+        field = Bool(title=u'Bool field', description=u'',
+                     readonly=False, required=True)
+
+        self.assertEqual('bool', registry.queryAdapter(field, IAdaptTo))
 
 
 def test_suite():
