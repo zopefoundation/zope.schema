@@ -5,6 +5,9 @@ Zope 3 Schemas
 Introduction
 ------------
 
+*This package is intended to be independently reusable in any Python
+project. It is maintained by the* `Zope Toolkit project <http://docs.zope.org/zopetoolkit/>`_.
+
 Schemas extend the notion of interfaces to detailed descriptions of Attributes
 (but not methods). Every schema is an interface and specifies the public
 fields of an object. A *field* roughly corresponds to an attribute of a
