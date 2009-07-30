@@ -59,6 +59,7 @@ class IntTest(FieldTestBase):
         field.validate(None)
         field.validate(5)
         field.validate(9)
+        field.validate(10)
 
         self.assertRaises(TooBig, field.validate, 11)
         self.assertRaises(TooBig, field.validate, 20)

@@ -224,7 +224,7 @@ class IMinMax(IOrderable):
         )
 
     max = Field(
-        title=_(u"End of the range (excluding the value itself)"),
+        title=_(u"End of the range (including the value itself)"),
         required=False,
         default=None
         )
