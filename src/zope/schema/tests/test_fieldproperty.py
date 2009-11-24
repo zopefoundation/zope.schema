@@ -20,8 +20,10 @@ from unittest import TestCase, TestSuite, main, makeSuite
 
 from zope.interface import Interface
 from zope.schema import Float, Text, Bytes
-from zope.schema.fieldproperty import FieldProperty
 from zope.schema.interfaces import ValidationError
+from zope.schema.fieldproperty import (FieldProperty,
+                                       FieldPropertyStoredThroughField)
+
 
 class I(Interface):
 
@@ -38,10 +40,12 @@ class C(object):
     code = FieldProperty(I['code'])
     date = FieldProperty(I['date'])
 
+
 class Test(TestCase):
+    klass = C
 
     def test_basic(self):
-        c = C()
+        c = self.klass()
         self.assertEqual(c.title, u'say something')
         self.assertEqual(c.weight, None)
         self.assertEqual(c.code, 'xxxxxx')
@@ -62,17 +66,30 @@ class Test(TestCase):
         self.assertEqual(c.code, 'abcdef')
 
     def test_readonly(self):
-        c = C()
+        c = self.klass()
         # The date should be only settable once
         c.date = 0.0
         # Setting the value a second time should fail.
         self.assertRaises(ValueError, setattr, c, 'date', 1.0)
 
 
+class D(object):
+
+    title = FieldPropertyStoredThroughField(I['title'])
+    weight = FieldPropertyStoredThroughField(I['weight'])
+    code = FieldPropertyStoredThroughField(I['code'])
+    date = FieldPropertyStoredThroughField(I['date'])
+
+
+class TestStoredThroughField(Test):
+    klass = D
+
+
 def test_suite():
     return TestSuite((
         makeSuite(Test),
+        makeSuite(TestStoredThroughField),
         ))
 
-if __name__=='__main__':
+if __name__ == '__main__':
     main(defaultTest='test_suite')

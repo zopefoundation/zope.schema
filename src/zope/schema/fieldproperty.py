@@ -15,7 +15,9 @@
 
 $Id$
 """
+from copy import copy
 _marker = object()
+
 
 class FieldProperty(object):
     """Computed attributes based on schema fields
@@ -56,3 +58,52 @@ class FieldProperty(object):
 
     def __getattr__(self, name):
         return getattr(self.__field, name)
+
+
+class FieldPropertyStoredThroughField(object):
+
+    def __init__(self, field, name=None):
+        if name is None:
+            name = field.__name__
+
+        self.__field = copy(field)
+        self.__field.__name__ = "__st_%s_st" % self.__field.__name__
+        self.__name = name
+
+    def setValue(self, inst, field, value):
+        field.set(inst, value)
+
+    def getValue(self, inst, field):
+        return field.query(inst, _marker)
+
+    def queryValue(self, inst, field, default):
+        return field.query(inst, default)
+
+    def __getattr__(self, name):
+        return getattr(self.__field, name)
+
+    def __get__(self, inst, klass):
+        if inst is None:
+            return self
+
+        field = self.__field.bind(inst)
+        value = self.getValue(inst, field)
+        if value is _marker:
+            value = getattr(field, 'default', _marker)
+            if value is _marker:
+                raise AttributeError(self.__name)
+
+        return value
+
+    def __set__(self, inst, value):
+        field = self.__field.bind(inst)
+        field.validate(value)
+        if field.readonly:
+            if self.queryValue(inst, field, _marker) is _marker:
+                field.readonly = False
+                self.setValue(inst, field, value)
+                field.readonly = True
+                return
+            else:
+                raise ValueError(self.__name, 'field is readonly')
+        self.setValue(inst, field, value)
