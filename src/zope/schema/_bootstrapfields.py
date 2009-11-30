@@ -344,6 +344,7 @@ class Bool(Field):
         # integers, and bool() returns either 1 or 0.  We need to
         # support using integers here so we don't invalidate schema
         # that were perfectly valid with older versions of Python.
+
         def _validate(self, value):
             # Convert integers to bools to they don't get mis-flagged
             # by the type check later.
