@@ -28,6 +28,7 @@ from zope.schema._bootstrapinterfaces import InvalidValue
 
 from zope.schema._schema import getFields
 
+
 class ValidatedProperty(object):
 
     def __init__(self, name, check=None):
@@ -41,6 +42,7 @@ class ValidatedProperty(object):
             else:
                 inst.validate(value)
         inst.__dict__[name] = value
+
 
 class Field(Attribute):
 
@@ -235,7 +237,6 @@ class Orderable(object):
         # and max.
         self.default = default
 
-
     def _validate(self, value):
         super(Orderable, self)._validate(value)
 
@@ -268,6 +269,7 @@ class MinMaxLen(object):
         if self.max_length is not None and len(value) > self.max_length:
             raise TooLong(value, self.max_length)
 
+
 class Text(MinMaxLen, Field):
     """A field containing text used for human discourse."""
     _type = unicode
@@ -293,6 +295,7 @@ class Text(MinMaxLen, Field):
         """
         self.validate(str)
         return str
+
 
 class TextLine(Text):
     """A text field with no newlines."""
