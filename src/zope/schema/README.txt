@@ -88,7 +88,7 @@ occurs a ``ValidationError`` will be raised; for example:
   >>> url_bound.validate(u'http://zope.org/foo')
   Traceback (most recent call last):
   ...
-  WrongType: (u'http://zope.org/foo', <type 'str'>)
+  WrongType: (u'http://zope.org/foo', <type 'str'>, 'url')
 
   >>> url_bound.validate('foo.bar')
   Traceback (most recent call last):

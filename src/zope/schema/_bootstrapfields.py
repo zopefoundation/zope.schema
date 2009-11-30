@@ -162,7 +162,7 @@ class Field(Attribute):
 
     def _validate(self, value):
         if self._type is not None and not isinstance(value, self._type):
-            raise WrongType(value, self._type)
+            raise WrongType(value, self._type, self.__name__)
 
         if not self.constraint(value):
             raise ConstraintNotSatisfied(value)
@@ -283,7 +283,7 @@ class Text(MinMaxLen, Field):
         >>> t.fromUnicode("foo x spam")
         Traceback (most recent call last):
         ...
-        WrongType: ('foo x spam', <type 'unicode'>)
+        WrongType: ('foo x spam', <type 'unicode'>, '')
         >>> t.fromUnicode(u"foo x spam")
         u'foo x spam'
         >>> t.fromUnicode(u"foo spam")

@@ -223,7 +223,7 @@ class Date(Orderable, Field):
     def _validate(self, value):
         super(Date, self)._validate(value)
         if isinstance(value, datetime):
-            raise WrongType(value, self._type)
+            raise WrongType(value, self._type, self.__name__)
 
 
 class Timedelta(Orderable, Field):
@@ -335,7 +335,7 @@ class InterfaceField(Field):
     def _validate(self, value):
         super(InterfaceField, self)._validate(value)
         if not IInterface.providedBy(value):
-            raise WrongType("An interface is required")
+            raise WrongType("An interface is required", value, self.__name__)
 
 
 def _validate_sequence(value_type, value, errors=None):
@@ -355,7 +355,7 @@ def _validate_sequence(value_type, value, errors=None):
 
             >>> errors = _validate_sequence(field, ('foo', u'bar', 1))
             >>> errors
-            [WrongType('foo', <type 'unicode'>), WrongType(1, <type 'unicode'>)]
+            [WrongType('foo', <type 'unicode'>, ''), WrongType(1, <type 'unicode'>, '')]
 
         The only valid value in the sequence is the second item. The others
         generated errors.
@@ -365,7 +365,7 @@ def _validate_sequence(value_type, value, errors=None):
 
         >>> errors = _validate_sequence(field, (2, u'baz'), errors)
         >>> errors
-        [WrongType('foo', <type 'unicode'>), WrongType(1, <type 'unicode'>), WrongType(2, <type 'unicode'>)]
+        [WrongType('foo', <type 'unicode'>, ''), WrongType(1, <type 'unicode'>, ''), WrongType(2, <type 'unicode'>, '')]
 
     """
     if errors is None:
