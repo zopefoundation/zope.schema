@@ -21,8 +21,6 @@ __docformat__ = 'restructuredtext'
 import re
 import decimal
 from datetime import datetime, date, timedelta, time
-import sys
-
 from zope.event import notify
 
 from zope.interface import classImplements, implements
@@ -58,10 +56,10 @@ from zope.schema.vocabulary import SimpleVocabulary
 
 
 # Fix up bootstrap field types
-Field.title       = FieldProperty(IField['title'])
+Field.title = FieldProperty(IField['title'])
 Field.description = FieldProperty(IField['description'])
-Field.required    = FieldProperty(IField['required'])
-Field.readonly    = FieldProperty(IField['readonly'])
+Field.required = FieldProperty(IField['required'])
+Field.readonly = FieldProperty(IField['readonly'])
 # Default is already taken care of
 classImplements(Field, IField)
 
@@ -75,10 +73,12 @@ classImplements(Bool, IBool)
 classImplements(Bool, IFromUnicode)
 classImplements(Int, IInt)
 
+
 class SourceText(Text):
     __doc__ = ISourceText.__doc__
     implements(ISourceText)
     _type = unicode
+
 
 class Bytes(MinMaxLen, Field):
     __doc__ = IBytes.__doc__
@@ -101,6 +101,7 @@ class Bytes(MinMaxLen, Field):
         v = str(u)
         self.validate(v)
         return v
+
 
 class ASCII(Bytes):
     __doc__ = IASCII.__doc__
@@ -132,6 +133,7 @@ class ASCII(Bytes):
         if not max(map(ord, value)) < 128:
             raise InvalidValue
 
+
 class BytesLine(Bytes):
     """A Text field with no newlines."""
 
@@ -141,6 +143,7 @@ class BytesLine(Bytes):
         # TODO: we should probably use a more general definition of newlines
         return '\n' not in value
 
+
 class ASCIILine(ASCII):
     __doc__ = IASCIILine.__doc__
 
@@ -149,6 +152,7 @@ class ASCIILine(ASCII):
     def constraint(self, value):
         # TODO: we should probably use a more general definition of newlines
         return '\n' not in value
+
 
 class Float(Orderable, Field):
     __doc__ = IFloat.__doc__
@@ -171,6 +175,7 @@ class Float(Orderable, Field):
         v = float(u)
         self.validate(v)
         return v
+
 
 class Decimal(Orderable, Field):
     __doc__ = IDecimal.__doc__
@@ -200,6 +205,7 @@ class Decimal(Orderable, Field):
         self.validate(v)
         return v
 
+
 class Datetime(Orderable, Field):
     __doc__ = IDatetime.__doc__
     implements(IDatetime)
@@ -208,25 +214,29 @@ class Datetime(Orderable, Field):
     def __init__(self, *args, **kw):
         super(Datetime, self).__init__(*args, **kw)
 
+
 class Date(Orderable, Field):
     __doc__ = IDate.__doc__
     implements(IDate)
     _type = date
-    
+
     def _validate(self, value):
         super(Date, self)._validate(value)
         if isinstance(value, datetime):
             raise WrongType(value, self._type)
 
+
 class Timedelta(Orderable, Field):
     __doc__ = ITimedelta.__doc__
     implements(ITimedelta)
     _type = timedelta
-    
+
+
 class Time(Orderable, Field):
     __doc__ = ITime.__doc__
     implements(ITime)
     _type = time
+
 
 class Choice(Field):
     """Choice fields can have a value found in a constant or dynamic set of
@@ -256,7 +266,7 @@ class Choice(Field):
         elif isinstance(vocabulary, (unicode, str)):
             self.vocabularyName = vocabulary
         else:
-            assert (ISource.providedBy(vocabulary) or 
+            assert (ISource.providedBy(vocabulary) or
                     IContextSourceBinder.providedBy(vocabulary))
             self.vocabulary = vocabulary
         # Before a default value is checked, it is validated. However, a
@@ -317,6 +327,7 @@ class Choice(Field):
         if value not in vocabulary:
             raise ConstraintNotSatisfied(value)
 
+
 class InterfaceField(Field):
     __doc__ = IInterfaceField.__doc__
     implements(IInterfaceField)
@@ -325,6 +336,7 @@ class InterfaceField(Field):
         super(InterfaceField, self)._validate(value)
         if not IInterface.providedBy(value):
             raise WrongType("An interface is required")
+
 
 def _validate_sequence(value_type, value, errors=None):
     """Validates a sequence value.
@@ -367,6 +379,7 @@ def _validate_sequence(value_type, value, errors=None):
             errors.append(error)
     return errors
 
+
 def _validate_uniqueness(value):
     temp_values = []
     for item in value:
@@ -374,6 +387,7 @@ def _validate_uniqueness(value):
             raise NotUnique(item)
 
         temp_values.append(item)
+
 
 class AbstractCollection(MinMaxLen, Iterable):
     value_type = None
@@ -404,34 +418,41 @@ class AbstractCollection(MinMaxLen, Iterable):
         if self.unique:
             _validate_uniqueness(value)
 
+
 class Tuple(AbstractCollection):
     """A field representing a Tuple."""
     implements(ITuple)
     _type = tuple
+
 
 class List(AbstractCollection):
     """A field representing a List."""
     implements(IList)
     _type = list
 
+
 class Set(AbstractCollection):
     """A field representing a set."""
     implements(ISet)
     _type = set
+
     def __init__(self, **kw):
         if 'unique' in kw: # set members are always unique
             raise TypeError(
                 "__init__() got an unexpected keyword argument 'unique'")
         super(Set, self).__init__(unique=True, **kw)
 
+
 class FrozenSet(AbstractCollection):
     implements(IFrozenSet)
     _type = frozenset
+
     def __init__(self, **kw):
         if 'unique' in kw: # set members are always unique
             raise TypeError(
                 "__init__() got an unexpected keyword argument 'unique'")
         super(FrozenSet, self).__init__(unique=True, **kw)
+
 
 def _validate_fields(schema, value, errors=None):
     if errors is None:
@@ -485,6 +506,7 @@ class Object(Field):
         value = event.object
         super(Object, self).set(object, value)
 
+
 class BeforeObjectAssignedEvent(object):
     """An object is going to be assigned to an attribute on another object."""
 
@@ -495,11 +517,12 @@ class BeforeObjectAssignedEvent(object):
         self.name = name
         self.context = context
 
+
 class Dict(MinMaxLen, Iterable):
     """A field representing a Dict."""
     implements(IDict)
     _type = dict
-    key_type   = None
+    key_type = None
     value_type = None
 
     def __init__(self, key_type=None, value_type=None, **kw):
@@ -533,16 +556,18 @@ class Dict(MinMaxLen, Iterable):
         # binding value_type is necessary for choices with named vocabularies,
         # and possibly also for other fields.
         if clone.key_type is not None:
-           clone.key_type = clone.key_type.bind(object)
+            clone.key_type = clone.key_type.bind(object)
         if clone.value_type is not None:
-           clone.value_type = clone.value_type.bind(object)
+            clone.value_type = clone.value_type.bind(object)
         return clone
 
 
 _isuri = re.compile(
-    r"[a-zA-z0-9+.-]+:"   # scheme
-    r"\S*$"               # non space (should be pickier)
-    ).match
+    # scheme
+    r"[a-zA-z0-9+.-]+:"
+    # non space (should be pickier)
+    r"\S*$").match
+
 
 class URI(BytesLine):
     """URI schema field
@@ -589,8 +614,9 @@ class URI(BytesLine):
 _isdotted = re.compile(
     r"([a-zA-Z][a-zA-z0-9_]*)"
     r"([.][a-zA-Z][a-zA-z0-9_]*)*"
-    r"$" # use the whole line
-    ).match
+    # use the whole line
+    r"$").match
+
 
 class Id(BytesLine):
     """Id field
