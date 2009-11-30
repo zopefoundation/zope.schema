@@ -59,7 +59,7 @@ class TestClass(object):
     _attribute = u''
 
     def getfoo(self):
-        return self._foo 
+        return self._foo
 
     def setfoo(self, value):
         self._foo = value
@@ -67,7 +67,7 @@ class TestClass(object):
     foo = property(getfoo, setfoo, None, u'foo')
 
     def getbar(self):
-        return self._bar 
+        return self._bar
 
     def setbar(self, value):
         self._bar = value
@@ -75,7 +75,7 @@ class TestClass(object):
     bar = property(getbar, setbar, None, u'foo')
 
     def getattribute(self):
-        return self._attribute 
+        return self._attribute
 
     def setattribute(self, value):
         self._attribute = value
@@ -110,9 +110,9 @@ class ObjectTest(CleanUp, FieldTestBase):
         except WrongContainedType, e:
             try:
                 return e[0]
-            except:  
+            except:
                 return []
-        self.fail('Expected WrongContainedType Error')    
+        self.fail('Expected WrongContainedType Error')
 
     def makeTestObject(self, **kw):
         kw['schema'] = kw.get('schema', Interface)
@@ -166,7 +166,7 @@ class ObjectTest(CleanUp, FieldTestBase):
         self.assertRaises(ValidationError, field.validate, data)
         self.assertRaises(WrongContainedType, field.validate, data)
         errors = self.getErrors(field.validate, data)
-        self.assertEquals(errors[0], RequiredMissing())
+        self.assertEquals(errors[0], RequiredMissing('foo'))
 
     def test_validate_FieldPropertyTestData(self):
         field = self.makeTestObject(schema=ITestSchema, required=False)

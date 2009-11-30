@@ -134,7 +134,7 @@ class Field(Attribute):
     def validate(self, value):
         if value == self.missing_value:
             if self.required:
-                raise RequiredMissing
+                raise RequiredMissing(self.__name__)
         else:
             try:
                 self._validate(value)
