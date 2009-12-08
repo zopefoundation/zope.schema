@@ -414,7 +414,7 @@ class AbstractCollection(MinMaxLen, Iterable):
         super(AbstractCollection, self)._validate(value)
         errors = _validate_sequence(self.value_type, value)
         if errors:
-            raise WrongContainedType(errors)
+            raise WrongContainedType(errors, self.__name__)
         if self.unique:
             _validate_uniqueness(value)
 
@@ -493,7 +493,7 @@ class Object(Field):
         # check the value against schema
         errors = _validate_fields(self.schema, value)
         if errors:
-            raise WrongContainedType(errors)
+            raise WrongContainedType(errors, self.__name__)
 
     def set(self, object, value):
         # Announce that we're going to assign the value to the object.
@@ -545,7 +545,7 @@ class Dict(MinMaxLen, Iterable):
             errors = _validate_sequence(self.key_type, value, errors)
 
             if errors:
-                raise WrongContainedType(errors)
+                raise WrongContainedType(errors, self.__name__)
 
         finally:
             errors = None
