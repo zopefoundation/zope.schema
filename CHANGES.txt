@@ -5,8 +5,10 @@ CHANGES
 3.5.5 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Extend validation error to hold the field name
 
+- Add FieldProperty class that uses Field.get and Field.set methods 
+  instead of storing directly on the instance __dict__
 
 3.5.4 (2009-03-25)
 ------------------
