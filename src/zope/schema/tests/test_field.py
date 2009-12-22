@@ -21,7 +21,7 @@ from unittest import TestCase, TestSuite, main, makeSuite
 from zope.schema import Field, Text, Int
 from zope.schema.interfaces import ValidationError, RequiredMissing
 from zope.schema.interfaces import ConstraintNotSatisfied
-from zope.testing.doctestunit import DocTestSuite
+from zope.testing.doctest import DocTestSuite
 from zope.testing import renormalizing
 
 class FieldTestBase(TestCase):
