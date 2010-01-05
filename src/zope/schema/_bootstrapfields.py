@@ -16,6 +16,9 @@
 $Id$
 """
 __docformat__ = 'restructuredtext'
+
+import sys
+
 from zope.interface import Attribute, providedBy, implements
 from zope.schema._bootstrapinterfaces import StopValidation
 from zope.schema._bootstrapinterfaces import IFromUnicode
@@ -42,6 +45,12 @@ class ValidatedProperty(object):
             else:
                 inst.validate(value)
         inst.__dict__[name] = value
+
+    if sys.platform.startswith('java'):
+        # apparently descriptors work differently on Jython
+        def __get__(self, inst, owner):
+            name, check = self._info
+            return inst.__dict__[name]
 
 
 class Field(Attribute):
@@ -390,7 +399,7 @@ class Int(Orderable, Field):
         >>> f = Int()
         >>> f.fromUnicode("125")
         125
-        >>> f.fromUnicode("125.6")
+        >>> f.fromUnicode("125.6") #doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
         ValueError: invalid literal for int(): 125.6

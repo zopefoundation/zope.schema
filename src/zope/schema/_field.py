@@ -167,8 +167,8 @@ class Float(Orderable, Field):
         >>> f = Float()
         >>> f.fromUnicode("1.25")
         1.25
-        >>> f.fromUnicode("1.25.6")
-        Traceback (most recent call last):
+        >>> f.fromUnicode("1.25.6") #doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last): 
         ...
         ValueError: invalid literal for float(): 1.25.6
         """

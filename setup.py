@@ -26,6 +26,42 @@ from setuptools import setup, find_packages
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
+def _modname(path, base, name=''):
+    if path == base:
+        return name
+    dirname, basename = os.path.split(path)
+    return _modname(dirname, base, basename + '.' + name)
+
+def alltests():
+    import logging
+    import pkg_resources
+    import unittest
+
+    class NullHandler(logging.Handler):
+        level = 50
+        
+        def emit(self, record):
+            pass
+
+    logging.getLogger().addHandler(NullHandler())
+
+    suite = unittest.TestSuite()
+    base = pkg_resources.working_set.find(
+        pkg_resources.Requirement.parse('zope.schema')).location
+    for dirpath, dirnames, filenames in os.walk(base):
+        if os.path.basename(dirpath) == 'tests':
+            for filename in filenames:
+                if filename.endswith('.py') and filename.startswith('test'):
+                    mod = __import__(
+                        _modname(dirpath, base, os.path.splitext(filename)[0]),
+                        {}, {}, ['*'])
+                    suite.addTest(mod.test_suite())
+        elif 'tests.py' in filenames:
+            continue
+            mod = __import__(_modname(dirpath, base, 'tests'), {}, {}, ['*'])
+            suite.addTest(mod.test_suite())
+    return suite
+
 setup(name='zope.schema',
       version = '3.6.1dev',
       url='http://pypi.python.org/pypi/zope.schema',
@@ -54,4 +90,5 @@ setup(name='zope.schema',
                        ],
       include_package_data = True,
       zip_safe = False,
+      test_suite='__main__.alltests',
       )

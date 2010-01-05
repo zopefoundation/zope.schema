@@ -5,6 +5,14 @@ CHANGES
 3.6.1 (unreleased)
 ------------------
 
+- Allow "setup.py test" to run at least a subset of the tests runnable
+  via ``bin/test`` (227 for ``setup.py test`` vs. 258. for
+  ``bin/test``)
+
+- Make ``zope.schema._bootstrapfields.ValidatedProperty`` descriptor
+  work under Jython.
+
+- Make "setup.py test" tests pass on Jython.
 
 3.6.0 (2009-12-22)
 ------------------

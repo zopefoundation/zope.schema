@@ -36,6 +36,7 @@ Create an instance of TwoInts but do not set attributes. We get two errors:
 
   >>> ti = TwoInts()
   >>> r = zope.schema.getValidationErrors(ITwoInts, ti)
+  >>> r.sort()
   >>> r
   [('a', SchemaNotFullyImplemented(...AttributeError...)),
    ('b', SchemaNotFullyImplemented(...AttributeError...))]
@@ -47,6 +48,7 @@ Create an instance of TwoInts but do not set attributes. We get two errors:
 The `getSchemaValidationErrors` function returns the same result:
 
   >>> r = zope.schema.getSchemaValidationErrors(ITwoInts, ti)
+  >>> r.sort()
   >>> r
   [('a', SchemaNotFullyImplemented(...AttributeError...)),
    ('b', SchemaNotFullyImplemented(...AttributeError...))]
@@ -62,6 +64,7 @@ When we set a valid value for `a` we still get the same error for `b`:
 
   >>> ti.a = 11
   >>> errors = zope.schema.getValidationErrors(ITwoInts, ti)
+  >>> errors.sort()
   >>> errors
   [('a', TooBig(11, 10)),
    ('b', SchemaNotFullyImplemented(...AttributeError...))]
