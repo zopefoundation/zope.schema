@@ -91,4 +91,5 @@ setup(name='zope.schema',
       include_package_data = True,
       zip_safe = False,
       test_suite='__main__.alltests',
+      tests_require='zope.testing',
       )
