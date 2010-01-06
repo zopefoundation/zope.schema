@@ -2,7 +2,7 @@
 CHANGES
 =======
 
-3.6.1 (unreleased)
+3.6.1 (2010-01-05)
 ------------------
 
 - Allow "setup.py test" to run at least a subset of the tests runnable
