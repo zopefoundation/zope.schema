@@ -17,8 +17,7 @@ $Id$
 """
 import zope.interface
 
-from zope.i18nmessageid import MessageFactory
-_ = MessageFactory("zope")
+from zope.schema._messageid import _
 
 class StopValidation(Exception):
     """Raised if the validation is completed early.

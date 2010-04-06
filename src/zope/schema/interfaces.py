@@ -18,21 +18,31 @@ $Id$
 __docformat__ = "reStructuredText"
 
 from zope.interface import Interface, Attribute
-from zope.schema._bootstrapfields import Container, Iterable
-from zope.schema._bootstrapfields import Field, Text, TextLine, Bool, Int
 
-from zope.i18nmessageid import MessageFactory
-_ = MessageFactory("zope")
+from zope.schema._messageid import _
 
 # Import from _bootstrapinterfaces only because other packages will expect
 # to find these interfaces here.
-from zope.schema._bootstrapinterfaces import StopValidation, ValidationError
+from zope.schema._bootstrapfields import Field
+from zope.schema._bootstrapfields import Container
+from zope.schema._bootstrapfields import Iterable
+from zope.schema._bootstrapfields import Text
+from zope.schema._bootstrapfields import TextLine
+from zope.schema._bootstrapfields import TextLine
+from zope.schema._bootstrapfields import Bool
+from zope.schema._bootstrapfields import Int
+from zope.schema._bootstrapinterfaces import StopValidation
+from zope.schema._bootstrapinterfaces import ValidationError
 from zope.schema._bootstrapinterfaces import IFromUnicode
-from zope.schema._bootstrapinterfaces import RequiredMissing, WrongType
+from zope.schema._bootstrapinterfaces import RequiredMissing
+from zope.schema._bootstrapinterfaces import WrongType
 from zope.schema._bootstrapinterfaces import ConstraintNotSatisfied
-from zope.schema._bootstrapinterfaces import NotAContainer, NotAnIterator
-from zope.schema._bootstrapinterfaces import TooSmall, TooBig
-from zope.schema._bootstrapinterfaces import TooShort, TooLong
+from zope.schema._bootstrapinterfaces import NotAContainer
+from zope.schema._bootstrapinterfaces import NotAnIterator
+from zope.schema._bootstrapinterfaces import TooSmall
+from zope.schema._bootstrapinterfaces import TooBig
+from zope.schema._bootstrapinterfaces import TooLong
+from zope.schema._bootstrapinterfaces import TooShort
 from zope.schema._bootstrapinterfaces import InvalidValue
 
 class WrongContainedType(ValidationError):
