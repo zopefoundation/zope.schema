@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2006 Zope Corporation and Contributors.
+# Copyright (c) 2006 Zope Foundation and Contributors.
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
@@ -26,7 +26,7 @@ setup(name='zope.schema',
       url='http://pypi.python.org/pypi/zope.schema',
       license='ZPL 2.1',
       description='Zope3 Data Schemas',
-      author='Zope Corporation and Contributors',
+      author='Zope Foundation and Contributors',
       author_email='zope3-dev@zope.org',
       long_description=(read('src', 'zope', 'schema', 'README.txt')
                         + '\n\n' +
