@@ -2,7 +2,7 @@
 CHANGES
 =======
 
-3.6.2 (unreleased)
+3.6.2 (2010-04-30)
 ------------------
 
 - Avoid maximum recursion when validating Object field that points to cycles
