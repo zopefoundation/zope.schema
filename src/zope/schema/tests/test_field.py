@@ -15,13 +15,15 @@
 
 $Id$
 """
+
 import re
 
-from unittest import TestCase, TestSuite, main, makeSuite
+from doctest import DocTestSuite
+from unittest import TestCase, TestSuite, makeSuite
+
 from zope.schema import Field, Text, Int
 from zope.schema.interfaces import ValidationError, RequiredMissing
 from zope.schema.interfaces import ConstraintNotSatisfied
-from zope.testing.doctest import DocTestSuite
 from zope.testing import renormalizing
 
 class FieldTestBase(TestCase):
@@ -149,6 +151,3 @@ def test_suite():
         DocTestSuite("zope.schema._field"),
         DocTestSuite("zope.schema._bootstrapfields",checker=checker),
         ))
-
-if __name__ == '__main__':
-    main(defaultTest='test_suite')

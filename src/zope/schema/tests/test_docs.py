@@ -15,9 +15,11 @@
 
 $Id$
 """
-import unittest
+import doctest
 import re
-from zope.testing import doctest, renormalizing
+import unittest
+
+from zope.testing import renormalizing
 
 def test_suite():
     checker = renormalizing.RENormalizing([
@@ -32,6 +34,3 @@ def test_suite():
             '../validation.txt', checker=checker,
             optionflags=doctest.NORMALIZE_WHITESPACE|doctest.ELLIPSIS),
         ))
-
-if __name__ == '__main__':
-    unittest.main(default='test_suite')
