@@ -1,3 +1,4 @@
+from zope.schema import List
 ##############################################################################
 #
 # Copyright (c) 2001, 2002 Zope Foundation and Contributors.
@@ -47,6 +48,55 @@ class ITestSchema(Interface):
         required=False)
 
     attribute = Attribute("Test attribute, an attribute can't be validated.")
+
+
+class ICyclic(Interface):
+    """A test schema"""
+
+    baz = Object(
+        schema=Interface,
+        title=_(u"Baz"),
+        description=_(u"Baz description"),
+        required=False,
+        )
+
+    baz_list = List(
+        value_type=Object(schema=Interface),
+        title=_(u"Baz List"),
+        description=_(u"Baz description"),
+        required=False,
+        )
+
+
+class IBaz(Interface):
+    """A test schema"""
+
+    cyclic = Object(
+        schema=ICyclic,
+        title=_(u"Cyclic"),
+        description=_(u"Cyclic description"),
+        required=False,
+        )
+
+ICyclic['baz'].schema = IBaz
+ICyclic['baz_list'].value_type.schema = IBaz
+
+
+class Cyclic(object):
+
+    implements(ICyclic)
+
+    def __init__(self, baz, baz_list):
+        self.baz = baz
+        self.baz_list = baz_list
+
+
+class Baz(object):
+
+    implements(IBaz)
+
+    def __init__(self, cyclic):
+        self.cyclic = cyclic
 
 
 class TestClass(object):
@@ -103,6 +153,7 @@ class NotFullyImplementedTestClass(object):
 
 class ObjectTest(CleanUp, FieldTestBase):
     """Test the Object Field."""
+
     def getErrors(self, f, *args, **kw):
         try:
             f(*args, **kw)
@@ -136,7 +187,7 @@ class ObjectTest(CleanUp, FieldTestBase):
 
     def test_init(self):
         for schema in self.validSchemas():
-            field = Object(schema=schema)
+            Object(schema=schema)
         for schema in self.invalidSchemas():
             self.assertRaises(ValidationError, Object, schema=schema)
             self.assertRaises(WrongType, Object, schema=schema)
@@ -189,9 +240,11 @@ class ObjectTest(CleanUp, FieldTestBase):
                                     __name__='object_field')
         data = self.makeTestData()
         events = []
+
         def register_event(event):
             events.append(event)
         zope.event.subscribers.append(register_event)
+
         class Dummy(object):
             pass
         context = Dummy()
@@ -202,6 +255,39 @@ class ObjectTest(CleanUp, FieldTestBase):
         self.assertEquals(data, event.object)
         self.assertEquals('object_field', event.name)
         self.assertEquals(context, event.context)
+
+    # cycles
+
+    def test_with_cycles_validate(self):
+        field = self.makeTestObject(schema=ICyclic)
+        baz1 = Baz(None)
+        baz2 = Baz(None)
+        cyclic = Cyclic(baz1, [baz1, baz2])
+        baz1.cyclic = cyclic
+        baz2.cyclic = cyclic
+        field.validate(cyclic)
+
+    def test_with_cycles_object_not_valid(self):
+        field = self.makeTestObject(schema=ICyclic)
+        data = self.makeTestData()
+        baz1 = Baz(None)
+        baz2 = Baz(None)
+        baz3 = Baz(data)
+        cyclic = Cyclic(baz3, [baz1, baz2])
+        baz1.cyclic = cyclic
+        baz2.cyclic = cyclic
+        self.assertRaises(WrongContainedType, field.validate, cyclic)
+
+    def test_with_cycles_collection_not_valid(self):
+        field = self.makeTestObject(schema=ICyclic)
+        data = self.makeTestData()
+        baz1 = Baz(None)
+        baz2 = Baz(None)
+        baz3 = Baz(data)
+        cyclic = Cyclic(baz1, [baz2, baz3])
+        baz1.cyclic = cyclic
+        baz2.cyclic = cyclic
+        self.assertRaises(WrongContainedType, field.validate, cyclic)
 
 
 def test_suite():

@@ -5,6 +5,8 @@ CHANGES
 3.6.2 (unreleased)
 ------------------
 
+- Avoid maximum recursion when validating Object field that points to cycles
+
 - Made the dependency on ``zope.i18nmessageid`` optional.
 
 3.6.1 (2010-01-05)

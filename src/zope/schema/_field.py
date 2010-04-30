@@ -168,7 +168,7 @@ class Float(Orderable, Field):
         >>> f.fromUnicode("1.25")
         1.25
         >>> f.fromUnicode("1.25.6") #doctest: +IGNORE_EXCEPTION_DETAIL
-        Traceback (most recent call last): 
+        Traceback (most recent call last):
         ...
         ValueError: invalid literal for float(): 1.25.6
         """
@@ -457,6 +457,9 @@ class FrozenSet(AbstractCollection):
 def _validate_fields(schema, value, errors=None):
     if errors is None:
         errors = []
+    if hasattr(value, '__validating_schema'):
+        return errors
+    value.__validating_schema = True
     for name in schema.names(all=True):
         if not IMethod.providedBy(schema[name]):
             try:
@@ -469,6 +472,7 @@ def _validate_fields(schema, value, errors=None):
             except AttributeError, error:
                 # property for the given name is not implemented
                 errors.append(SchemaNotFullyImplemented(error))
+    delattr(value, '__validating_schema')
     return errors
 
 
