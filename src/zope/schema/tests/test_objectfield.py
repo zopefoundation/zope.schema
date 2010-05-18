@@ -50,55 +50,6 @@ class ITestSchema(Interface):
     attribute = Attribute("Test attribute, an attribute can't be validated.")
 
 
-class ICyclic(Interface):
-    """A test schema"""
-
-    baz = Object(
-        schema=Interface,
-        title=_(u"Baz"),
-        description=_(u"Baz description"),
-        required=False,
-        )
-
-    baz_list = List(
-        value_type=Object(schema=Interface),
-        title=_(u"Baz List"),
-        description=_(u"Baz description"),
-        required=False,
-        )
-
-
-class IBaz(Interface):
-    """A test schema"""
-
-    cyclic = Object(
-        schema=ICyclic,
-        title=_(u"Cyclic"),
-        description=_(u"Cyclic description"),
-        required=False,
-        )
-
-ICyclic['baz'].schema = IBaz
-ICyclic['baz_list'].value_type.schema = IBaz
-
-
-class Cyclic(object):
-
-    implements(ICyclic)
-
-    def __init__(self, baz, baz_list):
-        self.baz = baz
-        self.baz_list = baz_list
-
-
-class Baz(object):
-
-    implements(IBaz)
-
-    def __init__(self, cyclic):
-        self.cyclic = cyclic
-
-
 class TestClass(object):
 
     implements(ITestSchema)
@@ -149,6 +100,79 @@ class NotFullyImplementedTestClass(object):
     foo = FieldProperty(ITestSchema['foo'])
     # bar = FieldProperty(ITestSchema['bar']): bar is not implemented
     # attribute
+
+
+class ISchemaWithObjectFieldAsInterface(Interface):
+
+    obj = Object(
+        schema=Interface,
+        title=_(u"Object"),
+        description=_(u"object description"),
+        required=False)
+
+
+class ClassWithObjectFieldAsInterface(object):
+
+    implements(ISchemaWithObjectFieldAsInterface)
+
+    _obj = None
+
+    def getobj(self):
+        return self._obj
+
+    def setobj(self, value):
+        self._obj = value
+
+    obj = property(getobj, setobj, None, u'obj')
+
+
+class IUnit(Interface):
+    """A schema that participate to a cycle"""
+
+    boss = Object(
+        schema=Interface,
+        title=_(u"Boss"),
+        description=_(u"Boss description"),
+        required=False,
+        )
+
+    members = List(
+        value_type=Object(schema=Interface),
+        title=_(u"Member List"),
+        description=_(u"Member list description"),
+        required=False,
+        )
+
+
+class IPerson(Interface):
+    """A schema that participate to a cycle"""
+
+    unit = Object(
+        schema=IUnit,
+        title=_(u"Unit"),
+        description=_(u"Unit description"),
+        required=False,
+        )
+
+IUnit['boss'].schema = IPerson
+IUnit['members'].value_type.schema = IPerson
+
+
+class Unit(object):
+
+    implements(IUnit)
+
+    def __init__(self, person, person_list):
+        self.boss = person
+        self.members = person_list
+
+
+class Person(object):
+
+    implements(IPerson)
+
+    def __init__(self, unit):
+        self.unit = unit
 
 
 class ObjectTest(CleanUp, FieldTestBase):
@@ -235,6 +259,14 @@ class ObjectTest(CleanUp, FieldTestBase):
         errors = self.getErrors(field.validate, data)
         self.assert_(isinstance(errors[0], SchemaNotFullyImplemented))
 
+    def test_validate_with_non_object_value(self):
+        field = self.makeTestObject(
+            schema=ISchemaWithObjectFieldAsInterface,
+            required=False)
+        instance = ClassWithObjectFieldAsInterface()
+        instance.obj = (1, 1)
+        field.validate(instance)
+
     def test_beforeAssignEvent(self):
         field = self.makeTestObject(schema=ITestSchema, required=False,
                                     __name__='object_field')
@@ -259,35 +291,35 @@ class ObjectTest(CleanUp, FieldTestBase):
     # cycles
 
     def test_with_cycles_validate(self):
-        field = self.makeTestObject(schema=ICyclic)
-        baz1 = Baz(None)
-        baz2 = Baz(None)
-        cyclic = Cyclic(baz1, [baz1, baz2])
-        baz1.cyclic = cyclic
-        baz2.cyclic = cyclic
-        field.validate(cyclic)
+        field = self.makeTestObject(schema=IUnit)
+        person1 = Person(None)
+        person2 = Person(None)
+        unit = Unit(person1, [person1, person2])
+        person1.unit = unit
+        person2.unit = unit
+        field.validate(unit)
 
     def test_with_cycles_object_not_valid(self):
-        field = self.makeTestObject(schema=ICyclic)
+        field = self.makeTestObject(schema=IUnit)
         data = self.makeTestData()
-        baz1 = Baz(None)
-        baz2 = Baz(None)
-        baz3 = Baz(data)
-        cyclic = Cyclic(baz3, [baz1, baz2])
-        baz1.cyclic = cyclic
-        baz2.cyclic = cyclic
-        self.assertRaises(WrongContainedType, field.validate, cyclic)
+        person1 = Person(None)
+        person2 = Person(None)
+        person3 = Person(data)
+        unit = Unit(person3, [person1, person2])
+        person1.unit = unit
+        person2.unit = unit
+        self.assertRaises(WrongContainedType, field.validate, unit)
 
     def test_with_cycles_collection_not_valid(self):
-        field = self.makeTestObject(schema=ICyclic)
+        field = self.makeTestObject(schema=IUnit)
         data = self.makeTestData()
-        baz1 = Baz(None)
-        baz2 = Baz(None)
-        baz3 = Baz(data)
-        cyclic = Cyclic(baz1, [baz2, baz3])
-        baz1.cyclic = cyclic
-        baz2.cyclic = cyclic
-        self.assertRaises(WrongContainedType, field.validate, cyclic)
+        person1 = Person(None)
+        person2 = Person(None)
+        person3 = Person(data)
+        unit = Unit(person1, [person2, person3])
+        person1.unit = unit
+        person2.unit = unit
+        self.assertRaises(WrongContainedType, field.validate, unit)
 
 
 def test_suite():

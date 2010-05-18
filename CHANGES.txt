@@ -5,6 +5,7 @@ CHANGES
 3.6.4 (unreleased)
 ------------------
 
+- fix validation of schema with Object Field that specify Interface schema.
 
 3.6.3 (2010-04-30)
 ------------------

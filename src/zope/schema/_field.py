@@ -23,7 +23,7 @@ import decimal
 from datetime import datetime, date, timedelta, time
 from zope.event import notify
 
-from zope.interface import classImplements, implements
+from zope.interface import classImplements, implements, Interface
 from zope.interface.interfaces import IInterface, IMethod
 
 from zope.schema.interfaces import IField
@@ -457,22 +457,37 @@ class FrozenSet(AbstractCollection):
 def _validate_fields(schema, value, errors=None):
     if errors is None:
         errors = []
-    if hasattr(value, '__validating_schema'):
+    # Interface can be used as schema property for Object fields that plan to
+    # hold values of any type.
+    # Because Interface does not include any Attribute, it is obviously not
+    # worth looping on its methods and filter them all out.
+    if schema is Interface:
         return errors
-    value.__validating_schema = True
-    for name in schema.names(all=True):
-        if not IMethod.providedBy(schema[name]):
-            try:
-                attribute = schema[name]
-                if IField.providedBy(attribute):
-                    # validate attributes that are fields
-                    attribute.validate(getattr(value, name))
-            except ValidationError, error:
-                errors.append(error)
-            except AttributeError, error:
-                # property for the given name is not implemented
-                errors.append(SchemaNotFullyImplemented(error))
-    delattr(value, '__validating_schema')
+    # if `value` is part of a cyclic graph, we need to break the cycle to avoid
+    # infinite recursion.
+    if hasattr(value, '__schema_being_validated'):
+        return errors
+    # Mark the value as being validated.
+    value.__schema_being_validated = True
+    # (If we have gotten here, we know that `value` provides an interface
+    # other than zope.interface.Interface;
+    # iow, we can rely on the fact that it is an instance
+    # that supports attribute assignment.)
+    try:
+        for name in schema.names(all=True):
+            if not IMethod.providedBy(schema[name]):
+                try:
+                    attribute = schema[name]
+                    if IField.providedBy(attribute):
+                        # validate attributes that are fields
+                        attribute.validate(getattr(value, name))
+                except ValidationError, error:
+                    errors.append(error)
+                except AttributeError, error:
+                    # property for the given name is not implemented
+                    errors.append(SchemaNotFullyImplemented(error))
+    finally:
+        delattr(value, '__schema_being_validated')
     return errors
 
 
