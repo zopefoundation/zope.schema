@@ -66,8 +66,8 @@ class FieldPropertyStoredThroughField(object):
         if name is None:
             name = field.__name__
 
-        self.__field = copy(field)
-        self.__field.__name__ = "__st_%s_st" % self.__field.__name__
+        self.field = copy(field)
+        self.field.__name__ = "__st_%s_st" % self.field.__name__
         self.__name = name
 
     def setValue(self, inst, field, value):
@@ -80,13 +80,13 @@ class FieldPropertyStoredThroughField(object):
         return field.query(inst, default)
 
     def __getattr__(self, name):
-        return getattr(self.__field, name)
+        return getattr(self.field, name)
 
     def __get__(self, inst, klass):
         if inst is None:
             return self
 
-        field = self.__field.bind(inst)
+        field = self.field.bind(inst)
         value = self.getValue(inst, field)
         if value is _marker:
             value = getattr(field, 'default', _marker)
@@ -96,7 +96,7 @@ class FieldPropertyStoredThroughField(object):
         return value
 
     def __set__(self, inst, value):
-        field = self.__field.bind(inst)
+        field = self.field.bind(inst)
         field.validate(value)
         if field.readonly:
             if self.queryValue(inst, field, _marker) is _marker:
