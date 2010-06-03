@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Date field tests
-
-$Id$
 """
 from unittest import main, makeSuite
 from zope.schema import Date

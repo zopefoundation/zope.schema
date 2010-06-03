@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Sample vocabulary supporting state abbreviations.
-
-$Id$
 """
 from zope.interface import implements
 from zope.schema import interfaces

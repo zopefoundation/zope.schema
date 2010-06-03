@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Container field tests
-
-$Id$
 """
 from UserDict import UserDict
 from unittest import main, makeSuite

@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """List field tests
-
-$Id$
 """
 from unittest import main, makeSuite
 

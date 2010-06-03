@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Field Properties tests
-
-$Id$
 """
 
 from unittest import TestCase, TestSuite, main, makeSuite

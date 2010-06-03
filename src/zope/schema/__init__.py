@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Schema package constructor
-
-$Id$
 """
 from zope.schema._field import Field, Container, Iterable, Orderable
 from zope.schema._field import MinMaxLen, Choice

@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Schema interfaces and exceptions
-
-$Id$
 """
 __docformat__ = "reStructuredText"
 

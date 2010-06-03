@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Vocabulary support for schema.
-
-$Id$
 """
 from zope.interface.declarations import directlyProvides, implements
 from zope.schema.interfaces import ValidationError

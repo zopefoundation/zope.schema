@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Test of the Vocabulary and related support APIs.
-
-$Id$
 """
 import unittest
 

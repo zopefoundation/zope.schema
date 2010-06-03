@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Schema convenience functions
-
-$Id$
 """
 
 import zope.interface.verify

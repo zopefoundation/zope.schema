@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Field equality tests
-
-$Id$
 """
 from unittest import TestCase, TestSuite, makeSuite
 from zope.schema import Text, Int

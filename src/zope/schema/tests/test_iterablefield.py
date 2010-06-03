@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Iterable field tests
-
-$Id$
 """
 from UserDict import UserDict, IterableUserDict
 from unittest import main, makeSuite

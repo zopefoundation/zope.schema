@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Decimal field tests
-
-$Id$
 """
 import decimal
 from unittest import main, makeSuite

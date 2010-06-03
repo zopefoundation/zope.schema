@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Tuple field tests.
-
-$Id$
 """
 from unittest import TestSuite, main, makeSuite
 

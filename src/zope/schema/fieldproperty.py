@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Computed attributes based on schema fields
-
-$Id$
 """
 from copy import copy
 _marker = object()

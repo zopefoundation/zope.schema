@@ -13,8 +13,6 @@ from zope.schema import List
 #
 ##############################################################################
 """This set of tests exercises Object fields.
-
-$Id$
 """
 from unittest import TestSuite, main, makeSuite
 

@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """String field tests
-
-$Id$
 """
 from unittest import TestSuite, main, makeSuite
 from zope.schema import Bytes, BytesLine, Text, TextLine, Password

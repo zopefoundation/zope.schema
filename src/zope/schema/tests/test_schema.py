@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Schema field tests
-
-$Id$
 """
 from unittest import TestCase, main, makeSuite
 from zope.interface import Interface

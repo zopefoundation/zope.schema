@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Test Interface accessor methods.
-
-$Id$
 """
 import unittest
 from zope.interface import Interface, implements

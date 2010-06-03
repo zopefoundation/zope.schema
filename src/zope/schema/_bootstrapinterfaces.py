@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Bootstrap schema interfaces and exceptions
-
-$Id$
 """
 import zope.interface
 

@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Tests for the schema package's documentation files
-
-$Id$
 """
 import doctest
 import re
