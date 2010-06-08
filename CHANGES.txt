@@ -2,7 +2,7 @@
 CHANGES
 =======
 
-3.6.4 (unreleased)
+3.6.4 (2010-06-08)
 ------------------
 
 - fix validation of schema with Object Field that specify Interface schema.
