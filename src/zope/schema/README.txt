@@ -104,7 +104,7 @@ object:
 That's it. You still might think this is a lot of work to validate and set a
 value for an object. Note, however, that it is very easy to write helper
 functions that automate these tasks. If correctly designed, you will never
-have to worry explicitely about validation again, since the system takes care
+have to worry explicitly about validation again, since the system takes care
 of it automatically.
 
 
