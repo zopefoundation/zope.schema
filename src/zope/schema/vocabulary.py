@@ -59,11 +59,14 @@ class SimpleVocabulary(object):
         self.by_token = {}
         self._terms = terms
         for term in self._terms:
+            if term.value in self.by_value:
+                raise ValueError(
+                    'term values must be unique: %s' % repr(term.value))
+            if term.token in self.by_token:
+                raise ValueError(
+                    'term tokens must be unique: %s' % repr(term.token))
             self.by_value[term.value] = term
             self.by_token[term.token] = term
-        if not (len(self.by_value) == len(self.by_token) == len(terms)):
-            raise ValueError(
-                'Supplied vocabulary values resulted in duplicate term tokens')
         if interfaces:
             directlyProvides(self, *interfaces)
 

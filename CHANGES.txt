@@ -2,10 +2,11 @@
 CHANGES
 =======
 
-3.6.5 (unreleased)
+3.7.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Improve error messages when term tokens or values are duplicates.
+- Fix the buildout so the tests run.
 
 
 3.6.4 (2010-06-08)
