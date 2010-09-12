@@ -2,7 +2,7 @@
 CHANGES
 =======
 
-3.7.0 (unreleased)
+3.7.0 (2010-09-12)
 ------------------
 
 - Improve error messages when term tokens or values are duplicates.
