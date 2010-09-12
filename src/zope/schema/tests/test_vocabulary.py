@@ -164,7 +164,7 @@ class SimpleVocabularyTests(unittest.TestCase):
         except ValueError, e:
             self.assertEquals(e.message, "term tokens must be unique: '2'")
 
-    def test_nonunique_token_message(self):
+    def test_nonunique_token_messages(self):
         try:
             vocabulary.SimpleVocabulary.fromItems([(0, 'one'), (1, 'one')])
         except ValueError, e:
