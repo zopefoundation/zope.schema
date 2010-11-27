@@ -20,7 +20,7 @@ Sources are designed with three concepts:
   this is called a title
 
 The last two elements are dispatched using a so called `term`. The
-ITitleTokenizedTerm interface contains a triple of (value, token, term).
+ITitleTokenizedTerm interface contains a triple of (value, token, title).
 
 Additionally there are some lookup functions to perform the mapping
 between values and terms and tokens and terms.
