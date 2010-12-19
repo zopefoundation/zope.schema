@@ -5,6 +5,8 @@ CHANGES
 3.7.1 (unreleased)
 ------------------
 
+- Don't allow "[\]^`" in DottedName.
+  https://bugs.launchpad.net/zope.schema/+bug/191236
 
 3.7.0 (2010-09-12)
 ------------------

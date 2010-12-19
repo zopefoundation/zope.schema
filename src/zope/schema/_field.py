@@ -629,8 +629,8 @@ class URI(BytesLine):
 
 
 _isdotted = re.compile(
-    r"([a-zA-Z][a-zA-z0-9_]*)"
-    r"([.][a-zA-Z][a-zA-z0-9_]*)*"
+    r"([a-zA-Z][a-zA-Z0-9_]*)"
+    r"([.][a-zA-Z][a-zA-Z0-9_]*)*"
     # use the whole line
     r"$").match
 
