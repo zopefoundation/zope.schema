@@ -76,6 +76,12 @@ class Field(Attribute):
 
     default = ValidatedProperty('default')
 
+    # These were declared as slots in zope.interface, we override them here to
+    # get rid of the dedcriptors so they don't break .bind()
+    __name__ = None
+    interface = None
+    _Element__tagged_values = None
+
     def __init__(self, title=u'', description=u'', __name__='',
                  required=True, readonly=False, constraint=None, default=None,
                  missing_value=__missing_value_marker):

@@ -19,6 +19,7 @@ import re
 from doctest import DocTestSuite
 from unittest import TestCase, TestSuite, makeSuite
 
+from zope.interface import Interface
 from zope.schema import Field, Text, Int
 from zope.schema.interfaces import ValidationError, RequiredMissing
 from zope.schema.interfaces import ConstraintNotSatisfied
@@ -32,6 +33,9 @@ class FieldTestBase(TestCase):
             title=u'Not required field', description=u'',
             readonly=False, required=False)
 
+        field.interface = Interface
+        field.setTaggedValue('a', 'b')
+
         class C(object):
             x=None
 
@@ -39,8 +43,9 @@ class FieldTestBase(TestCase):
         field2 = field.bind(c)
 
         self.assertEqual(field2.context, c)
-        for n in ('__class__', '__name__', 'title', 'description',
-                  'readonly', 'required'):
+        self.assertEqual(field.queryTaggedValue('a'), field2.queryTaggedValue('a'))
+        for n in ('__class__', '__name__', '__doc__', 'title', 'description',
+                  'readonly', 'required', 'interface'):
             self.assertEquals(getattr(field2, n), getattr(field, n), n)
 
     def testValidate(self):
