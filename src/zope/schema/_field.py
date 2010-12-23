@@ -463,10 +463,10 @@ def _validate_fields(schema, value, errors=None):
         return errors
     # if `value` is part of a cyclic graph, we need to break the cycle to avoid
     # infinite recursion.
-    if hasattr(value, '__schema_being_validated'):
+    if hasattr(value, '_v_schema_being_validated'):
         return errors
     # Mark the value as being validated.
-    value.__schema_being_validated = True
+    value._v_schema_being_validated = True
     # (If we have gotten here, we know that `value` provides an interface
     # other than zope.interface.Interface;
     # iow, we can rely on the fact that it is an instance
@@ -485,7 +485,7 @@ def _validate_fields(schema, value, errors=None):
                     # property for the given name is not implemented
                     errors.append(SchemaNotFullyImplemented(error))
     finally:
-        delattr(value, '__schema_being_validated')
+        delattr(value, '_v_schema_being_validated')
     return errors
 
 

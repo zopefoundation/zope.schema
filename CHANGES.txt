@@ -5,6 +5,12 @@ CHANGES
 3.7.1 (unreleased)
 ------------------
 
+- The validation token, used in the validation of schema with Object
+  Field to avoid infinite recursion, has been renamed.
+  ``__schema_being_validated`` became ``_v_schema_being_validated``,
+  a volatile attribute, to avoid persistency and therefore,
+  read/write conflicts.
+
 - Don't allow "[\]^`" in DottedName.
   https://bugs.launchpad.net/zope.schema/+bug/191236
 
