@@ -463,6 +463,8 @@ def _validate_fields(schema, value, errors=None):
         return errors
     # if `value` is part of a cyclic graph, we need to break the cycle to avoid
     # infinite recursion.
+    #
+    # (use volatile attribute to avoid persistency/conflicts)
     if hasattr(value, '_v_schema_being_validated'):
         return errors
     # Mark the value as being validated.
