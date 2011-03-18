@@ -37,7 +37,7 @@ def alltests():
 
     class NullHandler(logging.Handler):
         level = 50
-        
+
         def emit(self, record):
             pass
 
@@ -61,7 +61,7 @@ def alltests():
     return suite
 
 setup(name='zope.schema',
-      version = '3.7.2dev',
+      version = '3.8.0',
       url='http://pypi.python.org/pypi/zope.schema',
       license='ZPL 2.1',
       description='zope.interface extension for defining data schemas',

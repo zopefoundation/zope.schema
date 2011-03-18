@@ -82,3 +82,13 @@ class IFromUnicode(zope.interface.Interface):
     def fromUnicode(str):
         """Convert a unicode string to a value.
         """
+
+class IContextAwareDefaultFactory(zope.interface.Interface):
+    """A default factory that requires a context.
+
+    The context is the field context. If the field is not bound, context may
+    be ``None``.
+    """
+
+    def __call__(context):
+        """Returns a default value for the field."""

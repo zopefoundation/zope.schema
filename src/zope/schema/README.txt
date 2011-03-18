@@ -233,7 +233,8 @@ Selection issues; field type can specify:
 
 - A default value
 
-  Default field values are assigned to objects when they are first created.
+  Default field values are assigned to objects when they are first created. A
+  default factory can be specified to dynamically compute default values.
 
 
 Fields and Widgets

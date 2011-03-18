@@ -26,6 +26,7 @@ from zope.schema._bootstrapinterfaces import NotAContainer, NotAnIterator
 from zope.schema._bootstrapinterfaces import TooSmall, TooBig
 from zope.schema._bootstrapinterfaces import TooShort, TooLong
 from zope.schema._bootstrapinterfaces import InvalidValue
+from zope.schema._bootstrapinterfaces import IContextAwareDefaultFactory
 
 from zope.schema._schema import getFields
 
@@ -44,11 +45,30 @@ class ValidatedProperty(object):
                 inst.validate(value)
         inst.__dict__[name] = value
 
-    if sys.platform.startswith('java'):
-        # apparently descriptors work differently on Jython
-        def __get__(self, inst, owner):
-            name, check = self._info
+    def __get__(self, inst, owner):
+        name, check = self._info
+        return inst.__dict__[name]
+
+class DefaultProperty(ValidatedProperty):
+
+    def __get__(self, inst, owner):
+        name, check = self._info
+        defaultFactory = inst.__dict__['defaultFactory']
+        # If there is no default factory, simply return the default.
+        if defaultFactory is None:
             return inst.__dict__[name]
+        # Get the default value by calling the factory. Some factories might
+        # require a context to produce a value.
+        if IContextAwareDefaultFactory.providedBy(defaultFactory):
+            value = defaultFactory(inst.context)
+        else:
+            value = defaultFactory()
+        # Check that the created value is valid.
+        if check is not None:
+            check(inst, value)
+        else:
+            inst.validate(value)
+        return value
 
 
 class Field(Attribute):
@@ -74,7 +94,7 @@ class Field(Attribute):
     #    of Field (including Field subclass) instances.
     order = 0
 
-    default = ValidatedProperty('default')
+    default = DefaultProperty('default')
 
     # These were declared as slots in zope.interface, we override them here to
     # get rid of the dedcriptors so they don't break .bind()
@@ -84,7 +104,7 @@ class Field(Attribute):
 
     def __init__(self, title=u'', description=u'', __name__='',
                  required=True, readonly=False, constraint=None, default=None,
-                 missing_value=__missing_value_marker):
+                 defaultFactory=None, missing_value=__missing_value_marker):
         """Pass in field values as keyword parameters.
 
 
@@ -127,6 +147,7 @@ class Field(Attribute):
         if constraint is not None:
             self.constraint = constraint
         self.default = default
+        self.defaultFactory = defaultFactory
 
         # Keep track of the order of field definitions
         Field.order += 1

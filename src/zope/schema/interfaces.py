@@ -42,6 +42,7 @@ from zope.schema._bootstrapinterfaces import TooBig
 from zope.schema._bootstrapinterfaces import TooLong
 from zope.schema._bootstrapinterfaces import TooShort
 from zope.schema._bootstrapinterfaces import InvalidValue
+from zope.schema._bootstrapinterfaces import IContextAwareDefaultFactory
 
 class WrongContainedType(ValidationError):
     __doc__ = _("""Wrong contained type""")

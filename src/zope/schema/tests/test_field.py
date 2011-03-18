@@ -19,10 +19,11 @@ import re
 from doctest import DocTestSuite
 from unittest import TestCase, TestSuite, makeSuite
 
-from zope.interface import Interface
+from zope.interface import Interface, provider
 from zope.schema import Field, Text, Int
+from zope.schema.interfaces import IContextAwareDefaultFactory
 from zope.schema.interfaces import ValidationError, RequiredMissing
-from zope.schema.interfaces import ConstraintNotSatisfied
+from zope.schema.interfaces import ConstraintNotSatisfied, WrongType
 from zope.testing import renormalizing
 
 class FieldTestBase(TestCase):
@@ -135,6 +136,33 @@ class FieldTest(FieldTestBase):
         i.validate(11)
         self.assertRaises(ConstraintNotSatisfied, i.validate, 10)
 
+    def testSimpleDefaultFactory(self):
+        field = Int(defaultFactory=lambda: 42)
+        self.assertEqual(field.default, 42)
+
+        # The default factory always wins against a default value.
+        field = Int(default=41, defaultFactory=lambda: 42)
+        self.assertEqual(field.default, 42)
+
+    def testContextAwareDefaultFactory(self):
+        @provider(IContextAwareDefaultFactory)
+        def getAnswerToUniverse(context):
+            if context is None:
+                return 0
+            return context.answer
+
+        field = Int(defaultFactory=getAnswerToUniverse)
+        self.assertEqual(field.default, 0)
+
+        class Context(object):
+            answer = 42
+
+        bound = field.bind(Context())
+        self.assertEqual(bound.default, 42)
+
+    def testBadValueDefaultFactory(self):
+        field = Int(defaultFactory=lambda: '42')
+        self.assertRaises(WrongType, lambda: field.default)
 
 class FieldDefaultBehaviour(TestCase):
     def test_required_defaults_to_true(self):

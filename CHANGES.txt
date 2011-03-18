@@ -2,11 +2,22 @@
 CHANGES
 =======
 
-3.7.2 (unreleased)
+3.8.0 (2011-03-18)
 ------------------
 
-- Nothing changed yet.
+- Implemented a ``defaultFactory`` attribute for all fields. It is a callable
+  that can be used to compute default values. The simplest case is::
 
+    Date(defaultFactory=datetime.date.today)
+
+  If the factory needs a context to compute a sensible default value, then it
+  must provide ``IContextAwareDefaultFactory``, which can be used as follows::
+
+    @provider(IContextAwareDefaultFactory)
+    def today(context):
+        return context.today()
+
+    Date(defaultFactory=today)
 
 3.7.1 (2010-12-25)
 ------------------
