@@ -61,7 +61,7 @@ def alltests():
     return suite
 
 setup(name='zope.schema',
-      version = '3.8.1',
+      version = '3.8.2dev',
       url='http://pypi.python.org/pypi/zope.schema',
       license='ZPL 2.1',
       description='zope.interface extension for defining data schemas',
