@@ -18,6 +18,7 @@ __docformat__ = 'restructuredtext'
 
 import re
 import decimal
+import threading
 from datetime import datetime, date, timedelta, time
 from zope.event import notify
 
@@ -452,6 +453,8 @@ class FrozenSet(AbstractCollection):
         super(FrozenSet, self).__init__(unique=True, **kw)
 
 
+VALIDATED_VALUES = threading.local()
+
 def _validate_fields(schema, value, errors=None):
     if errors is None:
         errors = []
@@ -462,13 +465,12 @@ def _validate_fields(schema, value, errors=None):
     if schema is Interface:
         return errors
     # if `value` is part of a cyclic graph, we need to break the cycle to avoid
-    # infinite recursion.
-    #
-    # (use volatile attribute to avoid persistency/conflicts)
-    if hasattr(value, '_v_schema_being_validated'):
+    # infinite recursion. Collect validated objects in a thread local dict by
+    # it's python represenation. A previous version was setting a volatile
+    # attribute which didn't work with security proxy
+    if id(value) in VALIDATED_VALUES.__dict__:
         return errors
-    # Mark the value as being validated.
-    value._v_schema_being_validated = True
+    VALIDATED_VALUES.__dict__[id(value)] = True
     # (If we have gotten here, we know that `value` provides an interface
     # other than zope.interface.Interface;
     # iow, we can rely on the fact that it is an instance
@@ -487,7 +489,7 @@ def _validate_fields(schema, value, errors=None):
                     # property for the given name is not implemented
                     errors.append(SchemaNotFullyImplemented(error))
     finally:
-        delattr(value, '_v_schema_being_validated')
+        del VALIDATED_VALUES.__dict__[id(value)]
     return errors
 
 

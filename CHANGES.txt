@@ -5,7 +5,9 @@ CHANGES
 3.8.1 (unreleased)
 ------------------
 
-- ...
+- fix broken Object field validation. Previous version was using a volatile
+  property on object field values which ends in a ForbiddenAttribute error
+  on security proxied objects. 
 
 3.8.0 (2011-03-18)
 ------------------
