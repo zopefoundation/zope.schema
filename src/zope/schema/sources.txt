@@ -39,8 +39,8 @@ Create a source for all odd numbers.
 
     >>> from zope import interface
     >>> from zope.schema.interfaces import ISource, IContextSourceBinder
-    >>> class MySource(object):
-    ...     interface.implements(ISource)
+    >>> @interface.implementer(ISource)
+    ... class MySource(object):
     ...     divisor = 2
     ...     def __contains__(self, value):
     ...         return bool(value % self.divisor)
@@ -60,8 +60,9 @@ If a IContextSourceBinder is passed as the `source` argument to Choice, it's
 `bind` method will be called with the context as its only argument.   The
 result must implement ISource and will be used as the source.
 
+    >>> from six import print_
     >>> def my_binder(context):
-    ...     print "Binder was called."
+    ...     print_("Binder was called.")
     ...     source = MySource()
     ...     source.divisor = context.divisor
     ...     return source

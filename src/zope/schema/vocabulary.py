@@ -13,7 +13,7 @@
 ##############################################################################
 """Vocabulary support for schema.
 """
-from zope.interface.declarations import directlyProvides, implements
+from zope.interface.declarations import directlyProvides, implementer
 from zope.schema.interfaces import ValidationError
 from zope.schema.interfaces import IVocabularyRegistry
 from zope.schema.interfaces import IVocabulary, IVocabularyTokenized
@@ -23,10 +23,9 @@ from zope.schema.interfaces import ITokenizedTerm, ITitledTokenizedTerm
 
 _marker = object()
 
+@implementer(ITokenizedTerm)
 class SimpleTerm(object):
     """Simple tokenized term used by SimpleVocabulary."""
-
-    implements(ITokenizedTerm)
 
     def __init__(self, value, token=None, title=None):
         """Create a term for value and token. If token is omitted,
@@ -41,10 +40,9 @@ class SimpleTerm(object):
         if title is not None:
             directlyProvides(self, ITitledTokenizedTerm)
 
+@implementer(IVocabularyTokenized)
 class SimpleVocabulary(object):
     """Vocabulary that works from a sequence of terms."""
-
-    implements(IVocabularyTokenized)
 
     def __init__(self, terms, *interfaces):
         """Initialize the vocabulary given a list of terms.
@@ -151,9 +149,9 @@ class VocabularyRegistryError(LookupError):
         return "unknown vocabulary: %r" % self.name
 
 
+@implementer(IVocabularyRegistry)
 class VocabularyRegistry(object):
     __slots__ = '_map',
-    implements(IVocabularyRegistry)
 
     def __init__(self):
         self._map = {}

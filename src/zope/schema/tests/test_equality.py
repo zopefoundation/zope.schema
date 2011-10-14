@@ -14,18 +14,20 @@
 """Field equality tests
 """
 from unittest import TestCase, TestSuite, makeSuite
+
+from six import u
 from zope.schema import Text, Int
 
 class FieldEqualityTests(TestCase):
 
     equality = [
-        'Text(title=u"Foo", description=u"Bar")',
-        'Int(title=u"Foo", description=u"Bar")',
+        'Text(title=u("Foo"), description=u("Bar"))',
+        'Int(title=u("Foo"), description=u("Bar"))',
         ]
 
     def test_equality(self):
         for text in self.equality:
-            self.assertEquals(eval(text), eval(text))
+            self.assertEqual(eval(text), eval(text))
 
 def test_suite():
     return TestSuite(

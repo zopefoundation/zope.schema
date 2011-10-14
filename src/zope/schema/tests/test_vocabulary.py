@@ -17,7 +17,7 @@ import unittest
 
 from zope.interface.verify import verifyObject
 from zope.interface.exceptions import DoesNotImplement
-from zope.interface import Interface, implements
+from zope.interface import Interface, implementer
 
 from zope.schema import interfaces
 from zope.schema import vocabulary
@@ -48,19 +48,19 @@ class RegistryTests(BaseTest):
     def test_setVocabularyRegistry(self):
         r = DummyRegistry()
         vocabulary.setVocabularyRegistry(r)
-        self.assert_(vocabulary.getVocabularyRegistry() is r)
+        self.assertTrue(vocabulary.getVocabularyRegistry() is r)
 
     def test_getVocabularyRegistry(self):
         r = vocabulary.getVocabularyRegistry()
-        self.assert_(interfaces.IVocabularyRegistry.providedBy(r))
+        self.assertTrue(interfaces.IVocabularyRegistry.providedBy(r))
 
     # TODO: still need to test the default implementation
 
 class SampleTerm(object):
     pass
 
+@implementer(interfaces.IVocabulary)
 class SampleVocabulary(object):
-    implements(interfaces.IVocabulary)
 
     def __iter__(self):
         return iter([self.getTerm(x) for x in range(0, 10)])
@@ -99,13 +99,13 @@ class SimpleVocabularyTests(unittest.TestCase):
     def test_simple_term_title(self):
         t = vocabulary.SimpleTerm(1)
         verifyObject(interfaces.ITokenizedTerm, t)
-        self.failUnlessRaises(DoesNotImplement, verifyObject,
+        self.assertRaises(DoesNotImplement, verifyObject,
             interfaces.ITitledTokenizedTerm, t)
-        self.failUnless(t.title is None)
+        self.assertTrue(t.title is None)
         t = vocabulary.SimpleTerm(1, title="Title")
         verifyObject(interfaces.ITokenizedTerm, t)
         verifyObject(interfaces.ITitledTokenizedTerm, t)
-        self.failUnlessEqual(t.title, "Title")
+        self.assertEqual(t.title, "Title")
 
     def test_order(self):
         value = 1
@@ -119,18 +119,18 @@ class SimpleVocabularyTests(unittest.TestCase):
             value += 1
 
     def test_implementation(self):
-        self.failUnless(verifyObject(interfaces.IVocabulary, self.list_vocab))
-        self.failUnless(
+        self.assertTrue(verifyObject(interfaces.IVocabulary, self.list_vocab))
+        self.assertTrue(
             verifyObject(interfaces.IVocabularyTokenized, self.list_vocab))
-        self.failUnless(verifyObject(interfaces.IVocabulary, self.items_vocab))
-        self.failUnless(
+        self.assertTrue(verifyObject(interfaces.IVocabulary, self.items_vocab))
+        self.assertTrue(
             verifyObject(interfaces.IVocabularyTokenized, self.items_vocab))
 
     def test_addt_interfaces(self):
         class IStupid(Interface):
             pass
         v = vocabulary.SimpleVocabulary.fromValues([1, 2, 3], IStupid)
-        self.failUnless(IStupid.providedBy(v))
+        self.assertTrue(IStupid.providedBy(v))
 
     def test_len(self):
         self.assertEqual(len(self.list_vocab), 3)
@@ -138,14 +138,14 @@ class SimpleVocabularyTests(unittest.TestCase):
 
     def test_contains(self):
         for v in (self.list_vocab, self.items_vocab):
-            self.assert_(1 in v and 2 in v and 3 in v)
-            self.assert_(5 not in v)
+            self.assertTrue(1 in v and 2 in v and 3 in v)
+            self.assertTrue(5 not in v)
 
     def test_iter_and_get_term(self):
         for v in (self.list_vocab, self.items_vocab):
             for term in v:
-                self.assert_(v.getTerm(term.value) is term)
-                self.assert_(v.getTermByToken(term.token) is term)
+                self.assertTrue(v.getTerm(term.value) is term)
+                self.assertTrue(v.getTermByToken(term.token) is term)
 
     def test_nonunique_tokens(self):
         self.assertRaises(
@@ -161,14 +161,14 @@ class SimpleVocabularyTests(unittest.TestCase):
     def test_nonunique_token_message(self):
         try:
             vocabulary.SimpleVocabulary.fromValues([2, '2'])
-        except ValueError, e:
-            self.assertEquals(str(e), "term tokens must be unique: '2'")
+        except ValueError as e:
+            self.assertEqual(str(e), "term tokens must be unique: '2'")
 
     def test_nonunique_token_messages(self):
         try:
             vocabulary.SimpleVocabulary.fromItems([(0, 'one'), (1, 'one')])
-        except ValueError, e:
-            self.assertEquals(str(e), "term values must be unique: 'one'")
+        except ValueError as e:
+            self.assertEqual(str(e), "term values must be unique: 'one'")
 
     def test_overriding_createTerm(self):
         class MyTerm(object):

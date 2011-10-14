@@ -14,6 +14,8 @@
 """Date field tests
 """
 from unittest import main, makeSuite
+
+from six import u
 from zope.schema import Date
 from zope.schema.interfaces import RequiredMissing, InvalidValue, WrongType
 from zope.schema.interfaces import TooSmall, TooBig
@@ -31,14 +33,14 @@ class DateTest(FieldTestBase):
         verifyObject(IDate, self._Field_Factory())
 
     def testValidate(self):
-        field = self._Field_Factory(title=u'Date field', description=u'',
+        field = self._Field_Factory(title=u('Date field'), description=u(''),
                                     readonly=False, required=False)
         field.validate(None)
         field.validate(datetime.now().date())
         self.assertRaises(WrongType, field.validate, datetime.now())
 
     def testValidateRequired(self):
-        field = self._Field_Factory(title=u'Date field', description=u'',
+        field = self._Field_Factory(title=u('Date field'), description=u(''),
                                     readonly=False, required=True)
         field.validate(datetime.now().date())
 
@@ -47,7 +49,7 @@ class DateTest(FieldTestBase):
     def testValidateMin(self):
         d1 = date(2000,10,1)
         d2 = date(2000,10,2)
-        field = self._Field_Factory(title=u'Date field', description=u'',
+        field = self._Field_Factory(title=u('Date field'), description=u(''),
                                     readonly=False, required=False, min=d1)
         field.validate(None)
         field.validate(d1)
@@ -60,7 +62,7 @@ class DateTest(FieldTestBase):
         d1 = date(2000,10,1)
         d2 = date(2000,10,2)
         d3 = date(2000,10,3)
-        field = self._Field_Factory(title=u'Date field', description=u'',
+        field = self._Field_Factory(title=u('Date field'), description=u(''),
                                     readonly=False, required=False, max=d2)
         field.validate(None)
         field.validate(d1)
@@ -75,7 +77,7 @@ class DateTest(FieldTestBase):
         d4 = date(2000,10,4)
         d5 = date(2000,10,5)
 
-        field = self._Field_Factory(title=u'Date field', description=u'',
+        field = self._Field_Factory(title=u('Date field'), description=u(''),
                                     readonly=False, required=False,
                                     min=d2, max=d4)
         field.validate(None)

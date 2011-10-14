@@ -17,7 +17,8 @@ __docformat__ = 'restructuredtext'
 
 import sys
 
-from zope.interface import Attribute, providedBy, implements
+from six import u, b, text_type, integer_types
+from zope.interface import Attribute, providedBy, implementer
 from zope.schema._bootstrapinterfaces import StopValidation
 from zope.schema._bootstrapinterfaces import IFromUnicode
 from zope.schema._bootstrapinterfaces import RequiredMissing, WrongType
@@ -102,7 +103,7 @@ class Field(Attribute):
     interface = None
     _Element__tagged_values = None
 
-    def __init__(self, title=u'', description=u'', __name__='',
+    def __init__(self, title=u(''), description=u(''), __name__='',
                  required=True, readonly=False, constraint=None, default=None,
                  defaultFactory=None, missing_value=__missing_value_marker):
         """Pass in field values as keyword parameters.
@@ -122,11 +123,11 @@ class Field(Attribute):
         >>> f.__doc__, f.title, f.description
         ('', u'', u'')
 
-        >>> f = Field(title=u'sample')
+        >>> f = Field(title=u('sample'))
         >>> f.__doc__, f.title, f.description
         (u'sample', u'sample', u'')
 
-        >>> f = Field(title=u'sample', description=u'blah blah\\nblah')
+        >>> f = Field(title=u('sample'), description=u('blah blah\\nblah'))
         >>> f.__doc__, f.title, f.description
         (u'sample\\n\\nblah blah\\nblah', u'sample', u'blah blah\\nblah')
         """
@@ -304,11 +305,10 @@ class MinMaxLen(object):
             raise TooLong(value, self.max_length)
 
 
+@implementer(IFromUnicode)
 class Text(MinMaxLen, Field):
     """A field containing text used for human discourse."""
-    _type = unicode
-
-    implements(IFromUnicode)
+    _type = text_type
 
     def __init__(self, *args, **kw):
         super(Text, self).__init__(*args, **kw)
@@ -316,13 +316,13 @@ class Text(MinMaxLen, Field):
     def fromUnicode(self, str):
         """
         >>> t = Text(constraint=lambda v: 'x' in v)
-        >>> t.fromUnicode("foo x spam")
+        >>> t.fromUnicode(b("foo x spam"))
         Traceback (most recent call last):
         ...
         WrongType: ('foo x spam', <type 'unicode'>, '')
-        >>> t.fromUnicode(u"foo x spam")
+        >>> t.fromUnicode(u("foo x spam"))
         u'foo x spam'
-        >>> t.fromUnicode(u"foo spam")
+        >>> t.fromUnicode(u("foo spam"))
         Traceback (most recent call last):
         ...
         ConstraintNotSatisfied: foo spam
@@ -410,11 +410,10 @@ class Bool(Field):
         return v
 
 
+@implementer(IFromUnicode)
 class Int(Orderable, Field):
     """A field representing an Integer."""
-    _type = int, long
-
-    implements(IFromUnicode)
+    _type = integer_types
 
     def __init__(self, *args, **kw):
         super(Int, self).__init__(*args, **kw)

@@ -15,6 +15,7 @@
 """
 import unittest
 
+from six import u
 from zope.interface import Interface
 from zope.interface.verify import verifyObject
 
@@ -26,25 +27,25 @@ from zope.schema.tests import states
 
 class IBirthInfo(Interface):
     state1 = Choice(
-        title=u'State of Birth',
-        description=u'The state in which you were born.',
+        title=u('State of Birth'),
+        description=u('The state in which you were born.'),
         vocabulary="states",
         default="AL",
         )
     state2 = Choice(
-        title=u'State of Birth',
-        description=u'The state in which you were born.',
+        title=u('State of Birth'),
+        description=u('The state in which you were born.'),
         vocabulary="states",
         default="AL",
         )
     state3 = Choice(
-        title=u'Favorite State',
-        description=u'The state you like the most.',
+        title=u('Favorite State'),
+        description=u('The state you like the most.'),
         vocabulary=states.StateVocabulary(),
         )
     state4 = Choice(
-        title=u"Name",
-        description=u"The name of your new state",
+        title=u("Name"),
+        description=u("The name of your new state"),
         vocabulary="states",
         )
 
@@ -61,17 +62,17 @@ class StateSelectionTest(unittest.TestCase):
     def test_default_presentation(self):
         field = IBirthInfo.getDescriptionFor("state1")
         bound = field.bind(object())
-        self.assert_(verifyObject(IVocabulary, bound.vocabulary))
+        self.assertTrue(verifyObject(IVocabulary, bound.vocabulary))
         self.assertEqual(bound.vocabulary.getTerm("VA").title, "Virginia")
 
     def test_contains(self):
         vocab = states.StateVocabulary()
-        self.assert_(verifyObject(IVocabulary, vocab))
+        self.assertTrue(verifyObject(IVocabulary, vocab))
         count = 0
         L = list(vocab)
         for term in L:
             count += 1
-            self.assert_(term.value in vocab)
+            self.assertTrue(term.value in vocab)
         self.assertEqual(count, len(vocab))
         # make sure we get the same values the second time around:
         L = [term.value for term in L]
@@ -83,9 +84,9 @@ class StateSelectionTest(unittest.TestCase):
     def test_prebound_vocabulary(self):
         field = IBirthInfo.getDescriptionFor("state3")
         bound = field.bind(None)
-        self.assert_(bound.vocabularyName is None)
-        self.assert_(verifyObject(IVocabulary, bound.vocabulary))
-        self.assert_("AL" in bound.vocabulary)
+        self.assertTrue(bound.vocabularyName is None)
+        self.assertTrue(verifyObject(IVocabulary, bound.vocabulary))
+        self.assertTrue("AL" in bound.vocabulary)
 
 
 def test_suite():

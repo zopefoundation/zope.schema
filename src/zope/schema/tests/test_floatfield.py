@@ -14,6 +14,8 @@
 """Float field tests
 """
 from unittest import main, makeSuite
+
+from six import u
 from zope.schema import Float
 from zope.schema.interfaces import RequiredMissing, InvalidValue
 from zope.schema.interfaces import TooSmall, TooBig
@@ -25,7 +27,7 @@ class FloatTest(FieldTestBase):
     _Field_Factory = Float
 
     def testValidate(self):
-        field = self._Field_Factory(title=u'Float field', description=u'',
+        field = self._Field_Factory(title=u('Float field'), description=u(''),
                                     readonly=False, required=False)
         field.validate(None)
         field.validate(10.0)
@@ -33,7 +35,7 @@ class FloatTest(FieldTestBase):
         field.validate(1000.0003)
 
     def testValidateRequired(self):
-        field = self._Field_Factory(title=u'Float field', description=u'',
+        field = self._Field_Factory(title=u('Float field'), description=u(''),
                                     readonly=False, required=True)
         field.validate(10.0)
         field.validate(0.93)
@@ -42,7 +44,7 @@ class FloatTest(FieldTestBase):
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def testValidateMin(self):
-        field = self._Field_Factory(title=u'Float field', description=u'',
+        field = self._Field_Factory(title=u('Float field'), description=u(''),
                                     readonly=False, required=False, min=10.5)
         field.validate(None)
         field.validate(10.6)
@@ -52,7 +54,7 @@ class FloatTest(FieldTestBase):
         self.assertRaises(TooSmall, field.validate, 10.4)
 
     def testValidateMax(self):
-        field = self._Field_Factory(title=u'Float field', description=u'',
+        field = self._Field_Factory(title=u('Float field'), description=u(''),
                                     readonly=False, required=False, max=10.5)
         field.validate(None)
         field.validate(5.3)
@@ -62,7 +64,7 @@ class FloatTest(FieldTestBase):
         self.assertRaises(TooBig, field.validate, 20.7)
 
     def testValidateMinAndMax(self):
-        field = self._Field_Factory(title=u'Float field', description=u'',
+        field = self._Field_Factory(title=u('Float field'), description=u(''),
                                     readonly=False, required=False,
                                     min=-0.6, max=10.1)
         field.validate(None)

@@ -15,7 +15,8 @@
 """
 from unittest import TestSuite, main, makeSuite
 
-from zope.interface import implements
+from six import u
+from zope.interface import implementer
 from zope.schema import Field, Tuple, Int
 from zope.schema.interfaces import IField
 from zope.schema.interfaces import ICollection, ISequence, ITuple
@@ -30,7 +31,7 @@ class TupleTest(CollectionFieldTestBase):
     _Field_Factory = Tuple
 
     def testValidate(self):
-        field = Tuple(title=u'Tuple field', description=u'',
+        field = Tuple(title=u('Tuple field'), description=u(''),
                       readonly=False, required=False)
         field.validate(None)
         field.validate(())
@@ -43,7 +44,7 @@ class TupleTest(CollectionFieldTestBase):
         self.assertRaises(WrongType, field.validate, {})
 
     def testValidateRequired(self):
-        field = Tuple(title=u'Tuple field', description=u'',
+        field = Tuple(title=u('Tuple field'), description=u(''),
                       readonly=False, required=True)
         field.validate(())
         field.validate((1, 2))
@@ -52,7 +53,7 @@ class TupleTest(CollectionFieldTestBase):
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def testValidateMinValues(self):
-        field = Tuple(title=u'Tuple field', description=u'',
+        field = Tuple(title=u('Tuple field'), description=u(''),
                       readonly=False, required=False, min_length=2)
         field.validate(None)
         field.validate((1, 2))
@@ -62,7 +63,7 @@ class TupleTest(CollectionFieldTestBase):
         self.assertRaises(TooShort, field.validate, (1,))
 
     def testValidateMaxValues(self):
-        field = Tuple(title=u'Tuple field', description=u'',
+        field = Tuple(title=u('Tuple field'), description=u(''),
                       readonly=False, required=False, max_length=2)
         field.validate(None)
         field.validate(())
@@ -72,7 +73,7 @@ class TupleTest(CollectionFieldTestBase):
         self.assertRaises(TooLong, field.validate, (1, 2, 3))
 
     def testValidateMinValuesAndMaxValues(self):
-        field = Tuple(title=u'Tuple field', description=u'',
+        field = Tuple(title=u('Tuple field'), description=u(''),
                       readonly=False, required=False,
                       min_length=1, max_length=2)
         field.validate(None)
@@ -83,7 +84,7 @@ class TupleTest(CollectionFieldTestBase):
         self.assertRaises(TooLong, field.validate, (1, 2, 3))
 
     def testValidateValueTypes(self):
-        field = Tuple(title=u'Tuple field', description=u'',
+        field = Tuple(title=u('Tuple field'), description=u(''),
                       readonly=False, required=False,
                       value_type=Int())
         field.validate(None)
@@ -103,21 +104,22 @@ class TupleTest(CollectionFieldTestBase):
 
         # however, allow anything that implements IField
         Tuple(value_type=Field())
+        @implementer(IField)
         class FakeField(object):
-            implements(IField)
+            pass
         Tuple(value_type=FakeField())
 
     def testUnique(self):
-        field = self._Field_Factory(title=u'test field', description=u'',
+        field = self._Field_Factory(title=u('test field'), description=u(''),
                                     readonly=False, required=True, unique=True)
         field.validate((1, 2))
         self.assertRaises(NotUnique, field.validate, (1, 2, 1))
     
     def testImplements(self):
         field = Tuple()
-        self.failUnless(ITuple.providedBy(field))
-        self.failUnless(ISequence.providedBy(field))
-        self.failUnless(ICollection.providedBy(field))
+        self.assertTrue(ITuple.providedBy(field))
+        self.assertTrue(ISequence.providedBy(field))
+        self.assertTrue(ICollection.providedBy(field))
 
 def test_suite():
     suite = TestSuite()

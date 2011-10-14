@@ -18,16 +18,20 @@ import re
 import unittest
 
 from zope.testing import renormalizing
+import zope.schema.tests
 
 def test_suite():
     checker = renormalizing.RENormalizing([
         (re.compile(r"\[\(None, Invalid\('8<=10',\)\)\]"),
                     r"[(None, <zope.interface.exceptions.Invalid instance at 0x...>)]",)
       ])
+    checker = checker + zope.schema.tests.py3_checker
     return unittest.TestSuite((
-        doctest.DocFileSuite('../sources.txt', optionflags=doctest.ELLIPSIS),
-        doctest.DocFileSuite('../fields.txt'),
-        doctest.DocFileSuite('../README.txt'),
+        doctest.DocFileSuite('../sources.txt',
+                             optionflags=doctest.ELLIPSIS,
+                             checker=zope.schema.tests.py3_checker),
+        doctest.DocFileSuite('../fields.txt', checker=zope.schema.tests.py3_checker),
+        doctest.DocFileSuite('../README.txt', checker=zope.schema.tests.py3_checker),
         doctest.DocFileSuite(
             '../validation.txt', checker=checker,
             optionflags=doctest.NORMALIZE_WHITESPACE|doctest.ELLIPSIS),

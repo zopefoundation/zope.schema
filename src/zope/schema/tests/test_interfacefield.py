@@ -14,6 +14,8 @@
 """Interface field tests
 """
 from unittest import main, makeSuite
+
+from six import u
 from zope.schema import InterfaceField
 from zope.schema.interfaces import RequiredMissing, WrongType
 from zope.schema.tests.test_field import FieldTestBase
@@ -28,13 +30,13 @@ class InterfaceTest(FieldTestBase):
     _Field_Factory = InterfaceField
 
     def testValidate(self):
-        field = InterfaceField(title=u'Interface field', description=u'',
+        field = InterfaceField(title=u('Interface field'), description=u(''),
                      readonly=False, required=False)
         field.validate(DummyInterface)
         self.assertRaises(WrongType, field.validate, object())
 
     def testValidateRequired(self):
-        field = InterfaceField(title=u'Interface field', description=u'',
+        field = InterfaceField(title=u('Interface field'), description=u(''),
                      readonly=False, required=True)
         self.assertRaises(RequiredMissing, field.validate, None)
 

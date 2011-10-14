@@ -15,6 +15,7 @@
 try:
     from zope.i18nmessageid import MessageFactory
 except ImportError:
-    _ = lambda x: unicode(x)
+    from six import text_type
+    _ = lambda x: text_type(x)
 else:
     _ = MessageFactory("zope")

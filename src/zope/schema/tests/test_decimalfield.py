@@ -14,6 +14,8 @@
 """Decimal field tests
 """
 import decimal
+
+from six import u
 from unittest import main, makeSuite
 from zope.schema import Decimal
 from zope.schema.interfaces import RequiredMissing, InvalidValue
@@ -26,7 +28,7 @@ class DecimalTest(FieldTestBase):
     _Field_Factory = Decimal
 
     def testValidate(self):
-        field = self._Field_Factory(title=u'Decimal field', description=u'',
+        field = self._Field_Factory(title=u('Decimal field'), description=u(''),
                                     readonly=False, required=False)
         field.validate(None)
         field.validate(decimal.Decimal("10.0"))
@@ -34,7 +36,7 @@ class DecimalTest(FieldTestBase):
         field.validate(decimal.Decimal("1000.0003"))
 
     def testValidateRequired(self):
-        field = self._Field_Factory(title=u'Decimal field', description=u'',
+        field = self._Field_Factory(title=u('Decimal field'), description=u(''),
                                     readonly=False, required=True)
         field.validate(decimal.Decimal("10.0"))
         field.validate(decimal.Decimal("0.93"))
@@ -43,7 +45,7 @@ class DecimalTest(FieldTestBase):
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def testValidateMin(self):
-        field = self._Field_Factory(title=u'Decimal field', description=u'',
+        field = self._Field_Factory(title=u('Decimal field'), description=u(''),
                                     readonly=False, required=False,
                                     min=decimal.Decimal("10.5"))
         field.validate(None)
@@ -54,7 +56,7 @@ class DecimalTest(FieldTestBase):
         self.assertRaises(TooSmall, field.validate, decimal.Decimal("10.4"))
 
     def testValidateMax(self):
-        field = self._Field_Factory(title=u'Decimal field', description=u'',
+        field = self._Field_Factory(title=u('Decimal field'), description=u(''),
                                     readonly=False, required=False,
                                     max=decimal.Decimal("10.5"))
         field.validate(None)
@@ -65,7 +67,7 @@ class DecimalTest(FieldTestBase):
         self.assertRaises(TooBig, field.validate, decimal.Decimal("20.7"))
 
     def testValidateMinAndMax(self):
-        field = self._Field_Factory(title=u'Decimal field', description=u'',
+        field = self._Field_Factory(title=u('Decimal field'), description=u(''),
                                     readonly=False, required=False,
                                     min=decimal.Decimal("-0.6"),
                                     max=decimal.Decimal("10.1"))

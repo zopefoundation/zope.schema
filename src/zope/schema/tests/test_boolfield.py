@@ -14,6 +14,8 @@
 """Boolean field tests
 """
 from unittest import main, makeSuite
+
+from six import u
 from zope.schema import Bool
 from zope.schema.interfaces import RequiredMissing, IBool, IFromUnicode
 from zope.schema.tests.test_field import FieldTestBase
@@ -27,14 +29,14 @@ class BoolTest(FieldTestBase):
     _Field_Factory = Bool
 
     def testValidate(self):
-        field = Bool(title=u'Bool field', description=u'',
+        field = Bool(title=u('Bool field'), description=u(''),
                      readonly=False, required=False)
         field.validate(None)
         field.validate(True)
         field.validate(False)
 
     def testValidateRequired(self):
-        field = Bool(title=u'Bool field', description=u'',
+        field = Bool(title=u('Bool field'), description=u(''),
                      readonly=False, required=True)
         field.validate(True)
         field.validate(False)
@@ -53,10 +55,10 @@ class BoolTest(FieldTestBase):
         class IAdaptTo(zope.interface.Interface):
             pass
 
-        registry.register((IBool,), IAdaptTo, u'', adapt_bool)
-        registry.register((IFromUnicode,), IAdaptTo, u'', adapt_from_unicode)
+        registry.register((IBool,), IAdaptTo, u(''), adapt_bool)
+        registry.register((IFromUnicode,), IAdaptTo, u(''), adapt_from_unicode)
 
-        field = Bool(title=u'Bool field', description=u'',
+        field = Bool(title=u('Bool field'), description=u(''),
                      readonly=False, required=True)
 
         self.assertEqual('bool', registry.queryAdapter(field, IAdaptTo))

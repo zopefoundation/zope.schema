@@ -14,6 +14,8 @@
 """Timedelta Field tests
 """
 from unittest import main, makeSuite
+
+from six import u
 from zope.schema import Timedelta
 from zope.schema.interfaces import RequiredMissing, InvalidValue
 from zope.schema.interfaces import TooSmall, TooBig
@@ -31,13 +33,13 @@ class TimedeltaTest(FieldTestBase):
         verifyObject(ITimedelta, self._Field_Factory())
 
     def testValidate(self):
-        field = self._Field_Factory(title=u'Timedelta field', description=u'',
+        field = self._Field_Factory(title=u('Timedelta field'), description=u(''),
                                     readonly=False, required=False)
         field.validate(None)
         field.validate(timedelta(minutes=15))
 
     def testValidateRequired(self):
-        field = self._Field_Factory(title=u'Timedelta field', description=u'',
+        field = self._Field_Factory(title=u('Timedelta field'), description=u(''),
                                     readonly=False, required=True)
         field.validate(timedelta(minutes=15))
 
@@ -46,7 +48,7 @@ class TimedeltaTest(FieldTestBase):
     def testValidateMin(self):
         t1 = timedelta(hours=2)
         t2 = timedelta(hours=3)
-        field = self._Field_Factory(title=u'Timedelta field', description=u'',
+        field = self._Field_Factory(title=u('Timedelta field'), description=u(''),
                                     readonly=False, required=False, min=t1)
         field.validate(None)
         field.validate(t1)
@@ -58,7 +60,7 @@ class TimedeltaTest(FieldTestBase):
         t1 = timedelta(minutes=1)
         t2 = timedelta(minutes=2)
         t3 = timedelta(minutes=3)
-        field = self._Field_Factory(title=u'Timedelta field', description=u'',
+        field = self._Field_Factory(title=u('Timedelta field'), description=u(''),
                                     readonly=False, required=False, max=t2)
         field.validate(None)
         field.validate(t1)
@@ -73,7 +75,7 @@ class TimedeltaTest(FieldTestBase):
         t4 = timedelta(days=4)
         t5 = timedelta(days=5)
 
-        field = self._Field_Factory(title=u'Timedelta field', description=u'',
+        field = self._Field_Factory(title=u('Timedelta field'), description=u(''),
                                     readonly=False, required=False,
                                     min=t2, max=t4)
         field.validate(None)

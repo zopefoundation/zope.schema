@@ -16,6 +16,7 @@
 
 from unittest import TestCase, TestSuite, main, makeSuite
 
+from six import u, b
 from zope.interface import Interface
 from zope.schema import Float, Text, Bytes
 from zope.schema.interfaces import ValidationError
@@ -25,10 +26,10 @@ from zope.schema.fieldproperty import (FieldProperty,
 
 class I(Interface):
 
-    title = Text(description=u"Short summary", default=u'say something')
+    title = Text(description=u("Short summary"), default=u('say something'))
     weight = Float(min=0.0)
-    code = Bytes(min_length=6, max_length=6, default='xxxxxx')
-    date = Float(title=u'Date', readonly=True)
+    code = Bytes(min_length=6, max_length=6, default=b('xxxxxx'))
+    date = Float(title=u('Date'), readonly=True)
 
 
 class C(object):
@@ -44,24 +45,24 @@ class Test(TestCase):
 
     def test_basic(self):
         c = self.klass()
-        self.assertEqual(c.title, u'say something')
+        self.assertEqual(c.title, u('say something'))
         self.assertEqual(c.weight, None)
-        self.assertEqual(c.code, 'xxxxxx')
-        self.assertRaises(ValidationError, setattr, c, 'title', 'foo')
-        self.assertRaises(ValidationError, setattr, c, 'weight', 'foo')
+        self.assertEqual(c.code, b('xxxxxx'))
+        self.assertRaises(ValidationError, setattr, c, 'title', b('foo'))
+        self.assertRaises(ValidationError, setattr, c, 'weight', b('foo'))
         self.assertRaises(ValidationError, setattr, c, 'weight', -1.0)
         self.assertRaises(ValidationError, setattr, c, 'weight', 2)
         self.assertRaises(ValidationError, setattr, c, 'code', -1)
-        self.assertRaises(ValidationError, setattr, c, 'code', 'xxxx')
-        self.assertRaises(ValidationError, setattr, c, 'code', u'xxxxxx')
+        self.assertRaises(ValidationError, setattr, c, 'code', b('xxxx'))
+        self.assertRaises(ValidationError, setattr, c, 'code', u('xxxxxx'))
 
-        c.title = u'c is good'
+        c.title = u('c is good')
         c.weight = 10.0
-        c.code = 'abcdef'
+        c.code = b('abcdef')
 
-        self.assertEqual(c.title, u'c is good')
+        self.assertEqual(c.title, u('c is good'))
         self.assertEqual(c.weight, 10)
-        self.assertEqual(c.code, 'abcdef')
+        self.assertEqual(c.code, b('abcdef'))
 
     def test_readonly(self):
         c = self.klass()

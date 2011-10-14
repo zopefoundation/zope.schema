@@ -50,7 +50,7 @@ class FieldProperty(object):
     def __set__(self, inst, value):
         field = self.__field.bind(inst)
         field.validate(value)
-        if field.readonly and inst.__dict__.has_key(self.__name):
+        if field.readonly and self.__name in inst.__dict__:
             raise ValueError(self.__name, 'field is readonly')
         inst.__dict__[self.__name] = value
 

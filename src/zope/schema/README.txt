@@ -35,24 +35,25 @@ instances, we now use schema fields:
 
   >>> import zope.interface
   >>> import zope.schema
+  >>> from six import u, b
 
   >>> class IBookmark(zope.interface.Interface):
   ...     title = zope.schema.TextLine(
-  ...         title=u'Title',
-  ...         description=u'The title of the bookmark',
+  ...         title=u('Title'),
+  ...         description=u('The title of the bookmark'),
   ...         required=True)
   ...
   ...     url = zope.schema.URI(
-  ...         title=u'Bookmark URL',
-  ...         description=u'URL of the Bookmark',
+  ...         title=u('Bookmark URL'),
+  ...         description=u('URL of the Bookmark'),
   ...         required=True)
   ...
 
 Now we create a class that implements this interface and create an instance of
 it:
 
-  >>> class Bookmark(object):
-  ...     zope.interface.implements(IBookmark)
+  >>> @zope.interface.implementer(IBookmark)
+  ... class Bookmark(object):
   ...
   ...     title = None
   ...     url = None
@@ -63,8 +64,8 @@ We would now like to only add validated values to the class. This can be done
 by first validating and then setting the value on the object. The first step
 is to define some data:
 
-  >>> title = u'Zope 3 Website'
-  >>> url = 'http://dev.zope.org/Zope3'
+  >>> title = u('Zope 3 Website')
+  >>> url = b('http://dev.zope.org/Zope3')
 
 Now we, get the fields from the interface:
 
@@ -85,12 +86,12 @@ Now that the fields are bound, we can finally validate the data:
 If the validation is successful, ``None`` is returned. If a validation error
 occurs a ``ValidationError`` will be raised; for example:
 
-  >>> url_bound.validate(u'http://zope.org/foo')
+  >>> url_bound.validate(u('http://zope.org/foo'))
   Traceback (most recent call last):
   ...
   WrongType: (u'http://zope.org/foo', <type 'str'>, 'url')
 
-  >>> url_bound.validate('foo.bar')
+  >>> url_bound.validate(b('foo.bar'))
   Traceback (most recent call last):
   ...
   InvalidURI: foo.bar
@@ -128,16 +129,16 @@ down example from the programmer's tutorial:
     >>> class IContact(zope.interface.Interface):
     ...     """Provides access to basic contact information."""
     ...
-    ...     first = zope.schema.TextLine(title=u"First name")
+    ...     first = zope.schema.TextLine(title=u("First name"))
     ...
-    ...     last = zope.schema.TextLine(title=u"Last name")
+    ...     last = zope.schema.TextLine(title=u("Last name"))
     ...
-    ...     email = zope.schema.TextLine(title=u"Electronic mail address")
+    ...     email = zope.schema.TextLine(title=u("Electronic mail address"))
     ...
-    ...     address = zope.schema.Text(title=u"Postal address")
+    ...     address = zope.schema.Text(title=u("Postal address"))
     ...
     ...     postalCode = zope.schema.TextLine(
-    ...         title=u"Postal code",
+    ...         title=u("Postal code"),
     ...         constraint=re.compile("\d{5,5}(-\d{4,4})?$").match)
 
 ``TextLine`` is a field and expresses that an attribute is a single line
@@ -161,8 +162,8 @@ Now we want a class that adheres to the ``IContact`` schema:
 Now you can see if an instance of ``Contact`` actually implements the
 schema:
 
-    >>> someone = Contact(u'Tim', u'Roberts', u'tim@roberts', u'',
-    ...                   u'12032-3492')
+    >>> someone = Contact(u('Tim'), u('Roberts'), u('tim@roberts'), u(''),
+    ...                   u('12032-3492'))
 
     >>> for field in zope.schema.getFields(IContact).values():
     ...     bound = field.bind(someone)

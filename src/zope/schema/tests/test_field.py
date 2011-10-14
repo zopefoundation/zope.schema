@@ -19,19 +19,21 @@ import re
 from doctest import DocTestSuite
 from unittest import TestCase, TestSuite, makeSuite
 
+from six import u, b
 from zope.interface import Interface, provider
 from zope.schema import Field, Text, Int
 from zope.schema.interfaces import IContextAwareDefaultFactory
 from zope.schema.interfaces import ValidationError, RequiredMissing
 from zope.schema.interfaces import ConstraintNotSatisfied, WrongType
 from zope.testing import renormalizing
+import zope.schema.tests
 
 class FieldTestBase(TestCase):
 
     def test_bind(self):
         field = self._Field_Factory(
             __name__ = 'x',
-            title=u'Not required field', description=u'',
+            title=u('Not required field'), description=u(''),
             readonly=False, required=False)
 
         field.interface = Interface
@@ -47,11 +49,11 @@ class FieldTestBase(TestCase):
         self.assertEqual(field.queryTaggedValue('a'), field2.queryTaggedValue('a'))
         for n in ('__class__', '__name__', '__doc__', 'title', 'description',
                   'readonly', 'required', 'interface'):
-            self.assertEquals(getattr(field2, n), getattr(field, n), n)
+            self.assertEqual(getattr(field2, n), getattr(field, n), n)
 
     def testValidate(self):
         field = self._Field_Factory(
-            title=u'Not required field', description=u'',
+            title=u('Not required field'), description=u(''),
             readonly=False, required=False)
         field.validate(None)
         field.validate('foo')
@@ -61,7 +63,7 @@ class FieldTestBase(TestCase):
 
     def testValidateRequired(self):
         field = self._Field_Factory(
-            title=u'Required field', description=u'',
+            title=u('Required field'), description=u(''),
             readonly=False, required=True)
         field.validate('foo')
         field.validate(1)
@@ -75,7 +77,7 @@ class CollectionFieldTestBase(FieldTestBase):
     def test_bind_binds_value_type(self):
         field = self._Field_Factory(
             __name__ = 'x',
-            title=u'Not required field', description=u'',
+            title=u('Not required field'), description=u(''),
             readonly=False, required=False,
             value_type=Int(),
             )
@@ -94,20 +96,20 @@ class FieldTest(FieldTestBase):
     _Field_Factory = Field
 
     def testSillyDefault(self):
-        self.assertRaises(ValidationError, Text, default="")
+        self.assertRaises(ValidationError, Text, default=b(""))
 
     def test__doc__(self):
-        field = Text(title=u"test fiield",
+        field = Text(title=u("test fiield"),
                      description=(
-                         u"To make sure that\n"
-                         u"doc strings are working correctly\n"
+                         u("To make sure that\n"
+                           "doc strings are working correctly\n")
                          )
                      )
         self.assertEqual(
             field.__doc__,
-            u"test fiield\n\n"
-            u"To make sure that\n"
-            u"doc strings are working correctly\n"
+            u("test fiield\n\n"
+              "To make sure that\n"
+              "doc strings are working correctly\n")
             )
 
     def testOrdering(self):
@@ -118,19 +120,19 @@ class FieldTest(FieldTestBase):
             a = Text()
             b = Text()
 
-        self.failUnless(S1['a'].order < S1['b'].order)
+        self.assertTrue(S1['a'].order < S1['b'].order)
 
         class S2(Interface):
             b = Text()
             a = Text()
 
-        self.failUnless(S2['a'].order > S2['b'].order)
+        self.assertTrue(S2['a'].order > S2['b'].order)
 
     def testConstraint(self):
         def isodd(x):
             return x % 2 == 1
 
-        i = Int(title=u'my constrained integer',
+        i = Int(title=u('my constrained integer'),
                 constraint=isodd)
 
         i.validate(11)
@@ -168,17 +170,18 @@ class FieldDefaultBehaviour(TestCase):
     def test_required_defaults_to_true(self):
         class MyField(Field):
             pass
-        field = MyField(title=u'my')
-        self.assert_(field.required)
+        field = MyField(title=u('my'))
+        self.assertTrue(field.required)
 
 def test_suite():
     checker = renormalizing.RENormalizing([
         (re.compile(r" with base 10: '125.6'"),
                     r': 125.6')
         ])
+    checker = checker + zope.schema.tests.py3_checker
     return TestSuite((
         makeSuite(FieldTest),
         makeSuite(FieldDefaultBehaviour),
-        DocTestSuite("zope.schema._field"),
+        DocTestSuite("zope.schema._field", checker=zope.schema.tests.py3_checker),
         DocTestSuite("zope.schema._bootstrapfields",checker=checker),
         ))

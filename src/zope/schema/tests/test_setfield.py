@@ -15,7 +15,8 @@
 """
 from unittest import TestSuite, main, makeSuite
 
-from zope.interface import implements, providedBy
+from six import u
+from zope.interface import implementer, providedBy
 from zope.schema import Field, Set, Int, FrozenSet
 from zope.schema.interfaces import IField
 from zope.schema.interfaces import (
@@ -32,7 +33,7 @@ class SetTest(CollectionFieldTestBase):
     _Field_Factory = Set
 
     def testValidate(self):
-        field = Set(title=u'Set field', description=u'',
+        field = Set(title=u('Set field'), description=u(''),
                     readonly=False, required=False)
         field.validate(None)
         field.validate(set())
@@ -50,7 +51,7 @@ class SetTest(CollectionFieldTestBase):
         self.assertRaises(WrongType, field.validate, frozenset((1, 2, 3)))
 
     def testValidateRequired(self):
-        field = Set(title=u'Set field', description=u'',
+        field = Set(title=u('Set field'), description=u(''),
                     readonly=False, required=True)
         field.validate(set())
         field.validate(set((1, 2)))
@@ -79,7 +80,7 @@ class SetTest(CollectionFieldTestBase):
         field.default = missing
 
     def testValidateMinValues(self):
-        field = Set(title=u'Set field', description=u'',
+        field = Set(title=u('Set field'), description=u(''),
                     readonly=False, required=False, min_length=2)
         field.validate(None)
         field.validate(set((1, 2)))
@@ -93,7 +94,7 @@ class SetTest(CollectionFieldTestBase):
         self.assertRaises(TooShort, field.validate, set((3,)))
 
     def testValidateMaxValues(self):
-        field = Set(title=u'Set field', description=u'',
+        field = Set(title=u('Set field'), description=u(''),
                     readonly=False, required=False, max_length=2)
         field.validate(None)
         field.validate(set())
@@ -107,7 +108,7 @@ class SetTest(CollectionFieldTestBase):
         self.assertRaises(TooLong, field.validate, set((1, 2, 3)))
 
     def testValidateMinValuesAndMaxValues(self):
-        field = Set(title=u'Set field', description=u'',
+        field = Set(title=u('Set field'), description=u(''),
                     readonly=False, required=False,
                     min_length=1, max_length=2)
         field.validate(None)
@@ -122,7 +123,7 @@ class SetTest(CollectionFieldTestBase):
         self.assertRaises(TooLong, field.validate, set((1, 2, 3)))
 
     def testValidateValueTypes(self):
-        field = Set(title=u'Set field', description=u'',
+        field = Set(title=u('Set field'), description=u(''),
                     readonly=False, required=False,
                     value_type=Int())
         field.validate(None)
@@ -149,21 +150,22 @@ class SetTest(CollectionFieldTestBase):
 
         # however, allow anything that implements IField
         Set(value_type=Field())
+        @implementer(IField)
         class FakeField(object):
-            implements(IField)
+            pass
         Set(value_type=FakeField())
     
     def testNoUniqueArgument(self):
         self.assertRaises(TypeError, Set, unique=False)
         self.assertRaises(TypeError, Set, unique=True)
-        self.failUnless(Set().unique)
+        self.assertTrue(Set().unique)
     
     def testImplements(self):
         field = Set()
-        self.failUnless(ISet.providedBy(field))
-        self.failUnless(IUnorderedCollection.providedBy(field))
-        self.failUnless(IAbstractSet.providedBy(field))
-        self.failUnless(ICollection.providedBy(field))
+        self.assertTrue(ISet.providedBy(field))
+        self.assertTrue(IUnorderedCollection.providedBy(field))
+        self.assertTrue(IAbstractSet.providedBy(field))
+        self.assertTrue(ICollection.providedBy(field))
 
 class FrozenSetTest(CollectionFieldTestBase):
     """Test the Tuple Field."""
@@ -171,7 +173,7 @@ class FrozenSetTest(CollectionFieldTestBase):
     _Field_Factory = FrozenSet
 
     def testValidate(self):
-        field = FrozenSet(title=u'Set field', description=u'',
+        field = FrozenSet(title=u('Set field'), description=u(''),
                     readonly=False, required=False)
         field.validate(None)
         field.validate(frozenset())
@@ -187,7 +189,7 @@ class FrozenSetTest(CollectionFieldTestBase):
         self.assertRaises(WrongType, field.validate, set((1, 2, 3)))
 
     def testValidateRequired(self):
-        field = FrozenSet(title=u'Set field', description=u'',
+        field = FrozenSet(title=u('Set field'), description=u(''),
                     readonly=False, required=True)
         field.validate(frozenset())
         field.validate(frozenset((1, 2)))
@@ -212,7 +214,7 @@ class FrozenSetTest(CollectionFieldTestBase):
         field.default = missing
 
     def testValidateMinValues(self):
-        field = FrozenSet(title=u'FrozenSet field', description=u'',
+        field = FrozenSet(title=u('FrozenSet field'), description=u(''),
                     readonly=False, required=False, min_length=2)
         field.validate(None)
         field.validate(frozenset((1, 2)))
@@ -222,7 +224,7 @@ class FrozenSetTest(CollectionFieldTestBase):
         self.assertRaises(TooShort, field.validate, frozenset((3,)))
 
     def testValidateMaxValues(self):
-        field = FrozenSet(title=u'FrozenSet field', description=u'',
+        field = FrozenSet(title=u('FrozenSet field'), description=u(''),
                           readonly=False, required=False, max_length=2)
         field.validate(None)
         field.validate(frozenset())
@@ -232,7 +234,7 @@ class FrozenSetTest(CollectionFieldTestBase):
         self.assertRaises(TooLong, field.validate, frozenset((1, 2, 3)))
 
     def testValidateMinValuesAndMaxValues(self):
-        field = FrozenSet(title=u'FrozenSet field', description=u'',
+        field = FrozenSet(title=u('FrozenSet field'), description=u(''),
                           readonly=False, required=False,
                           min_length=1, max_length=2)
         field.validate(None)
@@ -243,7 +245,7 @@ class FrozenSetTest(CollectionFieldTestBase):
         self.assertRaises(TooLong, field.validate, frozenset((1, 2, 3)))
 
     def testValidateValueTypes(self):
-        field = FrozenSet(title=u'FrozenSet field', description=u'',
+        field = FrozenSet(title=u('FrozenSet field'), description=u(''),
                           readonly=False, required=False,
                           value_type=Int())
         field.validate(None)
@@ -264,21 +266,22 @@ class FrozenSetTest(CollectionFieldTestBase):
 
         # however, allow anything that implements IField
         FrozenSet(value_type=Field())
+        @implementer(IField)
         class FakeField(object):
-            implements(IField)
+            pass
         FrozenSet(value_type=FakeField())
     
     def testNoUniqueArgument(self):
         self.assertRaises(TypeError, FrozenSet, unique=False)
         self.assertRaises(TypeError, FrozenSet, unique=True)
-        self.failUnless(FrozenSet().unique)
+        self.assertTrue(FrozenSet().unique)
     
     def testImplements(self):
         field = FrozenSet()
-        self.failUnless(IFrozenSet.providedBy(field))
-        self.failUnless(IAbstractSet.providedBy(field))
-        self.failUnless(IUnorderedCollection.providedBy(field))
-        self.failUnless(ICollection.providedBy(field))
+        self.assertTrue(IFrozenSet.providedBy(field))
+        self.assertTrue(IAbstractSet.providedBy(field))
+        self.assertTrue(IUnorderedCollection.providedBy(field))
+        self.assertTrue(ICollection.providedBy(field))
 
 def test_suite():
     suite = TestSuite()

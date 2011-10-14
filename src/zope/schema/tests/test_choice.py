@@ -15,13 +15,14 @@
 """
 import unittest
 
+from six import u
 from zope.schema import vocabulary
 from zope.schema import Choice
 from zope.schema.interfaces import ConstraintNotSatisfied
 from zope.schema.interfaces import ValidationError
 from zope.schema.interfaces import InvalidValue, NotAContainer, NotUnique
 
-from test_vocabulary import SampleVocabulary, DummyRegistry
+from zope.schema.tests.test_vocabulary import SampleVocabulary, DummyRegistry
 
 
 class Value_ChoiceFieldTests(unittest.TestCase):
@@ -41,7 +42,7 @@ class Value_ChoiceFieldTests(unittest.TestCase):
         choice = Choice(values=['a', 'c'])
         choice.validate('a')
         choice.validate('c')
-        choice.validate(u'c')
+        choice.validate(u('c'))
         self.assertRaises(ConstraintNotSatisfied, choice.validate, 'd')
 
     def test_validate_tuple(self):
@@ -71,11 +72,11 @@ class Vocabulary_ChoiceFieldTests(unittest.TestCase):
     def check_preconstructed(self, cls, okval, badval):
         v = SampleVocabulary()
         field = cls(vocabulary=v)
-        self.assert_(field.vocabulary is v)
-        self.assert_(field.vocabularyName is None)
+        self.assertTrue(field.vocabulary is v)
+        self.assertTrue(field.vocabularyName is None)
         bound = field.bind(None)
-        self.assert_(bound.vocabulary is v)
-        self.assert_(bound.vocabularyName is None)
+        self.assertTrue(bound.vocabulary is v)
+        self.assertTrue(bound.vocabularyName is None)
         bound.default = okval
         self.assertEqual(bound.default, okval)
         self.assertRaises(ValidationError, setattr, bound, "default", badval)
@@ -86,11 +87,11 @@ class Vocabulary_ChoiceFieldTests(unittest.TestCase):
     def check_constructed(self, cls, okval, badval):
         vocabulary.setVocabularyRegistry(DummyRegistry())
         field = cls(vocabulary="vocab")
-        self.assert_(field.vocabulary is None)
+        self.assertTrue(field.vocabulary is None)
         self.assertEqual(field.vocabularyName, "vocab")
         o = object()
         bound = field.bind(o)
-        self.assert_(isinstance(bound.vocabulary, SampleVocabulary))
+        self.assertTrue(isinstance(bound.vocabulary, SampleVocabulary))
         bound.default = okval
         self.assertEqual(bound.default, okval)
         self.assertRaises(ValidationError, setattr, bound, "default", badval)

@@ -35,14 +35,11 @@ def getFields(schema):
             fields[name] = attr
     return fields
 
-
 def getFieldsInOrder(schema,
-                     _fieldsorter=lambda x, y: cmp(x[1].order, y[1].order)):
+                     _field_key=lambda x: x[1].order):
     """Return a list of (name, value) tuples in native schema order.
     """
-    fields = getFields(schema).items()
-    fields.sort(_fieldsorter)
-    return fields
+    return sorted(getFields(schema).items(), key=_field_key)
 
 
 def getFieldNamesInOrder(schema):
@@ -82,13 +79,13 @@ def getSchemaValidationErrors(schema, object):
             continue
         try:
             value = getattr(object, name)
-        except AttributeError, error:
+        except AttributeError as error:
             # property for the given name is not implemented
             errors.append((
                 name, zope.schema.interfaces.SchemaNotFullyImplemented(error)))
         else:
             try:
                 attribute.bind(object).validate(value)
-            except zope.schema.ValidationError, e:
+            except zope.schema.ValidationError as e:
                 errors.append((name, e))
     return errors

@@ -14,6 +14,7 @@
 """String field tests
 """
 from unittest import TestSuite, main, makeSuite
+from six import b, u
 from zope.schema import Bytes, BytesLine, Text, TextLine, Password
 from zope.schema.interfaces import ValidationError, WrongType
 from zope.schema.interfaces import RequiredMissing, InvalidValue
@@ -24,7 +25,7 @@ class StrTest(FieldTestBase):
     """Test the Str Field."""
 
     def testValidate(self):
-        field = self._Field_Factory(title=u'Str field', description=u'',
+        field = self._Field_Factory(title=u('Str field'), description=u(''),
                                     readonly=False, required=False)
         field.validate(None)
         field.validate(self._convert('foo'))
@@ -36,7 +37,7 @@ class StrTest(FieldTestBase):
         # we need to set the min-length to 1.
 
         field = self._Field_Factory(
-            title=u'Str field', description=u'',
+            title=u('Str field'), description=u(''),
             readonly=False, required=True, min_length=1)
         field.validate(self._convert('foo'))
 
@@ -45,7 +46,7 @@ class StrTest(FieldTestBase):
 
     def testValidateMinLength(self):
         field = self._Field_Factory(
-            title=u'Str field', description=u'',
+            title=u('Str field'), description=u(''),
             readonly=False, required=False, min_length=3)
         field.validate(None)
         field.validate(self._convert('333'))
@@ -57,7 +58,7 @@ class StrTest(FieldTestBase):
 
     def testValidateMaxLength(self):
         field = self._Field_Factory(
-            title=u'Str field', description=u'',
+            title=u('Str field'), description=u(''),
             readonly=False, required=False, max_length=5)
         field.validate(None)
         field.validate(self._convert(''))
@@ -69,7 +70,7 @@ class StrTest(FieldTestBase):
 
     def testValidateMinLengthAndMaxLength(self):
         field = self._Field_Factory(
-            title=u'Str field', description=u'',
+            title=u('Str field'), description=u(''),
             readonly=False, required=False,
             min_length=3, max_length=5)
 
@@ -87,32 +88,34 @@ class StrTest(FieldTestBase):
 class MultiLine(object):
 
     def test_newlines(self):
-        field = self._Field_Factory(title=u'Str field')
+        field = self._Field_Factory(title=u('Str field'))
         field.validate(self._convert('hello\nworld'))
 
 
 class BytesTest(StrTest, MultiLine):
     _Field_Factory = Bytes
-    _convert = str
+
+    def _convert(self, v):
+        return b(v)
 
     def testBadStringType(self):
         field = self._Field_Factory()
-        self.assertRaises(ValidationError, field.validate, u'hello')
+        self.assertRaises(ValidationError, field.validate, u('hello'))
 
 
 class TextTest(StrTest, MultiLine):
     _Field_Factory = Text
     def _convert(self, v):
-        return unicode(v, 'ascii')
+        return u(v)
 
     def testBadStringType(self):
         field = self._Field_Factory()
-        self.assertRaises(ValidationError, field.validate, 'hello')
+        self.assertRaises(ValidationError, field.validate, b('hello'))
 
 class SingleLine(object):
 
     def test_newlines(self):
-        field = self._Field_Factory(title=u'Str field')
+        field = self._Field_Factory(title=u('Str field'))
         self.assertRaises(ConstraintNotSatisfied,
                                     field.validate,
                                     self._convert('hello\nworld'))
@@ -125,7 +128,7 @@ class PasswordTest(SingleLine, TextTest):
             password = None
         dummy = Dummy()
 
-        field = self._Field_Factory(title=u'Str field', description=u'',
+        field = self._Field_Factory(title=u('Str field'), description=u(''),
                                     readonly=False, required=True, __name__='password')
         field = field.bind(dummy)
 
@@ -136,12 +139,12 @@ class PasswordTest(SingleLine, TextTest):
         field.validate(field.UNCHANGED_PASSWORD)
 
         # Using a normal value, the field gets updated
-        field.set(dummy, u'test')
-        self.assertEquals(u'test', dummy.password)
+        field.set(dummy, u('test'))
+        self.assertEqual(u('test'), dummy.password)
 
         # Using UNCHANGED_PASSWORD the field is not updated.
         field.set(dummy, field.UNCHANGED_PASSWORD)
-        self.assertEquals(u'test', dummy.password)
+        self.assertEqual(u('test'), dummy.password)
 
 
 class LineTest(SingleLine, BytesTest):

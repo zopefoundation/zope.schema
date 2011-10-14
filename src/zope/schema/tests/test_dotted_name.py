@@ -14,6 +14,8 @@
 """DottedName field tests
 """
 from unittest import main, makeSuite
+
+from six import b
 from zope.schema import DottedName
 from zope.schema.tests.test_field import FieldTestBase
 from zope.schema.interfaces import InvalidDottedName, RequiredMissing

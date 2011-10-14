@@ -15,7 +15,8 @@
 """
 from unittest import main, makeSuite
 
-from zope.interface import implements
+from six import u
+from zope.interface import implementer
 from zope.schema import Field, List, Int
 from zope.schema.interfaces import IField
 from zope.schema.interfaces import ICollection, ISequence, IList
@@ -30,7 +31,7 @@ class ListTest(CollectionFieldTestBase):
     _Field_Factory = List
 
     def testValidate(self):
-        field = List(title=u'List field', description=u'',
+        field = List(title=u('List field'), description=u(''),
                      readonly=False, required=False)
         field.validate(None)
         field.validate([])
@@ -38,7 +39,7 @@ class ListTest(CollectionFieldTestBase):
         field.validate([3,])
 
     def testValidateRequired(self):
-        field = List(title=u'List field', description=u'',
+        field = List(title=u('List field'), description=u(''),
                      readonly=False, required=True)
         field.validate([])
         field.validate([1, 2])
@@ -47,7 +48,7 @@ class ListTest(CollectionFieldTestBase):
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def testValidateMinValues(self):
-        field = List(title=u'List field', description=u'',
+        field = List(title=u('List field'), description=u(''),
                      readonly=False, required=False, min_length=2)
         field.validate(None)
         field.validate([1, 2])
@@ -57,7 +58,7 @@ class ListTest(CollectionFieldTestBase):
         self.assertRaises(TooShort, field.validate, [1,])
 
     def testValidateMaxValues(self):
-        field = List(title=u'List field', description=u'',
+        field = List(title=u('List field'), description=u(''),
                      readonly=False, required=False, max_length=2)
         field.validate(None)
         field.validate([])
@@ -67,7 +68,7 @@ class ListTest(CollectionFieldTestBase):
         self.assertRaises(TooLong, field.validate, [1, 2, 3])
 
     def testValidateMinValuesAndMaxValues(self):
-        field = List(title=u'List field', description=u'',
+        field = List(title=u('List field'), description=u(''),
                      readonly=False, required=False,
                      min_length=1, max_length=2)
         field.validate(None)
@@ -78,7 +79,7 @@ class ListTest(CollectionFieldTestBase):
         self.assertRaises(TooLong, field.validate, [1, 2, 3])
 
     def testValidateValueTypes(self):
-        field = List(title=u'List field', description=u'',
+        field = List(title=u('List field'), description=u(''),
                      readonly=False, required=False,
                      value_type=Int())
         field.validate(None)
@@ -98,21 +99,22 @@ class ListTest(CollectionFieldTestBase):
 
         # however, allow anything that implements IField
         List(value_type=Field())
+        @implementer(IField)
         class FakeField(object):
-            implements(IField)
+            pass
         List(value_type=FakeField())
 
     def testUnique(self):
-        field = self._Field_Factory(title=u'test field', description=u'',
+        field = self._Field_Factory(title=u('test field'), description=u(''),
                                     readonly=False, required=True, unique=True)
         field.validate([1, 2])
         self.assertRaises(NotUnique, field.validate, [1, 2, 1])
     
     def testImplements(self):
         field = List()
-        self.failUnless(IList.providedBy(field))
-        self.failUnless(ISequence.providedBy(field))
-        self.failUnless(ICollection.providedBy(field))
+        self.assertTrue(IList.providedBy(field))
+        self.assertTrue(ISequence.providedBy(field))
+        self.assertTrue(ICollection.providedBy(field))
 
 def test_suite():
     return makeSuite(ListTest)

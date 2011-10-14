@@ -26,11 +26,12 @@ uniqueness. In a schema, this might be written as follows:
 
   >>> from zope.interface import Interface
   >>> from zope.schema import List, Float
+  >>> from six import u
   >>> class IInventoryItem(Interface):
   ...     pricePoints = List(
-  ...         title=u"Price Points",
+  ...         title=u("Price Points"),
   ...         unique=True,
-  ...         value_type=Float(title=u"Price", min=0.0)
+  ...         value_type=Float(title=u("Price"), min=0.0)
   ...     )
 
 This indicates several things.

@@ -16,6 +16,7 @@
 __docformat__ = "reStructuredText"
 
 from zope.interface import Interface, Attribute
+from six import u, PY3
 
 from zope.schema._messageid import _
 
@@ -107,46 +108,46 @@ class IField(Interface):
         """
 
     title = TextLine(
-        title=_(u"Title"),
-        description=_(u"A short summary or label"),
-        default=u"",
+        title=_("Title"),
+        description=_("A short summary or label"),
+        default=u(""),
         required=False,
         )
 
     description = Text(
-        title=_(u"Description"),
-        description=_(u"A description of the field"),
-        default=u"",
+        title=_("Description"),
+        description=_("A description of the field"),
+        default=u(""),
         required=False,
         )
 
     required = Bool(
-        title=_(u"Required"),
+        title=_("Required"),
         description=(
-        _(u"Tells whether a field requires its value to exist.")),
+        _("Tells whether a field requires its value to exist.")),
         default=True)
 
     readonly = Bool(
-        title=_(u"Read Only"),
-        description=_(u"If true, the field's value cannot be changed."),
+        title=_("Read Only"),
+        description=_("If true, the field's value cannot be changed."),
         required=False,
         default=False)
 
     default = Field(
-        title=_(u"Default Value"),
-        description=_(u"""The field default value may be None or a legal
+        title=_("Default Value"),
+        description=_("""The field default value may be None or a legal
                         field value""")
         )
 
     missing_value = Field(
-        title=_(u"Missing Value"),
-        description=_(u"""If input for this Field is missing, and that's ok,
+        title=_("Missing Value"),
+        description=_("""If input for this Field is missing, and that's ok,
                           then this is the value to use""")
         )
 
     order = Int(
-        title=_(u"Field Order"),
-        description=_(u"""
+        title=_("Field Order"),
+        description=_("""
         The order attribute can be used to determine the order in
         which fields in a schema were defined. If one field is created
         after another (in the same thread), its order will be
@@ -159,7 +160,7 @@ class IField(Interface):
         )
 
     def constraint(value):
-        u"""Check a customized constraint on the value.
+        """Check a customized constraint on the value.
 
         You can implement this method with your Field to
         require a certain constraint.  This relaxes the need
@@ -168,7 +169,7 @@ class IField(Interface):
         """
 
     def validate(value):
-        u"""Validate that the given value is a valid field value.
+        """Validate that the given value is a valid field value.
 
         Returns nothing but raises an error if the value is invalid.
         It checks everything specific to a Field and also checks
@@ -191,7 +192,7 @@ class IField(Interface):
         """
 
 class IIterable(IField):
-    u"""Fields with a value that can be iterated over.
+    """Fields with a value that can be iterated over.
 
     The value needs to support iteration; the implementation mechanism
     is not constrained.  (Either `__iter__()` or `__getitem__()` may be
@@ -199,7 +200,7 @@ class IIterable(IField):
     """
 
 class IContainer(IField):
-    u"""Fields whose value allows an ``x in value`` check.
+    """Fields whose value allows an ``x in value`` check.
 
     The value needs to support the `in` operator, but is not
     constrained in how it does so (whether it defines `__contains__()`
@@ -207,7 +208,7 @@ class IContainer(IField):
     """
 
 class IOrderable(IField):
-    u"""Field requiring its value to be orderable.
+    """Field requiring its value to be orderable.
 
     The set of value needs support a complete ordering; the
     implementation mechanism is not constrained.  Either `__cmp__()` or
@@ -215,36 +216,36 @@ class IOrderable(IField):
     """
 
 class ILen(IField):
-    u"""A Field requiring its value to have a length.
+    """A Field requiring its value to have a length.
 
     The value needs to have a conventional __len__ method.
     """
 
 class IMinMax(IOrderable):
-    u"""Field requiring its value to be between min and max.
+    """Field requiring its value to be between min and max.
 
     This implies that the value needs to support the IOrderable interface.
     """
 
     min = Field(
-        title=_(u"Start of the range"),
+        title=_("Start of the range"),
         required=False,
         default=None
         )
 
     max = Field(
-        title=_(u"End of the range (including the value itself)"),
+        title=_("End of the range (including the value itself)"),
         required=False,
         default=None
         )
 
 
 class IMinMaxLen(ILen):
-    u"""Field requiring the length of its value to be within a range"""
+    """Field requiring the length of its value to be within a range"""
 
     min_length = Int(
-        title=_(u"Minimum length"),
-        description=_(u"""
+        title=_("Minimum length"),
+        description=_("""
         Value after whitespace processing cannot have less than
         `min_length` characters (if a string type) or elements (if
         another sequence type). If `min_length` is ``None``, there is
@@ -255,8 +256,8 @@ class IMinMaxLen(ILen):
         default=0)
 
     max_length = Int(
-        title=_(u"Maximum length"),
-        description=_(u"""
+        title=_("Maximum length"),
+        description=_("""
         Value after whitespace processing cannot have greater
         or equal than `max_length` characters (if a string type) or
         elements (if another sequence type). If `max_length` is
@@ -266,87 +267,98 @@ class IMinMaxLen(ILen):
         default=None)
 
 class IInterfaceField(IField):
-    u"""Fields with a value that is an interface (implementing
+    """Fields with a value that is an interface (implementing
     zope.interface.Interface)."""
 
 class IBool(IField):
-    u"""Boolean Field."""
+    """Boolean Field."""
 
     default = Bool(
-        title=_(u"Default Value"),
-        description=_(u"""The field default value may be None or a legal
+        title=_("Default Value"),
+        description=_("""The field default value may be None or a legal
                         field value""")
         )
 
 class IBytes(IMinMaxLen, IIterable, IField):
-    u"""Field containing a byte string (like the python str).
+    """Field containing a byte string (like the python str).
 
     The value might be constrained to be with length limits.
     """
 
-class IASCII(IBytes):
-    u"""Field containing a 7-bit ASCII string. No characters > DEL
+class IText(IMinMaxLen, IIterable, IField):
+    """Field containing a unicode string."""
+
+# for things which are of the str type on both Python 2 and 3
+if PY3:
+    _IStr = IText
+else:
+    _IStr = IBytes
+
+class IASCII(_IStr):
+    """Field containing a 7-bit ASCII string. No characters > DEL
     (chr(127)) are allowed
 
     The value might be constrained to be with length limits.
     """
 
 class IBytesLine(IBytes):
-    u"""Field containing a byte string without newlines."""
+    """Field containing a byte string without newlines."""
 
 class IASCIILine(IASCII):
-    u"""Field containing a 7-bit ASCII string without newlines."""
-
-class IText(IMinMaxLen, IIterable, IField):
-    u"""Field containing a unicode string."""
+    """Field containing a 7-bit ASCII string without newlines."""
 
 class ISourceText(IText):
-    u"""Field for source text of object."""
+    """Field for source text of object."""
 
 class ITextLine(IText):
-    u"""Field containing a unicode string without newlines."""
+    """Field containing a unicode string without newlines."""
+
+if PY3:
+    _IStrLine = ITextLine
+else:
+    _IStrLine = IBytesLine
 
 class IPassword(ITextLine):
-    u"Field containing a unicode string without newlines that is a password."
+    "Field containing a unicode string without newlines that is a password."
 
 class IInt(IMinMax, IField):
-    u"""Field containing an Integer Value."""
+    """Field containing an Integer Value."""
 
     min = Int(
-        title=_(u"Start of the range"),
+        title=_("Start of the range"),
         required=False,
         default=None
         )
 
     max = Int(
-        title=_(u"End of the range (excluding the value itself)"),
+        title=_("End of the range (excluding the value itself)"),
         required=False,
         default=None
         )
 
     default = Int(
-        title=_(u"Default Value"),
-        description=_(u"""The field default value may be None or a legal
+        title=_("Default Value"),
+        description=_("""The field default value may be None or a legal
                         field value""")
         )
 
 class IFloat(IMinMax, IField):
-    u"""Field containing a Float."""
+    """Field containing a Float."""
 
 class IDecimal(IMinMax, IField):
-    u"""Field containing a Decimal."""
+    """Field containing a Decimal."""
 
 class IDatetime(IMinMax, IField):
-    u"""Field containing a DateTime."""
+    """Field containing a DateTime."""
 
 class IDate(IMinMax, IField):
-    u"""Field containing a date."""
+    """Field containing a date."""
 
 class ITimedelta(IMinMax, IField):
-    u"""Field containing a timedelta."""
+    """Field containing a timedelta."""
 
 class ITime(IMinMax, IField):
-    u"""Field containing a time."""
+    """Field containing a time."""
 
 def _is_field(value):
     if not IField.providedBy(value):
@@ -364,48 +376,48 @@ class IURI(IBytesLine):
     """A field containing an absolute URI
     """
 
-class IId(IBytesLine):
+class IId(_IStrLine):
     """A field containing a unique identifier
 
     A unique identifier is either an absolute URI or a dotted name.
     If it's a dotted name, it should have a module/package name as a prefix.
     """
 
-class IDottedName(IBytesLine):
+class IDottedName(_IStrLine):
     """Dotted name field.
 
     Values of DottedName fields must be Python-style dotted names.
     """
 
     min_dots = Int(
-        title=_(u"Minimum number of dots"),
+        title=_("Minimum number of dots"),
         required=True,
         min=0,
         default=0
         )
 
     max_dots = Int(
-        title=_(u"Maximum number of dots (should not be less than min_dots)"),
+        title=_("Maximum number of dots (should not be less than min_dots)"),
         required=False,
         default=None
         )
 
 class IChoice(IField):
-    u"""Field whose value is contained in a predefined set
+    """Field whose value is contained in a predefined set
 
     Only one, values or vocabulary, may be specified for a given choice.
     """
     vocabulary = Field(
-        title=_(u"Vocabulary or source providing values"),
-        description=_(u"The ISource, IContextSourceBinder or IBaseVocabulary "
-                      u"object that provides values for this field."),
+        title=_("Vocabulary or source providing values"),
+        description=_("The ISource, IContextSourceBinder or IBaseVocabulary "
+                      "object that provides values for this field."),
         required=False,
         default=None
         )
 
     vocabularyName = TextLine(
-        title=_(u"Vocabulary name"),
-        description=_(u"Vocabulary name to lookup in the vocabulary registry"),
+        title=_("Vocabulary name"),
+        description=_("Vocabulary name to lookup in the vocabulary registry"),
         required=False,
         default=None
         )
@@ -415,15 +427,15 @@ class IChoice(IField):
 # Abstract
 
 class ICollection(IMinMaxLen, IIterable, IContainer):
-    u"""Abstract interface containing a collection value.
+    """Abstract interface containing a collection value.
 
     The Value must be iterable and may have a min_length/max_length.
     """
 
     value_type = Field(
         title = _("Value Type"),
-        description = _(u"Field value items must conform to the given type, "
-                        u"expressed via a Field."))
+        description = _("Field value items must conform to the given type, "
+                        "expressed via a Field."))
 
     unique = Bool(
         title = _('Unique Members'),
@@ -432,47 +444,47 @@ class ICollection(IMinMaxLen, IIterable, IContainer):
         default=False)
 
 class ISequence(ICollection):
-    u"""Abstract interface specifying that the value is ordered"""
+    """Abstract interface specifying that the value is ordered"""
 
 class IUnorderedCollection(ICollection):
-    u"""Abstract interface specifying that the value cannot be ordered"""
+    """Abstract interface specifying that the value cannot be ordered"""
 
 class IAbstractSet(IUnorderedCollection):
-    u"""An unordered collection of unique values."""
+    """An unordered collection of unique values."""
 
-    unique = Attribute(u"This ICollection interface attribute must be True")
+    unique = Attribute("This ICollection interface attribute must be True")
 
 class IAbstractBag(IUnorderedCollection):
-    u"""An unordered collection of values, with no limitations on whether
+    """An unordered collection of values, with no limitations on whether
     members are unique"""
 
-    unique = Attribute(u"This ICollection interface attribute must be False")
+    unique = Attribute("This ICollection interface attribute must be False")
 
 # Concrete
 
 class ITuple(ISequence):
-    u"""Field containing a value that implements the API of a conventional
+    """Field containing a value that implements the API of a conventional
     Python tuple."""
 
 class IList(ISequence):
-    u"""Field containing a value that implements the API of a conventional
+    """Field containing a value that implements the API of a conventional
     Python list."""
 
 class ISet(IAbstractSet):
-    u"""Field containing a value that implements the API of a Python2.4+ set.
+    """Field containing a value that implements the API of a Python2.4+ set.
     """
 
 class IFrozenSet(IAbstractSet):
-    u"""Field containing a value that implements the API of a conventional
+    """Field containing a value that implements the API of a conventional
     Python 2.4+ frozenset."""
 
 # (end Collections)
 
 class IObject(IField):
-    u"""Field containing an Object value."""
+    """Field containing an Object value."""
 
     schema = Attribute("schema",
-        _(u"The Interface that defines the Fields comprising the Object."))
+        _("The Interface that defines the Fields comprising the Object."))
 
 class IBeforeObjectAssignedEvent(Interface):
     """An object is going to be assigned to an attribute on another object.
@@ -494,19 +506,19 @@ class IBeforeObjectAssignedEvent(Interface):
 
 
 class IDict(IMinMaxLen, IIterable, IContainer):
-    u"""Field containing a conventional dict.
+    """Field containing a conventional dict.
 
     The key_type and value_type fields allow specification
     of restrictions for keys and values contained in the dict.
     """
 
     key_type = Attribute("key_type",
-        _(u"""Field keys must conform to the given type, expressed
+        _("""Field keys must conform to the given type, expressed
            via a Field.
         """))
 
     value_type = Attribute("value_type",
-        _(u"""Field values must conform to the given type, expressed
+        _("""Field values must conform to the given type, expressed
            via a Field.
         """))
 
@@ -533,7 +545,7 @@ class ITokenizedTerm(ITerm):
 class ITitledTokenizedTerm(ITokenizedTerm):
     """A tokenized term that includes a title."""
 
-    title = TextLine(title=_(u"Title"))
+    title = TextLine(title=_("Title"))
 
 class ISource(Interface):
     """A set of values from which to choose

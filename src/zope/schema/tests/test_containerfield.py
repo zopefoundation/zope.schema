@@ -13,7 +13,12 @@
 ##############################################################################
 """Container field tests
 """
-from UserDict import UserDict
+from six import PY3, u
+if not PY3:
+    from UserDict import UserDict
+else:
+    #python3
+    from collections import UserDict
 from unittest import main, makeSuite
 from zope.schema import Container
 from zope.schema.interfaces import RequiredMissing, NotAContainer
@@ -25,7 +30,7 @@ class ContainerTest(FieldTestBase):
     _Field_Factory = Container
 
     def testValidate(self):
-        field = self._Field_Factory(title=u'test field', description=u'',
+        field = self._Field_Factory(title=u('test field'), description=u(''),
                                     readonly=False, required=False)
         field.validate(None)
         field.validate('')
@@ -38,7 +43,7 @@ class ContainerTest(FieldTestBase):
         self.assertRaises(NotAContainer, field.validate, True)
 
     def testValidateRequired(self):
-        field = self._Field_Factory(title=u'test field', description=u'',
+        field = self._Field_Factory(title=u('test field'), description=u(''),
                                     readonly=False, required=True)
 
         field.validate('')

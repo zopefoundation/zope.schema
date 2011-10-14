@@ -35,6 +35,13 @@ class ValidationError(zope.interface.Invalid):
             return -1
         return cmp(self.args, other.args)
 
+    def __eq__(self, other):
+        if not hasattr(other, 'args'):
+            return False
+        return self.args == other.args
+
+    __hash__ = zope.interface.Invalid.__hash__ # python3
+
     def __repr__(self):
         return '%s(%s)' % (self.__class__.__name__,
             ', '.join(repr(arg) for arg in self.args))

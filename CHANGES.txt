@@ -2,10 +2,13 @@
 CHANGES
 =======
 
-3.8.2 (unreleased)
+3.9.0 (unreleased)
 ------------------
 
-- ...
+- Fix deprecated unittest methods.
+
+- Port to Python 3. This adds a dependency on six and removes support for
+  Python 2.5.
 
 3.8.1 (2011-09-23)
 ------------------

@@ -16,8 +16,9 @@ from zope.schema import List
 """
 from unittest import TestSuite, main, makeSuite
 
+from six import u
 import zope.event
-from zope.interface import Attribute, Interface, implements
+from zope.interface import Attribute, Interface, implementer
 from zope.schema import Object, TextLine
 from zope.schema.fieldproperty import FieldProperty
 from zope.schema.interfaces import ValidationError
@@ -34,27 +35,26 @@ class ITestSchema(Interface):
     """A test schema"""
 
     foo = TextLine(
-        title=_(u"Foo"),
-        description=_(u"Foo description"),
-        default=u"",
+        title=_("Foo"),
+        description=_("Foo description"),
+        default=u(""),
         required=True)
 
     bar = TextLine(
-        title=_(u"Bar"),
-        description=_(u"Bar description"),
-        default=u"",
+        title=_("Bar"),
+        description=_("Bar description"),
+        default=u(""),
         required=False)
 
     attribute = Attribute("Test attribute, an attribute can't be validated.")
 
 
+@implementer(ITestSchema)
 class TestClass(object):
 
-    implements(ITestSchema)
-
-    _foo = u''
-    _bar = u''
-    _attribute = u''
+    _foo = u('')
+    _bar = u('')
+    _attribute = u('')
 
     def getfoo(self):
         return self._foo
@@ -62,7 +62,7 @@ class TestClass(object):
     def setfoo(self, value):
         self._foo = value
 
-    foo = property(getfoo, setfoo, None, u'foo')
+    foo = property(getfoo, setfoo, None, u('foo'))
 
     def getbar(self):
         return self._bar
@@ -70,7 +70,7 @@ class TestClass(object):
     def setbar(self, value):
         self._bar = value
 
-    bar = property(getbar, setbar, None, u'foo')
+    bar = property(getbar, setbar, None, u('foo'))
 
     def getattribute(self):
         return self._attribute
@@ -78,12 +78,11 @@ class TestClass(object):
     def setattribute(self, value):
         self._attribute = value
 
-    attribute = property(getattribute, setattribute, None, u'attribute')
+    attribute = property(getattribute, setattribute, None, u('attribute'))
 
 
+@implementer(ITestSchema)
 class FieldPropertyTestClass(object):
-
-    implements(ITestSchema)
 
 
     foo = FieldProperty(ITestSchema['foo'])
@@ -91,9 +90,8 @@ class FieldPropertyTestClass(object):
     attribute = FieldProperty(ITestSchema['attribute'])
 
 
+@implementer(ITestSchema)
 class NotFullyImplementedTestClass(object):
-
-    implements(ITestSchema)
 
     foo = FieldProperty(ITestSchema['foo'])
     # bar = FieldProperty(ITestSchema['bar']): bar is not implemented
@@ -104,14 +102,13 @@ class ISchemaWithObjectFieldAsInterface(Interface):
 
     obj = Object(
         schema=Interface,
-        title=_(u"Object"),
-        description=_(u"object description"),
+        title=_("Object"),
+        description=_("object description"),
         required=False)
 
 
+@implementer(ISchemaWithObjectFieldAsInterface)
 class ClassWithObjectFieldAsInterface(object):
-
-    implements(ISchemaWithObjectFieldAsInterface)
 
     _obj = None
 
@@ -121,7 +118,7 @@ class ClassWithObjectFieldAsInterface(object):
     def setobj(self, value):
         self._obj = value
 
-    obj = property(getobj, setobj, None, u'obj')
+    obj = property(getobj, setobj, None, u('obj'))
 
 
 class IUnit(Interface):
@@ -129,15 +126,15 @@ class IUnit(Interface):
 
     boss = Object(
         schema=Interface,
-        title=_(u"Boss"),
-        description=_(u"Boss description"),
+        title=_("Boss"),
+        description=_("Boss description"),
         required=False,
         )
 
     members = List(
         value_type=Object(schema=Interface),
-        title=_(u"Member List"),
-        description=_(u"Member list description"),
+        title=_("Member List"),
+        description=_("Member list description"),
         required=False,
         )
 
@@ -147,8 +144,8 @@ class IPerson(Interface):
 
     unit = Object(
         schema=IUnit,
-        title=_(u"Unit"),
-        description=_(u"Unit description"),
+        title=_("Unit"),
+        description=_("Unit description"),
         required=False,
         )
 
@@ -156,18 +153,16 @@ IUnit['boss'].schema = IPerson
 IUnit['members'].value_type.schema = IPerson
 
 
+@implementer(IUnit)
 class Unit(object):
-
-    implements(IUnit)
 
     def __init__(self, person, person_list):
         self.boss = person
         self.members = person_list
 
 
+@implementer(IPerson)
 class Person(object):
-
-    implements(IPerson)
 
     def __init__(self, unit):
         self.unit = unit
@@ -179,9 +174,9 @@ class ObjectTest(CleanUp, FieldTestBase):
     def getErrors(self, f, *args, **kw):
         try:
             f(*args, **kw)
-        except WrongContainedType, e:
+        except WrongContainedType as e:
             try:
-                return e[0]
+                return e.args[0]
             except:
                 return []
         self.fail('Expected WrongContainedType Error')
@@ -224,7 +219,7 @@ class ObjectTest(CleanUp, FieldTestBase):
 
     def test_validate_required(self):
         field = self._Field_Factory(
-            title=u'Required field', description=u'',
+            title=u('Required field'), description=u(''),
             readonly=False, required=True)
         self.assertRaises(RequiredMissing, field.validate, None)
 
@@ -238,7 +233,7 @@ class ObjectTest(CleanUp, FieldTestBase):
         self.assertRaises(ValidationError, field.validate, data)
         self.assertRaises(WrongContainedType, field.validate, data)
         errors = self.getErrors(field.validate, data)
-        self.assertEquals(errors[0], RequiredMissing('foo'))
+        self.assertEqual(errors[0], RequiredMissing('foo'))
 
     def test_validate_FieldPropertyTestData(self):
         field = self.makeTestObject(schema=ITestSchema, required=False)
@@ -255,7 +250,7 @@ class ObjectTest(CleanUp, FieldTestBase):
         self.assertRaises(ValidationError, field.validate, data)
         self.assertRaises(WrongContainedType, field.validate, data)
         errors = self.getErrors(field.validate, data)
-        self.assert_(isinstance(errors[0], SchemaNotFullyImplemented))
+        self.assertTrue(isinstance(errors[0], SchemaNotFullyImplemented))
 
     def test_validate_with_non_object_value(self):
         field = self.makeTestObject(
@@ -279,12 +274,12 @@ class ObjectTest(CleanUp, FieldTestBase):
             pass
         context = Dummy()
         field.set(context, data)
-        self.assertEquals(1, len(events))
+        self.assertEqual(1, len(events))
         event = events[0]
-        self.failUnless(IBeforeObjectAssignedEvent.providedBy(event))
-        self.assertEquals(data, event.object)
-        self.assertEquals('object_field', event.name)
-        self.assertEquals(context, event.context)
+        self.assertTrue(IBeforeObjectAssignedEvent.providedBy(event))
+        self.assertEqual(data, event.object)
+        self.assertEqual('object_field', event.name)
+        self.assertEqual(context, event.context)
 
     # cycles
 
