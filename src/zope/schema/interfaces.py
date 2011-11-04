@@ -490,7 +490,7 @@ class IBeforeObjectAssignedEvent(Interface):
     """An object is going to be assigned to an attribute on another object.
 
     Subscribers to this event can change the object on this event to change
-    what object is going to be assigned. This is useful, e.g. for wrapping 
+    what object is going to be assigned. This is useful, e.g. for wrapping
     or replacing objects before they get assigned to conform to application
     policy.
 
@@ -668,6 +668,6 @@ class IVocabularyRegistry(Interface):
 class IVocabularyFactory(Interface):
     """Can create vocabularies."""
 
-    def __call__(self, context):
+    def __call__(context):
         """The context provides a location that the vocabulary can make use
         of."""
