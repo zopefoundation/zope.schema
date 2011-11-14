@@ -806,6 +806,8 @@ class DottedName(_StrLine):
                                     self.max_dots, value)
 
     def fromUnicode(self, value):
-        v = b(value.strip())
+        v = value.strip()
+        if not isinstance(v, self._type):
+            v = v.encode('ascii')
         self.validate(v)
         return v

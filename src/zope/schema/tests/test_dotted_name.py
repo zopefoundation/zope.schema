@@ -15,7 +15,7 @@
 """
 from unittest import main, makeSuite
 
-from six import b
+from six import b, u
 from zope.schema import DottedName
 from zope.schema.tests.test_field import FieldTestBase
 from zope.schema.interfaces import InvalidDottedName, RequiredMissing
@@ -46,6 +46,11 @@ class DottedNameTest(FieldTestBase):
         field.validate('foo.bar')
         
         self.assertRaises(RequiredMissing, field.validate, None)
+
+    def testFromUnicode(self):
+        field = self._Field_Factory()
+        self.assertEquals(field.fromUnicode(u('foo')), 'foo')
+
 
 def test_suite():
     suite = makeSuite(DottedNameTest)

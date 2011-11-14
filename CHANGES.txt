@@ -5,7 +5,8 @@ CHANGES
 4.0.1 (unreleased)
 ------------------
 
-- None yet.
+- Fix bug in ``fromUnicode`` method of ``DottedName`` which would fail
+  validation on being given unicode.
 
 4.0.0 (2011-11-09)
 ------------------
