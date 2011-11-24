@@ -27,7 +27,6 @@ from zope.schema._bootstrapfields import Container
 from zope.schema._bootstrapfields import Iterable
 from zope.schema._bootstrapfields import Text
 from zope.schema._bootstrapfields import TextLine
-from zope.schema._bootstrapfields import TextLine
 from zope.schema._bootstrapfields import Bool
 from zope.schema._bootstrapfields import Int
 from zope.schema._bootstrapinterfaces import StopValidation
