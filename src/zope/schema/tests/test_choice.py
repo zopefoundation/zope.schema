@@ -16,11 +16,13 @@
 import unittest
 
 from six import u
+from zope.interface import implements
 from zope.schema import vocabulary
 from zope.schema import Choice
 from zope.schema.interfaces import ConstraintNotSatisfied
 from zope.schema.interfaces import ValidationError
 from zope.schema.interfaces import InvalidValue, NotAContainer, NotUnique
+from zope.schema.interfaces import IContextSourceBinder
 
 from zope.schema.tests.test_vocabulary import SampleVocabulary, DummyRegistry
 
@@ -112,10 +114,37 @@ class Vocabulary_ChoiceFieldTests(unittest.TestCase):
         self.assertRaises(ValueError, choice.validate, "value")
 
 
+class SampleContextSourceBinder(object):
+    implements(IContextSourceBinder)
+    def __call__(self, context):
+        return SampleVocabulary()
+
+class ContextSourceBinder_ChoiceFieldTests(unittest.TestCase):
+    """Tests of the Choice Field using IContextSourceBinder as source."""
+
+    def setUp(self):
+        vocabulary._clear()
+
+    def tearDown(self):
+        vocabulary._clear()
+
+    def test_validate_source(self):
+        s = SampleContextSourceBinder()
+        choice = Choice(source=s)
+        # raises not iterable with unbound field
+        self.assertRaises(TypeError, choice.validate, 1)
+        o = object()
+        clone = choice.bind(o)
+        clone.validate(1)
+        clone.validate(3)
+        self.assertRaises(ConstraintNotSatisfied, clone.validate, 42)
+
+
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(Vocabulary_ChoiceFieldTests))
     suite.addTest(unittest.makeSuite(Value_ChoiceFieldTests))
+    suite.addTest(unittest.makeSuite(ContextSourceBinder_ChoiceFieldTests))
     return suite
 
 if __name__ == "__main__":

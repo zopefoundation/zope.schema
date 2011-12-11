@@ -492,7 +492,12 @@ def _validate_fields(schema, value, errors=None):
             if not IMethod.providedBy(schema[name]):
                 try:
                     attribute = schema[name]
-                    if IField.providedBy(attribute):
+                    if IChoice.providedBy(attribute):
+                        # Choice must be bound before validation otherwise
+                        # IContextSourceBinder is not iterable in validation
+                        bound = attribute.bind(value)
+                        bound.validate(getattr(value, name))
+                    elif IField.providedBy(attribute):
                         # validate attributes that are fields
                         attribute.validate(getattr(value, name))
                 except ValidationError as error:
