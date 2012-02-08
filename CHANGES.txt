@@ -2,8 +2,10 @@
 CHANGES
 =======
 
-4.0.2 (unreleased)
+4.1 (unreleased)
 ------------------
+
+- Add TreeVocabulary for nested tree-like vocabularies.
 
 - Fix broken Object field validation where the schema contains a Choice with
   ICountextSourceBinder source. In this case the vocabulary was not iterable
