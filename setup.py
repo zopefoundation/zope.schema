@@ -19,6 +19,7 @@
 """Setup for zope.schema package
 """
 import os
+import sys
 from setuptools import setup, find_packages
 
 def read(*rnames):
@@ -60,6 +61,16 @@ def alltests():
             suite.addTest(mod.test_suite())
     return suite
 
+REQUIRES = [
+        'setuptools',
+        'zope.interface >= 3.6.0',
+        'zope.event',
+        'six',
+        ]
+
+if sys.version_info < (2 , 7):
+    REQUIRES += ['ordereddict'],
+
 setup(name='zope.schema',
       version = '4.0.2dev',
       url='http://pypi.python.org/pypi/zope.schema',
@@ -81,11 +92,8 @@ setup(name='zope.schema',
       namespace_packages=['zope',],
       extras_require={'test': ['zope.testing'],
                       'docs': ['z3c.recipe.sphinxdoc']},
-      install_requires=['setuptools',
-                        'zope.interface >= 3.6.0',
-                        'zope.event',
-                        'six',
-                       ],
+      install_requires=REQUIRES,
+      
       classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",

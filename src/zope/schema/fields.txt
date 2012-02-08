@@ -116,6 +116,9 @@ registered vocabularies can simply be functions that rely on SimpleVocabulary:
 The vocabulary interface is simple enough that writing a custom vocabulary is
 not too difficult itself.
 
+See for example zope.schema.vocabulary.TreeVocabulary for another
+IBaseVocabulary supporting vocabulary that provides a nested, tree-like structure.
+
 Choices and Collections
 -----------------------
 
@@ -156,3 +159,4 @@ on the basis of uniqueness and other constraints.
 
 This level of indirection may be unnecessary for some applications, and can be
 disabled with simple ZCML changes within `zope.app`.
+
