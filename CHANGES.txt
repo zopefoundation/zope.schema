@@ -9,7 +9,7 @@ CHANGES
 
 - Fix broken Object field validation where the schema contains a Choice with
   ICountextSourceBinder source. In this case the vocabulary was not iterable
-  because the field was not bound and the source binder dien't return the 
+  because the field was not bound and the source binder didn't return the 
   real vocabulary. Added simple test for IContextSourceBinder validation. But a
   test with an Object field with a schema using a Choice with
   IContextSourceBinder is still missing.
