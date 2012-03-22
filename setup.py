@@ -68,11 +68,11 @@ REQUIRES = [
         'six',
         ]
 
-if sys.version_info < (2 , 7):
-    REQUIRES += ['ordereddict'],
+if sys.version_info < (2, 7):
+    REQUIRES += ['ordereddict']
 
 setup(name='zope.schema',
-      version = '4.1dev',
+      version = '4.1.0dev',
       url='http://pypi.python.org/pypi/zope.schema',
       license='ZPL 2.1',
       description='zope.interface extension for defining data schemas',
@@ -93,7 +93,6 @@ setup(name='zope.schema',
       extras_require={'test': ['zope.testing'],
                       'docs': ['z3c.recipe.sphinxdoc']},
       install_requires=REQUIRES,
-      
       classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
