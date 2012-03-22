@@ -16,7 +16,7 @@
 import unittest
 
 from six import u
-from zope.interface import implements
+from zope.interface import implementer
 from zope.schema import vocabulary
 from zope.schema import Choice
 from zope.schema.interfaces import ConstraintNotSatisfied
@@ -114,8 +114,8 @@ class Vocabulary_ChoiceFieldTests(unittest.TestCase):
         self.assertRaises(ValueError, choice.validate, "value")
 
 
+@implementer(IContextSourceBinder)
 class SampleContextSourceBinder(object):
-    implements(IContextSourceBinder)
     def __call__(self, context):
         return SampleVocabulary()
 
