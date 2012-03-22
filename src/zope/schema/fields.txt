@@ -117,12 +117,13 @@ The vocabulary interface is simple enough that writing a custom vocabulary is
 not too difficult itself.
 
 See for example zope.schema.vocabulary.TreeVocabulary for another
-IBaseVocabulary supporting vocabulary that provides a nested, tree-like structure.
+IBaseVocabulary supporting vocabulary that provides a nested, tree-like 
+structure.
 
 Choices and Collections
 -----------------------
 
-Choices are a field type and can be used as a value_type for collections.  Just
+Choices are a field type and can be used as a value_type for collections. Just
 as a collection of an "Int" value_type constrains members to integers, so a
 choice-based value type constrains members to choices within the Choice's
 vocabulary.  Typically in the Zope application server widgets are found not
