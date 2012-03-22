@@ -15,7 +15,7 @@
 """
 try:
     from collections import OrderedDict
-except:
+except ImportError:
     from ordereddict import OrderedDict
 
 from zope.interface.declarations import directlyProvides, implementer
@@ -162,7 +162,7 @@ class TreeVocabulary(object):
     """
     # The default implementation uses a dict to create the tree structure. This
     # can however be overridden in a subclass by any other IEnumerableMapping
-    # compliant object type. Python 2.7's OrderableDict for example.
+    # compliant object type. Python 2.7's OrderedDict for example.
     terms_factory = OrderedDict
 
     def __init__(self, terms, *interfaces):
@@ -213,7 +213,7 @@ class TreeVocabulary(object):
         return self._terms.__iter__()
 
     def __len__(self):
-        """x.__iter__() <==> iter(x)
+        """x.__len__() <==> len(x)
         """
         return self._terms.__len__()
 

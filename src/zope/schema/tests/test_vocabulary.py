@@ -17,7 +17,7 @@ import unittest
 
 try:
     from collections import OrderedDict
-except:
+except ImportError:
     from ordereddict import OrderedDict
 
 from zope.interface.verify import verifyObject
