@@ -1,6 +1,3 @@
-recursive-include src/zope/schema *.zcml
-recursive-include src/zope/schema *.po
-recursive-include src/zope/schema *.mo
-recursive-include src/zape/schema *.txt
+recursive-include src/zope/schema *.txt
 graft src/zope/schema/tests
 global-exclude *.pyc
