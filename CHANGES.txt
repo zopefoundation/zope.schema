@@ -5,7 +5,7 @@ CHANGES
 4.1.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Remove trailing slash in MANIFEST.in, it causes Winbot to crash.
 
 
 4.1.0 (2012-03-23)
