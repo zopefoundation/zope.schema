@@ -13,14 +13,14 @@
 ##############################################################################
 """Tests for the schema package's documentation files
 """
-import doctest
-import re
 import unittest
 
-from zope.testing import renormalizing
-import zope.schema.tests
-
 def test_suite():
+    import doctest
+    import re
+
+    from zope.testing import renormalizing
+    import zope.schema.tests
     checker = renormalizing.RENormalizing([
         (re.compile(r"\[\(None, Invalid\('8<=10',\)\)\]"),
                     r"[(None, <zope.interface.exceptions.Invalid instance at 0x...>)]",)

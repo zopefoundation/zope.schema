@@ -15,58 +15,65 @@
 """
 import unittest
 
-from six import u
-from zope.interface import Interface
-from zope.interface.verify import verifyObject
-
-from zope.schema import vocabulary
-from zope.schema import Choice
-from zope.schema.interfaces import IVocabulary
-from zope.schema.tests import states
-
-
-class IBirthInfo(Interface):
-    state1 = Choice(
-        title=u('State of Birth'),
-        description=u('The state in which you were born.'),
-        vocabulary="states",
-        default="AL",
-        )
-    state2 = Choice(
-        title=u('State of Birth'),
-        description=u('The state in which you were born.'),
-        vocabulary="states",
-        default="AL",
-        )
-    state3 = Choice(
-        title=u('Favorite State'),
-        description=u('The state you like the most.'),
-        vocabulary=states.StateVocabulary(),
-        )
-    state4 = Choice(
-        title=u("Name"),
-        description=u("The name of your new state"),
-        vocabulary="states",
-        )
-
 
 class StateSelectionTest(unittest.TestCase):
+
     def setUp(self):
-        vocabulary._clear()
-        vr = vocabulary.getVocabularyRegistry()
-        vr.register("states", states.StateVocabulary)
+        from zope.schema.vocabulary import _clear
+        from zope.schema.vocabulary import getVocabularyRegistry
+        from zope.schema.tests.states import StateVocabulary
+        _clear()
+        vr = getVocabularyRegistry()
+        vr.register("states", StateVocabulary)
 
     def tearDown(self):
-        vocabulary._clear()
+        from zope.schema.vocabulary import _clear
+        _clear()
+
+    def _makeSchema(self):
+        from six import u
+        from zope.interface import Interface
+        from zope.schema import Choice
+        from zope.schema.tests.states import StateVocabulary
+        class IBirthInfo(Interface):
+            state1 = Choice(
+                title=u('State of Birth'),
+                description=u('The state in which you were born.'),
+                vocabulary="states",
+                default="AL",
+                )
+            state2 = Choice(
+                title=u('State of Birth'),
+                description=u('The state in which you were born.'),
+                vocabulary="states",
+                default="AL",
+                )
+            state3 = Choice(
+                title=u('Favorite State'),
+                description=u('The state you like the most.'),
+                vocabulary=StateVocabulary(),
+                )
+            state4 = Choice(
+                title=u("Name"),
+                description=u("The name of your new state"),
+                vocabulary="states",
+                )
+        return IBirthInfo
 
     def test_default_presentation(self):
-        field = IBirthInfo.getDescriptionFor("state1")
+        from zope.interface.verify import verifyObject
+        from zope.schema.interfaces import IVocabulary
+        schema = self._makeSchema()
+        field = schema.getDescriptionFor("state1")
         bound = field.bind(object())
         self.assertTrue(verifyObject(IVocabulary, bound.vocabulary))
         self.assertEqual(bound.vocabulary.getTerm("VA").title, "Virginia")
 
     def test_contains(self):
-        vocab = states.StateVocabulary()
+        from zope.interface.verify import verifyObject
+        from zope.schema.interfaces import IVocabulary
+        from zope.schema.tests.states import StateVocabulary
+        vocab = StateVocabulary()
         self.assertTrue(verifyObject(IVocabulary, vocab))
         count = 0
         L = list(vocab)
@@ -82,7 +89,10 @@ class StateSelectionTest(unittest.TestCase):
         self.assertEqual(L, L2)
 
     def test_prebound_vocabulary(self):
-        field = IBirthInfo.getDescriptionFor("state3")
+        from zope.interface.verify import verifyObject
+        from zope.schema.interfaces import IVocabulary
+        schema = self._makeSchema()
+        field = schema.getDescriptionFor("state3")
         bound = field.bind(None)
         self.assertTrue(bound.vocabularyName is None)
         self.assertTrue(verifyObject(IVocabulary, bound.vocabulary))
@@ -90,7 +100,6 @@ class StateSelectionTest(unittest.TestCase):
 
 
 def test_suite():
-    return unittest.makeSuite(StateSelectionTest)
-
-if __name__ == "__main__":
-    unittest.main(defaultTest="test_suite")
+    return unittest.TestSuite((
+        unittest.makeSuite(StateSelectionTest),
+    ))

@@ -13,30 +13,30 @@
 ##############################################################################
 """String field tests
 """
-from unittest import TestSuite, main, makeSuite
-from six import b, u
-from zope.schema import Bytes, BytesLine, Text, TextLine, Password
-from zope.schema.interfaces import ValidationError, WrongType
-from zope.schema.interfaces import RequiredMissing, InvalidValue
-from zope.schema.interfaces import TooShort, TooLong, ConstraintNotSatisfied
+import unittest
+
 from zope.schema.tests.test_field import FieldTestBase
+
 
 class StrTest(FieldTestBase):
     """Test the Str Field."""
 
     def testValidate(self):
-        field = self._Field_Factory(title=u('Str field'), description=u(''),
+        from six import u
+        field = self._makeOne(title=u('Str field'), description=u(''),
                                     readonly=False, required=False)
         field.validate(None)
         field.validate(self._convert('foo'))
         field.validate(self._convert(''))
 
     def testValidateRequired(self):
-
+        from six import u
+        from zope.schema.interfaces import RequiredMissing
+        from zope.schema.interfaces import TooShort
         # Note that if we want to require non-empty strings,
         # we need to set the min-length to 1.
 
-        field = self._Field_Factory(
+        field = self._makeOne(
             title=u('Str field'), description=u(''),
             readonly=False, required=True, min_length=1)
         field.validate(self._convert('foo'))
@@ -45,7 +45,9 @@ class StrTest(FieldTestBase):
         self.assertRaises(TooShort, field.validate, self._convert(''))
 
     def testValidateMinLength(self):
-        field = self._Field_Factory(
+        from six import u
+        from zope.schema.interfaces import TooShort
+        field = self._makeOne(
             title=u('Str field'), description=u(''),
             readonly=False, required=False, min_length=3)
         field.validate(None)
@@ -57,7 +59,9 @@ class StrTest(FieldTestBase):
         self.assertRaises(TooShort, field.validate, self._convert('1'))
 
     def testValidateMaxLength(self):
-        field = self._Field_Factory(
+        from six import u
+        from zope.schema.interfaces import TooLong
+        field = self._makeOne(
             title=u('Str field'), description=u(''),
             readonly=False, required=False, max_length=5)
         field.validate(None)
@@ -69,7 +73,10 @@ class StrTest(FieldTestBase):
         self.assertRaises(TooLong, field.validate, self._convert('999999999'))
 
     def testValidateMinLengthAndMaxLength(self):
-        field = self._Field_Factory(
+        from six import u
+        from zope.schema.interfaces import TooLong
+        from zope.schema.interfaces import TooShort
+        field = self._makeOne(
             title=u('Str field'), description=u(''),
             readonly=False, required=False,
             min_length=3, max_length=5)
@@ -88,48 +95,75 @@ class StrTest(FieldTestBase):
 class MultiLine(object):
 
     def test_newlines(self):
-        field = self._Field_Factory(title=u('Str field'))
+        from six import u
+        field = self._makeOne(title=u('Str field'))
         field.validate(self._convert('hello\nworld'))
 
 
 class BytesTest(StrTest, MultiLine):
-    _Field_Factory = Bytes
+
+    def _getTargetClass(self):
+        from zope.schema import Bytes
+        return Bytes
 
     def _convert(self, v):
+        from six import b
         return b(v)
 
     def testBadStringType(self):
-        field = self._Field_Factory()
+        from six import u
+        from zope.schema.interfaces import ValidationError
+        field = self._makeOne()
         self.assertRaises(ValidationError, field.validate, u('hello'))
 
 
 class TextTest(StrTest, MultiLine):
-    _Field_Factory = Text
+
+    def _getTargetClass(self):
+        from zope.schema import Text
+        return Text
+
     def _convert(self, v):
+        from six import u
         return u(v)
 
     def testBadStringType(self):
-        field = self._Field_Factory()
+        from six import b
+        from zope.schema.interfaces import ValidationError
+        field = self._makeOne()
         self.assertRaises(ValidationError, field.validate, b('hello'))
+
+    def testSillyDefault(self):
+        from six import b
+        from zope.schema.interfaces import ValidationError
+        self.assertRaises(ValidationError, self._makeOne, default=b(""))
 
 class SingleLine(object):
 
     def test_newlines(self):
-        field = self._Field_Factory(title=u('Str field'))
+        from six import u
+        from zope.schema.interfaces import ConstraintNotSatisfied
+        field = self._makeOne(title=u('Str field'))
         self.assertRaises(ConstraintNotSatisfied,
                                     field.validate,
                                     self._convert('hello\nworld'))
 
 class PasswordTest(SingleLine, TextTest):
-    _Field_Factory = Password
+
+    def _getTargetClass(self):
+        from zope.schema import Password
+        return Password
 
     def test_existingValue(self):
+        from six import u
+        from zope.schema.interfaces import WrongType
         class Dummy(object):
             password = None
         dummy = Dummy()
 
-        field = self._Field_Factory(title=u('Str field'), description=u(''),
-                                    readonly=False, required=True, __name__='password')
+        field = self._makeOne(title=u('Str field'), description=u(''),
+                                    readonly=False, required=True,
+                                    __name__='password')
         field = field.bind(dummy)
 
         # Using UNCHANGED_PASSWORD is not allowed if no password was set yet
@@ -147,21 +181,26 @@ class PasswordTest(SingleLine, TextTest):
         self.assertEqual(u('test'), dummy.password)
 
 
-class LineTest(SingleLine, BytesTest):
-    _Field_Factory = BytesLine
+class BytesLineTest(SingleLine, BytesTest):
+
+    def _getTargetClass(self):
+        from zope.schema import BytesLine
+        return BytesLine
+
 
 class TextLineTest(SingleLine, TextTest):
-    _Field_Factory = TextLine
+
+    def _getTargetClass(self):
+        from zope.schema import TextLine
+        return TextLine
 
 
 def test_suite():
-    return TestSuite((
-        makeSuite(BytesTest),
-        makeSuite(TextTest),
-        makeSuite(LineTest),
-        makeSuite(TextLineTest),
-        makeSuite(PasswordTest),
+    return unittest.TestSuite((
+        unittest.makeSuite(BytesTest),
+        unittest.makeSuite(TextTest),
+        unittest.makeSuite(BytesLineTest),
+        unittest.makeSuite(TextLineTest),
+        unittest.makeSuite(PasswordTest),
         ))
 
-if __name__ == '__main__':
-    main(defaultTest='test_suite')

@@ -14,37 +14,48 @@
 """Field Properties tests
 """
 
-from unittest import TestCase, TestSuite, main, makeSuite
-
-from six import u, b
-from zope.interface import Interface
-from zope.schema import Float, Text, Bytes
-from zope.schema.interfaces import ValidationError
-from zope.schema.fieldproperty import (FieldProperty,
-                                       FieldPropertyStoredThroughField)
+import unittest
 
 
-class I(Interface):
+class Test(unittest.TestCase):
 
-    title = Text(description=u("Short summary"), default=u('say something'))
-    weight = Float(min=0.0)
-    code = Bytes(min_length=6, max_length=6, default=b('xxxxxx'))
-    date = Float(title=u('Date'), readonly=True)
+    def _getSchema(self):
+        from six import b
+        from six import u
+        from zope.interface import Interface
+        from zope.schema import Bytes
+        from zope.schema import Float
+        from zope.schema import Text
 
+        class Schema(Interface):
+            title = Text(description=u("Short summary"),
+                         default=u('say something'))
+            weight = Float(min=0.0)
+            code = Bytes(min_length=6, max_length=6, default=b('xxxxxx'))
+            date = Float(title=u('Date'), readonly=True)
 
-class C(object):
+        return Schema
 
-    title = FieldProperty(I['title'])
-    weight = FieldProperty(I['weight'])
-    code = FieldProperty(I['code'])
-    date = FieldProperty(I['date'])
+    def _getTargetClass(self):
+        from zope.schema.fieldproperty import FieldProperty
+        schema = self._getSchema()
 
+        class Klass(object):
+            title = FieldProperty(schema['title'])
+            weight = FieldProperty(schema['weight'])
+            code = FieldProperty(schema['code'])
+            date = FieldProperty(schema['date'])
 
-class Test(TestCase):
-    klass = C
+        return Klass
+
+    def _makeOne(self):
+        return self._getTargetClass()()
 
     def test_basic(self):
-        c = self.klass()
+        from six import b
+        from six import u
+        from zope.schema.interfaces import ValidationError
+        c = self._makeOne()
         self.assertEqual(c.title, u('say something'))
         self.assertEqual(c.weight, None)
         self.assertEqual(c.code, b('xxxxxx'))
@@ -65,30 +76,31 @@ class Test(TestCase):
         self.assertEqual(c.code, b('abcdef'))
 
     def test_readonly(self):
-        c = self.klass()
+        c = self._makeOne()
         # The date should be only settable once
         c.date = 0.0
         # Setting the value a second time should fail.
         self.assertRaises(ValueError, setattr, c, 'date', 1.0)
 
 
-class D(object):
-
-    title = FieldPropertyStoredThroughField(I['title'])
-    weight = FieldPropertyStoredThroughField(I['weight'])
-    code = FieldPropertyStoredThroughField(I['code'])
-    date = FieldPropertyStoredThroughField(I['date'])
-
-
 class TestStoredThroughField(Test):
-    klass = D
+
+    def _getTargetClass(self):
+        schema = self._getSchema()
+
+        class Klass(object):
+            from zope.schema.fieldproperty import \
+                FieldPropertyStoredThroughField
+            title = FieldPropertyStoredThroughField(schema['title'])
+            weight = FieldPropertyStoredThroughField(schema['weight'])
+            code = FieldPropertyStoredThroughField(schema['code'])
+            date = FieldPropertyStoredThroughField(schema['date'])
+
+        return Klass
 
 
 def test_suite():
-    return TestSuite((
-        makeSuite(Test),
-        makeSuite(TestStoredThroughField),
+    return unittest.TestSuite((
+        unittest.makeSuite(Test),
+        unittest.makeSuite(TestStoredThroughField),
         ))
-
-if __name__ == '__main__':
-    main(defaultTest='test_suite')

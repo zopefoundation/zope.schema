@@ -15,122 +15,141 @@
 """
 import unittest
 
-from six import u
-from zope.interface import implementer
-from zope.schema import vocabulary
-from zope.schema import Choice
-from zope.schema.interfaces import ConstraintNotSatisfied
-from zope.schema.interfaces import ValidationError
-from zope.schema.interfaces import InvalidValue, NotAContainer, NotUnique
-from zope.schema.interfaces import IContextSourceBinder
 
-from zope.schema.tests.test_vocabulary import SampleVocabulary, DummyRegistry
+class _Base(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema import Choice
+        return Choice
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
 
 
-class Value_ChoiceFieldTests(unittest.TestCase):
+class Value_ChoiceFieldTests(_Base):
     """Tests of the Choice Field using values."""
 
     def test_create_vocabulary(self):
-        choice = Choice(values=[1, 3])
+        choice = self._makeOne(values=[1, 3])
         self.assertEqual([term.value for term in choice.vocabulary], [1, 3])
 
     def test_validate_int(self):
-        choice = Choice(values=[1, 3])
+        from zope.schema.interfaces import ConstraintNotSatisfied
+        choice = self._makeOne(values=[1, 3])
         choice.validate(1)
         choice.validate(3)
         self.assertRaises(ConstraintNotSatisfied, choice.validate, 4)
 
     def test_validate_string(self):
-        choice = Choice(values=['a', 'c'])
+        from six import u
+        from zope.schema.interfaces import ConstraintNotSatisfied
+        choice = self._makeOne(values=['a', 'c'])
         choice.validate('a')
         choice.validate('c')
         choice.validate(u('c'))
         self.assertRaises(ConstraintNotSatisfied, choice.validate, 'd')
 
     def test_validate_tuple(self):
-        choice = Choice(values=[(1, 2), (5, 6)])
+        from zope.schema.interfaces import ConstraintNotSatisfied
+        choice = self._makeOne(values=[(1, 2), (5, 6)])
         choice.validate((1, 2))
         choice.validate((5, 6))
         self.assertRaises(ConstraintNotSatisfied, choice.validate, [5, 6])
         self.assertRaises(ConstraintNotSatisfied, choice.validate, ())
 
     def test_validate_mixed(self):
-        choice = Choice(values=[1, 'b', (0.2,)])
+        from zope.schema.interfaces import ConstraintNotSatisfied
+        choice = self._makeOne(values=[1, 'b', (0.2,)])
         choice.validate(1)
         choice.validate('b')
         choice.validate((0.2,))
         self.assertRaises(ConstraintNotSatisfied, choice.validate, '1')
         self.assertRaises(ConstraintNotSatisfied, choice.validate, 0.2)
 
-class Vocabulary_ChoiceFieldTests(unittest.TestCase):
+
+class Vocabulary_ChoiceFieldTests(_Base):
     """Tests of the Choice Field using vocabularies."""
 
     def setUp(self):
-        vocabulary._clear()
+        from zope.schema.vocabulary import _clear
+        _clear()
 
     def tearDown(self):
-        vocabulary._clear()
+        from zope.schema.vocabulary import _clear
+        _clear()
 
-    def check_preconstructed(self, cls, okval, badval):
-        v = SampleVocabulary()
-        field = cls(vocabulary=v)
+    def _getTargetClass(self):
+        from zope.schema import Choice
+        return Choice
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test_preconstructed_vocabulary(self):
+        from zope.schema.interfaces import ValidationError
+        from zope.schema.tests.test_vocabulary import _makeSampleVocabulary
+        v = _makeSampleVocabulary()
+        field = self._makeOne(vocabulary=v)
         self.assertTrue(field.vocabulary is v)
         self.assertTrue(field.vocabularyName is None)
         bound = field.bind(None)
         self.assertTrue(bound.vocabulary is v)
         self.assertTrue(bound.vocabularyName is None)
-        bound.default = okval
-        self.assertEqual(bound.default, okval)
-        self.assertRaises(ValidationError, setattr, bound, "default", badval)
+        bound.default = 1
+        self.assertEqual(bound.default, 1)
+        self.assertRaises(ValidationError, setattr, bound, "default", 42)
 
-    def test_preconstructed_vocabulary(self):
-        self.check_preconstructed(Choice, 1, 42)
-
-    def check_constructed(self, cls, okval, badval):
-        vocabulary.setVocabularyRegistry(DummyRegistry())
-        field = cls(vocabulary="vocab")
+    def test_constructed_vocabulary(self):
+        from zope.schema.interfaces import ValidationError
+        from zope.schema.vocabulary import setVocabularyRegistry
+        from zope.schema.tests.test_vocabulary import _makeDummyRegistry
+        setVocabularyRegistry(_makeDummyRegistry())
+        field = self._makeOne(vocabulary="vocab")
         self.assertTrue(field.vocabulary is None)
         self.assertEqual(field.vocabularyName, "vocab")
         o = object()
         bound = field.bind(o)
-        self.assertTrue(isinstance(bound.vocabulary, SampleVocabulary))
-        bound.default = okval
-        self.assertEqual(bound.default, okval)
-        self.assertRaises(ValidationError, setattr, bound, "default", badval)
-
-    def test_constructed_vocabulary(self):
-        self.check_constructed(Choice, 1, 42)
+        bound.default = 1
+        self.assertEqual(bound.default, 1)
+        self.assertRaises(ValidationError, setattr, bound, "default", 42)
 
     def test_create_vocabulary(self):
-        vocabulary.setVocabularyRegistry(DummyRegistry())
-        field = Choice(vocabulary="vocab")
+        from zope.schema.vocabulary import setVocabularyRegistry
+        from zope.schema.tests.test_vocabulary import _makeDummyRegistry
+        setVocabularyRegistry(_makeDummyRegistry())
+        field = self._makeOne(vocabulary="vocab")
         o = object()
         bound = field.bind(o)
         self.assertEqual([term.value for term in bound.vocabulary],
                          [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 
     def test_undefined_vocabulary(self):
-        choice = Choice(vocabulary="unknown")
+        choice = self._makeOne(vocabulary="unknown")
         self.assertRaises(ValueError, choice.validate, "value")
 
 
-@implementer(IContextSourceBinder)
-class SampleContextSourceBinder(object):
-    def __call__(self, context):
-        return SampleVocabulary()
-
-class ContextSourceBinder_ChoiceFieldTests(unittest.TestCase):
+class ContextSourceBinder_ChoiceFieldTests(_Base):
     """Tests of the Choice Field using IContextSourceBinder as source."""
 
     def setUp(self):
-        vocabulary._clear()
+        from zope.schema.vocabulary import _clear
+        _clear()
 
     def tearDown(self):
-        vocabulary._clear()
+        from zope.schema.vocabulary import _clear
+        _clear()
 
     def test_validate_source(self):
+        from zope.interface import implementer
+        from zope.schema.interfaces import IContextSourceBinder
+        from zope.schema.interfaces import ConstraintNotSatisfied
+        from zope.schema.tests.test_vocabulary import _makeSampleVocabulary
+        @implementer(IContextSourceBinder)
+        class SampleContextSourceBinder(object):
+            def __call__(self, context):
+                return _makeSampleVocabulary()
         s = SampleContextSourceBinder()
-        choice = Choice(source=s)
+        choice = self._makeOne(source=s)
         # raises not iterable with unbound field
         self.assertRaises(TypeError, choice.validate, 1)
         o = object()
@@ -141,11 +160,8 @@ class ContextSourceBinder_ChoiceFieldTests(unittest.TestCase):
 
 
 def test_suite():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(Vocabulary_ChoiceFieldTests))
-    suite.addTest(unittest.makeSuite(Value_ChoiceFieldTests))
-    suite.addTest(unittest.makeSuite(ContextSourceBinder_ChoiceFieldTests))
-    return suite
-
-if __name__ == "__main__":
-    unittest.main(defaultTest="test_suite")
+    return unittest.TestSuite((
+        unittest.makeSuite(Vocabulary_ChoiceFieldTests),
+        unittest.makeSuite(Value_ChoiceFieldTests),
+        unittest.makeSuite(ContextSourceBinder_ChoiceFieldTests),
+    ))

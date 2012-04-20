@@ -13,25 +13,22 @@
 ##############################################################################
 """Generic field tests
 """
+import unittest
 
-import re
 
-from doctest import DocTestSuite
-from unittest import TestCase, TestSuite, makeSuite
 
-from six import u, b
-from zope.interface import Interface, provider
-from zope.schema import Field, Text, Int
-from zope.schema.interfaces import IContextAwareDefaultFactory
-from zope.schema.interfaces import ValidationError, RequiredMissing
-from zope.schema.interfaces import ConstraintNotSatisfied, WrongType
-from zope.testing import renormalizing
-import zope.schema.tests
+class FieldTestBase(unittest.TestCase):
 
-class FieldTestBase(TestCase):
+    def _getTargetClass(self):
+        raise NotImplementedError
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
 
     def test_bind(self):
-        field = self._Field_Factory(
+        from six import u
+        from zope.interface import Interface
+        field = self._makeOne(
             __name__ = 'x',
             title=u('Not required field'), description=u(''),
             readonly=False, required=False)
@@ -46,13 +43,15 @@ class FieldTestBase(TestCase):
         field2 = field.bind(c)
 
         self.assertEqual(field2.context, c)
-        self.assertEqual(field.queryTaggedValue('a'), field2.queryTaggedValue('a'))
+        self.assertEqual(field.queryTaggedValue('a'),
+                         field2.queryTaggedValue('a'))
         for n in ('__class__', '__name__', '__doc__', 'title', 'description',
                   'readonly', 'required', 'interface'):
             self.assertEqual(getattr(field2, n), getattr(field, n), n)
 
     def testValidate(self):
-        field = self._Field_Factory(
+        from six import u
+        field = self._makeOne(
             title=u('Not required field'), description=u(''),
             readonly=False, required=False)
         field.validate(None)
@@ -62,7 +61,9 @@ class FieldTestBase(TestCase):
         field.validate('')
 
     def testValidateRequired(self):
-        field = self._Field_Factory(
+        from six import u
+        from zope.schema.interfaces import RequiredMissing
+        field = self._makeOne(
             title=u('Required field'), description=u(''),
             readonly=False, required=True)
         field.validate('foo')
@@ -75,7 +76,9 @@ class FieldTestBase(TestCase):
 class CollectionFieldTestBase(FieldTestBase):
 
     def test_bind_binds_value_type(self):
-        field = self._Field_Factory(
+        from six import u
+        from zope.schema import Int
+        field = self._makeOne(
             __name__ = 'x',
             title=u('Not required field'), description=u(''),
             readonly=False, required=False,
@@ -93,13 +96,13 @@ class CollectionFieldTestBase(FieldTestBase):
 class FieldTest(FieldTestBase):
     """Test generic Field."""
 
-    _Field_Factory = Field
-
-    def testSillyDefault(self):
-        self.assertRaises(ValidationError, Text, default=b(""))
+    def _getTargetClass(self):
+        from zope.schema import Field
+        return Field
 
     def test__doc__(self):
-        field = Text(title=u("test fiield"),
+        from six import u
+        field = self._makeOne(title=u("test fiield"),
                      description=(
                          u("To make sure that\n"
                            "doc strings are working correctly\n")
@@ -117,18 +120,21 @@ class FieldTest(FieldTestBase):
         from zope.interface import Interface
 
         class S1(Interface):
-            a = Text()
-            b = Text()
+            a = self._makeOne()
+            b = self._makeOne()
 
         self.assertTrue(S1['a'].order < S1['b'].order)
 
         class S2(Interface):
-            b = Text()
-            a = Text()
+            b = self._makeOne()
+            a = self._makeOne()
 
         self.assertTrue(S2['a'].order > S2['b'].order)
 
     def testConstraint(self):
+        from six import u
+        from zope.schema import Int
+        from zope.schema.interfaces import ConstraintNotSatisfied
         def isodd(x):
             return x % 2 == 1
 
@@ -139,6 +145,7 @@ class FieldTest(FieldTestBase):
         self.assertRaises(ConstraintNotSatisfied, i.validate, 10)
 
     def testSimpleDefaultFactory(self):
+        from zope.schema import Int
         field = Int(defaultFactory=lambda: 42)
         self.assertEqual(field.default, 42)
 
@@ -147,6 +154,9 @@ class FieldTest(FieldTestBase):
         self.assertEqual(field.default, 42)
 
     def testContextAwareDefaultFactory(self):
+        from zope.interface import provider
+        from zope.schema import Int
+        from zope.schema.interfaces import IContextAwareDefaultFactory
         @provider(IContextAwareDefaultFactory)
         def getAnswerToUniverse(context):
             if context is None:
@@ -163,25 +173,33 @@ class FieldTest(FieldTestBase):
         self.assertEqual(bound.default, 42)
 
     def testBadValueDefaultFactory(self):
+        from zope.schema import Int
+        from zope.schema.interfaces import WrongType
         field = Int(defaultFactory=lambda: '42')
         self.assertRaises(WrongType, lambda: field.default)
 
-class FieldDefaultBehaviour(TestCase):
+class FieldDefaultBehaviour(unittest.TestCase):
     def test_required_defaults_to_true(self):
+        from zope.schema import Field
+        from six import u
         class MyField(Field):
             pass
         field = MyField(title=u('my'))
         self.assertTrue(field.required)
 
 def test_suite():
+    from doctest import DocTestSuite
+    import re
+    from zope.schema.tests import py3_checker
+    from zope.testing import renormalizing
     checker = renormalizing.RENormalizing([
         (re.compile(r" with base 10: '125.6'"),
                     r': 125.6')
         ])
-    checker = checker + zope.schema.tests.py3_checker
-    return TestSuite((
-        makeSuite(FieldTest),
-        makeSuite(FieldDefaultBehaviour),
-        DocTestSuite("zope.schema._field", checker=zope.schema.tests.py3_checker),
+    checker = checker + py3_checker
+    return unittest.TestSuite((
+        unittest.makeSuite(FieldTest),
+        unittest.makeSuite(FieldDefaultBehaviour),
+        DocTestSuite("zope.schema._field", checker=py3_checker),
         DocTestSuite("zope.schema._bootstrapfields",checker=checker),
         ))

@@ -13,25 +13,26 @@
 ##############################################################################
 """Container field tests
 """
-from six import PY3, u
-if not PY3:
-    from UserDict import UserDict
-else:
-    #python3
-    from collections import UserDict
-from unittest import main, makeSuite
-from zope.schema import Container
-from zope.schema.interfaces import RequiredMissing, NotAContainer
+import unittest
+
 from zope.schema.tests.test_field import FieldTestBase
 
 class ContainerTest(FieldTestBase):
     """Test the Container Field."""
 
-    _Field_Factory = Container
+    def _getTargetClass(self):
+        from zope.schema import Container
+        return Container
 
     def testValidate(self):
-        field = self._Field_Factory(title=u('test field'), description=u(''),
-                                    readonly=False, required=False)
+        try:
+            from UserDict import UserDict
+        except ImportError: #pragma NO COVER python3
+            from collections import UserDict
+        from six import u
+        from zope.schema.interfaces import NotAContainer
+        field = self._makeOne(title=u('test field'), description=u(''),
+                              readonly=False, required=False)
         field.validate(None)
         field.validate('')
         field.validate('abc')
@@ -43,16 +44,15 @@ class ContainerTest(FieldTestBase):
         self.assertRaises(NotAContainer, field.validate, True)
 
     def testValidateRequired(self):
-        field = self._Field_Factory(title=u('test field'), description=u(''),
-                                    readonly=False, required=True)
-
+        from six import u
+        from zope.schema.interfaces import RequiredMissing
+        field = self._makeOne(title=u('test field'), description=u(''),
+                              readonly=False, required=True)
         field.validate('')
-
         self.assertRaises(RequiredMissing, field.validate, None)
 
 
 def test_suite():
-    return makeSuite(ContainerTest)
-
-if __name__ == '__main__':
-    main(defaultTest='test_suite')
+    return unittest.TestSuite((
+        unittest.makeSuite(ContainerTest),
+    ))

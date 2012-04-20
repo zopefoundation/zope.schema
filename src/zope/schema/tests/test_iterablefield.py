@@ -13,26 +13,31 @@
 ##############################################################################
 """Iterable field tests
 """
-from six import PY3, u
-if not PY3:
-    from UserDict import UserDict, IterableUserDict
-else:
-    #python3
-    from collections import UserDict as IterableUserDict, UserDict
-from unittest import main, makeSuite
-from zope.schema import Iterable
-from zope.schema.interfaces import RequiredMissing
-from zope.schema.interfaces import NotAContainer, NotAnIterator
+import unittest
+
 from zope.schema.tests.test_field import FieldTestBase
+
 
 class IterableTest(FieldTestBase):
     """Test the Iterable Field."""
 
-    _Field_Factory = Iterable
+    def _getTargetClass(self):
+        from zope.schema import Iterable
+        return Iterable
 
     def testValidate(self):
-        field = self._Field_Factory(title=u('test field'), description=u(''),
-                                    readonly=False, required=False)
+        try:
+            from UserDict import UserDict
+        except ImportError: #pragma NO COVER python3
+            from collections import UserDict
+            IterableUserDict =  UserDict
+        else: #pragma NO COVER python2
+            from UserDict import IterableUserDict
+        from six import u
+        from zope.schema.interfaces import NotAContainer
+        from zope.schema.interfaces import NotAnIterator
+        field = self._makeOne(title=u('test field'), description=u(''),
+                              readonly=False, required=False)
         field.validate(None)
         field.validate('')
         field.validate('abc')
@@ -45,16 +50,16 @@ class IterableTest(FieldTestBase):
         self.assertRaises(NotAnIterator, field.validate, UserDict)
 
     def testValidateRequired(self):
-        field = self._Field_Factory(title=u('test field'), description=u(''),
-                                    readonly=False, required=True)
-
+        from six import u
+        from zope.schema.interfaces import RequiredMissing
+        field = self._makeOne(title=u('test field'), description=u(''),
+                              readonly=False, required=True)
         field.validate('')
-
         self.assertRaises(RequiredMissing, field.validate, None)
 
 
 def test_suite():
-    return makeSuite(IterableTest)
+    return unittest.TestSuite((
+        unittest.makeSuite(IterableTest),
+    ))
 
-if __name__ == '__main__':
-    main(defaultTest='test_suite')

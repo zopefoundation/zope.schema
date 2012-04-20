@@ -13,27 +13,29 @@
 ##############################################################################
 """DottedName field tests
 """
-from unittest import main, makeSuite
+import unittest
 
-from six import b, u
-from zope.schema import DottedName
 from zope.schema.tests.test_field import FieldTestBase
-from zope.schema.interfaces import InvalidDottedName, RequiredMissing
+
 
 class DottedNameTest(FieldTestBase):
     """Test the DottedName Field."""
 
-    _Field_Factory = DottedName
+    def _getTargetClass(self):
+        from zope.schema import DottedName
+        return DottedName
 
     def testValidate(self):
-        field = self._Field_Factory(required=False)
+        from zope.schema.interfaces import InvalidDottedName
+        field = self._makeOne(required=False)
 
         field.validate(None)
         field.validate('foo.bar')
         field.validate('foo.bar0')
         field.validate('foo0.bar')
         
-        # We used to incorrectly allow ^: https://bugs.launchpad.net/zope.schema/+bug/191236
+        # We used to incorrectly allow ^:
+        #  https://bugs.launchpad.net/zope.schema/+bug/191236
         self.assertRaises(InvalidDottedName, field.validate, 'foo.bar^foobar')
         self.assertRaises(InvalidDottedName, field.validate, 'foo^foobar.bar')
         # dotted names cannot start with digits
@@ -41,17 +43,20 @@ class DottedNameTest(FieldTestBase):
         self.assertRaises(InvalidDottedName, field.validate, '0foo.bar')
 
     def testValidateRequired(self):
-        field = self._Field_Factory(required=True)
+        from zope.schema.interfaces import RequiredMissing
+        field = self._makeOne(required=True)
         
         field.validate('foo.bar')
         
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def testFromUnicode(self):
-        field = self._Field_Factory()
+        from six import u
+        field = self._makeOne()
         self.assertEquals(field.fromUnicode(u('foo')), 'foo')
 
 
 def test_suite():
-    suite = makeSuite(DottedNameTest)
-    return suite
+    return unittest.TestSuite((
+        unittest.makeSuite(DottedNameTest),
+    ))

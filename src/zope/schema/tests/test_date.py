@@ -13,43 +13,50 @@
 ##############################################################################
 """Date field tests
 """
-from unittest import main, makeSuite
+import unittest
 
-from six import u
-from zope.schema import Date
-from zope.schema.interfaces import RequiredMissing, InvalidValue, WrongType
-from zope.schema.interfaces import TooSmall, TooBig
 from zope.schema.tests.test_field import FieldTestBase
-from datetime import datetime, date
 
 class DateTest(FieldTestBase):
     """Test the Date Field."""
 
-    _Field_Factory = Date
+    def _getTargetClass(self):
+        from zope.schema import Date
+        return Date
 
     def testInterface(self):
         from zope.interface.verify import verifyObject
         from zope.schema.interfaces import IDate
-        verifyObject(IDate, self._Field_Factory())
+        verifyObject(IDate, self._makeOne())
 
     def testValidate(self):
-        field = self._Field_Factory(title=u('Date field'), description=u(''),
+        from datetime import datetime
+        from six import u
+        from zope.schema.interfaces import WrongType
+        field = self._makeOne(title=u('Date field'), description=u(''),
                                     readonly=False, required=False)
         field.validate(None)
         field.validate(datetime.now().date())
         self.assertRaises(WrongType, field.validate, datetime.now())
 
     def testValidateRequired(self):
-        field = self._Field_Factory(title=u('Date field'), description=u(''),
+        from datetime import datetime
+        from six import u
+        from zope.schema.interfaces import RequiredMissing
+        field = self._makeOne(title=u('Date field'), description=u(''),
                                     readonly=False, required=True)
         field.validate(datetime.now().date())
 
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def testValidateMin(self):
+        from datetime import date
+        from datetime import datetime
+        from six import u
+        from zope.schema.interfaces import TooSmall
         d1 = date(2000,10,1)
         d2 = date(2000,10,2)
-        field = self._Field_Factory(title=u('Date field'), description=u(''),
+        field = self._makeOne(title=u('Date field'), description=u(''),
                                     readonly=False, required=False, min=d1)
         field.validate(None)
         field.validate(d1)
@@ -59,10 +66,13 @@ class DateTest(FieldTestBase):
         self.assertRaises(TooSmall, field.validate, date(2000,9,30))
 
     def testValidateMax(self):
+        from datetime import date
+        from six import u
+        from zope.schema.interfaces import TooBig
         d1 = date(2000,10,1)
         d2 = date(2000,10,2)
         d3 = date(2000,10,3)
-        field = self._Field_Factory(title=u('Date field'), description=u(''),
+        field = self._makeOne(title=u('Date field'), description=u(''),
                                     readonly=False, required=False, max=d2)
         field.validate(None)
         field.validate(d1)
@@ -71,13 +81,17 @@ class DateTest(FieldTestBase):
         self.assertRaises(TooBig, field.validate, d3)
 
     def testValidateMinAndMax(self):
+        from datetime import date
+        from six import u
+        from zope.schema.interfaces import TooBig
+        from zope.schema.interfaces import TooSmall
         d1 = date(2000,10,1)
         d2 = date(2000,10,2)
         d3 = date(2000,10,3)
         d4 = date(2000,10,4)
         d5 = date(2000,10,5)
 
-        field = self._Field_Factory(title=u('Date field'), description=u(''),
+        field = self._makeOne(title=u('Date field'), description=u(''),
                                     readonly=False, required=False,
                                     min=d2, max=d4)
         field.validate(None)
@@ -90,8 +104,6 @@ class DateTest(FieldTestBase):
 
 
 def test_suite():
-    suite = makeSuite(DateTest)
-    return suite
-
-if __name__ == '__main__':
-    main(defaultTest='test_suite')
+    return unittest.TestSuite((
+        unittest.makeSuite(DateTest),
+    ))

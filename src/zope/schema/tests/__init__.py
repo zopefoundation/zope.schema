@@ -32,9 +32,12 @@ if PY3:
                     r"InvalidDottedName: \1"),
         (re.compile(r"zope.schema.interfaces.InvalidDottedName:"),
                     r"InvalidDottedName:"),
-        (re.compile(r"zope.schema._bootstrapinterfaces.ConstraintNotSatisfied: '([^']*)'"),
+        (re.compile(
+          r"zope.schema._bootstrapinterfaces.ConstraintNotSatisfied: '([^']*)'"
+                   ),
                     r"ConstraintNotSatisfied: \1"),
-        (re.compile(r"zope.schema._bootstrapinterfaces.ConstraintNotSatisfied:"),
+        (re.compile(
+           r"zope.schema._bootstrapinterfaces.ConstraintNotSatisfied:"),
                     r"ConstraintNotSatisfied:"),
         (re.compile(r"zope.schema._bootstrapinterfaces.WrongType:"),
                     r"WrongType:"),

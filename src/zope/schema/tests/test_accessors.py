@@ -14,23 +14,25 @@
 """Test Interface accessor methods.
 """
 import unittest
-from zope.interface import Interface, implementer
-from six import u
-from zope.schema import Text, accessors
-from zope.schema.interfaces import IText
-from zope.schema.accessors import FieldReadAccessor, FieldWriteAccessor
-from zope.interface.verify import verifyClass, verifyObject
-from zope.interface import document
-from zope.interface.interfaces import IMethod
+
 
 class Test(unittest.TestCase):
 
     def test(self):
+        from six import u
+        from zope.interface import Interface
+        from zope.interface import implementer
+        from zope.interface.interfaces import IMethod
+        from zope.interface.verify import verifyClass
+        from zope.interface.verify import verifyObject
+        from zope.schema import Text
+        from zope.schema.accessors import accessors
+        from zope.schema.accessors import FieldReadAccessor
+        from zope.schema.accessors import FieldWriteAccessor
+        from zope.schema.interfaces import IText
 
         field = Text(title=u("Foo thing"))
-
         class I(Interface):
-
             getFoo, setFoo = accessors(field)
 
         @implementer(I)
@@ -88,16 +90,20 @@ class Test(unittest.TestCase):
         self.assertEqual(instance.set, 1)
 
     def test_doc(self):
+        from six import u
+        from zope.interface import Interface
+        from zope.interface.document import asStructuredText
+        from zope.schema import Text
+        from zope.schema.accessors import accessors
 
         field = Text(title=u("Foo thing"))
-
         class I(Interface):
 
             getFoo, setFoo = accessors(field)
             def bar(): pass
             x = Text()
 
-        d = document.asStructuredText(I)
+        d = asStructuredText(I)
         self.assertEqual(d,
                          "I\n"
                          "\n"
@@ -117,9 +123,9 @@ class Test(unittest.TestCase):
 
 
 def test_suite():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(Test))
-    return suite
+    return unittest.TestSuite((
+        unittest.makeSuite(Test),
+    ))
 
 
 if __name__ == '__main__':

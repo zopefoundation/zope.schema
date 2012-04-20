@@ -13,21 +13,21 @@
 ##############################################################################
 """Integer field tests
 """
-from unittest import main, makeSuite
+import unittest
 
-from six import u
-from zope.schema import Int
-from zope.schema.interfaces import RequiredMissing, InvalidValue
-from zope.schema.interfaces import TooSmall, TooBig
 from zope.schema.tests.test_field import FieldTestBase
+
 
 class IntTest(FieldTestBase):
     """Test the Int Field."""
 
-    _Field_Factory = Int
+    def _getTargetClass(self):
+        from zope.schema import Int
+        return Int
 
     def testValidate(self):
-        field = self._Field_Factory(title=u('Int field'), description=u(''),
+        from six import u
+        field = self._makeOne(title=u('Int field'), description=u(''),
                                     readonly=False, required=False)
         field.validate(None)
         field.validate(10)
@@ -35,7 +35,9 @@ class IntTest(FieldTestBase):
         field.validate(-1)
 
     def testValidateRequired(self):
-        field = self._Field_Factory(title=u('Int field'), description=u(''),
+        from six import u
+        from zope.schema.interfaces import RequiredMissing
+        field = self._makeOne(title=u('Int field'), description=u(''),
                                     readonly=False, required=True)
         field.validate(10)
         field.validate(0)
@@ -44,7 +46,9 @@ class IntTest(FieldTestBase):
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def testValidateMin(self):
-        field = self._Field_Factory(title=u('Int field'), description=u(''),
+        from six import u
+        from zope.schema.interfaces import TooSmall
+        field = self._makeOne(title=u('Int field'), description=u(''),
                                     readonly=False, required=False, min=10)
         field.validate(None)
         field.validate(10)
@@ -54,7 +58,9 @@ class IntTest(FieldTestBase):
         self.assertRaises(TooSmall, field.validate, -10)
 
     def testValidateMax(self):
-        field = self._Field_Factory(title=u('Int field'), description=u(''),
+        from six import u
+        from zope.schema.interfaces import TooBig
+        field = self._makeOne(title=u('Int field'), description=u(''),
                                     readonly=False, required=False, max=10)
         field.validate(None)
         field.validate(5)
@@ -65,7 +71,10 @@ class IntTest(FieldTestBase):
         self.assertRaises(TooBig, field.validate, 20)
 
     def testValidateMinAndMax(self):
-        field = self._Field_Factory(title=u('Int field'), description=u(''),
+        from six import u
+        from zope.schema.interfaces import TooBig
+        from zope.schema.interfaces import TooSmall
+        field = self._makeOne(title=u('Int field'), description=u(''),
                                     readonly=False, required=False,
                                     min=0, max=10)
         field.validate(None)
@@ -80,8 +89,6 @@ class IntTest(FieldTestBase):
 
 
 def test_suite():
-    suite = makeSuite(IntTest)
-    return suite
-
-if __name__ == '__main__':
-    main(defaultTest='test_suite')
+    return unittest.TestSuite((
+        unittest.makeSuite(IntTest),
+    ))

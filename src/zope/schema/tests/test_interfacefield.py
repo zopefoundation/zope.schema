@@ -13,36 +13,39 @@
 ##############################################################################
 """Interface field tests
 """
-from unittest import main, makeSuite
+import unittest
 
-from six import u
-from zope.schema import InterfaceField
-from zope.schema.interfaces import RequiredMissing, WrongType
 from zope.schema.tests.test_field import FieldTestBase
-from zope.interface import Interface
-
-class DummyInterface(Interface):
-    pass
 
 class InterfaceTest(FieldTestBase):
     """Test the Bool Field."""
 
-    _Field_Factory = InterfaceField
+    def _getTargetClass(self):
+        from zope.schema import InterfaceField
+        return InterfaceField
 
     def testValidate(self):
-        field = InterfaceField(title=u('Interface field'), description=u(''),
+        from six import u
+        from zope.interface import Interface
+        from zope.schema.interfaces import WrongType
+
+        class DummyInterface(Interface):
+            pass
+
+        field = self._makeOne(title=u('Interface field'), description=u(''),
                      readonly=False, required=False)
         field.validate(DummyInterface)
         self.assertRaises(WrongType, field.validate, object())
 
     def testValidateRequired(self):
-        field = InterfaceField(title=u('Interface field'), description=u(''),
+        from six import u
+        from zope.schema.interfaces import RequiredMissing
+        field = self._makeOne(title=u('Interface field'), description=u(''),
                      readonly=False, required=True)
         self.assertRaises(RequiredMissing, field.validate, None)
 
 
 def test_suite():
-    return makeSuite(InterfaceTest)
-
-if __name__ == '__main__':
-    main(defaultTest='test_suite')
+    return unittest.TestSuite((
+        unittest.makeSuite(InterfaceTest),
+    ))

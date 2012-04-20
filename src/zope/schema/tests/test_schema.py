@@ -13,51 +13,59 @@
 ##############################################################################
 """Schema field tests
 """
-from unittest import TestCase, main, makeSuite
-from six import u, b
-from zope.interface import Interface
-from zope.schema import Bytes
-from zope.schema import getFields, getFieldsInOrder
-from zope.schema import getFieldNames, getFieldNamesInOrder
-
-class ISchemaTest(Interface):
-    title = Bytes(
-        title=u("Title"),
-        description=u("Title"),
-        default=b(""),
-        required=True)
-
-    description = Bytes(
-        title=u("Description"),
-        description=u("Description"),
-        default=b(""),
-        required=True)
-
-    spam = Bytes(
-        title=u("Spam"),
-        description=u("Spam"),
-        default=b(""),
-        required=True)
-
-class ISchemaTestSubclass(ISchemaTest):
-    foo = Bytes(
-        title=u('Foo'),
-        description=u('Fooness'),
-        default=b(""),
-        required=False)
+import unittest
 
 
-class SchemaTest(TestCase):
+class SchemaTest(unittest.TestCase):
+
+    def _makeSchema(self):
+        from six import b
+        from six import u
+        from zope.interface import Interface
+        from zope.schema import Bytes
+
+        class ISchemaTest(Interface):
+            title = Bytes(
+                title=u("Title"),
+                description=u("Title"),
+                default=b(""),
+                required=True)
+            description = Bytes(
+                title=u("Description"),
+                description=u("Description"),
+                default=b(""),
+                required=True)
+            spam = Bytes(
+                title=u("Spam"),
+                description=u("Spam"),
+                default=b(""),
+                required=True)
+        return ISchemaTest
+
+    def _makeDerivedSchema(self):
+        from six import b
+        from six import u
+        from zope.schema import Bytes
+
+        class ISchemaTestSubclass(self._makeSchema()):
+            foo = Bytes(
+                title=u('Foo'),
+                description=u('Fooness'),
+                default=b(""),
+                required=False)
+        return ISchemaTestSubclass
 
     def test_getFieldNames(self):
-        names = getFieldNames(ISchemaTest)
+        from zope.schema import getFieldNames
+        names = getFieldNames(self._makeSchema())
         self.assertEqual(len(names),3)
         self.assertTrue('title' in names)
         self.assertTrue('description' in names)
         self.assertTrue('spam' in names)
 
     def test_getFieldNamesAll(self):
-        names = getFieldNames(ISchemaTestSubclass)
+        from zope.schema import getFieldNames
+        names = getFieldNames(self._makeDerivedSchema())
         self.assertEqual(len(names),4)
         self.assertTrue('title' in names)
         self.assertTrue('description' in names)
@@ -65,7 +73,8 @@ class SchemaTest(TestCase):
         self.assertTrue('foo' in names)
 
     def test_getFields(self):
-        fields = getFields(ISchemaTest)
+        from zope.schema import getFields
+        fields = getFields(self._makeSchema())
 
         self.assertTrue('title' in fields)
         self.assertTrue('description' in fields)
@@ -76,7 +85,8 @@ class SchemaTest(TestCase):
             self.assertEqual(key, value.getName())
 
     def test_getFieldsAll(self):
-        fields = getFields(ISchemaTestSubclass)
+        from zope.schema import getFields
+        fields = getFields(self._makeDerivedSchema())
 
         self.assertTrue('title' in fields)
         self.assertTrue('description' in fields)
@@ -88,29 +98,33 @@ class SchemaTest(TestCase):
             self.assertEqual(key, value.getName())
 
     def test_getFieldsInOrder(self):
-        fields = getFieldsInOrder(ISchemaTest)
+        from zope.schema import getFieldsInOrder
+        fields = getFieldsInOrder(self._makeSchema())
         field_names = [name for name, field in fields]
         self.assertEqual(field_names, ['title', 'description', 'spam'])
         for key, value in fields:
             self.assertEqual(key, value.getName())
 
     def test_getFieldsInOrderAll(self):
-        fields = getFieldsInOrder(ISchemaTestSubclass)
+        from zope.schema import getFieldsInOrder
+        fields = getFieldsInOrder(self._makeDerivedSchema())
         field_names = [name for name, field in fields]
         self.assertEqual(field_names, ['title', 'description', 'spam', 'foo'])
         for key, value in fields:
             self.assertEqual(key, value.getName())
 
     def test_getFieldsNamesInOrder(self):
-        names = getFieldNamesInOrder(ISchemaTest)
+        from zope.schema import getFieldNamesInOrder
+        names = getFieldNamesInOrder(self._makeSchema())
         self.assertEqual(names, ['title', 'description', 'spam'])
 
     def test_getFieldsNamesInOrderAll(self):
-        names = getFieldNamesInOrder(ISchemaTestSubclass)
+        from zope.schema import getFieldNamesInOrder
+        names = getFieldNamesInOrder(self._makeDerivedSchema())
         self.assertEqual(names, ['title', 'description', 'spam', 'foo'])
 
-def test_suite():
-    return makeSuite(SchemaTest)
 
-if __name__ == '__main__':
-    main(defaultTest='test_suite')
+def test_suite():
+    return unittest.TestSuite((
+        unittest.makeSuite(SchemaTest),
+    ))

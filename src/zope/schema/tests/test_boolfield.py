@@ -13,30 +13,30 @@
 ##############################################################################
 """Boolean field tests
 """
-from unittest import main, makeSuite
+import unittest
 
-from six import u
-from zope.schema import Bool
-from zope.schema.interfaces import RequiredMissing, IBool, IFromUnicode
 from zope.schema.tests.test_field import FieldTestBase
-import zope.interface.adapter
-import zope.interface
 
 
 class BoolTest(FieldTestBase):
     """Test the Bool Field."""
 
-    _Field_Factory = Bool
+    def _getTargetClass(self):
+        from zope.schema import Bool
+        return Bool
 
     def testValidate(self):
-        field = Bool(title=u('Bool field'), description=u(''),
+        from six import u
+        field = self._makeOne(title=u('Bool field'), description=u(''),
                      readonly=False, required=False)
         field.validate(None)
         field.validate(True)
         field.validate(False)
 
     def testValidateRequired(self):
-        field = Bool(title=u('Bool field'), description=u(''),
+        from six import u
+        from zope.schema.interfaces import RequiredMissing
+        field = self._makeOne(title=u('Bool field'), description=u(''),
                      readonly=False, required=True)
         field.validate(True)
         field.validate(False)
@@ -44,7 +44,12 @@ class BoolTest(FieldTestBase):
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def testIBoolIsMoreImportantThanIFromUnicode(self):
-        registry = zope.interface.adapter.AdapterRegistry()
+        from six import u
+        from zope.interface import Interface
+        from zope.interface.adapter import AdapterRegistry
+        from zope.schema.interfaces import IBool
+        from zope.schema.interfaces import IFromUnicode
+        registry = AdapterRegistry()
 
         def adapt_bool(context):
             return 'bool'
@@ -52,20 +57,19 @@ class BoolTest(FieldTestBase):
         def adapt_from_unicode(context):
             return 'unicode'
 
-        class IAdaptTo(zope.interface.Interface):
+        class IAdaptTo(Interface):
             pass
 
         registry.register((IBool,), IAdaptTo, u(''), adapt_bool)
         registry.register((IFromUnicode,), IAdaptTo, u(''), adapt_from_unicode)
 
-        field = Bool(title=u('Bool field'), description=u(''),
+        field = self._makeOne(title=u('Bool field'), description=u(''),
                      readonly=False, required=True)
 
         self.assertEqual('bool', registry.queryAdapter(field, IAdaptTo))
 
 
 def test_suite():
-    return makeSuite(BoolTest)
-
-if __name__ == '__main__':
-    main(defaultTest='test_suite')
+    return unittest.TestSuite((
+        unittest.makeSuite(BoolTest),
+    ))
