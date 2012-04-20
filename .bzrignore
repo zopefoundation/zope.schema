@@ -7,3 +7,6 @@
 *.egg-info
 .coverage
 __pycache__
+nosetests.xml
+coverage.xml
+.tox

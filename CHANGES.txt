@@ -2,8 +2,10 @@
 CHANGES
 =======
 
-4.1.2 (unreleased)
+4.2.0 (unreleased)
 ------------------
+
+- Added support for continuous integration using ``tox`` and ``jenkins``.
 
 - Dropped the external ``six`` dependency in favor of a much-trimmed
   ``zope.schema._compat`` module.
