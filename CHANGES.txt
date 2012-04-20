@@ -5,6 +5,8 @@ CHANGES
 4.2.0 (unreleased)
 ------------------
 
+- Added explicit support for PyPy.
+
 - Added support for continuous integration using ``tox`` and ``jenkins``.
 
 - Dropped the external ``six`` dependency in favor of a much-trimmed
