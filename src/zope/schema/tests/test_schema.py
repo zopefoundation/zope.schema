@@ -171,14 +171,25 @@ class Test_getValidationErrors(unittest.TestCase):
         from zope.interface import Interface
         from zope.interface import invariant
         from zope.interface.exceptions import Invalid
-        class IWithInvariant(Interface):
+        class IWithFailingInvariant(Interface):
             @invariant
             def _epic_fail(obj):
                 raise Invalid('testing')
-        errors = self._callFUT(IWithInvariant, object())
+        errors = self._callFUT(IWithFailingInvariant, object())
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0][0], None)
         self.assertEqual(errors[0][1].__class__, Invalid)
+
+    def test_schema_with_invariant_ok(self):
+        from zope.interface import Interface
+        from zope.interface import invariant
+        class IWithPassingInvariant(Interface):
+            @invariant
+            def _hall_pass(obj):
+                pass
+        errors = self._callFUT(IWithPassingInvariant, object())
+        self.assertEqual(len(errors), 0)
+
 
 class Test_getSchemaValidationErrors(unittest.TestCase):
 
