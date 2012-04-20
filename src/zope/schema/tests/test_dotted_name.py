@@ -53,7 +53,7 @@ class DottedNameTest(unittest.TestCase, FieldTestBase):
     def testFromUnicode(self):
         from zope.schema._compat import u
         field = self._makeOne()
-        self.assertEquals(field.fromUnicode(u('foo')), 'foo')
+        self.assertEqual(field.fromUnicode(u('foo')), 'foo')
 
 
 def test_suite():
