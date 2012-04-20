@@ -18,7 +18,7 @@ from zope.schema.tests.test_field import FieldTestBase
 from zope.testing.cleanup import CleanUp
 
 
-class ObjectTest(CleanUp, FieldTestBase):
+class ObjectTest(CleanUp, unittest.TestCase, FieldTestBase):
     """Test the Object Field."""
 
     def _getTargetClass(self):

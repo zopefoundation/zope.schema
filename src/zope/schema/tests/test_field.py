@@ -16,8 +16,7 @@
 import unittest
 
 
-
-class FieldTestBase(unittest.TestCase):
+class FieldTestBase(object):
 
     def _getTargetClass(self):
         raise NotImplementedError
@@ -93,7 +92,7 @@ class CollectionFieldTestBase(FieldTestBase):
 
         self.assertEqual(field2.value_type.context, c)
 
-class FieldTest(FieldTestBase):
+class FieldTest(unittest.TestCase, FieldTestBase):
     """Test generic Field."""
 
     def _getTargetClass(self):

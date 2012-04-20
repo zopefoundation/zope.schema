@@ -18,7 +18,7 @@ import unittest
 from zope.schema.tests.test_field import FieldTestBase
 
 
-class DictTest(FieldTestBase):
+class DictTest(unittest.TestCase, FieldTestBase):
     """Test the Dict Field."""
 
     def _getTargetClass(self):

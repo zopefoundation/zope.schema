@@ -18,7 +18,7 @@ import unittest
 from zope.schema.tests.test_field import CollectionFieldTestBase
 
 
-class ListTest(CollectionFieldTestBase):
+class ListTest(unittest.TestCase, CollectionFieldTestBase):
     """Test the List Field."""
 
     def _getTargetClass(self):

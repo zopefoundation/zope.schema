@@ -18,7 +18,7 @@ import unittest
 from zope.schema.tests.test_field import FieldTestBase
 
 
-class StrTest(FieldTestBase):
+class StrTestBase(FieldTestBase):
     """Test the Str Field."""
 
     def testValidate(self):
@@ -100,7 +100,7 @@ class MultiLine(object):
         field.validate(self._convert('hello\nworld'))
 
 
-class BytesTest(StrTest, MultiLine):
+class BytesTest(unittest.TestCase, StrTestBase, MultiLine):
 
     def _getTargetClass(self):
         from zope.schema import Bytes
@@ -117,7 +117,7 @@ class BytesTest(StrTest, MultiLine):
         self.assertRaises(ValidationError, field.validate, u('hello'))
 
 
-class TextTest(StrTest, MultiLine):
+class TextTest(unittest.TestCase, StrTestBase, MultiLine):
 
     def _getTargetClass(self):
         from zope.schema import Text

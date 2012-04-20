@@ -17,7 +17,7 @@ import unittest
 
 from zope.schema.tests.test_field import FieldTestBase
 
-class InterfaceTest(FieldTestBase):
+class InterfaceTest(unittest.TestCase, FieldTestBase):
     """Test the Bool Field."""
 
     def _getTargetClass(self):

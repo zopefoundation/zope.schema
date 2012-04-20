@@ -18,7 +18,7 @@ import unittest
 from zope.schema.tests.test_field import CollectionFieldTestBase
 
 
-class TupleTest(CollectionFieldTestBase):
+class TupleTest(unittest.TestCase, CollectionFieldTestBase):
     """Test the Tuple Field."""
 
     def _getTargetClass(self):

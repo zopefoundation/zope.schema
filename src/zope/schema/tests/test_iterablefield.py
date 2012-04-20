@@ -18,7 +18,7 @@ import unittest
 from zope.schema.tests.test_field import FieldTestBase
 
 
-class IterableTest(FieldTestBase):
+class IterableTest(unittest.TestCase, FieldTestBase):
     """Test the Iterable Field."""
 
     def _getTargetClass(self):

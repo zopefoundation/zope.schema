@@ -18,7 +18,7 @@ import unittest
 from zope.schema.tests.test_field import FieldTestBase
 
 
-class DecimalTest(FieldTestBase):
+class DecimalTest(unittest.TestCase, FieldTestBase):
     """Test the Decimal Field."""
 
     def _getTargetClass(self):

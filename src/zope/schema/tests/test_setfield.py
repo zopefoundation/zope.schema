@@ -18,7 +18,7 @@ import unittest
 from zope.schema.tests.test_field import CollectionFieldTestBase
 
 
-class SetTest(CollectionFieldTestBase):
+class SetTest(unittest.TestCase, CollectionFieldTestBase):
     """Test the Tuple Field."""
 
     def _getTargetClass(self):
@@ -183,7 +183,7 @@ class SetTest(CollectionFieldTestBase):
         self.assertTrue(ICollection.providedBy(field))
 
 
-class FrozenSetTest(CollectionFieldTestBase):
+class FrozenSetTest(unittest.TestCase, CollectionFieldTestBase):
     """Test the Tuple Field."""
 
     def _getTargetClass(self):

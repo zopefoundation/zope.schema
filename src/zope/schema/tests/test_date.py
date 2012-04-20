@@ -17,7 +17,7 @@ import unittest
 
 from zope.schema.tests.test_field import FieldTestBase
 
-class DateTest(FieldTestBase):
+class DateTest(unittest.TestCase, FieldTestBase):
     """Test the Date Field."""
 
     def _getTargetClass(self):

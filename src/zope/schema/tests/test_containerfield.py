@@ -17,7 +17,7 @@ import unittest
 
 from zope.schema.tests.test_field import FieldTestBase
 
-class ContainerTest(FieldTestBase):
+class ContainerTest(unittest.TestCase, FieldTestBase):
     """Test the Container Field."""
 
     def _getTargetClass(self):

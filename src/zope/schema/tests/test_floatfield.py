@@ -18,7 +18,7 @@ import unittest
 from zope.schema.tests.test_field import FieldTestBase
 
 
-class FloatTest(FieldTestBase):
+class FloatTest(unittest.TestCase, FieldTestBase):
     """Test the Float Field."""
 
     def _getTargetClass(self):

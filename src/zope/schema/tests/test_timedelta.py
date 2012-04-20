@@ -18,7 +18,7 @@ import unittest
 from zope.schema.tests.test_field import FieldTestBase
 
 
-class TimedeltaTest(FieldTestBase):
+class TimedeltaTest(unittest.TestCase, FieldTestBase):
     """Test the Timedelta Field."""
 
     def _getTargetClass(self):
