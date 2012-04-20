@@ -79,15 +79,7 @@ setup(name='zope.schema',
       description='zope.interface extension for defining data schemas',
       author='Zope Foundation and Contributors',
       author_email='zope-dev@zope.org',
-      long_description=(read('src', 'zope', 'schema', 'README.txt')
-                        + '\n\n' +
-                        read('src', 'zope', 'schema', 'fields.txt')
-                        + '\n\n' +
-                        read('src', 'zope', 'schema', 'sources.txt')
-                        + '\n\n' +
-                        read('src', 'zope', 'schema', 'validation.txt')
-                        + '\n\n' +
-                        read('CHANGES.txt')),
+      long_description=(read('README.txt') + '\n\n' + read('CHANGES.txt')),
       packages=find_packages('src'),
       package_dir = {'': 'src'},
       namespace_packages=['zope',],

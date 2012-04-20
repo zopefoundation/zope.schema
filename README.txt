@@ -11,4 +11,4 @@ its value and provide a validation method.  Besides you can optionally
 specify characteristics such as its value being read-only or not
 required.
 
-See 'src/zope/schema/README.txt' for more information.
+See 'docs/index.rst' for more information.
