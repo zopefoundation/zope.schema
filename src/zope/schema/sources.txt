@@ -60,9 +60,9 @@ If a IContextSourceBinder is passed as the `source` argument to Choice, it's
 `bind` method will be called with the context as its only argument.   The
 result must implement ISource and will be used as the source.
 
-    >>> from zope.schema._compat import print_
+    >>> _my_binder_called = []
     >>> def my_binder(context):
-    ...     print_("Binder was called.")
+    ...     _my_binder_called.append(context)   
     ...     source = MySource()
     ...     source.divisor = context.divisor
     ...     return source
@@ -73,7 +73,8 @@ result must implement ISource and will be used as the source.
 
     >>> choice = Choice(__name__='number', source=my_binder)
     >>> bound = choice.bind(Context())
-    Binder was called.
+    >>> len(_my_binder_called)
+    1
     >>> bound.vocabulary
     <...MySource...>
     >>> bound.vocabulary.divisor
@@ -85,8 +86,10 @@ initalization doesn't fail in that case.
 
     >>> choice = Choice(__name__='number', source=my_binder, default=2)
 
+    >>> del _my_binder_called[:]
     >>> bound = choice.bind(Context())
-    Binder was called.
+    >>> len(_my_binder_called)
+    1
 
     >>> bound.validate(bound.default)
     >>> bound.validate(3)

@@ -16,14 +16,14 @@ Create an interface to validate against:
 
   >>> import zope.interface
   >>> import zope.schema
-  >>> from zope.schema._compat import print_
+  >>> _a_greater_b_called = []
   >>> class ITwoInts(zope.interface.Interface):
   ...     a = zope.schema.Int(max=10)
   ...     b = zope.schema.Int(min=5)
   ...
   ...     @zope.interface.invariant
   ...     def a_greater_b(obj):
-  ...         print_("Checking if a > b")
+  ...         _a_greater_b_called.append(obj)
   ...         if obj.a <= obj.b:
   ...             raise zope.interface.Invalid("%s<=%s" % (obj.a, obj.b))
   ...     
@@ -92,7 +92,8 @@ checked. As `b>a` the invariant fails:
 
   >>> ti.b = 10
   >>> errors = zope.schema.getValidationErrors(ITwoInts, ti)
-  Checking if a > b
+  >>> len(_a_greater_b_called)
+  1
   >>> errors
   [(None, <zope.interface.exceptions.Invalid instance at 0x...>)]
 
@@ -106,9 +107,11 @@ When using `getSchemaValidationErrors` we do not get an error any more:
 Set `b=5` so everything is fine:
 
   >>> ti.b = 5
+  >>> del _a_greater_b_called[:]
   >>> zope.schema.getValidationErrors(ITwoInts, ti)
-  Checking if a > b
   []
+  >>> len(_a_greater_b_called)
+  1
 
 
 Compare ValidationError
