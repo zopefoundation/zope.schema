@@ -71,6 +71,8 @@ REQUIRES = [
 if sys.version_info < (2, 7):
     REQUIRES += ['ordereddict']
 
+TESTS_REQUIRE = ['zope.testing']
+
 setup(name='zope.schema',
       version='4.1.2.dev0',
       url='http://pypi.python.org/pypi/zope.schema',
@@ -90,8 +92,8 @@ setup(name='zope.schema',
       packages=find_packages('src'),
       package_dir = {'': 'src'},
       namespace_packages=['zope',],
-      extras_require={'test': ['zope.testing'],
-                      'docs': ['z3c.recipe.sphinxdoc']},
+      #extras_require={
+      #                'docs': ['z3c.recipe.sphinxdoc']},
       install_requires=REQUIRES,
       classifiers=[
         "Development Status :: 5 - Production/Stable",
@@ -108,5 +110,10 @@ setup(name='zope.schema',
       include_package_data = True,
       zip_safe = False,
       test_suite='__main__.alltests',
-      tests_require='zope.testing',
-      )
+      tests_require=TESTS_REQUIRE,
+      extras_require={
+        'docs': ['Sphinx'],
+        'test': TESTS_REQUIRE,
+        'testing': TESTS_REQUIRE + ['nose', 'coverage'],
+      },
+)

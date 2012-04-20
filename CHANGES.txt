@@ -5,7 +5,10 @@ CHANGES
 4.1.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Added ``setup.py dev`` alias (runs ``setup.py develop`` plus installs
+  ``nose`` and ``coverage``).
+
+- Added ``setup.py docs`` alias (installs ``Sphinx`` and dependencies).
 
 
 4.1.1 (2012-03-23)
