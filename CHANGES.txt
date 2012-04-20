@@ -5,6 +5,9 @@ CHANGES
 4.1.2 (unreleased)
 ------------------
 
+- Dropped the external ``six`` dependency in favor of a much-trimmed
+  ``zope.schema._compat`` module.
+
 - Tests now pass when run under ``nose``.
 
 - Added ``setup.py dev`` alias (runs ``setup.py develop`` plus installs

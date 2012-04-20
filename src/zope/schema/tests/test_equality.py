@@ -20,7 +20,7 @@ class FieldEqualityTests(unittest.TestCase):
 
     def test_equality(self):
 
-        from six import u
+        from zope.schema._compat import u
         from zope.schema import Int
         from zope.schema import Text
 

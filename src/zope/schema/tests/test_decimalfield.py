@@ -27,7 +27,7 @@ class DecimalTest(unittest.TestCase, FieldTestBase):
 
     def testValidate(self):
         import decimal
-        from six import u
+        from zope.schema._compat import u
         field = self._makeOne(title=u('Decimal field'), description=u(''),
                                     readonly=False, required=False)
         field.validate(None)
@@ -37,7 +37,7 @@ class DecimalTest(unittest.TestCase, FieldTestBase):
 
     def testValidateRequired(self):
         import decimal
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import RequiredMissing
         field = self._makeOne(title=u('Decimal field'), description=u(''),
                                     readonly=False, required=True)
@@ -49,7 +49,7 @@ class DecimalTest(unittest.TestCase, FieldTestBase):
 
     def testValidateMin(self):
         import decimal
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooSmall
         field = self._makeOne(title=u('Decimal field'), description=u(''),
                                     readonly=False, required=False,
@@ -63,7 +63,7 @@ class DecimalTest(unittest.TestCase, FieldTestBase):
 
     def testValidateMax(self):
         import decimal
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooBig
         field = self._makeOne(title=u('Decimal field'), description=u(''),
                                     readonly=False, required=False,
@@ -77,7 +77,7 @@ class DecimalTest(unittest.TestCase, FieldTestBase):
 
     def testValidateMinAndMax(self):
         import decimal
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooBig
         from zope.schema.interfaces import TooSmall
         field = self._makeOne(title=u('Decimal field'), description=u(''),

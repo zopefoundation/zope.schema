@@ -32,7 +32,7 @@ class ObjectTest(CleanUp, unittest.TestCase, FieldTestBase):
         return super(ObjectTest, self)._makeOne(**kw)
 
     def _makeSchema(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.interface import Attribute
         from zope.interface import Interface
         from zope.schema import TextLine
@@ -67,7 +67,7 @@ class ObjectTest(CleanUp, unittest.TestCase, FieldTestBase):
         self.fail('Expected WrongContainedType Error')
 
     def makeTestData(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.interface import implementer
         schema = self._makeSchema()
 
@@ -148,7 +148,7 @@ class ObjectTest(CleanUp, unittest.TestCase, FieldTestBase):
         pass
 
     def test_validate_required(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import RequiredMissing
         field = self._makeOne(
             title=u('Required field'), description=u(''),
@@ -196,7 +196,7 @@ class ObjectTest(CleanUp, unittest.TestCase, FieldTestBase):
         self.assertTrue(isinstance(errors[0], SchemaNotFullyImplemented))
 
     def test_validate_with_non_object_value(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.interface import Interface
         from zope.interface import implementer
         from zope.schema import Object

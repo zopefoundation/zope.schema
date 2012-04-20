@@ -3,7 +3,7 @@
 
 import re
 
-from six import PY3
+from zope.schema._compat import PY3
 from zope.testing import renormalizing
 
 if PY3:

@@ -17,17 +17,27 @@ __docformat__ = 'restructuredtext'
 
 import sys
 
-from six import u, b, text_type, integer_types
-from zope.interface import Attribute, providedBy, implementer
-from zope.schema._bootstrapinterfaces import StopValidation
-from zope.schema._bootstrapinterfaces import IFromUnicode
-from zope.schema._bootstrapinterfaces import RequiredMissing, WrongType
+from zope.interface import Attribute
+from zope.interface import providedBy
+from zope.interface import implementer
+
 from zope.schema._bootstrapinterfaces import ConstraintNotSatisfied
-from zope.schema._bootstrapinterfaces import NotAContainer, NotAnIterator
-from zope.schema._bootstrapinterfaces import TooSmall, TooBig
-from zope.schema._bootstrapinterfaces import TooShort, TooLong
-from zope.schema._bootstrapinterfaces import InvalidValue
 from zope.schema._bootstrapinterfaces import IContextAwareDefaultFactory
+from zope.schema._bootstrapinterfaces import IFromUnicode
+from zope.schema._bootstrapinterfaces import InvalidValue
+from zope.schema._bootstrapinterfaces import NotAContainer
+from zope.schema._bootstrapinterfaces import NotAnIterator
+from zope.schema._bootstrapinterfaces import RequiredMissing
+from zope.schema._bootstrapinterfaces import StopValidation
+from zope.schema._bootstrapinterfaces import TooBig
+from zope.schema._bootstrapinterfaces import TooLong
+from zope.schema._bootstrapinterfaces import TooShort
+from zope.schema._bootstrapinterfaces import TooSmall
+from zope.schema._bootstrapinterfaces import WrongType
+from zope.schema._compat import u
+from zope.schema._compat import b # used in docstring doctests
+from zope.schema._compat import text_type
+from zope.schema._compat import integer_types
 
 from zope.schema._schema import getFields
 

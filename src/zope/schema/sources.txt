@@ -60,7 +60,7 @@ If a IContextSourceBinder is passed as the `source` argument to Choice, it's
 `bind` method will be called with the context as its only argument.   The
 result must implement ISource and will be used as the source.
 
-    >>> from six import print_
+    >>> from zope.schema._compat import print_
     >>> def my_binder(context):
     ...     print_("Binder was called.")
     ...     source = MySource()

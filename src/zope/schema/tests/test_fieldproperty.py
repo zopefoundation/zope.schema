@@ -20,8 +20,8 @@ import unittest
 class Test(unittest.TestCase):
 
     def _getSchema(self):
-        from six import b
-        from six import u
+        from zope.schema._compat import b
+        from zope.schema._compat import u
         from zope.interface import Interface
         from zope.schema import Bytes
         from zope.schema import Float
@@ -52,8 +52,8 @@ class Test(unittest.TestCase):
         return self._getTargetClass()()
 
     def test_basic(self):
-        from six import b
-        from six import u
+        from zope.schema._compat import b
+        from zope.schema._compat import u
         from zope.schema.interfaces import ValidationError
         c = self._makeOne()
         self.assertEqual(c.title, u('say something'))

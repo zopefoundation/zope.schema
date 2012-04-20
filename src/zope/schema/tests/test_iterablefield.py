@@ -33,7 +33,7 @@ class IterableTest(unittest.TestCase, FieldTestBase):
             IterableUserDict =  UserDict
         else: #pragma NO COVER python2
             from UserDict import IterableUserDict
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import NotAContainer
         from zope.schema.interfaces import NotAnIterator
         field = self._makeOne(title=u('test field'), description=u(''),
@@ -50,7 +50,7 @@ class IterableTest(unittest.TestCase, FieldTestBase):
         self.assertRaises(NotAnIterator, field.validate, UserDict)
 
     def testValidateRequired(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import RequiredMissing
         field = self._makeOne(title=u('test field'), description=u(''),
                               readonly=False, required=True)

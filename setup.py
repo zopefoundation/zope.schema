@@ -65,7 +65,6 @@ REQUIRES = [
         'setuptools',
         'zope.interface >= 3.6.0',
         'zope.event',
-        'six',
         ]
 
 if sys.version_info < (2, 7):

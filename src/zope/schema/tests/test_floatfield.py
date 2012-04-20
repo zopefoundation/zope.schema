@@ -26,7 +26,7 @@ class FloatTest(unittest.TestCase, FieldTestBase):
         return Float
 
     def testValidate(self):
-        from six import u
+        from zope.schema._compat import u
         field = self._makeOne(title=u('Float field'), description=u(''),
                                     readonly=False, required=False)
         field.validate(None)
@@ -35,7 +35,7 @@ class FloatTest(unittest.TestCase, FieldTestBase):
         field.validate(1000.0003)
 
     def testValidateRequired(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import RequiredMissing
         field = self._makeOne(title=u('Float field'), description=u(''),
                                     readonly=False, required=True)
@@ -46,7 +46,7 @@ class FloatTest(unittest.TestCase, FieldTestBase):
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def testValidateMin(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooSmall
         field = self._makeOne(title=u('Float field'), description=u(''),
                                     readonly=False, required=False, min=10.5)
@@ -58,7 +58,7 @@ class FloatTest(unittest.TestCase, FieldTestBase):
         self.assertRaises(TooSmall, field.validate, 10.4)
 
     def testValidateMax(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooBig
         field = self._makeOne(title=u('Float field'), description=u(''),
                                     readonly=False, required=False, max=10.5)
@@ -70,7 +70,7 @@ class FloatTest(unittest.TestCase, FieldTestBase):
         self.assertRaises(TooBig, field.validate, 20.7)
 
     def testValidateMinAndMax(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooBig
         from zope.schema.interfaces import TooSmall
         field = self._makeOne(title=u('Float field'), description=u(''),

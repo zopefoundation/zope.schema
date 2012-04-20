@@ -35,7 +35,7 @@ instances, we now use schema fields:
 
   >>> import zope.interface
   >>> import zope.schema
-  >>> from six import u, b
+  >>> from zope.schema._compat import u, b
 
   >>> class IBookmark(zope.interface.Interface):
   ...     title = zope.schema.TextLine(

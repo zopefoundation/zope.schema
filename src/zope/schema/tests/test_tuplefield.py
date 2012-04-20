@@ -26,7 +26,7 @@ class TupleTest(unittest.TestCase, CollectionFieldTestBase):
         return Tuple
 
     def testValidate(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import WrongType
         field = self._makeOne(title=u('Tuple field'), description=u(''),
                       readonly=False, required=False)
@@ -41,7 +41,7 @@ class TupleTest(unittest.TestCase, CollectionFieldTestBase):
         self.assertRaises(WrongType, field.validate, {})
 
     def testValidateRequired(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import RequiredMissing
         field = self._makeOne(title=u('Tuple field'), description=u(''),
                       readonly=False, required=True)
@@ -52,7 +52,7 @@ class TupleTest(unittest.TestCase, CollectionFieldTestBase):
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def testValidateMinValues(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooShort
         field = self._makeOne(title=u('Tuple field'), description=u(''),
                       readonly=False, required=False, min_length=2)
@@ -64,7 +64,7 @@ class TupleTest(unittest.TestCase, CollectionFieldTestBase):
         self.assertRaises(TooShort, field.validate, (1,))
 
     def testValidateMaxValues(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooLong
         field = self._makeOne(title=u('Tuple field'), description=u(''),
                       readonly=False, required=False, max_length=2)
@@ -76,7 +76,7 @@ class TupleTest(unittest.TestCase, CollectionFieldTestBase):
         self.assertRaises(TooLong, field.validate, (1, 2, 3))
 
     def testValidateMinValuesAndMaxValues(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooLong
         from zope.schema.interfaces import TooShort
         field = self._makeOne(title=u('Tuple field'), description=u(''),
@@ -90,7 +90,7 @@ class TupleTest(unittest.TestCase, CollectionFieldTestBase):
         self.assertRaises(TooLong, field.validate, (1, 2, 3))
 
     def testValidateValueTypes(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema import Int
         from zope.schema.interfaces import WrongContainedType
         field = self._makeOne(title=u('Tuple field'), description=u(''),
@@ -122,7 +122,7 @@ class TupleTest(unittest.TestCase, CollectionFieldTestBase):
         self._makeOne(value_type=FakeField())
 
     def testUnique(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import NotUnique
         field = self._makeOne(title=u('test field'), description=u(''),
                                     readonly=False, required=True, unique=True)

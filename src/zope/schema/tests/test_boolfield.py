@@ -26,7 +26,7 @@ class BoolTest(unittest.TestCase, FieldTestBase):
         return Bool
 
     def testValidate(self):
-        from six import u
+        from zope.schema._compat import u
         field = self._makeOne(title=u('Bool field'), description=u(''),
                      readonly=False, required=False)
         field.validate(None)
@@ -34,7 +34,7 @@ class BoolTest(unittest.TestCase, FieldTestBase):
         field.validate(False)
 
     def testValidateRequired(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import RequiredMissing
         field = self._makeOne(title=u('Bool field'), description=u(''),
                      readonly=False, required=True)
@@ -44,7 +44,7 @@ class BoolTest(unittest.TestCase, FieldTestBase):
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def testIBoolIsMoreImportantThanIFromUnicode(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.interface import Interface
         from zope.interface.adapter import AdapterRegistry
         from zope.schema.interfaces import IBool

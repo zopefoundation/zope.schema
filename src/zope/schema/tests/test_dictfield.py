@@ -26,7 +26,7 @@ class DictTest(unittest.TestCase, FieldTestBase):
         return Dict
 
     def testValidate(self):
-        from six import u
+        from zope.schema._compat import u
         field = self._makeOne(title=u('Dict field'),
                      description=u(''), readonly=False, required=False)
         field.validate(None)
@@ -35,7 +35,7 @@ class DictTest(unittest.TestCase, FieldTestBase):
         field.validate({'a': 1})
 
     def testValidateRequired(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import RequiredMissing
         field = self._makeOne(title=u('Dict field'),
                      description=u(''), readonly=False, required=True)
@@ -46,7 +46,7 @@ class DictTest(unittest.TestCase, FieldTestBase):
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def testValidateMinValues(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooShort
         field = self._makeOne(title=u('Dict field'),
                      description=u(''), readonly=False, required=False,
@@ -58,7 +58,7 @@ class DictTest(unittest.TestCase, FieldTestBase):
         self.assertRaises(TooShort, field.validate, {})
 
     def testValidateMaxValues(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooLong
         field = self._makeOne(title=u('Dict field'),
                      description=u(''), readonly=False, required=False,
@@ -71,7 +71,7 @@ class DictTest(unittest.TestCase, FieldTestBase):
         self.assertRaises(TooLong, field.validate, {1: 'a', 2: 'b', 3: 'c'})
 
     def testValidateMinValuesAndMaxValues(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooLong
         from zope.schema.interfaces import TooShort
         field = self._makeOne(title=u('Dict field'),
@@ -85,7 +85,7 @@ class DictTest(unittest.TestCase, FieldTestBase):
         self.assertRaises(TooLong, field.validate, {1: 'a', 2: 'b', 3: 'c'})
 
     def testValidateValueType(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema import Int
         from zope.schema.interfaces import WrongContainedType
         field = self._makeOne(title=u('Dict field'),
@@ -100,7 +100,7 @@ class DictTest(unittest.TestCase, FieldTestBase):
         self.assertRaises(WrongContainedType, field.validate, {'a': ()} )
 
     def testValidateKeyTypes(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema import Int
         from zope.schema.interfaces import WrongContainedType
         field = self._makeOne(title=u('Dict field'),
@@ -116,7 +116,7 @@ class DictTest(unittest.TestCase, FieldTestBase):
 
 
     def test_bind_binds_key_and_value_types(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema import Int
         field = self._makeOne(
             __name__ = 'x',

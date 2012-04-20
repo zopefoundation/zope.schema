@@ -31,7 +31,7 @@ class StateSelectionTest(unittest.TestCase):
         _clear()
 
     def _makeSchema(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.interface import Interface
         from zope.schema import Choice
         from zope.schema.tests.states import StateVocabulary

@@ -19,8 +19,8 @@ import unittest
 class SchemaTest(unittest.TestCase):
 
     def _makeSchema(self):
-        from six import b
-        from six import u
+        from zope.schema._compat import b
+        from zope.schema._compat import u
         from zope.interface import Interface
         from zope.schema import Bytes
 
@@ -43,8 +43,8 @@ class SchemaTest(unittest.TestCase):
         return ISchemaTest
 
     def _makeDerivedSchema(self):
-        from six import b
-        from six import u
+        from zope.schema._compat import b
+        from zope.schema._compat import u
         from zope.schema import Bytes
 
         class ISchemaTestSubclass(self._makeSchema()):

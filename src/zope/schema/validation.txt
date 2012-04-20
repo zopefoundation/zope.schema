@@ -16,7 +16,7 @@ Create an interface to validate against:
 
   >>> import zope.interface
   >>> import zope.schema
-  >>> from six import print_
+  >>> from zope.schema._compat import print_
   >>> class ITwoInts(zope.interface.Interface):
   ...     a = zope.schema.Int(max=10)
   ...     b = zope.schema.Int(min=5)

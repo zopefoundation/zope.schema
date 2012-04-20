@@ -29,7 +29,7 @@ class ContainerTest(unittest.TestCase, FieldTestBase):
             from UserDict import UserDict
         except ImportError: #pragma NO COVER python3
             from collections import UserDict
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import NotAContainer
         field = self._makeOne(title=u('test field'), description=u(''),
                               readonly=False, required=False)
@@ -44,7 +44,7 @@ class ContainerTest(unittest.TestCase, FieldTestBase):
         self.assertRaises(NotAContainer, field.validate, True)
 
     def testValidateRequired(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import RequiredMissing
         field = self._makeOne(title=u('test field'), description=u(''),
                               readonly=False, required=True)

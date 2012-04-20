@@ -22,7 +22,7 @@ class StrTestBase(FieldTestBase):
     """Test the Str Field."""
 
     def testValidate(self):
-        from six import u
+        from zope.schema._compat import u
         field = self._makeOne(title=u('Str field'), description=u(''),
                                     readonly=False, required=False)
         field.validate(None)
@@ -30,7 +30,7 @@ class StrTestBase(FieldTestBase):
         field.validate(self._convert(''))
 
     def testValidateRequired(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import RequiredMissing
         from zope.schema.interfaces import TooShort
         # Note that if we want to require non-empty strings,
@@ -45,7 +45,7 @@ class StrTestBase(FieldTestBase):
         self.assertRaises(TooShort, field.validate, self._convert(''))
 
     def testValidateMinLength(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooShort
         field = self._makeOne(
             title=u('Str field'), description=u(''),
@@ -59,7 +59,7 @@ class StrTestBase(FieldTestBase):
         self.assertRaises(TooShort, field.validate, self._convert('1'))
 
     def testValidateMaxLength(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooLong
         field = self._makeOne(
             title=u('Str field'), description=u(''),
@@ -73,7 +73,7 @@ class StrTestBase(FieldTestBase):
         self.assertRaises(TooLong, field.validate, self._convert('999999999'))
 
     def testValidateMinLengthAndMaxLength(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooLong
         from zope.schema.interfaces import TooShort
         field = self._makeOne(
@@ -95,7 +95,7 @@ class StrTestBase(FieldTestBase):
 class MultiLine(object):
 
     def test_newlines(self):
-        from six import u
+        from zope.schema._compat import u
         field = self._makeOne(title=u('Str field'))
         field.validate(self._convert('hello\nworld'))
 
@@ -107,11 +107,11 @@ class BytesTest(unittest.TestCase, StrTestBase, MultiLine):
         return Bytes
 
     def _convert(self, v):
-        from six import b
+        from zope.schema._compat import b
         return b(v)
 
     def testBadStringType(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import ValidationError
         field = self._makeOne()
         self.assertRaises(ValidationError, field.validate, u('hello'))
@@ -124,24 +124,24 @@ class TextTest(unittest.TestCase, StrTestBase, MultiLine):
         return Text
 
     def _convert(self, v):
-        from six import u
+        from zope.schema._compat import u
         return u(v)
 
     def testBadStringType(self):
-        from six import b
+        from zope.schema._compat import b
         from zope.schema.interfaces import ValidationError
         field = self._makeOne()
         self.assertRaises(ValidationError, field.validate, b('hello'))
 
     def testSillyDefault(self):
-        from six import b
+        from zope.schema._compat import b
         from zope.schema.interfaces import ValidationError
         self.assertRaises(ValidationError, self._makeOne, default=b(""))
 
 class SingleLine(object):
 
     def test_newlines(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import ConstraintNotSatisfied
         field = self._makeOne(title=u('Str field'))
         self.assertRaises(ConstraintNotSatisfied,
@@ -155,7 +155,7 @@ class PasswordTest(SingleLine, TextTest):
         return Password
 
     def test_existingValue(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import WrongType
         class Dummy(object):
             password = None

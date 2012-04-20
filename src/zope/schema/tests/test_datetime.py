@@ -26,7 +26,7 @@ class DatetimeTest(unittest.TestCase, FieldTestBase):
 
     def testValidate(self):
         from datetime import datetime
-        from six import u
+        from zope.schema._compat import u
         field = self._makeOne(title=u('Datetime field'), description=u(''),
                                     readonly=False, required=False)
         field.validate(None)
@@ -34,7 +34,7 @@ class DatetimeTest(unittest.TestCase, FieldTestBase):
 
     def testValidateRequired(self):
         from datetime import datetime
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import RequiredMissing
         field = self._makeOne(title=u('Datetime field'), description=u(''),
                                     readonly=False, required=True)
@@ -44,7 +44,7 @@ class DatetimeTest(unittest.TestCase, FieldTestBase):
 
     def testValidateMin(self):
         from datetime import datetime
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooSmall
         d1 = datetime(2000,10,1)
         d2 = datetime(2000,10,2)
@@ -59,7 +59,7 @@ class DatetimeTest(unittest.TestCase, FieldTestBase):
 
     def testValidateMax(self):
         from datetime import datetime
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooBig
         d1 = datetime(2000,10,1)
         d2 = datetime(2000,10,2)
@@ -74,7 +74,7 @@ class DatetimeTest(unittest.TestCase, FieldTestBase):
 
     def testValidateMinAndMax(self):
         from datetime import datetime
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooBig
         from zope.schema.interfaces import TooSmall
         d1 = datetime(2000,10,1)

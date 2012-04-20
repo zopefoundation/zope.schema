@@ -13,46 +13,91 @@
 ##############################################################################
 """Schema Fields
 """
-
 __docformat__ = 'restructuredtext'
 
-import re
+from datetime import datetime
+from datetime import date
+from datetime import timedelta
+from datetime import time
 import decimal
+import re
 import threading
-from datetime import datetime, date, timedelta, time
+
 from zope.event import notify
+from zope.interface import classImplements
+from zope.interface import implementer
+from zope.interface import Interface
+from zope.interface.interfaces import IInterface
+from zope.interface.interfaces import IMethod
 
-from zope.interface import classImplements, implementer, Interface
-from zope.interface.interfaces import IInterface, IMethod
-from six import u, b, text_type, string_types, binary_type, PY3
-
-from zope.schema.interfaces import IField
-from zope.schema.interfaces import IMinMaxLen, IText, ITextLine
-from zope.schema.interfaces import ISourceText
-from zope.schema.interfaces import IInterfaceField
-from zope.schema.interfaces import IBytes, IASCII, IBytesLine, IASCIILine
-from zope.schema.interfaces import IBool, IInt, IFloat, IDatetime, IFrozenSet
-from zope.schema.interfaces import IChoice, ITuple, IList, ISet, IDict
-from zope.schema.interfaces import IPassword, IDate, ITimedelta
-from zope.schema.interfaces import IObject, IBeforeObjectAssignedEvent
-from zope.schema.interfaces import ITime, IDecimal
-from zope.schema.interfaces import IURI, IId, IDottedName, IFromUnicode
-from zope.schema.interfaces import ISource, IBaseVocabulary
+from zope.schema.interfaces import IASCII
+from zope.schema.interfaces import IASCIILine
+from zope.schema.interfaces import IBaseVocabulary
+from zope.schema.interfaces import IBeforeObjectAssignedEvent
+from zope.schema.interfaces import IBool
+from zope.schema.interfaces import IBytes
+from zope.schema.interfaces import IBytesLine
+from zope.schema.interfaces import IChoice
 from zope.schema.interfaces import IContextSourceBinder
+from zope.schema.interfaces import IDate
+from zope.schema.interfaces import IDatetime
+from zope.schema.interfaces import IDecimal
+from zope.schema.interfaces import IDict
+from zope.schema.interfaces import IDottedName
+from zope.schema.interfaces import IField
+from zope.schema.interfaces import IFloat
+from zope.schema.interfaces import IFromUnicode
+from zope.schema.interfaces import IFrozenSet
+from zope.schema.interfaces import IId
+from zope.schema.interfaces import IInt
+from zope.schema.interfaces import IInterfaceField
+from zope.schema.interfaces import IList
+from zope.schema.interfaces import IMinMaxLen
+from zope.schema.interfaces import IObject
+from zope.schema.interfaces import IPassword
+from zope.schema.interfaces import ISet
+from zope.schema.interfaces import ISource
+from zope.schema.interfaces import ISourceText
+from zope.schema.interfaces import IText
+from zope.schema.interfaces import ITextLine
+from zope.schema.interfaces import ITime
+from zope.schema.interfaces import ITimedelta
+from zope.schema.interfaces import ITuple
+from zope.schema.interfaces import IURI
 
-from zope.schema.interfaces import ValidationError, InvalidValue
-from zope.schema.interfaces import WrongType, WrongContainedType, NotUnique
-from zope.schema.interfaces import SchemaNotProvided, SchemaNotFullyImplemented
-from zope.schema.interfaces import InvalidURI, InvalidId, InvalidDottedName
+from zope.schema.interfaces import ValidationError
+from zope.schema.interfaces import InvalidValue
+from zope.schema.interfaces import WrongType
+from zope.schema.interfaces import WrongContainedType
+from zope.schema.interfaces import NotUnique
+from zope.schema.interfaces import SchemaNotProvided
+from zope.schema.interfaces import SchemaNotFullyImplemented
+from zope.schema.interfaces import InvalidURI
+from zope.schema.interfaces import InvalidId
+from zope.schema.interfaces import InvalidDottedName
 from zope.schema.interfaces import ConstraintNotSatisfied
 
-from zope.schema._bootstrapfields import Field, Container, Iterable, Orderable
-from zope.schema._bootstrapfields import Text, TextLine, Bool, Int, Password
+from zope.schema._bootstrapfields import Field
+from zope.schema._bootstrapfields import Container
+from zope.schema._bootstrapfields import Iterable
+from zope.schema._bootstrapfields import Orderable
+from zope.schema._bootstrapfields import Text
+from zope.schema._bootstrapfields import TextLine
+from zope.schema._bootstrapfields import Bool
+from zope.schema._bootstrapfields import Int
+from zope.schema._bootstrapfields import Password
 from zope.schema._bootstrapfields import MinMaxLen
 from zope.schema.fieldproperty import FieldProperty
 from zope.schema.vocabulary import getVocabularyRegistry
 from zope.schema.vocabulary import VocabularyRegistryError
 from zope.schema.vocabulary import SimpleVocabulary
+
+from zope.schema._compat import u # used in docstring doctests
+from zope.schema._compat import b
+from zope.schema._compat import text_type
+from zope.schema._compat import string_types
+from zope.schema._compat import binary_type
+from zope.schema._compat import PY3
 
 
 # Fix up bootstrap field types
@@ -86,7 +131,7 @@ class Bytes(MinMaxLen, Field):
 
     _type = binary_type
 
-    def fromUnicode(self, u):
+    def fromUnicode(self, uc):
         """
         >>> obj = Bytes(constraint=lambda v: b('x') in v)
 
@@ -99,9 +144,9 @@ class Bytes(MinMaxLen, Field):
 
         """
         if PY3:
-            v = b(u)
+            v = b(uc)
         else:
-            v = str(u)
+            v = str(uc)
         self.validate(v)
         return v
 
@@ -173,7 +218,7 @@ class Float(Orderable, Field):
     def __init__(self, *args, **kw):
         super(Float, self).__init__(*args, **kw)
 
-    def fromUnicode(self, u):
+    def fromUnicode(self, uc):
         """
         >>> f = Float()
         >>> f.fromUnicode("1.25")
@@ -183,7 +228,7 @@ class Float(Orderable, Field):
         ...
         ValueError: invalid literal for float(): 1.25.6
         """
-        v = float(u)
+        v = float(uc)
         self.validate(v)
         return v
 
@@ -196,7 +241,7 @@ class Decimal(Orderable, Field):
     def __init__(self, *args, **kw):
         super(Decimal, self).__init__(*args, **kw)
 
-    def fromUnicode(self, u):
+    def fromUnicode(self, uc):
         """
         >>> f = Decimal()
         >>> import decimal
@@ -210,9 +255,9 @@ class Decimal(Orderable, Field):
         ValueError: invalid literal for Decimal(): 1.25.6
         """
         try:
-            v = decimal.Decimal(u)
+            v = decimal.Decimal(uc)
         except decimal.InvalidOperation:
-            raise ValueError('invalid literal for Decimal(): %s' % u)
+            raise ValueError('invalid literal for Decimal(): %s' % uc)
         self.validate(v)
         return v
 
@@ -360,19 +405,19 @@ def _validate_sequence(value_type, value, errors=None):
 
     To illustrate, we'll use a text value type. All values must be unicode.
 
-            >>> field = TextLine(required=True)
+       >>> field = TextLine(required=True)
 
-        To validate a sequence of various values:
+    To validate a sequence of various values:
 
-            >>> errors = _validate_sequence(field, (b('foo'), u('bar'), 1))
-            >>> errors
-            [WrongType(b'foo', <type 'unicode'>, ''), WrongType(1, <type 'unicode'>, '')]
+       >>> errors = _validate_sequence(field, (b('foo'), u('bar'), 1))
+       >>> errors
+       [WrongType(b'foo', <type 'unicode'>, ''), WrongType(1, <type 'unicode'>, '')]
 
-        The only valid value in the sequence is the second item. The others
-        generated errors.
+    The only valid value in the sequence is the second item. The others
+    generated errors.
 
-        We can use the optional errors argument to collect additional errors
-        for a new sequence:
+    We can use the optional errors argument to collect additional errors
+    for a new sequence:
 
         >>> errors = _validate_sequence(field, (2, u('baz')), errors)
         >>> errors

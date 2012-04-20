@@ -17,9 +17,7 @@ __docformat__ = "reStructuredText"
 
 from zope.interface import Interface, Attribute
 from zope.interface.common.mapping import IEnumerableMapping
-from six import u, PY3
 
-from zope.schema._messageid import _
 
 # Import from _bootstrapinterfaces only because other packages will expect
 # to find these interfaces here.
@@ -44,6 +42,10 @@ from zope.schema._bootstrapinterfaces import TooLong
 from zope.schema._bootstrapinterfaces import TooShort
 from zope.schema._bootstrapinterfaces import InvalidValue
 from zope.schema._bootstrapinterfaces import IContextAwareDefaultFactory
+
+from zope.schema._compat import PY3
+from zope.schema._compat import u
+from zope.schema._messageid import _
 
 
 class WrongContainedType(ValidationError):

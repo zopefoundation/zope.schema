@@ -26,7 +26,7 @@ uniqueness. In a schema, this might be written as follows:
 
   >>> from zope.interface import Interface
   >>> from zope.schema import List, Float
-  >>> from six import u
+  >>> from zope.schema._compat import u
   >>> class IInventoryItem(Interface):
   ...     pricePoints = List(
   ...         title=u("Price Points"),

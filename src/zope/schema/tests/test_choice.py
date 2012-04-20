@@ -41,7 +41,7 @@ class Value_ChoiceFieldTests(_Base):
         self.assertRaises(ConstraintNotSatisfied, choice.validate, 4)
 
     def test_validate_string(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import ConstraintNotSatisfied
         choice = self._makeOne(values=['a', 'c'])
         choice.validate('a')

@@ -51,7 +51,7 @@ class DottedNameTest(unittest.TestCase, FieldTestBase):
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def testFromUnicode(self):
-        from six import u
+        from zope.schema._compat import u
         field = self._makeOne()
         self.assertEquals(field.fromUnicode(u('foo')), 'foo')
 

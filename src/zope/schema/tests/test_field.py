@@ -25,7 +25,7 @@ class FieldTestBase(object):
         return self._getTargetClass()(*args, **kw)
 
     def test_bind(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.interface import Interface
         field = self._makeOne(
             __name__ = 'x',
@@ -49,7 +49,7 @@ class FieldTestBase(object):
             self.assertEqual(getattr(field2, n), getattr(field, n), n)
 
     def testValidate(self):
-        from six import u
+        from zope.schema._compat import u
         field = self._makeOne(
             title=u('Not required field'), description=u(''),
             readonly=False, required=False)
@@ -60,7 +60,7 @@ class FieldTestBase(object):
         field.validate('')
 
     def testValidateRequired(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import RequiredMissing
         field = self._makeOne(
             title=u('Required field'), description=u(''),
@@ -75,7 +75,7 @@ class FieldTestBase(object):
 class CollectionFieldTestBase(FieldTestBase):
 
     def test_bind_binds_value_type(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema import Int
         field = self._makeOne(
             __name__ = 'x',
@@ -100,7 +100,7 @@ class FieldTest(unittest.TestCase, FieldTestBase):
         return Field
 
     def test__doc__(self):
-        from six import u
+        from zope.schema._compat import u
         field = self._makeOne(title=u("test fiield"),
                      description=(
                          u("To make sure that\n"
@@ -131,7 +131,7 @@ class FieldTest(unittest.TestCase, FieldTestBase):
         self.assertTrue(S2['a'].order > S2['b'].order)
 
     def testConstraint(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema import Int
         from zope.schema.interfaces import ConstraintNotSatisfied
         def isodd(x):
@@ -180,7 +180,7 @@ class FieldTest(unittest.TestCase, FieldTestBase):
 class FieldDefaultBehaviour(unittest.TestCase):
     def test_required_defaults_to_true(self):
         from zope.schema import Field
-        from six import u
+        from zope.schema._compat import u
         class MyField(Field):
             pass
         field = MyField(title=u('my'))

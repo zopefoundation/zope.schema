@@ -26,7 +26,7 @@ class IntTest(unittest.TestCase, FieldTestBase):
         return Int
 
     def testValidate(self):
-        from six import u
+        from zope.schema._compat import u
         field = self._makeOne(title=u('Int field'), description=u(''),
                                     readonly=False, required=False)
         field.validate(None)
@@ -35,7 +35,7 @@ class IntTest(unittest.TestCase, FieldTestBase):
         field.validate(-1)
 
     def testValidateRequired(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import RequiredMissing
         field = self._makeOne(title=u('Int field'), description=u(''),
                                     readonly=False, required=True)
@@ -46,7 +46,7 @@ class IntTest(unittest.TestCase, FieldTestBase):
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def testValidateMin(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooSmall
         field = self._makeOne(title=u('Int field'), description=u(''),
                                     readonly=False, required=False, min=10)
@@ -58,7 +58,7 @@ class IntTest(unittest.TestCase, FieldTestBase):
         self.assertRaises(TooSmall, field.validate, -10)
 
     def testValidateMax(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooBig
         field = self._makeOne(title=u('Int field'), description=u(''),
                                     readonly=False, required=False, max=10)
@@ -71,7 +71,7 @@ class IntTest(unittest.TestCase, FieldTestBase):
         self.assertRaises(TooBig, field.validate, 20)
 
     def testValidateMinAndMax(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooBig
         from zope.schema.interfaces import TooSmall
         field = self._makeOne(title=u('Int field'), description=u(''),

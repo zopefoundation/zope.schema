@@ -19,7 +19,7 @@ import unittest
 class Test(unittest.TestCase):
 
     def test(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.interface import Interface
         from zope.interface import implementer
         from zope.interface.interfaces import IMethod
@@ -90,7 +90,7 @@ class Test(unittest.TestCase):
         self.assertEqual(instance.set, 1)
 
     def test_doc(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.interface import Interface
         from zope.interface.document import asStructuredText
         from zope.schema import Text

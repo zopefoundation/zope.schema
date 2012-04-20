@@ -26,7 +26,7 @@ class SetTest(unittest.TestCase, CollectionFieldTestBase):
         return Set
 
     def testValidate(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import WrongType
         field = self._makeOne(title=u('Set field'), description=u(''),
                     readonly=False, required=False)
@@ -46,7 +46,7 @@ class SetTest(unittest.TestCase, CollectionFieldTestBase):
         self.assertRaises(WrongType, field.validate, frozenset((1, 2, 3)))
 
     def testValidateRequired(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import RequiredMissing
         field = self._makeOne(title=u('Set field'), description=u(''),
                     readonly=False, required=True)
@@ -78,7 +78,7 @@ class SetTest(unittest.TestCase, CollectionFieldTestBase):
         field.default = missing
 
     def testValidateMinValues(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooShort
         field = self._makeOne(title=u('Set field'), description=u(''),
                     readonly=False, required=False, min_length=2)
@@ -94,7 +94,7 @@ class SetTest(unittest.TestCase, CollectionFieldTestBase):
         self.assertRaises(TooShort, field.validate, set((3,)))
 
     def testValidateMaxValues(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooLong
         field = self._makeOne(title=u('Set field'), description=u(''),
                     readonly=False, required=False, max_length=2)
@@ -110,7 +110,7 @@ class SetTest(unittest.TestCase, CollectionFieldTestBase):
         self.assertRaises(TooLong, field.validate, set((1, 2, 3)))
 
     def testValidateMinValuesAndMaxValues(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooLong
         from zope.schema.interfaces import TooShort
         field = self._makeOne(title=u('Set field'), description=u(''),
@@ -128,7 +128,7 @@ class SetTest(unittest.TestCase, CollectionFieldTestBase):
         self.assertRaises(TooLong, field.validate, set((1, 2, 3)))
 
     def testValidateValueTypes(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema import Int
         from zope.schema.interfaces import WrongContainedType
         field = self._makeOne(title=u('Set field'), description=u(''),
@@ -191,7 +191,7 @@ class FrozenSetTest(unittest.TestCase, CollectionFieldTestBase):
         return FrozenSet
 
     def testValidate(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import WrongType
         field = self._makeOne(title=u('Set field'), description=u(''),
                     readonly=False, required=False)
@@ -209,7 +209,7 @@ class FrozenSetTest(unittest.TestCase, CollectionFieldTestBase):
         self.assertRaises(WrongType, field.validate, set((1, 2, 3)))
 
     def testValidateRequired(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import RequiredMissing
         field = self._makeOne(title=u('Set field'), description=u(''),
                     readonly=False, required=True)
@@ -237,7 +237,7 @@ class FrozenSetTest(unittest.TestCase, CollectionFieldTestBase):
         field.default = missing
 
     def testValidateMinValues(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooShort
         field = self._makeOne(title=u('FrozenSet field'), description=u(''),
                     readonly=False, required=False, min_length=2)
@@ -249,7 +249,7 @@ class FrozenSetTest(unittest.TestCase, CollectionFieldTestBase):
         self.assertRaises(TooShort, field.validate, frozenset((3,)))
 
     def testValidateMaxValues(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooLong
         field = self._makeOne(title=u('FrozenSet field'), description=u(''),
                           readonly=False, required=False, max_length=2)
@@ -261,7 +261,7 @@ class FrozenSetTest(unittest.TestCase, CollectionFieldTestBase):
         self.assertRaises(TooLong, field.validate, frozenset((1, 2, 3)))
 
     def testValidateMinValuesAndMaxValues(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooLong
         from zope.schema.interfaces import TooShort
         field = self._makeOne(title=u('FrozenSet field'), description=u(''),
@@ -275,7 +275,7 @@ class FrozenSetTest(unittest.TestCase, CollectionFieldTestBase):
         self.assertRaises(TooLong, field.validate, frozenset((1, 2, 3)))
 
     def testValidateValueTypes(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema import Int
         from zope.schema.interfaces import WrongContainedType
         field = self._makeOne(title=u('FrozenSet field'), description=u(''),

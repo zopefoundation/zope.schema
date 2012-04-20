@@ -26,7 +26,7 @@ class ListTest(unittest.TestCase, CollectionFieldTestBase):
         return List
 
     def testValidate(self):
-        from six import u
+        from zope.schema._compat import u
         field = self._makeOne(title=u('List field'), description=u(''),
                      readonly=False, required=False)
         field.validate(None)
@@ -35,7 +35,7 @@ class ListTest(unittest.TestCase, CollectionFieldTestBase):
         field.validate([3,])
 
     def testValidateRequired(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import RequiredMissing
         field = self._makeOne(title=u('List field'), description=u(''),
                      readonly=False, required=True)
@@ -46,7 +46,7 @@ class ListTest(unittest.TestCase, CollectionFieldTestBase):
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def testValidateMinValues(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooShort
         field = self._makeOne(title=u('List field'), description=u(''),
                      readonly=False, required=False, min_length=2)
@@ -58,7 +58,7 @@ class ListTest(unittest.TestCase, CollectionFieldTestBase):
         self.assertRaises(TooShort, field.validate, [1,])
 
     def testValidateMaxValues(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooLong
         field = self._makeOne(title=u('List field'), description=u(''),
                      readonly=False, required=False, max_length=2)
@@ -70,7 +70,7 @@ class ListTest(unittest.TestCase, CollectionFieldTestBase):
         self.assertRaises(TooLong, field.validate, [1, 2, 3])
 
     def testValidateMinValuesAndMaxValues(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooLong
         from zope.schema.interfaces import TooShort
         field = self._makeOne(title=u('List field'), description=u(''),
@@ -84,7 +84,7 @@ class ListTest(unittest.TestCase, CollectionFieldTestBase):
         self.assertRaises(TooLong, field.validate, [1, 2, 3])
 
     def testValidateValueTypes(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema import Int
         from zope.schema.interfaces import WrongContainedType
         field = self._makeOne(title=u('List field'), description=u(''),
@@ -116,7 +116,7 @@ class ListTest(unittest.TestCase, CollectionFieldTestBase):
         self._makeOne(value_type=FakeField())
 
     def testUnique(self):
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import NotUnique
         field = self._makeOne(title=u('test field'), description=u(''),
                                     readonly=False, required=True, unique=True)

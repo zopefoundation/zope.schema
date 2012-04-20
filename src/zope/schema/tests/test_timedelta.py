@@ -32,7 +32,7 @@ class TimedeltaTest(unittest.TestCase, FieldTestBase):
 
     def testValidate(self):
         from datetime import timedelta
-        from six import u
+        from zope.schema._compat import u
         field = self._makeOne(title=u('Timedelta field'),
                                     description=u(''),
                                     readonly=False, required=False)
@@ -41,7 +41,7 @@ class TimedeltaTest(unittest.TestCase, FieldTestBase):
 
     def testValidateRequired(self):
         from datetime import timedelta
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import RequiredMissing
         field = self._makeOne(title=u('Timedelta field'), description=u(''),
                                     readonly=False, required=True)
@@ -51,7 +51,7 @@ class TimedeltaTest(unittest.TestCase, FieldTestBase):
 
     def testValidateMin(self):
         from datetime import timedelta
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooSmall
         t1 = timedelta(hours=2)
         t2 = timedelta(hours=3)
@@ -66,7 +66,7 @@ class TimedeltaTest(unittest.TestCase, FieldTestBase):
 
     def testValidateMax(self):
         from datetime import timedelta
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooBig
         t1 = timedelta(minutes=1)
         t2 = timedelta(minutes=2)
@@ -82,7 +82,7 @@ class TimedeltaTest(unittest.TestCase, FieldTestBase):
 
     def testValidateMinAndMax(self):
         from datetime import timedelta
-        from six import u
+        from zope.schema._compat import u
         from zope.schema.interfaces import TooBig
         from zope.schema.interfaces import TooSmall
         t1 = timedelta(days=1)
