@@ -5,6 +5,8 @@ CHANGES
 4.2.0 (unreleased)
 ------------------
 
+- Doctests moved from the package and wired up as normal Sphinx documentation.
+
 - Added explicit support for PyPy.
 
 - Added support for continuous integration using ``tox`` and ``jenkins``.
