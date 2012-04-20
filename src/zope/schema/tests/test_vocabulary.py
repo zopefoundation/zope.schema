@@ -273,76 +273,73 @@ class TreeVocabularyTests(unittest.TestCase):
         # term_by_value, term_by_value and path_by_value.
         tv2 = self.tree_vocab_2()
         self.assertEqual(
-            [k for k in tv2.term_by_value.keys()], 
-            ['Tyrol', 'Bavaria', 'Regions',
-             'Austria', 'Germany', 'Ausserfern'])
+            [k for k in sorted(tv2.term_by_value.keys())], 
+            ['Ausserfern','Austria','Bavaria','Germany','Regions','Tyrol'])
 
         self.assertEqual(
-            [k for k in tv2.term_by_token.keys()],
-            ['bav', 'ger', 'auss', 'regions', 'aut', 'tyr'])
+            [k for k in sorted(tv2.term_by_token.keys())],
+            ['auss', 'aut', 'bav', 'ger', 'regions', 'tyr'])
 
         self.assertEqual(
-            [k for k in tv2.path_by_value.keys()], 
-            ['Tyrol', 'Bavaria', 'Regions',
-             'Austria', 'Germany', 'Ausserfern'])
+            [k for k in sorted(tv2.path_by_value.keys())], 
+            ['Ausserfern','Austria','Bavaria','Germany','Regions','Tyrol'])
 
         self.assertEqual(
-            [k for k in tv2.path_by_value.values()], 
-            [
-                ['Regions', 'Austria', 'Tyrol'], 
-                ['Regions', 'Germany', 'Bavaria'], 
-                ['Regions'], 
-                ['Regions', 'Austria'], 
-                ['Regions', 'Germany'], 
-                ['Regions', 'Austria', 'Tyrol', 'Ausserfern']
+            [k for k in sorted(tv2.path_by_value.values())], 
+            [['Regions'], 
+             ['Regions', 'Austria'], 
+             ['Regions', 'Austria', 'Tyrol'], 
+             ['Regions', 'Austria', 'Tyrol', 'Ausserfern'],
+             ['Regions', 'Germany'], 
+             ['Regions', 'Germany', 'Bavaria'], 
             ])
 
         self.assertEqual(
-            [k for k in self.tree_vocab_3().term_by_value.keys()], 
-            [   'data_transaction', 
-                'check_in', 
-                'infrastructure', 
-                'res_gui', 
-                'database', 
-                'reservations', 
-                'dcs_host', 
-                'communication_network', 
-                'res_host', 
-                'services', 
-                'messaging', 
-                'security'
+            [k for k in sorted(self.tree_vocab_3().term_by_value.keys())], 
+            ['check_in', 
+             'communication_network', 
+             'data_transaction', 
+             'database', 
+             'dcs_host', 
+             'infrastructure', 
+             'messaging', 
+             'res_gui', 
+             'res_host', 
+             'reservations', 
+             'security',
+             'services', 
             ])
 
         self.assertEqual(
-            [k for k in self.tree_vocab_3().term_by_token.keys()],
-            [   'data_transaction', 
-                'check_in', 
-                'infrastructure', 
-                'res_gui', 
-                'database', 
-                'reservations', 
-                'dcs_host', 
-                'communication_network', 
-                'res_host', 
-                'services', 
-                'messaging', 
-                'security'
+            [k for k in sorted(self.tree_vocab_3().term_by_token.keys())],
+            ['check_in', 
+             'communication_network', 
+             'data_transaction', 
+             'database', 
+             'dcs_host', 
+             'infrastructure', 
+             'messaging', 
+             'res_gui', 
+             'res_host', 
+             'reservations', 
+             'security',
+             'services', 
             ])
 
         self.assertEqual(
-            [k for k in self.tree_vocab_3().path_by_value.values()], 
-            [   ['infrastructure', 'data_transaction'], 
-                ['services', 'check_in'],
-                ['infrastructure'], 
-                ['services', 'reservations', 'res_gui'],
-                ['infrastructure', 'data_transaction', 'database'], 
-                ['services', 'reservations'], 
-                ['services', 'check_in', 'dcs_host'],
-                ['infrastructure', 'communication_network'], 
-                ['services', 'reservations', 'res_host'], 
-                ['services'], 
-                ['infrastructure', 'communication_network', 'messaging'], 
-                ['infrastructure', 'security']
+            [k for k in sorted(self.tree_vocab_3().path_by_value.values())], 
+            [['infrastructure'], 
+             ['infrastructure', 'communication_network'], 
+             ['infrastructure', 'communication_network', 'messaging'], 
+             ['infrastructure', 'data_transaction'], 
+             ['infrastructure', 'data_transaction', 'database'], 
+             ['infrastructure', 'security'],
+             ['services'], 
+             ['services', 'check_in'],
+             ['services', 'check_in', 'dcs_host'],
+             ['services', 'reservations'], 
+             ['services', 'reservations', 'res_gui'],
+             ['services', 'reservations', 'res_host'], 
             ])
 
     def test_termpath(self):
