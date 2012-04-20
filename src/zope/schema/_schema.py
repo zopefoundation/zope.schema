@@ -50,7 +50,6 @@ def getFieldNamesInOrder(schema):
 
 def getValidationErrors(schema, object):
     """Return a list of all validation errors.
-
     """
     errors = getSchemaValidationErrors(schema, object)
     if errors:
