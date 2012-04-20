@@ -5,6 +5,8 @@ CHANGES
 4.1.2 (unreleased)
 ------------------
 
+- Tests now pass when run under ``nose``.
+
 - Added ``setup.py dev`` alias (runs ``setup.py develop`` plus installs
   ``nose`` and ``coverage``).
 
