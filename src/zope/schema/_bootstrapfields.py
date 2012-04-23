@@ -15,8 +15,6 @@
 """
 __docformat__ = 'restructuredtext'
 
-import sys
-
 from zope.interface import Attribute
 from zope.interface import providedBy
 from zope.interface import implementer
@@ -24,7 +22,6 @@ from zope.interface import implementer
 from zope.schema._bootstrapinterfaces import ConstraintNotSatisfied
 from zope.schema._bootstrapinterfaces import IContextAwareDefaultFactory
 from zope.schema._bootstrapinterfaces import IFromUnicode
-from zope.schema._bootstrapinterfaces import InvalidValue
 from zope.schema._bootstrapinterfaces import NotAContainer
 from zope.schema._bootstrapinterfaces import NotAnIterator
 from zope.schema._bootstrapinterfaces import RequiredMissing
