@@ -193,9 +193,9 @@ class BytesLine(Bytes):
         return b('\n') not in value
 
 # for things which are of the str type on both Python 2 and 3
-if PY3:
+if PY3: #pragma NO COVER
     _StrLine = TextLine
-else:
+else: #pragma NO COVER
     _StrLine = BytesLine
 
 @implementer(IASCIILine)

@@ -60,9 +60,31 @@ class ASCIITests(unittest.TestCase):
             asc._validate(chr(i)) #doesn't raise
 
 
+class BytesLineTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._field import BytesLine
+        return BytesLine
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test_constraint_miss(self):
+        from zope.schema._compat import b
+        bl = self._makeOne()
+        self.assertEqual(bl.constraint(b('one line\nthen another')), False)
+
+    def test_constraint_hit(self):
+        from zope.schema._compat import b
+        bl = self._makeOne()
+        self.assertEqual(bl.constraint(b('')), True)
+        self.assertEqual(bl.constraint(b('one line')), True)
+
+
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite(BytesTests),
         unittest.makeSuite(ASCIITests),
+        unittest.makeSuite(BytesLineTests),
     ))
 
