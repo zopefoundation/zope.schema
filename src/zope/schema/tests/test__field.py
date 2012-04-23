@@ -153,6 +153,31 @@ class DateTests(unittest.TestCase):
         self.assertRaises(WrongType, asc._validate, datetime.now())
 
 
+class ChoiceTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._field import Choice
+        return Choice
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test_fromUnicode_miss(self):
+        from zope.schema.interfaces import ConstraintNotSatisfied
+        from zope.schema._compat import u
+        flt = self._makeOne(values=(u('foo'), u('bar'), u('baz')))
+        self.assertRaises(ConstraintNotSatisfied, flt.fromUnicode, u(''))
+        self.assertRaises(ConstraintNotSatisfied, flt.fromUnicode, u('abc'))
+        self.assertRaises(ConstraintNotSatisfied, flt.fromUnicode, u('1.4G'))
+
+    def test_fromUnicode_hit(self):
+        from zope.schema._compat import u
+        flt = self._makeOne(values=(u('foo'), u('bar'), u('baz')))
+        self.assertEqual(flt.fromUnicode(u('foo')), u('foo'))
+        self.assertEqual(flt.fromUnicode(u('bar')), u('bar'))
+        self.assertEqual(flt.fromUnicode(u('baz')), u('baz'))
+
+
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite(BytesTests),
@@ -162,5 +187,6 @@ def test_suite():
         unittest.makeSuite(FloatTests),
         unittest.makeSuite(DecimalTests),
         unittest.makeSuite(DateTests),
+        unittest.makeSuite(ChoiceTests),
     ))
 
