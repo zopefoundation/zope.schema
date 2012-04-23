@@ -487,6 +487,46 @@ class TextTests(unittest.TestCase):
         self.assertEqual(txt.fromUnicode(deadbeef), deadbeef)
 
 
+class BoolTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._bootstrapfields import Bool
+        return Bool
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test_ctor_defaults(self):
+        txt = self._makeOne()
+        self.assertEqual(txt._type, bool)
+
+    def test__validate_w_int(self):
+        boo = self._makeOne()
+        boo._validate(0) #doesn't raise
+        boo._validate(1) #doesn't raise
+
+    def test_set_w_int(self):
+        boo = self._makeOne(__name__='boo')
+        inst = DummyInst()
+        boo.set(inst, 0)
+        self.assertEqual(inst.boo, False)
+        boo.set(inst, 1)
+        self.assertEqual(inst.boo, True)
+
+    def test_fromUnicode_miss(self):
+        txt = self._makeOne()
+        self.assertEqual(txt.fromUnicode(''), False)
+        self.assertEqual(txt.fromUnicode('0'), False)
+        self.assertEqual(txt.fromUnicode('1'), False)
+        self.assertEqual(txt.fromUnicode('False'), False)
+        self.assertEqual(txt.fromUnicode('false'), False)
+
+    def test_fromUnicode_hit(self):
+        txt = self._makeOne()
+        self.assertEqual(txt.fromUnicode('True'), True)
+        self.assertEqual(txt.fromUnicode('true'), True)
+
+
 class DummyInst(object):
     missing_value = object()
 
@@ -508,4 +548,5 @@ def test_suite():
         unittest.makeSuite(OrderableTests),
         unittest.makeSuite(MinMaxLenTests),
         unittest.makeSuite(TextTests),
+        unittest.makeSuite(BoolTests),
     ))
