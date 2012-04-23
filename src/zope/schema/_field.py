@@ -346,13 +346,12 @@ class Choice(Field):
         # get registered vocabulary if needed:
         if IContextSourceBinder.providedBy(self.vocabulary):
             clone.vocabulary = self.vocabulary(object)
-            if not ISource.providedBy(clone.vocabulary):
-                raise ValueError('Invalid clone vocabulary')
         elif clone.vocabulary is None and self.vocabularyName is not None:
             vr = getVocabularyRegistry()
             clone.vocabulary = vr.get(object, self.vocabularyName)
-            if not ISource.providedBy(clone.vocabulary):
-                raise ValueError('Invalid clone vocabulary')
+
+        if not ISource.providedBy(clone.vocabulary):
+            raise ValueError('Invalid clone vocabulary')
 
         return clone
 
