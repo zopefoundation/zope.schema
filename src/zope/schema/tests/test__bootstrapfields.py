@@ -539,8 +539,9 @@ class IntTests(unittest.TestCase):
         return self._getTargetClass()(*args, **kw)
 
     def test_ctor_defaults(self):
+        from zope.schema._compat import integer_types
         txt = self._makeOne()
-        self.assertEqual(txt._type, int)
+        self.assertEqual(txt._type, integer_types)
 
     def test_fromUnicode_miss(self):
         from zope.schema._compat import u
