@@ -143,10 +143,7 @@ class Bytes(MinMaxLen, Field):
         ConstraintNotSatisfied:  foo y.z bat
 
         """
-        if PY3:
-            v = b(uc)
-        else:
-            v = str(uc)
+        v = binary_type(uc)
         self.validate(v)
         return v
 
