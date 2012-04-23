@@ -459,6 +459,34 @@ class MinMaxLenTests(unittest.TestCase):
         self.assertRaises(TooLong, mml._validate, (0, 1, 2))
 
 
+class TextTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._bootstrapfields import Text
+        return Text
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test_ctor_defaults(self):
+        from zope.schema._compat import text_type
+        txt = self._makeOne()
+        self.assertEqual(txt._type, text_type)
+
+    def test_fromUnicode_miss(self):
+        from zope.schema._bootstrapinterfaces import WrongType
+        from zope.schema._compat import binary_type
+        deadbeef = binary_type('DEADBEEF')
+        txt = self._makeOne()
+        self.assertRaises(WrongType, txt.fromUnicode, deadbeef)
+
+    def test_fromUnicode_hit(self):
+        from zope.schema._compat import text_type
+        deadbeef = text_type('DEADBEEF')
+        txt = self._makeOne()
+        self.assertEqual(txt.fromUnicode(deadbeef), deadbeef)
+
+
 class DummyInst(object):
     missing_value = object()
 
@@ -479,4 +507,5 @@ def test_suite():
         unittest.makeSuite(IterableTests),
         unittest.makeSuite(OrderableTests),
         unittest.makeSuite(MinMaxLenTests),
+        unittest.makeSuite(TextTests),
     ))
