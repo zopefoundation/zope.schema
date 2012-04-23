@@ -294,17 +294,20 @@ class FieldTests(unittest.TestCase):
         class Derived(self._getTargetClass()):
             pass
         right = Derived()
-        self.assertNotEqual(left, right)
+        self.assertEqual(left == right, False)
+        self.assertEqual(left != right, True)
 
     def test___eq___same_type_different_attrs(self):
         left = self._makeOne(required=True)
         right = self._makeOne(required=False)
-        self.assertNotEqual(left, right)
+        self.assertEqual(left == right, False)
+        self.assertEqual(left != right, True)
 
     def test___eq___same_type_same_attrs(self):
         left = self._makeOne()
         right = self._makeOne()
-        self.assertEqual(left, right)
+        self.assertEqual(left == right, True)
+        self.assertEqual(left != right, False)
 
     def test_get_miss(self):
         field = self._makeOne(__name__='nonesuch')
@@ -346,6 +349,116 @@ class FieldTests(unittest.TestCase):
         self.assertEqual(inst.extant, 'AFTER')
 
 
+class ContainerTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._bootstrapfields import Container
+        return Container
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test__validate_not_collection_not_iterable(self):
+        from zope.schema._bootstrapinterfaces import NotAContainer
+        cont = self._makeOne()
+        self.assertRaises(NotAContainer, cont._validate, object())
+
+    def test__validate_collection_but_not_iterable(self):
+        cont = self._makeOne()
+        class Dummy(object):
+            def __contains__(self, item):
+                return False
+        cont._validate(Dummy()) #doesn't raise
+
+    def test__validate_not_collection_but_iterable(self):
+        cont = self._makeOne()
+        class Dummy(object):
+            def __iter__(self):
+                return iter(())
+        cont._validate(Dummy()) #doesn't raise
+
+    def test__validate_w_collections(self):
+        cont = self._makeOne()
+        cont._validate(()) #doesn't raise
+        cont._validate([]) #doesn't raise
+        cont._validate('') #doesn't raise
+        cont._validate({}) #doesn't raise
+
+
+class IterableTests(ContainerTests):
+
+    def _getTargetClass(self):
+        from zope.schema._bootstrapfields import Iterable
+        return Iterable
+
+    def test__validate_collection_but_not_iterable(self):
+        from zope.schema._bootstrapinterfaces import NotAnIterator
+        itr = self._makeOne()
+        class Dummy(object):
+            def __contains__(self, item):
+                return False
+        self.assertRaises(NotAnIterator, itr._validate, Dummy())
+
+
+class OrderableTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._bootstrapfields import Orderable
+        return Orderable
+
+    def _makeOne(self, *args, **kw):
+        # Orderable is a mixin for a type derived from Field
+        from zope.schema._bootstrapfields import Field
+        class Mixed(self._getTargetClass(), Field):
+            pass
+        return Mixed(*args, **kw)
+
+    def test_ctor_defaults(self):
+        ordb = self._makeOne()
+        self.assertEqual(ordb.min, None)
+        self.assertEqual(ordb.max, None)
+        self.assertEqual(ordb.default, None)
+
+    def test_ctor_default_too_small(self):
+        # This test exercises _validate, too
+        from zope.schema._bootstrapinterfaces import TooSmall
+        self.assertRaises(TooSmall, self._makeOne, min=0, default=-1)
+
+    def test_ctor_default_too_large(self):
+        # This test exercises _validate, too
+        from zope.schema._bootstrapinterfaces import TooBig
+        self.assertRaises(TooBig, self._makeOne, max=10, default=11)
+
+
+class MinMaxLenTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._bootstrapfields import MinMaxLen
+        return MinMaxLen
+
+    def _makeOne(self, *args, **kw):
+        # MinMaxLen is a mixin for a type derived from Field
+        from zope.schema._bootstrapfields import Field
+        class Mixed(self._getTargetClass(), Field):
+            pass
+        return Mixed(*args, **kw)
+
+    def test_ctor_defaults(self):
+        mml = self._makeOne()
+        self.assertEqual(mml.min_length, 0)
+        self.assertEqual(mml.max_length, None)
+
+    def test_validate_too_short(self):
+        from zope.schema._bootstrapinterfaces import TooShort
+        mml = self._makeOne(min_length=1)
+        self.assertRaises(TooShort, mml._validate, ())
+
+    def test_validate_too_long(self):
+        from zope.schema._bootstrapinterfaces import TooLong
+        mml = self._makeOne(max_length=2)
+        self.assertRaises(TooLong, mml._validate, (0, 1, 2))
+
+
 class DummyInst(object):
     missing_value = object()
 
@@ -362,4 +475,8 @@ def test_suite():
         unittest.makeSuite(ValidatedPropertyTests),
         unittest.makeSuite(DefaultPropertyTests),
         unittest.makeSuite(FieldTests),
+        unittest.makeSuite(ContainerTests),
+        unittest.makeSuite(IterableTests),
+        unittest.makeSuite(OrderableTests),
+        unittest.makeSuite(MinMaxLenTests),
     ))
