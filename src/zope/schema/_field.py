@@ -300,16 +300,21 @@ class Choice(Field):
     def __init__(self, values=None, vocabulary=None, source=None, **kw):
         """Initialize object."""
         if vocabulary is not None:
-            assert (isinstance(vocabulary, string_types)
-                    or IBaseVocabulary.providedBy(vocabulary))
-            assert source is None, (
-                "You cannot specify both source and vocabulary.")
+            if (not isinstance(vocabulary, string_types)
+                    and not IBaseVocabulary.providedBy(vocabulary)):
+                raise ValueError('vocabulary must be a string or implement '
+                                 'IBaseVocabulary')
+            if source is not None:
+                raise ValueError(
+                    "You cannot specify both source and vocabulary.")
         elif source is not None:
             vocabulary = source
 
-        assert not (values is None and vocabulary is None), (
+        if (values is None and vocabulary is None):
+            raise ValueError(
                "You must specify either values or vocabulary.")
-        assert values is None or vocabulary is None, (
+        if values is not None and vocabulary is not None:
+            raise ValueError(
                "You cannot specify both values and vocabulary.")
 
         self.vocabulary = None
@@ -319,8 +324,9 @@ class Choice(Field):
         elif isinstance(vocabulary, string_types):
             self.vocabularyName = vocabulary
         else:
-            assert (ISource.providedBy(vocabulary) or
-                    IContextSourceBinder.providedBy(vocabulary))
+            if (not ISource.providedBy(vocabulary) and
+                not IContextSourceBinder.providedBy(vocabulary)):
+                raise ValueError('Invalid vocabulary')
             self.vocabulary = vocabulary
         # Before a default value is checked, it is validated. However, a
         # named vocabulary is usually not complete when these fields are
@@ -340,11 +346,13 @@ class Choice(Field):
         # get registered vocabulary if needed:
         if IContextSourceBinder.providedBy(self.vocabulary):
             clone.vocabulary = self.vocabulary(object)
-            assert ISource.providedBy(clone.vocabulary)
+            if not ISource.providedBy(clone.vocabulary):
+                raise ValueError('Invalid clone vocabulary')
         elif clone.vocabulary is None and self.vocabularyName is not None:
             vr = getVocabularyRegistry()
             clone.vocabulary = vr.get(object, self.vocabularyName)
-            assert ISource.providedBy(clone.vocabulary)
+            if not ISource.providedBy(clone.vocabulary):
+                raise ValueError('Invalid clone vocabulary')
 
         return clone
 
