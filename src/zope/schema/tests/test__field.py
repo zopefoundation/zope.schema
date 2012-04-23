@@ -36,8 +36,33 @@ class BytesTests(unittest.TestCase):
         self.assertEqual(byt.fromUnicode(u('DEADBEEF')), b('DEADBEEF'))
 
 
+class ASCIITests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._field import ASCII
+        return ASCII
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test__validate_empty(self):
+        asc = self._makeOne()
+        asc._validate('') # no error
+
+    def test__validate_non_empty_miss(self):
+        from zope.schema.interfaces import InvalidValue
+        asc = self._makeOne()
+        self.assertRaises(InvalidValue, asc._validate, chr(129))
+
+    def test__validate_non_empty_hit(self):
+        asc = self._makeOne()
+        for i in range(128):
+            asc._validate(chr(i)) #doesn't raise
+
+
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite(BytesTests),
+        unittest.makeSuite(ASCIITests),
     ))
 

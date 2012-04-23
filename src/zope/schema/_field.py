@@ -148,9 +148,9 @@ class Bytes(MinMaxLen, Field):
         return v
 
 # for things which are of the str type on both Python 2 and 3
-if PY3:
+if PY3: #pragma NO COVER
     _Str = Text
-else:
+else: #pragma NO COVER
     _Str = Bytes
 
 @implementer(IASCII)
