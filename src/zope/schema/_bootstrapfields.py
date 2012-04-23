@@ -239,6 +239,9 @@ class Container(Field):
                 raise NotAContainer(value)
 
 
+# XXX This class violates the Liskov Substituability Principle:  it
+#     is derived from Container, but cannot be used everywhere an instance
+#     of Container could be, because it's '_validate' is more restrictive.
 class Iterable(Container):
 
     def _validate(self, value):
