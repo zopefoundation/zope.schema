@@ -475,14 +475,14 @@ class TextTests(unittest.TestCase):
 
     def test_fromUnicode_miss(self):
         from zope.schema._bootstrapinterfaces import WrongType
-        from zope.schema._compat import binary_type
-        deadbeef = binary_type('DEADBEEF')
+        from zope.schema._compat import b
+        deadbeef = b('DEADBEEF')
         txt = self._makeOne()
         self.assertRaises(WrongType, txt.fromUnicode, deadbeef)
 
     def test_fromUnicode_hit(self):
-        from zope.schema._compat import text_type
-        deadbeef = text_type('DEADBEEF')
+        from zope.schema._compat import u
+        deadbeef = u('DEADBEEF')
         txt = self._makeOne()
         self.assertEqual(txt.fromUnicode(deadbeef), deadbeef)
 
@@ -514,17 +514,47 @@ class BoolTests(unittest.TestCase):
         self.assertEqual(inst.boo, True)
 
     def test_fromUnicode_miss(self):
+        from zope.schema._compat import u
         txt = self._makeOne()
-        self.assertEqual(txt.fromUnicode(''), False)
-        self.assertEqual(txt.fromUnicode('0'), False)
-        self.assertEqual(txt.fromUnicode('1'), False)
-        self.assertEqual(txt.fromUnicode('False'), False)
-        self.assertEqual(txt.fromUnicode('false'), False)
+        self.assertEqual(txt.fromUnicode(u('')), False)
+        self.assertEqual(txt.fromUnicode(u('0')), False)
+        self.assertEqual(txt.fromUnicode(u('1')), False)
+        self.assertEqual(txt.fromUnicode(u('False')), False)
+        self.assertEqual(txt.fromUnicode(u('false')), False)
 
     def test_fromUnicode_hit(self):
+        from zope.schema._compat import u
         txt = self._makeOne()
-        self.assertEqual(txt.fromUnicode('True'), True)
-        self.assertEqual(txt.fromUnicode('true'), True)
+        self.assertEqual(txt.fromUnicode(u('True')), True)
+        self.assertEqual(txt.fromUnicode(u('true')), True)
+
+
+class IntTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._bootstrapfields import Int
+        return Int
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test_ctor_defaults(self):
+        txt = self._makeOne()
+        self.assertEqual(txt._type, int)
+
+    def test_fromUnicode_miss(self):
+        from zope.schema._compat import u
+        txt = self._makeOne()
+        self.assertRaises(ValueError, txt.fromUnicode, u(''))
+        self.assertRaises(ValueError, txt.fromUnicode, u('False'))
+        self.assertRaises(ValueError, txt.fromUnicode, u('True'))
+
+    def test_fromUnicode_hit(self):
+        from zope.schema._compat import u
+        txt = self._makeOne()
+        self.assertEqual(txt.fromUnicode(u('0')), 0)
+        self.assertEqual(txt.fromUnicode(u('1')), 1)
+        self.assertEqual(txt.fromUnicode(u('-1')), -1)
 
 
 class DummyInst(object):
@@ -549,4 +579,5 @@ def test_suite():
         unittest.makeSuite(MinMaxLenTests),
         unittest.makeSuite(TextTests),
         unittest.makeSuite(BoolTests),
+        unittest.makeSuite(IntTests),
     ))
