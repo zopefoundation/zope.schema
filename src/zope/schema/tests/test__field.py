@@ -23,6 +23,18 @@ class BytesTests(unittest.TestCase):
     def _makeOne(self, *args, **kw):
         return self._getTargetClass()(*args, **kw)
 
+    def test_fromUnicode_miss(self):
+        from zope.schema._compat import u
+        byt = self._makeOne()
+        self.assertRaises(UnicodeEncodeError, byt.fromUnicode, u(chr(129)))
+
+    def test_fromUnicode_hit(self):
+        from zope.schema._compat import u
+        from zope.schema._compat import b
+        byt = self._makeOne()
+        self.assertEqual(byt.fromUnicode(u('')), b(''))
+        self.assertEqual(byt.fromUnicode(u('DEADBEEF')), b('DEADBEEF'))
+
 
 def test_suite():
     return unittest.TestSuite((
