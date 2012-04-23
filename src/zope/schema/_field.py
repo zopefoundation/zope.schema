@@ -300,8 +300,8 @@ class Choice(Field):
     def __init__(self, values=None, vocabulary=None, source=None, **kw):
         """Initialize object."""
         if vocabulary is not None:
-            if (not isinstance(vocabulary, string_types)
-                    and not IBaseVocabulary.providedBy(vocabulary)):
+            if (not isinstance(vocabulary, string_types) and
+                not IBaseVocabulary.providedBy(vocabulary)):
                 raise ValueError('vocabulary must be a string or implement '
                                  'IBaseVocabulary')
             if source is not None:

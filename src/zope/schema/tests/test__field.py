@@ -162,6 +162,33 @@ class ChoiceTests(unittest.TestCase):
     def _makeOne(self, *args, **kw):
         return self._getTargetClass()(*args, **kw)
 
+    def test_ctor_wo_values_vocabulary_or_source(self):
+        self.assertRaises(ValueError, self._makeOne)
+
+    def test_ctor_invalid_vocabulary(self):
+        self.assertRaises(ValueError, self._makeOne, vocabulary=object())
+
+    def test_ctor_invalid_source(self):
+        self.assertRaises(ValueError, self._makeOne, source=object())
+
+    def test_ctor_both_vocabulary_and_source(self):
+        self.assertRaises(ValueError,
+                          self._makeOne, vocabulary='voc.name', source=object())
+
+    def test_ctor_both_vocabulary_and_values(self):
+        self.assertRaises(ValueError,
+                          self._makeOne, vocabulary='voc.name', values=[1, 2])
+
+    def test_ctor_w_values(self):
+        from zope.schema.vocabulary import SimpleVocabulary
+        choose = self._makeOne(values=[1, 2])
+        self.assertTrue(isinstance(choose.vocabulary, SimpleVocabulary))
+        self.assertEqual(sorted(choose.vocabulary.by_value.keys()), [1, 2])
+
+    def test_ctor_w_named_vocabulary(self):
+        choose = self._makeOne(vocabulary='voc.name')
+        self.assertEqual(choose.vocabularyName, 'voc.name')
+
     def test_fromUnicode_miss(self):
         from zope.schema.interfaces import ConstraintNotSatisfied
         from zope.schema._compat import u
