@@ -81,10 +81,86 @@ class BytesLineTests(unittest.TestCase):
         self.assertEqual(bl.constraint(b('one line')), True)
 
 
+class ASCIILineTests(BytesLineTests):
+
+    def _getTargetClass(self):
+        from zope.schema._field import ASCIILine
+        return ASCIILine
+
+
+class FloatTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._field import Float
+        return Float
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test_fromUnicode_miss(self):
+        from zope.schema._compat import u
+        flt = self._makeOne()
+        self.assertRaises(ValueError, flt.fromUnicode, u(''))
+        self.assertRaises(ValueError, flt.fromUnicode, u('abc'))
+        self.assertRaises(ValueError, flt.fromUnicode, u('14.G'))
+
+    def test_fromUnicode_hit(self):
+        from zope.schema._compat import u
+        flt = self._makeOne()
+        self.assertEqual(flt.fromUnicode(u('0')), 0.0)
+        self.assertEqual(flt.fromUnicode(u('1.23')), 1.23)
+        self.assertEqual(flt.fromUnicode(u('1.23e6')), 1230000.0)
+
+
+class DecimalTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._field import Decimal
+        return Decimal
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test_fromUnicode_miss(self):
+        from zope.schema._compat import u
+        flt = self._makeOne()
+        self.assertRaises(ValueError, flt.fromUnicode, u(''))
+        self.assertRaises(ValueError, flt.fromUnicode, u('abc'))
+        self.assertRaises(ValueError, flt.fromUnicode, u('1.4G'))
+
+    def test_fromUnicode_hit(self):
+        from decimal import Decimal
+        from zope.schema._compat import u
+        flt = self._makeOne()
+        self.assertEqual(flt.fromUnicode(u('0')), Decimal('0.0'))
+        self.assertEqual(flt.fromUnicode(u('1.23')), Decimal('1.23'))
+        self.assertEqual(flt.fromUnicode(u('12345.6')), Decimal('12345.6'))
+
+
+class DateTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._field import Date
+        return Date
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test__validate_miss(self):
+        from datetime import datetime
+        from zope.schema.interfaces import WrongType
+        asc = self._makeOne()
+        self.assertRaises(WrongType, asc._validate, datetime.now())
+
+
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite(BytesTests),
         unittest.makeSuite(ASCIITests),
         unittest.makeSuite(BytesLineTests),
+        unittest.makeSuite(ASCIILineTests),
+        unittest.makeSuite(FloatTests),
+        unittest.makeSuite(DecimalTests),
+        unittest.makeSuite(DateTests),
     ))
 
