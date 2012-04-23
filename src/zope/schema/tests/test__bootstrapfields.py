@@ -487,6 +487,40 @@ class TextTests(unittest.TestCase):
         self.assertEqual(txt.fromUnicode(deadbeef), deadbeef)
 
 
+class PasswordTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._bootstrapfields import Password
+        return Password
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test_set_unchanged(self):
+        klass = self._getTargetClass()
+        pw = self._makeOne()
+        inst = DummyInst()
+        before = dict(inst.__dict__)
+        pw.set(inst, klass.UNCHANGED_PASSWORD) #doesn't raise, doesn't write
+        after = dict(inst.__dict__)
+        self.assertEqual(after, before)
+
+    def test_validate_unchanged_not_already_set(self):
+        from zope.schema._bootstrapinterfaces import WrongType
+        klass = self._getTargetClass()
+        inst = DummyInst()
+        pw = self._makeOne(__name__= 'password').bind(inst)
+        self.assertRaises(WrongType,
+                          pw.validate, klass.UNCHANGED_PASSWORD)
+
+    def test_validate_unchanged_already_set(self):
+        klass = self._getTargetClass()
+        inst = DummyInst()
+        inst.password = 'foobar'
+        pw = self._makeOne(__name__= 'password').bind(inst)
+        pw.validate(klass.UNCHANGED_PASSWORD) # doesn't raise
+
+
 class BoolTests(unittest.TestCase):
 
     def _getTargetClass(self):
@@ -579,6 +613,7 @@ def test_suite():
         unittest.makeSuite(OrderableTests),
         unittest.makeSuite(MinMaxLenTests),
         unittest.makeSuite(TextTests),
+        unittest.makeSuite(PasswordTests),
         unittest.makeSuite(BoolTests),
         unittest.makeSuite(IntTests),
     ))
