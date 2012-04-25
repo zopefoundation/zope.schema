@@ -1653,6 +1653,112 @@ class ObjectTests(unittest.TestCase):
         self.assertEqual(log[0].context, inst)
 
 
+class DictTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._field import Dict
+        return Dict
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test_class_conforms_to_IDict(self):
+        from zope.interface.verify import verifyClass
+        from zope.schema.interfaces import IDict
+        verifyClass(IDict, self._getTargetClass())
+
+    def test_instance_conforms_to_IDict(self):
+        from zope.interface.verify import verifyObject
+        from zope.schema.interfaces import IDict
+        verifyObject(IDict, self._makeOne())
+
+    def test_ctor_key_type_not_IField(self):
+        self.assertRaises(ValueError, self._makeOne, key_type=object())
+
+    def test_ctor_value_type_not_IField(self):
+        self.assertRaises(ValueError, self._makeOne, value_type=object())
+
+    def test_validate_wrong_types(self):
+        from zope.schema.interfaces import WrongType
+        from zope.schema._compat import u
+        from zope.schema._compat import b
+        field = self._makeOne()
+        self.assertRaises(WrongType, field.validate, u(''))
+        self.assertRaises(WrongType, field.validate, b(''))
+        self.assertRaises(WrongType, field.validate, 1)
+        self.assertRaises(WrongType, field.validate, 1.0)
+        self.assertRaises(WrongType, field.validate, ())
+        self.assertRaises(WrongType, field.validate, [])
+        self.assertRaises(WrongType, field.validate, set())
+        self.assertRaises(WrongType, field.validate, frozenset())
+        self.assertRaises(WrongType, field.validate, object())
+
+    def test_validate_not_required(self):
+        field = self._makeOne(required=False)
+        field.validate({})
+        field.validate({1: 'b', 2: 'd'})
+        field.validate({3: 'a'})
+        field.validate(None)
+
+    def test_validate_required(self):
+        from zope.schema.interfaces import RequiredMissing
+        field = self._makeOne()
+        field.validate({})
+        field.validate({1: 'b', 2: 'd'})
+        field.validate({3: 'a'})
+        self.assertRaises(RequiredMissing, field.validate, None)
+
+    def test_validate_invalid_key_type(self):
+        from zope.schema.interfaces import WrongContainedType
+        from zope.schema._bootstrapfields import Int
+        field = self._makeOne(key_type=Int())
+        field.validate({})
+        field.validate({1: 'b', 2: 'd'})
+        field.validate({3: 'a'})
+        self.assertRaises(WrongContainedType, field.validate, {'a': 1})
+
+    def test_validate_invalid_value_type(self):
+        from zope.schema.interfaces import WrongContainedType
+        from zope.schema._bootstrapfields import Int
+        field = self._makeOne(value_type=Int())
+        field.validate({})
+        field.validate({'b': 1, 'd': 2})
+        field.validate({'a': 3})
+        self.assertRaises(WrongContainedType, field.validate, {1: 'a'})
+
+    def test_validate_min_length(self):
+        from zope.schema.interfaces import TooShort
+        field = self._makeOne(min_length=1)
+        field.validate({1: 'a'})
+        field.validate({1: 'a', 2: 'b'})
+        self.assertRaises(TooShort, field.validate, {})
+
+    def test_validate_max_length(self):
+        from zope.schema.interfaces import TooLong
+        field = self._makeOne(max_length=1)
+        field.validate({})
+        field.validate({1: 'a'})
+        self.assertRaises(TooLong, field.validate, {1: 'a', 2: 'b'})
+        self.assertRaises(TooLong, field.validate, {1: 'a', 2: 'b', 3: 'c'})
+
+    def test_validate_min_length_and_max_length(self):
+        from zope.schema.interfaces import TooLong
+        from zope.schema.interfaces import TooShort
+        field = self._makeOne(min_length=1, max_length=2)
+        field.validate({1: 'a'})
+        field.validate({1: 'a', 2: 'b'})
+        self.assertRaises(TooShort, field.validate, {})
+        self.assertRaises(TooLong, field.validate, {1: 'a', 2: 'b', 3: 'c'})
+
+    def test_bind_binds_key_and_value_types(self):
+        from zope.schema import Int
+        field = self._makeOne(key_type=Int(), value_type=Int())
+        context = DummyInstance()
+        field2 = field.bind(context)
+        self.assertEqual(field2.key_type.context, context)
+        self.assertEqual(field2.value_type.context, context)
+
+
 class DummyInstance(object):
     pass
 
@@ -1716,5 +1822,6 @@ def test_suite():
         unittest.makeSuite(SetTests),
         unittest.makeSuite(FrozenSetTests),
         unittest.makeSuite(ObjectTests),
+        unittest.makeSuite(DictTests),
     ))
 
