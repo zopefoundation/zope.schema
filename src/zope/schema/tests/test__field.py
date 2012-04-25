@@ -1759,6 +1759,81 @@ class DictTests(unittest.TestCase):
         self.assertEqual(field2.value_type.context, context)
 
 
+class URITests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._field import URI
+        return URI
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test_class_conforms_to_IURI(self):
+        from zope.interface.verify import verifyClass
+        from zope.schema.interfaces import IURI
+        verifyClass(IURI, self._getTargetClass())
+
+    def test_instance_conforms_to_IURI(self):
+        from zope.interface.verify import verifyObject
+        from zope.schema.interfaces import IURI
+        verifyObject(IURI, self._makeOne())
+
+    def test_validate_wrong_types(self):
+        from zope.schema.interfaces import WrongType
+        from zope.schema._compat import u
+        field = self._makeOne()
+        self.assertRaises(WrongType, field.validate, u(''))
+        self.assertRaises(WrongType, field.validate, 1)
+        self.assertRaises(WrongType, field.validate, 1.0)
+        self.assertRaises(WrongType, field.validate, ())
+        self.assertRaises(WrongType, field.validate, [])
+        self.assertRaises(WrongType, field.validate, {})
+        self.assertRaises(WrongType, field.validate, set())
+        self.assertRaises(WrongType, field.validate, frozenset())
+        self.assertRaises(WrongType, field.validate, object())
+
+    def test_validate_not_required(self):
+        from zope.schema._compat import b
+        field = self._makeOne(required=False)
+        field.validate(b('http://example.com/'))
+        field.validate(None)
+
+    def test_validate_required(self):
+        from zope.schema.interfaces import RequiredMissing
+        from zope.schema._compat import b
+        field = self._makeOne()
+        field.validate(b('http://example.com/'))
+        self.assertRaises(RequiredMissing, field.validate, None)
+
+    def test_validate_not_a_uri(self):
+        from zope.schema.interfaces import ConstraintNotSatisfied
+        from zope.schema.interfaces import InvalidURI
+        from zope.schema._compat import b
+        field = self._makeOne()
+        self.assertRaises(InvalidURI, field.validate, b(''))
+        self.assertRaises(InvalidURI, field.validate, b('abc'))
+        self.assertRaises(InvalidURI, field.validate, b('\xab\xde'))
+        self.assertRaises(ConstraintNotSatisfied,
+                          field.validate, b('http://example.com/\nDAV:'))
+
+    def test_fromUnicode_ok(self):
+        from zope.schema._compat import b
+        from zope.schema._compat import u
+        field = self._makeOne()
+        self.assertEqual(field.fromUnicode(u('http://example.com/')),
+                         b('http://example.com/'))
+
+    def test_fromUnicode_invalid(self):
+        from zope.schema.interfaces import ConstraintNotSatisfied
+        from zope.schema.interfaces import InvalidURI
+        from zope.schema._compat import u
+        field = self._makeOne()
+        self.assertRaises(InvalidURI, field.fromUnicode, u(''))
+        self.assertRaises(InvalidURI, field.fromUnicode, u('abc'))
+        self.assertRaises(ConstraintNotSatisfied,
+                          field.fromUnicode, u('http://example.com/\nDAV:'))
+
+
 class DummyInstance(object):
     pass
 
@@ -1823,5 +1898,6 @@ def test_suite():
         unittest.makeSuite(FrozenSetTests),
         unittest.makeSuite(ObjectTests),
         unittest.makeSuite(DictTests),
+        unittest.makeSuite(URITests),
     ))
 
