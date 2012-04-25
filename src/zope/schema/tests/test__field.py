@@ -1375,6 +1375,284 @@ class FrozenSetTests(unittest.TestCase):
         self.assertRaises(TooLong, field.validate, frozenset((1, 2, 3)))
 
 
+class ObjectTests(unittest.TestCase):
+
+    def setUp(self):
+        from zope.event import subscribers
+        self._before = subscribers[:]
+
+    def tearDown(self):
+        from zope.event import subscribers
+        subscribers[:] = self._before
+
+    def _getTargetClass(self):
+        from zope.schema._field import Object
+        return Object
+
+    def _makeOne(self, schema=None, *args, **kw):
+        if schema is None:
+            schema = self._makeSchema()
+        return self._getTargetClass()(schema, *args, **kw)
+
+    def _makeSchema(self, **kw):
+        from zope.interface import Interface
+        from zope.interface.interface import InterfaceClass
+        return InterfaceClass('ISchema', (Interface,), kw)
+
+    def _getErrors(self, f, *args, **kw):
+        from zope.schema.interfaces import WrongContainedType
+        try:
+            f(*args, **kw)
+        except WrongContainedType as e:
+            try:
+                return e.args[0]
+            except:
+                return []
+        self.fail('Expected WrongContainedType Error')
+
+    def _makeCycles(self):
+        from zope.interface import Interface
+        from zope.interface import implementer
+        from zope.schema import Object
+        from zope.schema import List
+        from zope.schema._messageid import _
+
+        class IUnit(Interface):
+            """A schema that participate to a cycle"""
+            boss = Object(
+                schema=Interface,
+                title=_("Boss"),
+                description=_("Boss description"),
+                required=False,
+                )
+            members = List(
+                value_type=Object(schema=Interface),
+                title=_("Member List"),
+                description=_("Member list description"),
+                required=False,
+                )
+
+        class IPerson(Interface):
+            """A schema that participate to a cycle"""
+            unit = Object(
+                schema=IUnit,
+                title=_("Unit"),
+                description=_("Unit description"),
+                required=False,
+                )
+
+        IUnit['boss'].schema = IPerson
+        IUnit['members'].value_type.schema = IPerson
+
+        @implementer(IUnit)
+        class Unit(object):
+            def __init__(self, person, person_list):
+                self.boss = person
+                self.members = person_list
+
+        @implementer(IPerson)
+        class Person(object):
+            def __init__(self, unit):
+                self.unit = unit
+
+        return IUnit, Person, Unit
+
+    def test_class_conforms_to_IObject(self):
+        from zope.interface.verify import verifyClass
+        from zope.schema.interfaces import IObject
+        verifyClass(IObject, self._getTargetClass())
+
+    def test_instance_conforms_to_IObject(self):
+        from zope.interface.verify import verifyObject
+        from zope.schema.interfaces import IObject
+        verifyObject(IObject, self._makeOne())
+
+    def test_ctor_w_bad_schema(self):
+        from zope.schema.interfaces import WrongType
+        self.assertRaises(WrongType, self._makeOne, object())
+
+    def test_validate_not_required(self):
+        schema = self._makeSchema()
+        objf = self._makeOne(schema, required=False)
+        objf.validate(None) # doesn't raise
+
+    def test_validate_required(self):
+        from zope.schema.interfaces import RequiredMissing
+        field = self._makeOne(required=True)
+        self.assertRaises(RequiredMissing, field.validate, None)
+
+    def test__validate_w_empty_schema(self):
+        from zope.interface import Interface
+        objf = self._makeOne(Interface)
+        objf.validate(object()) # doesn't raise
+
+    def test__validate_w_value_not_providing_schema(self):
+        from zope.schema.interfaces import SchemaNotProvided
+        from zope.schema._bootstrapfields import Text
+        schema = self._makeSchema(foo=Text(), bar=Text())
+        objf = self._makeOne(schema)
+        self.assertRaises(SchemaNotProvided, objf.validate, object())
+
+    def test__validate_w_value_providing_schema_but_missing_fields(self):
+        from zope.interface import implementer
+        from zope.schema.interfaces import SchemaNotFullyImplemented
+        from zope.schema.interfaces import WrongContainedType
+        from zope.schema._bootstrapfields import Text
+        schema = self._makeSchema(foo=Text(), bar=Text())
+        @implementer(schema)
+        class Broken(object):
+            pass
+        objf = self._makeOne(schema)
+        self.assertRaises(WrongContainedType, objf.validate, Broken())
+        errors = self._getErrors(objf.validate, Broken())
+        self.assertEqual(len(errors), 2)
+        err = errors[0]
+        self.assertEqual(isinstance(err, SchemaNotFullyImplemented), True)
+        nested = err.args[0]
+        self.assertEqual(isinstance(nested, AttributeError), True)
+        self.assertEqual("'foo'" in str(nested), True)
+        err = errors[1]
+        self.assertEqual(isinstance(err, SchemaNotFullyImplemented), True)
+        nested = err.args[0]
+        self.assertEqual(isinstance(nested, AttributeError), True)
+        self.assertEqual("'bar'" in str(nested), True)
+
+    def test__validate_w_value_providing_schema_but_invalid_fields(self):
+        from zope.interface import implementer
+        from zope.schema.interfaces import WrongContainedType
+        from zope.schema.interfaces import RequiredMissing
+        from zope.schema.interfaces import WrongType
+        from zope.schema._bootstrapfields import Text
+        from zope.schema._compat import text_type
+        schema = self._makeSchema(foo=Text(), bar=Text())
+        @implementer(schema)
+        class Broken(object):
+            foo = None
+            bar = 1
+        objf = self._makeOne(schema)
+        self.assertRaises(WrongContainedType, objf.validate, Broken())
+        errors = self._getErrors(objf.validate, Broken())
+        self.assertEqual(len(errors), 2)
+        err = errors[0]
+        self.assertEqual(isinstance(err, RequiredMissing), True)
+        self.assertEqual(err.args, ('foo',))
+        err = errors[1]
+        self.assertEqual(isinstance(err, WrongType), True)
+        self.assertEqual(err.args, (1, text_type, 'bar'))
+
+    def test__validate_w_value_providing_schema(self):
+        from zope.interface import implementer
+        from zope.schema._bootstrapfields import Text
+        from zope.schema._field import Choice
+        from zope.schema._compat import u
+        schema = self._makeSchema(foo=Text(),
+                                  bar=Text(),
+                                  baz=Choice(values=[1, 2, 3]),
+                                 )
+        @implementer(schema)
+        class OK(object):
+            foo = u('Foo')
+            bar = u('Bar')
+            baz = 2
+        objf = self._makeOne(schema)
+        objf.validate(OK()) # doesn't raise
+
+    def test_validate_w_cycles(self):
+        IUnit, Person, Unit = self._makeCycles()
+        field = self._makeOne(schema=IUnit)
+        person1 = Person(None)
+        person2 = Person(None)
+        unit = Unit(person1, [person1, person2])
+        person1.unit = unit
+        person2.unit = unit
+        field.validate(unit) #doesn't raise
+
+    def test_validate_w_cycles_object_not_valid(self):
+        from zope.schema.interfaces import WrongContainedType
+        IUnit, Person, Unit = self._makeCycles()
+        field = self._makeOne(schema=IUnit)
+        person1 = Person(None)
+        person2 = Person(None)
+        person3 = Person(DummyInstance())
+        unit = Unit(person3, [person1, person2])
+        person1.unit = unit
+        person2.unit = unit
+        self.assertRaises(WrongContainedType, field.validate, unit)
+
+    def test_validate_w_cycles_collection_not_valid(self):
+        from zope.schema.interfaces import WrongContainedType
+        IUnit, Person, Unit = self._makeCycles()
+        field = self._makeOne(schema=IUnit)
+        person1 = Person(None)
+        person2 = Person(None)
+        person3 = Person(DummyInstance())
+        unit = Unit(person1, [person2, person3])
+        person1.unit = unit
+        person2.unit = unit
+        self.assertRaises(WrongContainedType, field.validate, unit)
+
+    def test_set_emits_IBOAE(self):
+        from zope.event import subscribers
+        from zope.interface import implementer
+        from zope.schema.interfaces import IBeforeObjectAssignedEvent
+        from zope.schema._bootstrapfields import Text
+        from zope.schema._field import Choice
+        from zope.schema._compat import u
+        schema = self._makeSchema(foo=Text(),
+                                  bar=Text(),
+                                  baz=Choice(values=[1, 2, 3]),
+                                 )
+        @implementer(schema)
+        class OK(object):
+            foo = u('Foo')
+            bar = u('Bar')
+            baz = 2
+        log = []
+        subscribers.append(log.append)
+        objf = self._makeOne(schema, __name__='field')
+        inst = DummyInstance()
+        value = OK()
+        objf.set(inst, value)
+        self.assertEqual(inst.field is value, True)
+        self.assertEqual(len(log), 1)
+        self.assertEqual(IBeforeObjectAssignedEvent.providedBy(log[0]), True)
+        self.assertEqual(log[0].object, value)
+        self.assertEqual(log[0].name, 'field')
+        self.assertEqual(log[0].context, inst)
+
+    def test_set_allows_IBOAE_subscr_to_replace_value(self):
+        from zope.event import subscribers
+        from zope.interface import implementer
+        from zope.schema._bootstrapfields import Text
+        from zope.schema._field import Choice
+        from zope.schema._compat import u
+        schema = self._makeSchema(foo=Text(),
+                                  bar=Text(),
+                                  baz=Choice(values=[1, 2, 3]),
+                                 )
+        @implementer(schema)
+        class OK(object):
+            def __init__(self, foo=u('Foo'), bar=u('Bar'), baz=2):
+                self.foo = foo
+                self.bar = bar
+                self.baz = baz
+        ok1 = OK()
+        ok2 = OK(u('Foo2'), u('Bar2'), 3)
+        log = []
+        subscribers.append(log.append)
+        def _replace(event):
+            event.object = ok2
+        subscribers.append(_replace)
+        objf = self._makeOne(schema, __name__='field')
+        inst = DummyInstance()
+        objf.set(inst, ok1)
+        self.assertEqual(inst.field is ok2, True)
+        self.assertEqual(len(log), 1)
+        self.assertEqual(log[0].object, ok2)
+        self.assertEqual(log[0].name, 'field')
+        self.assertEqual(log[0].context, inst)
+
+
 class DummyInstance(object):
     pass
 
@@ -1437,5 +1715,6 @@ def test_suite():
         unittest.makeSuite(ListTests),
         unittest.makeSuite(SetTests),
         unittest.makeSuite(FrozenSetTests),
+        unittest.makeSuite(ObjectTests),
     ))
 
