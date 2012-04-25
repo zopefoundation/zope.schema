@@ -1912,6 +1912,110 @@ class IdTests(unittest.TestCase):
                           field.fromUnicode, u('http://example.com/\nDAV:'))
 
 
+class DottedNameTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._field import DottedName
+        return DottedName
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test_class_conforms_to_IDottedName(self):
+        from zope.interface.verify import verifyClass
+        from zope.schema.interfaces import IDottedName
+        verifyClass(IDottedName, self._getTargetClass())
+
+    def test_instance_conforms_to_IDottedName(self):
+        from zope.interface.verify import verifyObject
+        from zope.schema.interfaces import IDottedName
+        verifyObject(IDottedName, self._makeOne())
+
+    def test_ctor_defaults(self):
+        dotted = self._makeOne()
+        self.assertEqual(dotted.min_dots, 0)
+        self.assertEqual(dotted.max_dots, None)
+
+    def test_ctor_min_dots_invalid(self):
+        self.assertRaises(ValueError, self._makeOne, min_dots=-1)
+
+    def test_ctor_min_dots_valid(self):
+        dotted = self._makeOne(min_dots=1)
+        self.assertEqual(dotted.min_dots, 1)
+
+    def test_ctor_max_dots_invalid(self):
+        self.assertRaises(ValueError, self._makeOne, min_dots=2, max_dots=1)
+
+    def test_ctor_max_dots_valid(self):
+        dotted = self._makeOne(max_dots=2)
+        self.assertEqual(dotted.max_dots, 2)
+
+    def test_validate_wrong_types(self):
+        from zope.schema.interfaces import WrongType
+        from zope.schema._compat import non_native_string
+        field = self._makeOne()
+        self.assertRaises(WrongType, field.validate, non_native_string(''))
+        self.assertRaises(WrongType, field.validate, 1)
+        self.assertRaises(WrongType, field.validate, 1.0)
+        self.assertRaises(WrongType, field.validate, ())
+        self.assertRaises(WrongType, field.validate, [])
+        self.assertRaises(WrongType, field.validate, {})
+        self.assertRaises(WrongType, field.validate, set())
+        self.assertRaises(WrongType, field.validate, frozenset())
+        self.assertRaises(WrongType, field.validate, object())
+
+    def test_validate_not_required(self):
+        field = self._makeOne(required=False)
+        field.validate('name')
+        field.validate('dotted.name')
+        field.validate(None)
+
+    def test_validate_required(self):
+        from zope.schema.interfaces import RequiredMissing
+        field = self._makeOne()
+        field.validate('name')
+        field.validate('dotted.name')
+        self.assertRaises(RequiredMissing, field.validate, None)
+
+    def test_validate_w_min_dots(self):
+        from zope.schema.interfaces import InvalidDottedName
+        field = self._makeOne(min_dots=1)
+        self.assertRaises(InvalidDottedName, field.validate, 'name')
+        field.validate('dotted.name')
+        field.validate('moar.dotted.name')
+
+    def test_validate_w_max_dots(self):
+        from zope.schema.interfaces import InvalidDottedName
+        field = self._makeOne(max_dots=1)
+        field.validate('name')
+        field.validate('dotted.name')
+        self.assertRaises(InvalidDottedName,
+                          field.validate, 'moar.dotted.name')
+
+    def test_validate_not_a_dotted_name(self):
+        from zope.schema.interfaces import ConstraintNotSatisfied
+        from zope.schema.interfaces import InvalidDottedName
+        field = self._makeOne()
+        self.assertRaises(InvalidDottedName, field.validate, '')
+        self.assertRaises(InvalidDottedName, field.validate, '\xab\xde')
+        self.assertRaises(ConstraintNotSatisfied,
+                          field.validate, 'http://example.com/\nDAV:')
+
+    def test_fromUnicode_dotted_name_ok(self):
+        from zope.schema._compat import u
+        field = self._makeOne()
+        self.assertEqual(field.fromUnicode(u('dotted.name')), 'dotted.name')
+
+    def test_fromUnicode_invalid(self):
+        from zope.schema.interfaces import ConstraintNotSatisfied
+        from zope.schema.interfaces import InvalidDottedName
+        from zope.schema._compat import u
+        field = self._makeOne()
+        self.assertRaises(InvalidDottedName, field.fromUnicode, u(''))
+        self.assertRaises(ConstraintNotSatisfied,
+                          field.fromUnicode, u('http://example.com/\nDAV:'))
+
+
 class DummyInstance(object):
     pass
 
@@ -1978,5 +2082,6 @@ def test_suite():
         unittest.makeSuite(DictTests),
         unittest.makeSuite(URITests),
         unittest.makeSuite(IdTests),
+        unittest.makeSuite(DottedNameTests),
     ))
 
