@@ -42,6 +42,17 @@ class ValidationErrorTests(unittest.TestCase):
         self.assertEqual(cmp(left, left), 0)
         self.assertEqual(cmp(right, left), 1)
 
+    def test___eq___no_args(self):
+        ve = self._makeOne()
+        self.assertEqual(ve == object(), False)
+
+    def test___eq___w_args(self):
+        left = self._makeOne('abc')
+        right = self._makeOne('def')
+        self.assertEqual(left == right, False)
+        self.assertEqual(left == left, True)
+        self.assertEqual(right == right, True)
+
 
 def test_suite():
     return unittest.TestSuite((
