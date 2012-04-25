@@ -81,9 +81,9 @@ class ASCIITests(unittest.TestCase):
 
     def test_validate_wrong_types(self):
         from zope.schema.interfaces import WrongType
-        from zope.schema._compat import u
+        from zope.schema._compat import non_native_string
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, u(''))
+        self.assertRaises(WrongType, field.validate, non_native_string(''))
         self.assertRaises(WrongType, field.validate, 1)
         self.assertRaises(WrongType, field.validate, 1.0)
         self.assertRaises(WrongType, field.validate, ())
@@ -108,21 +108,7 @@ class ASCIITests(unittest.TestCase):
             asc._validate(chr(i)) #doesn't raise
 
 
-class _LineTestsBase(object):
-
-    def test_constraint_miss(self):
-        from zope.schema._compat import b
-        bl = self._makeOne()
-        self.assertEqual(bl.constraint(b('one line\nthen another')), False)
-
-    def test_constraint_hit(self):
-        from zope.schema._compat import b
-        bl = self._makeOne()
-        self.assertEqual(bl.constraint(b('')), True)
-        self.assertEqual(bl.constraint(b('one line')), True)
-
-
-class BytesLineTests(unittest.TestCase, _LineTestsBase):
+class BytesLineTests(unittest.TestCase):
 
     def _getTargetClass(self):
         from zope.schema._field import BytesLine
@@ -182,7 +168,7 @@ class BytesLineTests(unittest.TestCase, _LineTestsBase):
         self.assertEqual(field.constraint(b('abc\ndef')), False)
 
 
-class ASCIILineTests(unittest.TestCase, _LineTestsBase):
+class ASCIILineTests(unittest.TestCase):
 
     def _getTargetClass(self):
         from zope.schema._field import ASCIILine
@@ -203,9 +189,9 @@ class ASCIILineTests(unittest.TestCase, _LineTestsBase):
 
     def test_validate_wrong_types(self):
         from zope.schema.interfaces import WrongType
-        from zope.schema._compat import u
+        from zope.schema._compat import non_native_string
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, u(''))
+        self.assertRaises(WrongType, field.validate, non_native_string(''))
         self.assertRaises(WrongType, field.validate, 1)
         self.assertRaises(WrongType, field.validate, 1.0)
         self.assertRaises(WrongType, field.validate, ())
@@ -217,32 +203,29 @@ class ASCIILineTests(unittest.TestCase, _LineTestsBase):
 
     def test_validate_not_required(self):
         from zope.schema.interfaces import InvalidValue
-        from zope.schema._compat import b
         field = self._makeOne(required=False)
         field.validate(None)
-        field.validate(b(''))
-        field.validate(b('abc'))
-        self.assertRaises(InvalidValue, field.validate, b('\xab\xde'))
+        field.validate('')
+        field.validate('abc')
+        self.assertRaises(InvalidValue, field.validate, '\xab\xde')
 
     def test_validate_required(self):
         from zope.schema.interfaces import InvalidValue
         from zope.schema.interfaces import RequiredMissing
-        from zope.schema._compat import b
         field = self._makeOne()
-        field.validate(b(''))
-        field.validate(b('abc'))
-        self.assertRaises(InvalidValue, field.validate, b('\xab\xde'))
+        field.validate('')
+        field.validate('abc')
+        self.assertRaises(InvalidValue, field.validate, '\xab\xde')
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def test_constraint(self):
-        from zope.schema._compat import b
         field = self._makeOne()
-        self.assertEqual(field.constraint(b('')), True)
-        self.assertEqual(field.constraint(b('abc')), True)
-        self.assertEqual(field.constraint(b('abc')), True)
+        self.assertEqual(field.constraint(''), True)
+        self.assertEqual(field.constraint('abc'), True)
+        self.assertEqual(field.constraint('abc'), True)
         # Non-ASCII byltes get checked in '_validate'.
-        self.assertEqual(field.constraint(b('\xab\xde')), True)
-        self.assertEqual(field.constraint(b('abc\ndef')), False)
+        self.assertEqual(field.constraint('\xab\xde'), True)
+        self.assertEqual(field.constraint('abc\ndef'), False)
 
 
 class FloatTests(unittest.TestCase):

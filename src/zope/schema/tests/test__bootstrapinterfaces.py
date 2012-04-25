@@ -14,6 +14,11 @@
 import unittest
 
 
+def _skip_under_py3(testcase):
+    from zope.schema._compat import PY3
+    if not PY3:
+        return testcase
+
 class ValidationErrorTests(unittest.TestCase):
 
     def _getTargetClass(self):
@@ -29,11 +34,13 @@ class ValidationErrorTests(unittest.TestCase):
         inst = Derived()
         self.assertEqual(inst.doc(), 'DERIVED')
 
+    @_skip_under_py3
     def test___cmp___no_args(self):
         # Py3k??
         ve = self._makeOne()
         self.assertEqual(cmp(ve, object()), -1)
 
+    @_skip_under_py3
     def test___cmp___hit(self):
         # Py3k??
         left = self._makeOne('abc')

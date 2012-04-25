@@ -98,6 +98,7 @@ from zope.schema._compat import text_type
 from zope.schema._compat import string_types
 from zope.schema._compat import binary_type
 from zope.schema._compat import PY3
+from zope.schema._compat import make_binary
 
 
 # Fix up bootstrap field types
@@ -143,7 +144,7 @@ class Bytes(MinMaxLen, Field):
         ConstraintNotSatisfied:  foo y.z bat
 
         """
-        v = binary_type(uc)
+        v = make_binary(uc)
         self.validate(v)
         return v
 
@@ -204,7 +205,7 @@ class ASCIILine(ASCII):
 
     def constraint(self, value):
         # TODO: we should probably use a more general definition of newlines
-        return b('\n') not in value
+        return '\n' not in value
 
 
 @implementer(IFloat, IFromUnicode)
