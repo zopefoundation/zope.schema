@@ -577,6 +577,50 @@ class IntTests(unittest.TestCase):
         txt = self._makeOne()
         self.assertEqual(txt._type, integer_types)
 
+    def test_validate_not_required(self):
+        field = self._makeOne(required=False)
+        field.validate(None)
+        field.validate(10)
+        field.validate(0)
+        field.validate(-1)
+
+    def test_validate_required(self):
+        from zope.schema.interfaces import RequiredMissing
+        field = self._makeOne()
+        field.validate(10)
+        field.validate(0)
+        field.validate(-1)
+        self.assertRaises(RequiredMissing, field.validate, None)
+
+    def test_validate_min(self):
+        from zope.schema.interfaces import TooSmall
+        field = self._makeOne(min=10)
+        field.validate(10)
+        field.validate(20)
+        self.assertRaises(TooSmall, field.validate, 9)
+        self.assertRaises(TooSmall, field.validate, -10)
+
+    def test_validate_max(self):
+        from zope.schema.interfaces import TooBig
+        field = self._makeOne(max=10)
+        field.validate(5)
+        field.validate(9)
+        field.validate(10)
+        self.assertRaises(TooBig, field.validate, 11)
+        self.assertRaises(TooBig, field.validate, 20)
+
+    def test_validate_min_and_max(self):
+        from zope.schema.interfaces import TooBig
+        from zope.schema.interfaces import TooSmall
+        field = self._makeOne(min=0, max=10)
+        field.validate(0)
+        field.validate(5)
+        field.validate(10)
+        self.assertRaises(TooSmall, field.validate, -10)
+        self.assertRaises(TooSmall, field.validate, -1)
+        self.assertRaises(TooBig, field.validate, 11)
+        self.assertRaises(TooBig, field.validate, 20)
+
     def test_fromUnicode_miss(self):
         from zope.schema._compat import u
         txt = self._makeOne()

@@ -23,6 +23,26 @@ class BytesTests(unittest.TestCase):
     def _makeOne(self, *args, **kw):
         return self._getTargetClass()(*args, **kw)
 
+    def test_class_conforms_to_IBytes(self):
+        from zope.interface.verify import verifyClass
+        from zope.schema.interfaces import IBytes
+        verifyClass(IBytes, self._getTargetClass())
+
+    def test_instance_conforms_to_IBytes(self):
+        from zope.interface.verify import verifyObject
+        from zope.schema.interfaces import IBytes
+        verifyObject(IBytes, self._makeOne())
+
+    def test_validate_wrong_types(self):
+        from zope.schema.interfaces import WrongType
+        field = self._makeOne()
+        self.assertRaises(WrongType, field.validate, 1)
+        self.assertRaises(WrongType, field.validate, 1.0)
+        self.assertRaises(WrongType, field.validate, ())
+        self.assertRaises(WrongType, field.validate, [])
+        self.assertRaises(WrongType, field.validate, {})
+        self.assertRaises(WrongType, field.validate, object())
+
     def test_fromUnicode_miss(self):
         from zope.schema._compat import u
         byt = self._makeOne()
@@ -45,6 +65,26 @@ class ASCIITests(unittest.TestCase):
     def _makeOne(self, *args, **kw):
         return self._getTargetClass()(*args, **kw)
 
+    def test_class_conforms_to_IASCII(self):
+        from zope.interface.verify import verifyClass
+        from zope.schema.interfaces import IASCII
+        verifyClass(IASCII, self._getTargetClass())
+
+    def test_instance_conforms_to_IASCII(self):
+        from zope.interface.verify import verifyObject
+        from zope.schema.interfaces import IASCII
+        verifyObject(IASCII, self._makeOne())
+
+    def test_validate_wrong_types(self):
+        from zope.schema.interfaces import WrongType
+        field = self._makeOne()
+        self.assertRaises(WrongType, field.validate, 1)
+        self.assertRaises(WrongType, field.validate, 1.0)
+        self.assertRaises(WrongType, field.validate, ())
+        self.assertRaises(WrongType, field.validate, [])
+        self.assertRaises(WrongType, field.validate, {})
+        self.assertRaises(WrongType, field.validate, object())
+
     def test__validate_empty(self):
         asc = self._makeOne()
         asc._validate('') # no error
@@ -60,14 +100,7 @@ class ASCIITests(unittest.TestCase):
             asc._validate(chr(i)) #doesn't raise
 
 
-class BytesLineTests(unittest.TestCase):
-
-    def _getTargetClass(self):
-        from zope.schema._field import BytesLine
-        return BytesLine
-
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
+class _LineTestsBase(object):
 
     def test_constraint_miss(self):
         from zope.schema._compat import b
@@ -81,11 +114,120 @@ class BytesLineTests(unittest.TestCase):
         self.assertEqual(bl.constraint(b('one line')), True)
 
 
-class ASCIILineTests(BytesLineTests):
+class BytesLineTests(unittest.TestCase, _LineTestsBase):
+
+    def _getTargetClass(self):
+        from zope.schema._field import BytesLine
+        return BytesLine
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test_class_conforms_to_IBytesLine(self):
+        from zope.interface.verify import verifyClass
+        from zope.schema.interfaces import IBytesLine
+        verifyClass(IBytesLine, self._getTargetClass())
+
+    def test_instance_conforms_to_IBytesLine(self):
+        from zope.interface.verify import verifyObject
+        from zope.schema.interfaces import IBytesLine
+        verifyObject(IBytesLine, self._makeOne())
+
+    def test_validate_wrong_types(self):
+        from zope.schema.interfaces import WrongType
+        field = self._makeOne()
+        self.assertRaises(WrongType, field.validate, 1)
+        self.assertRaises(WrongType, field.validate, 1.0)
+        self.assertRaises(WrongType, field.validate, ())
+        self.assertRaises(WrongType, field.validate, [])
+        self.assertRaises(WrongType, field.validate, {})
+        self.assertRaises(WrongType, field.validate, object())
+
+    def test_validate_not_required(self):
+        from zope.schema._compat import b
+        field = self._makeOne(required=False)
+        field.validate(None)
+        field.validate(b(''))
+        field.validate(b('abc'))
+        field.validate(b('\xab\xde'))
+
+    def test_validate_required(self):
+        from zope.schema.interfaces import RequiredMissing
+        from zope.schema._compat import b
+        field = self._makeOne()
+        field.validate(b(''))
+        field.validate(b('abc'))
+        field.validate(b('\xab\xde'))
+        self.assertRaises(RequiredMissing, field.validate, None)
+
+    def test_constraint(self):
+        from zope.schema._compat import b
+        field = self._makeOne()
+        self.assertEqual(field.constraint(b('')), True)
+        self.assertEqual(field.constraint(b('abc')), True)
+        self.assertEqual(field.constraint(b('abc')), True)
+        self.assertEqual(field.constraint(b('\xab\xde')), True)
+        self.assertEqual(field.constraint(b('abc\ndef')), False)
+
+
+class ASCIILineTests(unittest.TestCase, _LineTestsBase):
 
     def _getTargetClass(self):
         from zope.schema._field import ASCIILine
         return ASCIILine
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test_class_conforms_to_IASCIILine(self):
+        from zope.interface.verify import verifyClass
+        from zope.schema.interfaces import IASCIILine
+        verifyClass(IASCIILine, self._getTargetClass())
+
+    def test_instance_conforms_to_IASCIILine(self):
+        from zope.interface.verify import verifyObject
+        from zope.schema.interfaces import IASCIILine
+        verifyObject(IASCIILine, self._makeOne())
+
+    def test_validate_wrong_types(self):
+        from zope.schema.interfaces import WrongType
+        field = self._makeOne()
+        self.assertRaises(WrongType, field.validate, 1)
+        self.assertRaises(WrongType, field.validate, 1.0)
+        self.assertRaises(WrongType, field.validate, ())
+        self.assertRaises(WrongType, field.validate, [])
+        self.assertRaises(WrongType, field.validate, {})
+        self.assertRaises(WrongType, field.validate, object())
+        self.assertRaises(WrongType, field.validate, object())
+
+    def test_validate_not_required(self):
+        from zope.schema.interfaces import InvalidValue
+        from zope.schema._compat import b
+        field = self._makeOne(required=False)
+        field.validate(None)
+        field.validate(b(''))
+        field.validate(b('abc'))
+        self.assertRaises(InvalidValue, field.validate, b('\xab\xde'))
+
+    def test_validate_required(self):
+        from zope.schema.interfaces import InvalidValue
+        from zope.schema.interfaces import RequiredMissing
+        from zope.schema._compat import b
+        field = self._makeOne()
+        field.validate(b(''))
+        field.validate(b('abc'))
+        self.assertRaises(InvalidValue, field.validate, b('\xab\xde'))
+        self.assertRaises(RequiredMissing, field.validate, None)
+
+    def test_constraint(self):
+        from zope.schema._compat import b
+        field = self._makeOne()
+        self.assertEqual(field.constraint(b('')), True)
+        self.assertEqual(field.constraint(b('abc')), True)
+        self.assertEqual(field.constraint(b('abc')), True)
+        # Non-ASCII byltes get checked in '_validate'.
+        self.assertEqual(field.constraint(b('\xab\xde')), True)
+        self.assertEqual(field.constraint(b('abc\ndef')), False)
 
 
 class FloatTests(unittest.TestCase):
@@ -96,6 +238,59 @@ class FloatTests(unittest.TestCase):
 
     def _makeOne(self, *args, **kw):
         return self._getTargetClass()(*args, **kw)
+
+    def test_class_conforms_to_IFloat(self):
+        from zope.interface.verify import verifyClass
+        from zope.schema.interfaces import IFloat
+        verifyClass(IFloat, self._getTargetClass())
+
+    def test_instance_conforms_to_IFloat(self):
+        from zope.interface.verify import verifyObject
+        from zope.schema.interfaces import IFloat
+        verifyObject(IFloat, self._makeOne())
+
+    def test_validate_not_required(self):
+        field = self._makeOne(required=False)
+        field.validate(None)
+        field.validate(10.0)
+        field.validate(0.93)
+        field.validate(1000.0003)
+
+    def test_validate_required(self):
+        from zope.schema.interfaces import RequiredMissing
+        field = self._makeOne()
+        field.validate(10.0)
+        field.validate(0.93)
+        field.validate(1000.0003)
+        self.assertRaises(RequiredMissing, field.validate, None)
+
+    def test_validate_min(self):
+        from zope.schema.interfaces import TooSmall
+        field = self._makeOne(min=10.5)
+        field.validate(10.6)
+        field.validate(20.2)
+        self.assertRaises(TooSmall, field.validate, -9.0)
+        self.assertRaises(TooSmall, field.validate, 10.4)
+
+    def test_validate_max(self):
+        from zope.schema.interfaces import TooBig
+        field = self._makeOne(max=10.5)
+        field.validate(5.3)
+        field.validate(-9.1)
+        self.assertRaises(TooBig, field.validate, 10.51)
+        self.assertRaises(TooBig, field.validate, 20.7)
+
+    def test_validate_min_and_max(self):
+        from zope.schema.interfaces import TooBig
+        from zope.schema.interfaces import TooSmall
+        field = self._makeOne(min=-0.6, max=10.1)
+        field.validate(0.0)
+        field.validate(-0.03)
+        field.validate(10.0001)
+        self.assertRaises(TooSmall, field.validate, -10.0)
+        self.assertRaises(TooSmall, field.validate, -1.6)
+        self.assertRaises(TooBig, field.validate, 11.45)
+        self.assertRaises(TooBig, field.validate, 20.02)
 
     def test_fromUnicode_miss(self):
         from zope.schema._compat import u
@@ -121,6 +316,65 @@ class DecimalTests(unittest.TestCase):
     def _makeOne(self, *args, **kw):
         return self._getTargetClass()(*args, **kw)
 
+    def test_class_conforms_to_IDecimal(self):
+        from zope.interface.verify import verifyClass
+        from zope.schema.interfaces import IDecimal
+        verifyClass(IDecimal, self._getTargetClass())
+
+    def test_instance_conforms_to_IDecimal(self):
+        from zope.interface.verify import verifyObject
+        from zope.schema.interfaces import IDecimal
+        verifyObject(IDecimal, self._makeOne())
+
+    def test_validate_not_required(self):
+        import decimal
+        field = self._makeOne(required=False)
+        field.validate(decimal.Decimal("10.0"))
+        field.validate(decimal.Decimal("0.93"))
+        field.validate(decimal.Decimal("1000.0003"))
+        field.validate(None)
+
+    def test_validate_required(self):
+        import decimal
+        from zope.schema.interfaces import RequiredMissing
+        field = self._makeOne()
+        field.validate(decimal.Decimal("10.0"))
+        field.validate(decimal.Decimal("0.93"))
+        field.validate(decimal.Decimal("1000.0003"))
+        self.assertRaises(RequiredMissing, field.validate, None)
+
+    def test_validate_min(self):
+        import decimal
+        from zope.schema.interfaces import TooSmall
+        field = self._makeOne(min=decimal.Decimal("10.5"))
+        field.validate(decimal.Decimal("10.6"))
+        field.validate(decimal.Decimal("20.2"))
+        self.assertRaises(TooSmall, field.validate, decimal.Decimal("-9.0"))
+        self.assertRaises(TooSmall, field.validate, decimal.Decimal("10.4"))
+
+    def test_validate_max(self):
+        import decimal
+        from zope.schema.interfaces import TooBig
+        field = self._makeOne(max=decimal.Decimal("10.5"))
+        field.validate(decimal.Decimal("5.3"))
+        field.validate(decimal.Decimal("-9.1"))
+        self.assertRaises(TooBig, field.validate, decimal.Decimal("10.51"))
+        self.assertRaises(TooBig, field.validate, decimal.Decimal("20.7"))
+
+    def test_validate_min_and_max(self):
+        import decimal
+        from zope.schema.interfaces import TooBig
+        from zope.schema.interfaces import TooSmall
+        field = self._makeOne(min=decimal.Decimal("-0.6"),
+                              max=decimal.Decimal("10.1"))
+        field.validate(decimal.Decimal("0.0"))
+        field.validate(decimal.Decimal("-0.03"))
+        field.validate(decimal.Decimal("10.0001"))
+        self.assertRaises(TooSmall, field.validate, decimal.Decimal("-10.0"))
+        self.assertRaises(TooSmall, field.validate, decimal.Decimal("-1.6"))
+        self.assertRaises(TooBig, field.validate, decimal.Decimal("11.45"))
+        self.assertRaises(TooBig, field.validate, decimal.Decimal("20.02"))
+
     def test_fromUnicode_miss(self):
         from zope.schema._compat import u
         flt = self._makeOne()
@@ -137,6 +391,86 @@ class DecimalTests(unittest.TestCase):
         self.assertEqual(flt.fromUnicode(u('12345.6')), Decimal('12345.6'))
 
 
+class DatetimeTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._field import Datetime
+        return Datetime
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test_class_conforms_to_IDatetime(self):
+        from zope.interface.verify import verifyClass
+        from zope.schema.interfaces import IDatetime
+        verifyClass(IDatetime, self._getTargetClass())
+
+    def test_instance_conforms_to_IDatetime(self):
+        from zope.interface.verify import verifyObject
+        from zope.schema.interfaces import IDatetime
+        verifyObject(IDatetime, self._makeOne())
+
+    def test_validate_wrong_types(self):
+        from datetime import date
+        from zope.schema.interfaces import WrongType
+        field = self._makeOne()
+        self.assertRaises(WrongType, field.validate, 1)
+        self.assertRaises(WrongType, field.validate, 1.0)
+        self.assertRaises(WrongType, field.validate, ())
+        self.assertRaises(WrongType, field.validate, [])
+        self.assertRaises(WrongType, field.validate, {})
+        self.assertRaises(WrongType, field.validate, object())
+        self.assertRaises(WrongType, field.validate, date.today())
+
+    def test_validate_not_required(self):
+        from datetime import datetime
+        field = self._makeOne(required=False)
+        field.validate(None) #doesn't raise
+        field.validate(datetime.now()) #doesn't raise
+
+    def test_validate_required(self):
+        from zope.schema.interfaces import RequiredMissing
+        field = self._makeOne(required=True)
+        self.assertRaises(RequiredMissing, field.validate, None)
+
+    def test_validate_w_min(self):
+        from datetime import datetime
+        from zope.schema.interfaces import TooSmall
+        d1 = datetime(2000,10,1)
+        d2 = datetime(2000,10,2)
+        field = self._makeOne(min=d1)
+        field.validate(d1) #doesn't raise
+        field.validate(d2) #doesn't raise
+        self.assertRaises(TooSmall, field.validate, datetime(2000,9,30))
+
+    def test_validate_w_max(self):
+        from datetime import datetime
+        from zope.schema.interfaces import TooBig
+        d1 = datetime(2000,10,1)
+        d2 = datetime(2000,10,2)
+        d3 = datetime(2000,10,3)
+        field = self._makeOne(max=d2)
+        field.validate(d1) #doesn't raise
+        field.validate(d2) #doesn't raise
+        self.assertRaises(TooBig, field.validate, d3)
+
+    def test_validate_w_min_and_max(self):
+        from datetime import datetime
+        from zope.schema.interfaces import TooBig
+        from zope.schema.interfaces import TooSmall
+        d1 = datetime(2000,10,1)
+        d2 = datetime(2000,10,2)
+        d3 = datetime(2000,10,3)
+        d4 = datetime(2000,10,4)
+        d5 = datetime(2000,10,5)
+        field = self._makeOne(min=d2, max=d4)
+        field.validate(d2) #doesn't raise
+        field.validate(d3) #doesn't raise
+        field.validate(d4) #doesn't raise
+        self.assertRaises(TooSmall, field.validate, d1)
+        self.assertRaises(TooBig, field.validate, d5)
+
+
 class DateTests(unittest.TestCase):
 
     def _getTargetClass(self):
@@ -146,11 +480,220 @@ class DateTests(unittest.TestCase):
     def _makeOne(self, *args, **kw):
         return self._getTargetClass()(*args, **kw)
 
-    def test__validate_miss(self):
+    def test_class_conforms_to_IDate(self):
+        from zope.interface.verify import verifyClass
+        from zope.schema.interfaces import IDate
+        verifyClass(IDate, self._getTargetClass())
+
+    def test_instance_conforms_to_IDate(self):
+        from zope.interface.verify import verifyObject
+        from zope.schema.interfaces import IDate
+        verifyObject(IDate, self._makeOne())
+
+    def test_validate_wrong_types(self):
         from datetime import datetime
         from zope.schema.interfaces import WrongType
-        asc = self._makeOne()
-        self.assertRaises(WrongType, asc._validate, datetime.now())
+        field = self._makeOne()
+        self.assertRaises(WrongType, field.validate, 1)
+        self.assertRaises(WrongType, field.validate, 1.0)
+        self.assertRaises(WrongType, field.validate, ())
+        self.assertRaises(WrongType, field.validate, [])
+        self.assertRaises(WrongType, field.validate, {})
+        self.assertRaises(WrongType, field.validate, object())
+        self.assertRaises(WrongType, field.validate, datetime.now())
+
+    def test_validate_not_required(self):
+        from datetime import date
+        field = self._makeOne(required=False)
+        field.validate(None)
+        field.validate(date.today())
+
+    def test_validate_required(self):
+        from datetime import datetime
+        from zope.schema.interfaces import RequiredMissing
+        field = self._makeOne()
+        field.validate(datetime.now().date())
+        self.assertRaises(RequiredMissing, field.validate, None)
+
+    def test_validate_w_min(self):
+        from datetime import date
+        from datetime import datetime
+        from zope.schema.interfaces import TooSmall
+        d1 = date(2000,10,1)
+        d2 = date(2000,10,2)
+        field = self._makeOne(min=d1)
+        field.validate(d1)
+        field.validate(d2)
+        field.validate(datetime.now().date())
+        self.assertRaises(TooSmall, field.validate, date(2000,9,30))
+
+    def test_validate_w_max(self):
+        from datetime import date
+        from zope.schema.interfaces import TooBig
+        d1 = date(2000,10,1)
+        d2 = date(2000,10,2)
+        d3 = date(2000,10,3)
+        field = self._makeOne(max=d2)
+        field.validate(d1)
+        field.validate(d2)
+        self.assertRaises(TooBig, field.validate, d3)
+
+    def test_validate_w_min_and_max(self):
+        from datetime import date
+        from zope.schema.interfaces import TooBig
+        from zope.schema.interfaces import TooSmall
+        d1 = date(2000,10,1)
+        d2 = date(2000,10,2)
+        d3 = date(2000,10,3)
+        d4 = date(2000,10,4)
+        d5 = date(2000,10,5)
+        field = self._makeOne(min=d2, max=d4)
+        field.validate(d2)
+        field.validate(d3)
+        field.validate(d4)
+        self.assertRaises(TooSmall, field.validate, d1)
+        self.assertRaises(TooBig, field.validate, d5)
+
+
+class TimedeltaTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._field import Timedelta
+        return Timedelta
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test_class_conforms_to_ITimedelta(self):
+        from zope.interface.verify import verifyClass
+        from zope.schema.interfaces import ITimedelta
+        verifyClass(ITimedelta, self._getTargetClass())
+
+    def test_instance_conforms_to_ITimedelta(self):
+        from zope.interface.verify import verifyObject
+        from zope.schema.interfaces import ITimedelta
+        verifyObject(ITimedelta, self._makeOne())
+
+    def test_validate_not_required(self):
+        from datetime import timedelta
+        field = self._makeOne(required=False)
+        field.validate(None)
+        field.validate(timedelta(minutes=15))
+
+    def test_validate_required(self):
+        from datetime import timedelta
+        from zope.schema.interfaces import RequiredMissing
+        field = self._makeOne()
+        field.validate(timedelta(minutes=15))
+        self.assertRaises(RequiredMissing, field.validate, None)
+
+    def test_validate_min(self):
+        from datetime import timedelta
+        from zope.schema.interfaces import TooSmall
+        t1 = timedelta(hours=2)
+        t2 = timedelta(hours=3)
+        field = self._makeOne(min=t1)
+        field.validate(t1)
+        field.validate(t2)
+        self.assertRaises(TooSmall, field.validate, timedelta(hours=1))
+
+    def test_validate_max(self):
+        from datetime import timedelta
+        from zope.schema.interfaces import TooBig
+        t1 = timedelta(minutes=1)
+        t2 = timedelta(minutes=2)
+        t3 = timedelta(minutes=3)
+        field = self._makeOne(max=t2)
+        field.validate(t1)
+        field.validate(t2)
+        self.assertRaises(TooBig, field.validate, t3)
+
+    def test_validate_min_and_max(self):
+        from datetime import timedelta
+        from zope.schema.interfaces import TooBig
+        from zope.schema.interfaces import TooSmall
+        t1 = timedelta(days=1)
+        t2 = timedelta(days=2)
+        t3 = timedelta(days=3)
+        t4 = timedelta(days=4)
+        t5 = timedelta(days=5)
+        field = self._makeOne(min=t2, max=t4)
+        field.validate(t2)
+        field.validate(t3)
+        field.validate(t4)
+        self.assertRaises(TooSmall, field.validate, t1)
+        self.assertRaises(TooBig, field.validate, t5)
+
+
+class TimeTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._field import Time
+        return Time
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test_class_conforms_to_ITime(self):
+        from zope.interface.verify import verifyClass
+        from zope.schema.interfaces import ITime
+        verifyClass(ITime, self._getTargetClass())
+
+    def test_instance_conforms_to_ITime(self):
+        from zope.interface.verify import verifyObject
+        from zope.schema.interfaces import ITime
+        verifyObject(ITime, self._makeOne())
+
+    def test_validate_not_required(self):
+        from datetime import time
+        field = self._makeOne(required=False)
+        field.validate(None)
+        field.validate(time(12,15,37))
+
+    def test_validate_required(self):
+        from datetime import time
+        from zope.schema.interfaces import RequiredMissing
+        field = self._makeOne()
+        field.validate(time(12,15,37))
+        self.assertRaises(RequiredMissing, field.validate, None)
+
+    def test_validate_min(self):
+        from datetime import time
+        from zope.schema.interfaces import TooSmall
+        t1 = time(12,15,37)
+        t2 = time(12,25,18)
+        t3 = time(12,42,43)
+        field = self._makeOne(min=t2)
+        field.validate(t2)
+        field.validate(t3)
+        self.assertRaises(TooSmall, field.validate, t1)
+
+    def test_validate_max(self):
+        from datetime import time
+        from zope.schema.interfaces import TooBig
+        t1 = time(12,15,37)
+        t2 = time(12,25,18)
+        t3 = time(12,42,43)
+        field = self._makeOne(max=t2)
+        field.validate(t1)
+        field.validate(t2)
+        self.assertRaises(TooBig, field.validate, t3)
+
+    def test_validate_min_and_max(self):
+        from datetime import time
+        from zope.schema.interfaces import TooBig
+        from zope.schema.interfaces import TooSmall
+        t1 = time(12,15,37)
+        t2 = time(12,25,18)
+        t3 = time(12,42,43)
+        t4 = time(13,7,12)
+        t5 = time(14,22,9)
+        field = self._makeOne(min=t2, max=t4)
+        field.validate(t2)
+        field.validate(t3)
+        field.validate(t4)
+        self.assertRaises(TooSmall, field.validate, t1)
+        self.assertRaises(TooBig, field.validate, t5)
 
 
 class ChoiceTests(unittest.TestCase):
@@ -169,6 +712,16 @@ class ChoiceTests(unittest.TestCase):
 
     def _makeOne(self, *args, **kw):
         return self._getTargetClass()(*args, **kw)
+
+    def test_class_conforms_to_IChoice(self):
+        from zope.interface.verify import verifyClass
+        from zope.schema.interfaces import IChoice
+        verifyClass(IChoice, self._getTargetClass())
+
+    def test_instance_conforms_to_IChoice(self):
+        from zope.interface.verify import verifyObject
+        from zope.schema.interfaces import IChoice
+        verifyObject(IChoice, self._makeOne(values=[1, 2, 3]))
 
     def test_ctor_wo_values_vocabulary_or_source(self):
         self.assertRaises(ValueError, self._makeOne)
@@ -363,6 +916,55 @@ class ChoiceTests(unittest.TestCase):
         self.assertRaises(ConstraintNotSatisfied, clone._validate, 42)
 
 
+class InterfaceFieldTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._field import InterfaceField
+        return InterfaceField
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test_class_conforms_to_IInterfaceField(self):
+        from zope.interface.verify import verifyClass
+        from zope.schema.interfaces import IInterfaceField
+        verifyClass(IInterfaceField, self._getTargetClass())
+
+    def test_instance_conforms_to_IInterfaceField(self):
+        from zope.interface.verify import verifyObject
+        from zope.schema.interfaces import IInterfaceField
+        verifyObject(IInterfaceField, self._makeOne())
+
+    def test_validate_wrong_types(self):
+        from datetime import date
+        from zope.schema.interfaces import WrongType
+        field = self._makeOne()
+        self.assertRaises(WrongType, field.validate, 1)
+        self.assertRaises(WrongType, field.validate, 1.0)
+        self.assertRaises(WrongType, field.validate, ())
+        self.assertRaises(WrongType, field.validate, [])
+        self.assertRaises(WrongType, field.validate, {})
+        self.assertRaises(WrongType, field.validate, object())
+        self.assertRaises(WrongType, field.validate, date.today())
+
+    def test_validate_not_required(self):
+        from zope.interface import Interface
+        class DummyInterface(Interface):
+            pass
+        field = self._makeOne(required=False)
+        field.validate(DummyInterface)
+        field.validate(None)
+
+    def test_validate_required(self):
+        from zope.interface import Interface
+        from zope.schema.interfaces import RequiredMissing
+        class DummyInterface(Interface):
+            pass
+        field = self._makeOne(required=True)
+        field.validate(DummyInterface)
+        self.assertRaises(RequiredMissing, field.validate, None)
+
+
 class DummyInstance(object):
     pass
 
@@ -414,7 +1016,11 @@ def test_suite():
         unittest.makeSuite(ASCIILineTests),
         unittest.makeSuite(FloatTests),
         unittest.makeSuite(DecimalTests),
+        unittest.makeSuite(DatetimeTests),
         unittest.makeSuite(DateTests),
+        unittest.makeSuite(TimedeltaTests),
+        unittest.makeSuite(TimeTests),
         unittest.makeSuite(ChoiceTests),
+        unittest.makeSuite(InterfaceFieldTests),
     ))
 
