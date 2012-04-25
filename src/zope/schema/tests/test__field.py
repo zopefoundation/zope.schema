@@ -965,6 +965,67 @@ class InterfaceFieldTests(unittest.TestCase):
         self.assertRaises(RequiredMissing, field.validate, None)
 
 
+class AbstractCollectionTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._field import AbstractCollection
+        return AbstractCollection
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test_ctor_defaults(self):
+        absc = self._makeOne()
+        self.assertEqual(absc.value_type, None)
+        self.assertEqual(absc.unique, False)
+
+    def test_ctor_explicit(self):
+        from zope.schema._bootstrapfields import Text
+        text = Text()
+        absc = self._makeOne(text, True)
+        self.assertEqual(absc.value_type, text)
+        self.assertEqual(absc.unique, True)
+
+    def test_ctor_w_non_field_value_type(self):
+        class NotAField(object):
+            pass
+        self.assertRaises(ValueError, self._makeOne, NotAField)
+
+    def test_bind_wo_value_Type(self):
+        absc = self._makeOne()
+        context = object()
+        bound = absc.bind(context)
+        self.assertEqual(bound.context, context)
+        self.assertEqual(bound.value_type, None)
+        self.assertEqual(bound.unique, False)
+
+    def test_bind_w_value_Type(self):
+        from zope.schema._bootstrapfields import Text
+        text = Text()
+        absc = self._makeOne(text, True)
+        context = object()
+        bound = absc.bind(context)
+        self.assertEqual(bound.context, context)
+        self.assertEqual(isinstance(bound.value_type, Text), True)
+        self.assertEqual(bound.value_type.context, context)
+        self.assertEqual(bound.unique, True)
+
+    def test__validate_wrong_contained_type(self):
+        from zope.schema.interfaces import WrongContainedType
+        from zope.schema._bootstrapfields import Text
+        text = Text()
+        absc = self._makeOne(text)
+        self.assertRaises(WrongContainedType, absc.validate, [1])
+
+    def test__validate_miss_uniqueness(self):
+        from zope.schema.interfaces import NotUnique
+        from zope.schema._bootstrapfields import Text
+        from zope.schema._compat import u
+        text = Text()
+        absc = self._makeOne(text, True)
+        self.assertRaises(NotUnique, absc.validate, [u('a'), u('a')])
+
+
 class DummyInstance(object):
     pass
 
@@ -1022,5 +1083,6 @@ def test_suite():
         unittest.makeSuite(TimeTests),
         unittest.makeSuite(ChoiceTests),
         unittest.makeSuite(InterfaceFieldTests),
+        unittest.makeSuite(AbstractCollectionTests),
     ))
 
