@@ -12,6 +12,7 @@ if PY3: #pragma NO COVER
     text_type = str
     binary_type = bytes
     integer_types = int,
+    non_native_string = bytes
 else: #pragma NO COVER
     def b(s):
         return s
@@ -21,3 +22,4 @@ else: #pragma NO COVER
     text_type = unicode
     binary_type = str
     integer_types = (int, long)
+    non_native_string = unicode

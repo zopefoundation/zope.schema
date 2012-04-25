@@ -1834,6 +1834,84 @@ class URITests(unittest.TestCase):
                           field.fromUnicode, u('http://example.com/\nDAV:'))
 
 
+class IdTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._field import Id
+        return Id
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test_class_conforms_to_IId(self):
+        from zope.interface.verify import verifyClass
+        from zope.schema.interfaces import IId
+        verifyClass(IId, self._getTargetClass())
+
+    def test_instance_conforms_to_IId(self):
+        from zope.interface.verify import verifyObject
+        from zope.schema.interfaces import IId
+        verifyObject(IId, self._makeOne())
+
+    def test_validate_wrong_types(self):
+        from zope.schema.interfaces import WrongType
+        from zope.schema._compat import non_native_string
+        field = self._makeOne()
+        self.assertRaises(WrongType, field.validate, non_native_string(''))
+        self.assertRaises(WrongType, field.validate, 1)
+        self.assertRaises(WrongType, field.validate, 1.0)
+        self.assertRaises(WrongType, field.validate, ())
+        self.assertRaises(WrongType, field.validate, [])
+        self.assertRaises(WrongType, field.validate, {})
+        self.assertRaises(WrongType, field.validate, set())
+        self.assertRaises(WrongType, field.validate, frozenset())
+        self.assertRaises(WrongType, field.validate, object())
+
+    def test_validate_not_required(self):
+        field = self._makeOne(required=False)
+        field.validate('http://example.com/')
+        field.validate('dotted.name')
+        field.validate(None)
+
+    def test_validate_required(self):
+        from zope.schema.interfaces import RequiredMissing
+        field = self._makeOne()
+        field.validate('http://example.com/')
+        field.validate('dotted.name')
+        self.assertRaises(RequiredMissing, field.validate, None)
+
+    def test_validate_not_a_uri(self):
+        from zope.schema.interfaces import ConstraintNotSatisfied
+        from zope.schema.interfaces import InvalidId
+        field = self._makeOne()
+        self.assertRaises(InvalidId, field.validate, '')
+        self.assertRaises(InvalidId, field.validate, 'abc')
+        self.assertRaises(InvalidId, field.validate, '\xab\xde')
+        self.assertRaises(ConstraintNotSatisfied,
+                          field.validate, 'http://example.com/\nDAV:')
+
+    def test_fromUnicode_url_ok(self):
+        from zope.schema._compat import u
+        field = self._makeOne()
+        self.assertEqual(field.fromUnicode(u('http://example.com/')),
+                         'http://example.com/')
+
+    def test_fromUnicode_dotted_name_ok(self):
+        from zope.schema._compat import u
+        field = self._makeOne()
+        self.assertEqual(field.fromUnicode(u('dotted.name')), 'dotted.name')
+
+    def test_fromUnicode_invalid(self):
+        from zope.schema.interfaces import ConstraintNotSatisfied
+        from zope.schema.interfaces import InvalidId
+        from zope.schema._compat import u
+        field = self._makeOne()
+        self.assertRaises(InvalidId, field.fromUnicode, u(''))
+        self.assertRaises(InvalidId, field.fromUnicode, u('abc'))
+        self.assertRaises(ConstraintNotSatisfied,
+                          field.fromUnicode, u('http://example.com/\nDAV:'))
+
+
 class DummyInstance(object):
     pass
 
@@ -1899,5 +1977,6 @@ def test_suite():
         unittest.makeSuite(ObjectTests),
         unittest.makeSuite(DictTests),
         unittest.makeSuite(URITests),
+        unittest.makeSuite(IdTests),
     ))
 
