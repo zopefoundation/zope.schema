@@ -47,6 +47,28 @@ class BytesTests(unittest.TestCase):
         self.assertRaises(WrongType, field.validate, frozenset())
         self.assertRaises(WrongType, field.validate, object())
 
+    def test_validate_w_invalid_default(self):
+        from zope.schema._compat import u
+        from zope.schema.interfaces import ValidationError
+        self.assertRaises(ValidationError, self._makeOne, default=u(''))
+
+    def test_validate_not_required(self):
+        from zope.schema._compat import b
+        field = self._makeOne(required=False)
+        field.validate(b(''))
+        field.validate(b('abc'))
+        field.validate(b('abc\ndef'))
+        field.validate(None)
+
+    def test_validate_required(self):
+        from zope.schema.interfaces import RequiredMissing
+        from zope.schema._compat import b
+        field = self._makeOne()
+        field.validate(b(''))
+        field.validate(b('abc'))
+        field.validate(b('abc\ndef'))
+        self.assertRaises(RequiredMissing, field.validate, None)
+
     def test_fromUnicode_miss(self):
         from zope.schema._compat import u
         byt = self._makeOne()

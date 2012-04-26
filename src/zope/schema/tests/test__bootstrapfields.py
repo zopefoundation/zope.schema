@@ -473,6 +473,42 @@ class TextTests(unittest.TestCase):
         txt = self._makeOne()
         self.assertEqual(txt._type, text_type)
 
+    def test_validate_wrong_types(self):
+        from zope.schema.interfaces import WrongType
+        from zope.schema._compat import b
+        field = self._makeOne()
+        self.assertRaises(WrongType, field.validate, b(''))
+        self.assertRaises(WrongType, field.validate, 1)
+        self.assertRaises(WrongType, field.validate, 1.0)
+        self.assertRaises(WrongType, field.validate, ())
+        self.assertRaises(WrongType, field.validate, [])
+        self.assertRaises(WrongType, field.validate, {})
+        self.assertRaises(WrongType, field.validate, set())
+        self.assertRaises(WrongType, field.validate, frozenset())
+        self.assertRaises(WrongType, field.validate, object())
+
+    def test_validate_w_invalid_default(self):
+        from zope.schema._compat import b
+        from zope.schema.interfaces import ValidationError
+        self.assertRaises(ValidationError, self._makeOne, default=b(''))
+
+    def test_validate_not_required(self):
+        from zope.schema._compat import u
+        field = self._makeOne(required=False)
+        field.validate(u(''))
+        field.validate(u('abc'))
+        field.validate(u('abc\ndef'))
+        field.validate(None)
+
+    def test_validate_required(self):
+        from zope.schema.interfaces import RequiredMissing
+        from zope.schema._compat import u
+        field = self._makeOne()
+        field.validate(u(''))
+        field.validate(u('abc'))
+        field.validate(u('abc\ndef'))
+        self.assertRaises(RequiredMissing, field.validate, None)
+
     def test_fromUnicode_miss(self):
         from zope.schema._bootstrapinterfaces import WrongType
         from zope.schema._compat import b
@@ -485,6 +521,62 @@ class TextTests(unittest.TestCase):
         deadbeef = u('DEADBEEF')
         txt = self._makeOne()
         self.assertEqual(txt.fromUnicode(deadbeef), deadbeef)
+
+
+class TextLineTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._field import TextLine
+        return TextLine
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test_class_conforms_to_ITextLine(self):
+        from zope.interface.verify import verifyClass
+        from zope.schema.interfaces import ITextLine
+        verifyClass(ITextLine, self._getTargetClass())
+
+    def test_instance_conforms_to_ITextLine(self):
+        from zope.interface.verify import verifyObject
+        from zope.schema.interfaces import ITextLine
+        verifyObject(ITextLine, self._makeOne())
+
+    def test_validate_wrong_types(self):
+        from zope.schema.interfaces import WrongType
+        from zope.schema._compat import b
+        field = self._makeOne()
+        self.assertRaises(WrongType, field.validate, b(''))
+        self.assertRaises(WrongType, field.validate, 1)
+        self.assertRaises(WrongType, field.validate, 1.0)
+        self.assertRaises(WrongType, field.validate, ())
+        self.assertRaises(WrongType, field.validate, [])
+        self.assertRaises(WrongType, field.validate, {})
+        self.assertRaises(WrongType, field.validate, set())
+        self.assertRaises(WrongType, field.validate, frozenset())
+        self.assertRaises(WrongType, field.validate, object())
+
+    def test_validate_not_required(self):
+        from zope.schema._compat import u
+        field = self._makeOne(required=False)
+        field.validate(u(''))
+        field.validate(u('abc'))
+        field.validate(None)
+
+    def test_validate_required(self):
+        from zope.schema.interfaces import RequiredMissing
+        from zope.schema._compat import u
+        field = self._makeOne()
+        field.validate(u(''))
+        field.validate(u('abc'))
+        self.assertRaises(RequiredMissing, field.validate, None)
+
+    def test_constraint(self):
+        from zope.schema._compat import u
+        field = self._makeOne()
+        self.assertEqual(field.constraint(u('')), True)
+        self.assertEqual(field.constraint(u('abc')), True)
+        self.assertEqual(field.constraint(u('abc\ndef')), False)
 
 
 class PasswordTests(unittest.TestCase):
@@ -505,6 +597,28 @@ class PasswordTests(unittest.TestCase):
         after = dict(inst.__dict__)
         self.assertEqual(after, before)
 
+    def test_set_normal(self):
+        klass = self._getTargetClass()
+        pw = self._makeOne(__name__='password')
+        inst = DummyInst()
+        pw.set(inst, 'PASSWORD')
+        self.assertEqual(inst.password, 'PASSWORD')
+
+    def test_validate_not_required(self):
+        from zope.schema._compat import u
+        field = self._makeOne(required=False)
+        field.validate(u(''))
+        field.validate(u('abc'))
+        field.validate(None)
+
+    def test_validate_required(self):
+        from zope.schema.interfaces import RequiredMissing
+        from zope.schema._compat import u
+        field = self._makeOne()
+        field.validate(u(''))
+        field.validate(u('abc'))
+        self.assertRaises(RequiredMissing, field.validate, None)
+
     def test_validate_unchanged_not_already_set(self):
         from zope.schema._bootstrapinterfaces import WrongType
         klass = self._getTargetClass()
@@ -519,6 +633,13 @@ class PasswordTests(unittest.TestCase):
         inst.password = 'foobar'
         pw = self._makeOne(__name__= 'password').bind(inst)
         pw.validate(klass.UNCHANGED_PASSWORD) # doesn't raise
+
+    def test_constraint(self):
+        from zope.schema._compat import u
+        field = self._makeOne()
+        self.assertEqual(field.constraint(u('')), True)
+        self.assertEqual(field.constraint(u('abc')), True)
+        self.assertEqual(field.constraint(u('abc\ndef')), False)
 
 
 class BoolTests(unittest.TestCase):
@@ -657,6 +778,7 @@ def test_suite():
         unittest.makeSuite(OrderableTests),
         unittest.makeSuite(MinMaxLenTests),
         unittest.makeSuite(TextTests),
+        unittest.makeSuite(TextLineTests),
         unittest.makeSuite(PasswordTests),
         unittest.makeSuite(BoolTests),
         unittest.makeSuite(IntTests),
