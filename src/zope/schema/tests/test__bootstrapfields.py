@@ -358,6 +358,15 @@ class ContainerTests(unittest.TestCase):
     def _makeOne(self, *args, **kw):
         return self._getTargetClass()(*args, **kw)
 
+    def test_validate_not_required(self):
+        field = self._makeOne(required=False)
+        field.validate(None)
+
+    def test_validate_required(self):
+        from zope.schema.interfaces import RequiredMissing
+        field = self._makeOne()
+        self.assertRaises(RequiredMissing, field.validate, None)
+
     def test__validate_not_collection_not_iterable(self):
         from zope.schema._bootstrapinterfaces import NotAContainer
         cont = self._makeOne()
