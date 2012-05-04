@@ -16,117 +16,269 @@
 import unittest
 
 
-class Test(unittest.TestCase):
+class FieldReadAccessorTests(unittest.TestCase):
 
-    def test(self):
-        from zope.schema._compat import u
-        from zope.interface import Interface
-        from zope.interface import implementer
-        from zope.interface.interfaces import IMethod
-        from zope.interface.verify import verifyClass
-        from zope.interface.verify import verifyObject
-        from zope.schema import Text
-        from zope.schema.accessors import accessors
+    def _getTargetClass(self):
         from zope.schema.accessors import FieldReadAccessor
-        from zope.schema.accessors import FieldWriteAccessor
-        from zope.schema.interfaces import IText
+        return FieldReadAccessor
 
-        field = Text(title=u("Foo thing"))
-        class I(Interface):
-            getFoo, setFoo = accessors(field)
-
-        @implementer(I)
-        class Bad(object):
-            pass
-
-        @implementer(I)
-        class Good(object):
-            
-            def __init__(self):
-                self.set = 0
-
-            def getFoo(self):
-                return u("foo")
-
-            def setFoo(self, v):
-                self.set += 1
-
-        names = I.names()
-        names.sort()
-        self.assertEqual(names, ['getFoo', 'setFoo'])
-        self.assertEqual(I['getFoo'].field, field)
-        self.assertEqual(I['getFoo'].__name__, 'getFoo')
-        self.assertEqual(I['getFoo'].__doc__, u('get Foo thing'))
-        self.assertEqual(I['getFoo'].__class__, FieldReadAccessor)
-        self.assertEqual(I['getFoo'].writer, I['setFoo'])
-
-        # test some field attrs
-        for attr in ('title', 'description', 'readonly'):
-            self.assertEqual(getattr(I['getFoo'], attr), getattr(field, attr))
-
-        self.assertTrue(IText.providedBy(I['getFoo']))
-        
-        self.assertTrue(IMethod.providedBy(I['getFoo']))
-        self.assertTrue(IMethod.providedBy(I['setFoo']))
-
-        self.assertEqual(I['setFoo'].field, field)
-        self.assertEqual(I['setFoo'].__name__, 'setFoo')
-        self.assertEqual(I['setFoo'].__doc__, u('set Foo thing'))
-        self.assertEqual(I['setFoo'].__class__, FieldWriteAccessor)
-
-        self.assertRaises(Exception, verifyClass, I, Bad)
-        self.assertRaises(Exception, verifyObject, I, Bad())
-        
-        self.assertEqual(I['getFoo'].query(Bad(), 42), 42)
-        self.assertRaises(AttributeError, I['getFoo'].get, Bad())
-
-        verifyClass(I, Good)
-        verifyObject(I, Good())
-
-        self.assertEqual(I['getFoo'].query(Good(), 42), u('foo'))
-        self.assertEqual(I['getFoo'].get(Good()), u('foo'))
-        instance = Good()
-        I['getFoo'].set(instance, u('whatever'))
-        self.assertEqual(instance.set, 1)
-
-    def test_doc(self):
-        from zope.schema._compat import u
-        from zope.interface import Interface
-        from zope.interface.document import asStructuredText
+    def _makeOne(self, field=None):
         from zope.schema import Text
+        if field is None:
+            field = Text(__name__='testing')
+        return self._getTargetClass()(field)
+
+    def test_ctor_not_created_inside_interface(self):
+        from zope.schema import Text
+        from zope.schema._compat import u
+        field = Text(title=u('Hmm'))
+        wrapped = self._makeOne(field)
+        self.assertTrue(wrapped.field is field)
+        self.assertEqual(wrapped.__name__, '') #__name__ set when in interface
+        self.assertEqual(wrapped.__doc__, 'get Hmm')
+
+    def test_ctor_created_inside_interface(self):
+        from zope.interface import Interface
+        from zope.schema import Text
+        from zope.schema._compat import u
+        field = Text(title=u('Hmm'))
+        class IFoo(Interface):
+            getter = self._makeOne(field)
+        getter = IFoo['getter']
+        self.assertEqual(getter.__name__, 'getter')
+        self.assertEqual(getter.__doc__, 'get Hmm')
+
+    def test___provides___w_field_no_provides(self):
+        from zope.interface import implementedBy
+        from zope.interface import providedBy
+        wrapped = self._makeOne(object())
+        self.assertEqual(list(providedBy(wrapped)),
+                         list(implementedBy(self._getTargetClass())))
+
+    def test___provides___w_field_w_provides(self):
+        from zope.interface import implementedBy
+        from zope.interface import providedBy
+        from zope.schema import Text
+        field = Text()
+        field_provides = list(providedBy(field))
+        wrapped = self._makeOne(field)
+        wrapped_provides = list(providedBy(wrapped)) 
+        self.assertEqual(wrapped_provides[:len(field_provides)],
+                         list(providedBy(field)))
+        for iface in list(implementedBy(self._getTargetClass())):
+            self.assertTrue(iface in wrapped_provides)
+
+    def test_getSignatureString(self):
+        wrapped = self._makeOne()
+        self.assertEqual(wrapped.getSignatureString(), '()')
+
+    def test_getSignatureInfo(self):
+        wrapped = self._makeOne()
+        info = wrapped.getSignatureInfo()
+        self.assertEqual(info['positional'], ())
+        self.assertEqual(info['required'], ())
+        self.assertEqual(info['optional'], ())
+        self.assertEqual(info['varargs'], None)
+        self.assertEqual(info['kwargs'], None)
+
+    def test_get_miss(self):
+        from zope.interface import Interface
+        class IFoo(Interface):
+            getter = self._makeOne()
+        getter = IFoo['getter']
+        class Foo(object):
+            pass
+        self.assertRaises(AttributeError, getter.get, Foo())
+
+    def test_get_hit(self):
+        from zope.interface import Interface
+        class IFoo(Interface):
+            getter = self._makeOne()
+        getter = IFoo['getter']
+        class Foo(object):
+            def getter(self):
+                return '123'
+        self.assertEqual(getter.get(Foo()), '123')
+
+    def test_query_miss_implicit_default(self):
+        from zope.interface import Interface
+        class IFoo(Interface):
+            getter = self._makeOne()
+        getter = IFoo['getter']
+        class Foo(object):
+            pass
+        self.assertEqual(getter.query(Foo()), None)
+
+    def test_query_miss_explicit_default(self):
+        from zope.interface import Interface
+        class IFoo(Interface):
+            getter = self._makeOne()
+        getter = IFoo['getter']
+        class Foo(object):
+            pass
+        self.assertEqual(getter.query(Foo(), 234), 234)
+
+    def test_query_hit(self):
+        from zope.interface import Interface
+        class IFoo(Interface):
+            getter = self._makeOne()
+        getter = IFoo['getter']
+        class Foo(object):
+            def getter(self):
+                return '123'
+        self.assertEqual(getter.query(Foo()), '123')
+
+    def test_set_readonly(self):
+        from zope.interface import Interface
+        from zope.schema import Text
+        field = Text(readonly=True)
+        class IFoo(Interface):
+            getter = self._makeOne(field)
+        getter = IFoo['getter']
+        class Foo(object):
+            def getter(self):
+                return '123'
+        self.assertRaises(TypeError, getter.set, Foo(), '456')
+
+    def test_set_no_writer(self):
+        from zope.interface import Interface
+        class IFoo(Interface):
+            getter = self._makeOne()
+        getter = IFoo['getter']
+        class Foo(object):
+            def getter(self):
+                return '123'
+        self.assertRaises(AttributeError, getter.set, Foo(), '456')
+
+    def test_set_w_writer(self):
+        from zope.interface import Interface
+        class IFoo(Interface):
+            getter = self._makeOne()
+        getter = IFoo['getter']
+        _called_with = []
+        class Writer(object):
+            pass
+        writer = Writer()
+        writer.__name__ = 'setMe'
+        getter.writer = writer
+        class Foo(object):
+            def setMe(self, value):
+                _called_with.append(value)
+        getter.set(Foo(), '456')
+        self.assertEqual(_called_with, ['456'])
+
+    def test_bind(self):
+        from zope.interface import Interface
+        class IFoo(Interface):
+            getter = self._makeOne()
+        getter = IFoo['getter']
+        context = object()
+        bound = getter.bind(context)
+        self.assertEqual(bound.__name__, 'getter')
+        self.assertTrue(isinstance(bound.field, getter.field.__class__))
+        self.assertTrue(bound.field.context is context)
+
+
+class FieldWriteAccessorTests(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema.accessors import FieldWriteAccessor
+        return FieldWriteAccessor
+
+    def _makeOne(self, field=None):
+        from zope.schema import Text
+        if field is None:
+            field = Text(__name__='testing')
+        return self._getTargetClass()(field)
+
+    def test_ctor_not_created_inside_interface(self):
+        from zope.schema import Text
+        from zope.schema._compat import u
+        field = Text(title=u('Hmm'))
+        wrapped = self._makeOne(field)
+        self.assertTrue(wrapped.field is field)
+        self.assertEqual(wrapped.__name__, '') #__name__ set when in interface
+        self.assertEqual(wrapped.__doc__, 'set Hmm')
+
+    def test_ctor_created_inside_interface(self):
+        from zope.interface import Interface
+        from zope.schema import Text
+        from zope.schema._compat import u
+        field = Text(title=u('Hmm'))
+        class IFoo(Interface):
+            setter = self._makeOne(field)
+        setter = IFoo['setter']
+        self.assertEqual(setter.__name__, 'setter')
+        self.assertEqual(setter.__doc__, 'set Hmm')
+
+    def test_getSignatureString(self):
+        wrapped = self._makeOne()
+        self.assertEqual(wrapped.getSignatureString(), '(newvalue)')
+
+    def test_getSignatureInfo(self):
+        wrapped = self._makeOne()
+        info = wrapped.getSignatureInfo()
+        self.assertEqual(info['positional'], ('newvalue',))
+        self.assertEqual(info['required'], ('newvalue',))
+        self.assertEqual(info['optional'], ())
+        self.assertEqual(info['varargs'], None)
+        self.assertEqual(info['kwargs'], None)
+
+
+class Test_accessors(unittest.TestCase):
+
+    def _callFUT(self, *args, **kw):
         from zope.schema.accessors import accessors
+        return accessors(*args, **kw)
 
-        field = Text(title=u("Foo thing"))
-        class I(Interface):
+    def test_w_only_read_accessor(self):
+        from zope.interface import Interface
+        from zope.schema import Text
+        from zope.schema._compat import u
+        field = Text(title=u('Hmm'), readonly=True)
+        class IFoo(Interface):
+            getter, = self._callFUT(field)
+        getter = IFoo['getter']
+        self.assertEqual(getter.__name__, 'getter')
+        self.assertEqual(getter.__doc__, 'get Hmm')
+        self.assertEqual(getter.getSignatureString(), '()')
+        info = getter.getSignatureInfo()
+        self.assertEqual(info['positional'], ())
+        self.assertEqual(info['required'], ())
+        self.assertEqual(info['optional'], ())
+        self.assertEqual(info['varargs'], None)
+        self.assertEqual(info['kwargs'], None)
 
-            getFoo, setFoo = accessors(field)
-            def bar(): pass
-            x = Text()
-
-        d = asStructuredText(I)
-        self.assertEqual(d,
-                         "I\n"
-                         "\n"
-                         " Attributes:\n"
-                         "\n"
-                         "  x -- no documentation\n"
-                         "\n"
-                         " Methods:\n"
-                         "\n"
-                         "  bar() -- no documentation\n"
-                         "\n"
-                         "  getFoo() -- get Foo thing\n"
-                         "\n"
-                         "  setFoo(newvalue) -- set Foo thing\n"
-                         "\n"
-                         )
+    def test_w_read_and_write_accessors(self):
+        from zope.interface import Interface
+        from zope.schema import Text
+        from zope.schema._compat import u
+        field = Text(title=u('Hmm'))
+        class IFoo(Interface):
+            getter, setter = self._callFUT(field)
+        getter = IFoo['getter']
+        self.assertEqual(getter.__name__, 'getter')
+        self.assertEqual(getter.getSignatureString(), '()')
+        info = getter.getSignatureInfo()
+        self.assertEqual(info['positional'], ())
+        self.assertEqual(info['required'], ())
+        self.assertEqual(info['optional'], ())
+        self.assertEqual(info['varargs'], None)
+        self.assertEqual(info['kwargs'], None)
+        setter = IFoo['setter']
+        self.assertEqual(setter.__name__, 'setter')
+        self.assertEqual(setter.getSignatureString(), '(newvalue)')
+        info = setter.getSignatureInfo()
+        self.assertEqual(info['positional'], ('newvalue',))
+        self.assertEqual(info['required'], ('newvalue',))
+        self.assertEqual(info['optional'], ())
+        self.assertEqual(info['varargs'], None)
+        self.assertEqual(info['kwargs'], None)
 
 
 def test_suite():
     return unittest.TestSuite((
-        unittest.makeSuite(Test),
+        unittest.makeSuite(FieldReadAccessorTests),
+        unittest.makeSuite(FieldWriteAccessorTests),
+        unittest.makeSuite(Test_accessors),
     ))
-
-
-if __name__ == '__main__':
-    unittest.main()
