@@ -292,9 +292,9 @@ class IText(IMinMaxLen, IIterable, IField):
     """Field containing a unicode string."""
 
 # for things which are of the str type on both Python 2 and 3
-if PY3:
+if PY3: #pragma NO COVER
     _IStr = IText
-else:
+else: #pragma NO COVER
     _IStr = IBytes
 
 class IASCII(_IStr):
@@ -316,9 +316,9 @@ class ISourceText(IText):
 class ITextLine(IText):
     """Field containing a unicode string without newlines."""
 
-if PY3:
+if PY3: #pragma NO COVER
     _IStrLine = ITextLine
-else:
+else: #pragma NO COVER
     _IStrLine = IBytesLine
 
 class IPassword(ITextLine):
