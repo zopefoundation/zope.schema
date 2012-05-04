@@ -2,6 +2,11 @@ import sys
 
 PY3 = sys.version_info[0] >= 3
 
+try:
+    from collections import OrderedDict
+except ImportError: #pragma NO COVER
+    from ordereddict import OrderedDict
+
 if PY3: #pragma NO COVER
     import builtins
     def b(s):
