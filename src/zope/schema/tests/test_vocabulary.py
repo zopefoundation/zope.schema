@@ -16,31 +16,40 @@
 import unittest
 
 
-class RegistryTests(unittest.TestCase):
-    """Tests of the simple vocabulary and presentation registries."""
+class SimpleTermTests(unittest.TestCase):
 
-    def setUp(self):
-        from zope.schema.vocabulary import _clear
-        _clear()
+    def _getTargetClass(self):
+        from zope.schema.vocabulary import SimpleTerm
+        return SimpleTerm
 
-    def tearDown(self):
-        from zope.schema.vocabulary import _clear
-        _clear()
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
 
-    def test_setVocabularyRegistry(self):
-        from zope.schema.vocabulary import setVocabularyRegistry
-        from zope.schema.vocabulary import getVocabularyRegistry
-        r = _makeDummyRegistry()
-        setVocabularyRegistry(r)
-        self.assertTrue(getVocabularyRegistry() is r)
+    def test_class_conforms_to_ITokenizedTerm(self):
+        from zope.interface.verify import verifyClass
+        from zope.schema.interfaces import ITokenizedTerm
+        verifyClass(ITokenizedTerm, self._getTargetClass())
 
-    def test_getVocabularyRegistry(self):
-        from zope.schema.interfaces import IVocabularyRegistry
-        from zope.schema.vocabulary import getVocabularyRegistry
-        r = getVocabularyRegistry()
-        self.assertTrue(IVocabularyRegistry.providedBy(r))
+    def test_instance_conforms_to_ITokenizedTerm(self):
+        from zope.interface.verify import verifyObject
+        from zope.schema.interfaces import ITokenizedTerm
+        verifyObject(ITokenizedTerm, self._makeOne('VALUE'))
 
-    # TODO: still need to test the default implementation
+    def test_ctor_defaults(self):
+        from zope.schema.interfaces import ITitledTokenizedTerm
+        term = self._makeOne('VALUE')
+        self.assertEqual(term.value, 'VALUE')
+        self.assertEqual(term.token, 'VALUE')
+        self.assertEqual(term.title, None)
+        self.assertFalse(ITitledTokenizedTerm.providedBy(term))
+
+    def test_ctor_explicit(self):
+        from zope.schema.interfaces import ITitledTokenizedTerm
+        term = self._makeOne('TERM', 'TOKEN', 'TITLE')
+        self.assertEqual(term.value, 'TERM')
+        self.assertEqual(term.token, 'TOKEN')
+        self.assertEqual(term.title, 'TITLE')
+        self.assertTrue(ITitledTokenizedTerm.providedBy(term))
 
 
 class SimpleVocabularyTests(unittest.TestCase):
@@ -49,83 +58,82 @@ class SimpleVocabularyTests(unittest.TestCase):
         from zope.schema.vocabulary import SimpleVocabulary
         return SimpleVocabulary
 
-    def list_vocab(self):
-        return self._getTargetClass().fromValues([1, 2, 3])
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
 
-    def items_vocab(self):
-        return self._getTargetClass().fromItems(
-            [('one', 1), ('two', 2), ('three', 3), ('fore!', 4)])
-
-    def test_simple_term(self):
-        from zope.interface.verify import verifyObject
-        from zope.schema.interfaces import ITokenizedTerm
-        from zope.schema.vocabulary import SimpleTerm
-        t = SimpleTerm(1)
-        verifyObject(ITokenizedTerm, t)
-        self.assertEqual(t.value, 1)
-        self.assertEqual(t.token, "1")
-        t = SimpleTerm(1, "One")
-        verifyObject(ITokenizedTerm, t)
-        self.assertEqual(t.value, 1)
-        self.assertEqual(t.token, "One")
-
-    def test_simple_term_title(self):
-        from zope.interface.verify import verifyObject
-        from zope.interface.exceptions import DoesNotImplement
-        from zope.schema.interfaces import ITokenizedTerm
-        from zope.schema.interfaces import ITitledTokenizedTerm
-        from zope.schema.vocabulary import SimpleTerm
-        t = SimpleTerm(1)
-        verifyObject(ITokenizedTerm, t)
-        self.assertRaises(DoesNotImplement, verifyObject,
-            ITitledTokenizedTerm, t)
-        self.assertTrue(t.title is None)
-        t = SimpleTerm(1, title="Title")
-        verifyObject(ITokenizedTerm, t)
-        verifyObject(ITitledTokenizedTerm, t)
-        self.assertEqual(t.title, "Title")
-
-    def test_order(self):
-        value = 1
-        for t in self.list_vocab():
-            self.assertEqual(t.value, value)
-            value += 1
-
-        value = 1
-        for t in self.items_vocab():
-            self.assertEqual(t.value, value)
-            value += 1
-
-    def test_implementation(self):
-        from zope.interface.verify import verifyObject
-        from zope.schema.interfaces import IVocabulary
+    def test_class_conforms_to_IVocabularyTokenized(self):
+        from zope.interface.verify import verifyClass
         from zope.schema.interfaces import IVocabularyTokenized
-        verifyObject(IVocabulary, self.list_vocab())
-        verifyObject(IVocabularyTokenized, self.list_vocab())
-        verifyObject(IVocabulary, self.items_vocab())
-        verifyObject(IVocabularyTokenized, self.items_vocab())
+        verifyClass(IVocabularyTokenized, self._getTargetClass())
 
-    def test_addt_interfaces(self):
+    def test_instance_conforms_to_IVocabularyTokenized(self):
+        from zope.interface.verify import verifyObject
+        from zope.schema.interfaces import IVocabularyTokenized
+        verifyObject(IVocabularyTokenized, self._makeOne(()))
+
+    def test_ctor_additional_interfaces(self):
         from zope.interface import Interface
+        from zope.schema.vocabulary import SimpleTerm
         class IStupid(Interface):
             pass
-        v = self._getTargetClass().fromValues([1, 2, 3], IStupid)
-        self.assertTrue(IStupid.providedBy(v))
+        VALUES = [1, 4, 2, 9]
+        vocabulary = self._makeOne([SimpleTerm(x) for x in VALUES], IStupid)
+        self.assertTrue(IStupid.providedBy(vocabulary))
+        self.assertEqual(len(vocabulary), len(VALUES))
+        for value, term in zip(VALUES, vocabulary):
+            self.assertEqual(term.value, value)
+        for value in VALUES:
+            self.assertTrue(value in vocabulary)
+        self.assertFalse('ABC' in vocabulary)
+        for term in vocabulary:
+            self.assertTrue(vocabulary.getTerm(term.value) is term)
+            self.assertTrue(vocabulary.getTermByToken(term.token) is term)
 
-    def test_len(self):
-        self.assertEqual(len(self.list_vocab()), 3)
-        self.assertEqual(len(self.items_vocab()), 4)
+    def test_fromValues(self):
+        from zope.interface import Interface
+        from zope.schema.interfaces import ITokenizedTerm
+        class IStupid(Interface):
+            pass
+        VALUES = [1, 4, 2, 9]
+        vocabulary = self._getTargetClass().fromValues(VALUES)
+        self.assertEqual(len(vocabulary), len(VALUES))
+        for value, term in zip(VALUES, vocabulary):
+            self.assertTrue(ITokenizedTerm.providedBy(term))
+            self.assertEqual(term.value, value)
+        for value in VALUES:
+            self.assertTrue(value in vocabulary)
 
-    def test_contains(self):
-        for v in (self.list_vocab(), self.items_vocab()):
-            self.assertTrue(1 in v and 2 in v and 3 in v)
-            self.assertTrue(5 not in v)
+    def test_fromItems(self):
+        from zope.interface import Interface
+        from zope.schema.interfaces import ITokenizedTerm
+        class IStupid(Interface):
+            pass
+        ITEMS = [('one', 1), ('two', 2), ('three', 3), ('fore!', 4)]
+        vocabulary = self._getTargetClass().fromItems(ITEMS)
+        self.assertEqual(len(vocabulary), len(ITEMS))
+        for item, term in zip(ITEMS, vocabulary):
+            self.assertTrue(ITokenizedTerm.providedBy(term))
+            self.assertEqual(term.token, item[0])
+            self.assertEqual(term.value, item[1])
+        for item in ITEMS:
+            self.assertTrue(item[1] in vocabulary)
 
-    def test_iter_and_get_term(self):
-        for v in (self.list_vocab(), self.items_vocab()):
-            for term in v:
-                self.assertTrue(v.getTerm(term.value) is term)
-                self.assertTrue(v.getTermByToken(term.token) is term)
+    def test_createTerm(self):
+        from zope.schema.vocabulary import SimpleTerm
+        VALUES = [1, 4, 2, 9]
+        for value in VALUES:
+            term = self._getTargetClass().createTerm(value)
+            self.assertTrue(isinstance(term, SimpleTerm))
+            self.assertEqual(term.value, value)
+            self.assertEqual(term.token, str(value))
+
+    def test_getTerm_miss(self):
+        vocabulary = self._makeOne(())
+        self.assertRaises(LookupError, vocabulary.getTerm, 'nonesuch')
+
+    def test_getTermByToken_miss(self):
+        vocabulary = self._makeOne(())
+        self.assertRaises(LookupError, vocabulary.getTermByToken, 'nonesuch')
 
     def test_nonunique_tokens(self):
         klass = self._getTargetClass()
@@ -162,6 +170,9 @@ class SimpleVocabularyTests(unittest.TestCase):
         vocab = MyVocabulary.fromValues([1, 2, 3])
         for term in vocab:
             self.assertEqual(term.value + 1, term.nextvalue)
+
+
+# Test _createTermTree via TreeVocabulary.fromDict
 
 
 class TreeVocabularyTests(unittest.TestCase):
@@ -223,7 +234,7 @@ class TreeVocabularyTests(unittest.TestCase):
             self.assertTrue(verifyObject(IVocabularyTokenized, v))
             self.assertTrue(verifyObject(ITreeVocabulary, v))
 
-    def test_addt_interfaces(self):
+    def test_additional_interfaces(self):
         from zope.interface import Interface
         class IStupid(Interface):
             pass
@@ -235,10 +246,7 @@ class TreeVocabularyTests(unittest.TestCase):
         #internal tree representation.
         #
         #Check that they keys are indeed oredered.
-        try:
-            from collections import OrderedDict
-        except ImportError: #pragma NO COVER
-            from ordereddict import OrderedDict
+        from zope.schema._compat import OrderedDict
 
         d = {   (1, 'new_york', 'New York'): {
                     (2, 'ny_albany', 'Albany'): {},
@@ -374,6 +382,7 @@ class TreeVocabularyTests(unittest.TestCase):
 
         self.assertTrue('bav' not in tv2)
         self.assertTrue('foo' not in tv2)
+        self.assertTrue({} not in tv2) # not hashable
 
         tv3 = self.tree_vocab_3()
         self.assertTrue('database' in tv3 and 
@@ -382,6 +391,7 @@ class TreeVocabularyTests(unittest.TestCase):
 
         self.assertTrue('Services' not in tv3)
         self.assertTrue('Database' not in tv3)
+        self.assertTrue({} not in tv3) # not hashable
 
     def test_values_and_items(self):
         for v in (self.tree_vocab_2(), self.tree_vocab_3()):
@@ -497,6 +507,34 @@ class TreeVocabularyTests(unittest.TestCase):
         self.assertEqual(term_path, vocab_path)
         self.assertEqual(term_path, [])
 
+
+class RegistryTests(unittest.TestCase):
+    #Tests of the simple vocabulary and presentation registries.
+
+    def setUp(self):
+        from zope.schema.vocabulary import _clear
+        _clear()
+
+    def tearDown(self):
+        from zope.schema.vocabulary import _clear
+        _clear()
+
+    def test_setVocabularyRegistry(self):
+        from zope.schema.vocabulary import setVocabularyRegistry
+        from zope.schema.vocabulary import getVocabularyRegistry
+        r = _makeDummyRegistry()
+        setVocabularyRegistry(r)
+        self.assertTrue(getVocabularyRegistry() is r)
+
+    def test_getVocabularyRegistry(self):
+        from zope.schema.interfaces import IVocabularyRegistry
+        from zope.schema.vocabulary import getVocabularyRegistry
+        r = getVocabularyRegistry()
+        self.assertTrue(IVocabularyRegistry.providedBy(r))
+
+    # TODO: still need to test the default implementation
+
+
 def _makeSampleVocabulary():
     from zope.interface import implementer
     from zope.schema.interfaces import IVocabulary
@@ -526,6 +564,7 @@ def _makeSampleVocabulary():
 
     return SampleVocabulary()
 
+
 def _makeDummyRegistry():
     from zope.schema.vocabulary import VocabularyRegistry
 
@@ -540,7 +579,8 @@ def _makeDummyRegistry():
 
 def test_suite():
     return unittest.TestSuite((
-        unittest.makeSuite(RegistryTests),
+        unittest.makeSuite(SimpleTermTests),
         unittest.makeSuite(SimpleVocabularyTests),
         unittest.makeSuite(TreeVocabularyTests),
+        unittest.makeSuite(RegistryTests),
     ))
