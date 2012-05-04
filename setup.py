@@ -65,33 +65,26 @@ REQUIRES = [
         'setuptools',
         'zope.interface >= 3.6.0',
         'zope.event',
-        'six',
         ]
 
 if sys.version_info < (2, 7):
     REQUIRES += ['ordereddict']
 
+TESTS_REQUIRE = ['zope.testing']
+
 setup(name='zope.schema',
-      version='4.1.2.dev0',
+      version='4.2.0.dev',
       url='http://pypi.python.org/pypi/zope.schema',
       license='ZPL 2.1',
       description='zope.interface extension for defining data schemas',
       author='Zope Foundation and Contributors',
       author_email='zope-dev@zope.org',
-      long_description=(read('src', 'zope', 'schema', 'README.txt')
-                        + '\n\n' +
-                        read('src', 'zope', 'schema', 'fields.txt')
-                        + '\n\n' +
-                        read('src', 'zope', 'schema', 'sources.txt')
-                        + '\n\n' +
-                        read('src', 'zope', 'schema', 'validation.txt')
-                        + '\n\n' +
-                        read('CHANGES.txt')),
+      long_description=(read('README.txt') + '\n\n' + read('CHANGES.txt')),
       packages=find_packages('src'),
       package_dir = {'': 'src'},
       namespace_packages=['zope',],
-      extras_require={'test': ['zope.testing'],
-                      'docs': ['z3c.recipe.sphinxdoc']},
+      #extras_require={
+      #                'docs': ['z3c.recipe.sphinxdoc']},
       install_requires=REQUIRES,
       classifiers=[
         "Development Status :: 5 - Production/Stable",
@@ -103,10 +96,17 @@ setup(name='zope.schema',
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.1",
         "Programming Language :: Python :: 3.2",
+        "Programming Language :: Python :: Implementation :: CPython",
+        "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Software Development :: Libraries :: Python Modules",
       ],
       include_package_data = True,
       zip_safe = False,
       test_suite='__main__.alltests',
-      tests_require='zope.testing',
-      )
+      tests_require=TESTS_REQUIRE,
+      extras_require={
+        'docs': ['Sphinx'],
+        'test': TESTS_REQUIRE,
+        'testing': TESTS_REQUIRE + ['nose', 'coverage'],
+      },
+)

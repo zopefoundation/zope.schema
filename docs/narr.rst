@@ -33,74 +33,91 @@ Let's have a look at a simple example. First we write an interface as usual,
 but instead of describing the attributes of the interface with ``Attribute``
 instances, we now use schema fields:
 
-  >>> import zope.interface
-  >>> import zope.schema
-  >>> from six import u, b
+.. doctest::
 
-  >>> class IBookmark(zope.interface.Interface):
-  ...     title = zope.schema.TextLine(
-  ...         title=u('Title'),
-  ...         description=u('The title of the bookmark'),
-  ...         required=True)
-  ...
-  ...     url = zope.schema.URI(
-  ...         title=u('Bookmark URL'),
-  ...         description=u('URL of the Bookmark'),
-  ...         required=True)
-  ...
+   >>> import zope.interface
+   >>> import zope.schema
+   >>> from zope.schema._compat import u, b
+
+   >>> class IBookmark(zope.interface.Interface):
+   ...     title = zope.schema.TextLine(
+   ...         title=u('Title'),
+   ...         description=u('The title of the bookmark'),
+   ...         required=True)
+   ...
+   ...     url = zope.schema.URI(
+   ...         title=u('Bookmark URL'),
+   ...         description=u('URL of the Bookmark'),
+   ...         required=True)
+   ...
 
 Now we create a class that implements this interface and create an instance of
 it:
 
-  >>> @zope.interface.implementer(IBookmark)
-  ... class Bookmark(object):
-  ...
-  ...     title = None
-  ...     url = None
+.. doctest::
 
-  >>> bm = Bookmark()
+   >>> @zope.interface.implementer(IBookmark)
+   ... class Bookmark(object):
+   ...
+   ...     title = None
+   ...     url = None
+
+   >>> bm = Bookmark()
 
 We would now like to only add validated values to the class. This can be done
 by first validating and then setting the value on the object. The first step
 is to define some data:
 
-  >>> title = u('Zope 3 Website')
-  >>> url = b('http://dev.zope.org/Zope3')
+.. doctest::
+
+   >>> title = u('Zope 3 Website')
+   >>> url = b('http://dev.zope.org/Zope3')
 
 Now we, get the fields from the interface:
 
-  >>> title_field = IBookmark.get('title')
-  >>> url_field = IBookmark.get('url')
+.. doctest::
+
+   >>> title_field = IBookmark.get('title')
+   >>> url_field = IBookmark.get('url')
 
 Next we have to bind these fields to the context, so that instance-specific
 information can be used for validation:
 
-  >>> title_bound = title_field.bind(bm)
-  >>> url_bound = url_field.bind(bm)
+.. doctest::
+
+   >>> title_bound = title_field.bind(bm)
+   >>> url_bound = url_field.bind(bm)
 
 Now that the fields are bound, we can finally validate the data:
 
-  >>> title_bound.validate(title)
-  >>> url_bound.validate(url)
+.. doctest::
+
+   >>> title_bound.validate(title)
+   >>> url_bound.validate(url)
 
 If the validation is successful, ``None`` is returned. If a validation error
 occurs a ``ValidationError`` will be raised; for example:
 
-  >>> url_bound.validate(u('http://zope.org/foo'))
-  Traceback (most recent call last):
-  ...
-  WrongType: (u'http://zope.org/foo', <type 'str'>, 'url')
+.. doctest::
 
-  >>> url_bound.validate(b('foo.bar'))
-  Traceback (most recent call last):
-  ...
-  InvalidURI: foo.bar
+   >>> from zope.schema._compat import non_native_string
+   >>> url_bound.validate(non_native_string('http://zope.org/foo'))
+   Traceback (most recent call last):
+   ...
+   WrongType: ...
+
+   >>> url_bound.validate('foo.bar'))
+   Traceback (most recent call last):
+   ...
+   InvalidURI: foo.bar
 
 Now that the data has been successfully validated, we can set it on the
 object:
 
-  >>> title_bound.set(bm, title)
-  >>> url_bound.set(bm, url)
+.. doctest::
+
+   >>> title_bound.set(bm, title)
+   >>> url_bound.set(bm, url)
 
 That's it. You still might think this is a lot of work to validate and set a
 value for an object. Note, however, that it is very easy to write helper
@@ -124,22 +141,24 @@ A schema starts out like an interface but defines certain fields to
 which an object's attributes must conform.  Let's look at a stripped
 down example from the programmer's tutorial:
 
-    >>> import re
+.. doctest::
 
-    >>> class IContact(zope.interface.Interface):
-    ...     """Provides access to basic contact information."""
-    ...
-    ...     first = zope.schema.TextLine(title=u("First name"))
-    ...
-    ...     last = zope.schema.TextLine(title=u("Last name"))
-    ...
-    ...     email = zope.schema.TextLine(title=u("Electronic mail address"))
-    ...
-    ...     address = zope.schema.Text(title=u("Postal address"))
-    ...
-    ...     postalCode = zope.schema.TextLine(
-    ...         title=u("Postal code"),
-    ...         constraint=re.compile("\d{5,5}(-\d{4,4})?$").match)
+   >>> import re
+
+   >>> class IContact(zope.interface.Interface):
+   ...     """Provides access to basic contact information."""
+   ...
+   ...     first = zope.schema.TextLine(title=u("First name"))
+   ...
+   ...     last = zope.schema.TextLine(title=u("Last name"))
+   ...
+   ...     email = zope.schema.TextLine(title=u("Electronic mail address"))
+   ...
+   ...     address = zope.schema.Text(title=u("Postal address"))
+   ...
+   ...     postalCode = zope.schema.TextLine(
+   ...         title=u("Postal code"),
+   ...         constraint=re.compile("\d{5,5}(-\d{4,4})?$").match)
 
 ``TextLine`` is a field and expresses that an attribute is a single line
 of Unicode text.  ``Text`` expresses an arbitrary Unicode ("text")
@@ -149,25 +168,29 @@ values that are US postal codes.
 
 Now we want a class that adheres to the ``IContact`` schema:
 
-    >>> class Contact(object):
-    ...     zope.interface.implements(IContact)
-    ...
-    ...     def __init__(self, first, last, email, address, pc):
-    ...         self.first = first
-    ...         self.last = last
-    ...         self.email = email
-    ...         self.address = address
-    ...         self.postalCode = pc
+.. doctest::
+
+   >>> class Contact(object):
+   ...     zope.interface.implements(IContact)
+   ...
+   ...     def __init__(self, first, last, email, address, pc):
+   ...         self.first = first
+   ...         self.last = last
+   ...         self.email = email
+   ...         self.address = address
+   ...         self.postalCode = pc
 
 Now you can see if an instance of ``Contact`` actually implements the
 schema:
 
-    >>> someone = Contact(u('Tim'), u('Roberts'), u('tim@roberts'), u(''),
-    ...                   u('12032-3492'))
+.. doctest::
 
-    >>> for field in zope.schema.getFields(IContact).values():
-    ...     bound = field.bind(someone)
-    ...     bound.validate(bound.get(someone))
+   >>> someone = Contact(u('Tim'), u('Roberts'), u('tim@roberts'), u(''),
+   ...                   u('12032-3492'))
+
+   >>> for field in zope.schema.getFields(IContact).values():
+   ...     bound = field.bind(someone)
+   ...     bound.validate(bound.get(someone))
 
 
 Data Modeling Concepts

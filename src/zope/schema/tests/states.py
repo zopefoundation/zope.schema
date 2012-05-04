@@ -13,7 +13,7 @@
 ##############################################################################
 """Sample vocabulary supporting state abbreviations.
 """
-from six import u
+from zope.schema._compat import u
 from zope.interface import implementer
 from zope.schema import interfaces
 from zope.schema import Choice

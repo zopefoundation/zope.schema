@@ -13,59 +13,56 @@
 ##############################################################################
 """Schema field tests
 """
-from unittest import TestCase, main, makeSuite
-from six import u, b
-from zope.interface import Interface
-from zope.schema import Bytes
-from zope.schema import getFields, getFieldsInOrder
-from zope.schema import getFieldNames, getFieldNamesInOrder
+import unittest
 
-class ISchemaTest(Interface):
-    title = Bytes(
-        title=u("Title"),
-        description=u("Title"),
-        default=b(""),
-        required=True)
+def _makeSchema():
+    from zope.schema._compat import b
+    from zope.schema._compat import u
+    from zope.interface import Interface
+    from zope.schema import Bytes
 
-    description = Bytes(
-        title=u("Description"),
-        description=u("Description"),
-        default=b(""),
-        required=True)
+    class ISchemaTest(Interface):
+        title = Bytes(
+            title=u("Title"),
+            description=u("Title"),
+            default=b(""),
+            required=True)
+        description = Bytes(
+            title=u("Description"),
+            description=u("Description"),
+            default=b(""),
+            required=True)
+        spam = Bytes(
+            title=u("Spam"),
+            description=u("Spam"),
+            default=b(""),
+            required=True)
+    return ISchemaTest
 
-    spam = Bytes(
-        title=u("Spam"),
-        description=u("Spam"),
-        default=b(""),
-        required=True)
+def _makeDerivedSchema(base=None):
+    from zope.schema._compat import b
+    from zope.schema._compat import u
+    from zope.schema import Bytes
+    if base is None:
+        base = _makeSchema()
 
-class ISchemaTestSubclass(ISchemaTest):
-    foo = Bytes(
-        title=u('Foo'),
-        description=u('Fooness'),
-        default=b(""),
-        required=False)
+    class ISchemaTestSubclass(base):
+        foo = Bytes(
+            title=u('Foo'),
+            description=u('Fooness'),
+            default=b(""),
+            required=False)
+    return ISchemaTestSubclass
 
 
-class SchemaTest(TestCase):
+class Test_getFields(unittest.TestCase):
 
-    def test_getFieldNames(self):
-        names = getFieldNames(ISchemaTest)
-        self.assertEqual(len(names),3)
-        self.assertTrue('title' in names)
-        self.assertTrue('description' in names)
-        self.assertTrue('spam' in names)
+    def _callFUT(self, schema):
+        from zope.schema import getFields
+        return getFields(schema)
 
-    def test_getFieldNamesAll(self):
-        names = getFieldNames(ISchemaTestSubclass)
-        self.assertEqual(len(names),4)
-        self.assertTrue('title' in names)
-        self.assertTrue('description' in names)
-        self.assertTrue('spam' in names)
-        self.assertTrue('foo' in names)
-
-    def test_getFields(self):
-        fields = getFields(ISchemaTest)
+    def test_simple(self):
+        fields = self._callFUT(_makeSchema())
 
         self.assertTrue('title' in fields)
         self.assertTrue('description' in fields)
@@ -75,8 +72,8 @@ class SchemaTest(TestCase):
         for key, value in fields.items():
             self.assertEqual(key, value.getName())
 
-    def test_getFieldsAll(self):
-        fields = getFields(ISchemaTestSubclass)
+    def test_derived(self):
+        fields = self._callFUT(_makeDerivedSchema())
 
         self.assertTrue('title' in fields)
         self.assertTrue('description' in fields)
@@ -87,30 +84,173 @@ class SchemaTest(TestCase):
         for key, value in fields.items():
             self.assertEqual(key, value.getName())
 
-    def test_getFieldsInOrder(self):
-        fields = getFieldsInOrder(ISchemaTest)
+
+class Test_getFieldsInOrder(unittest.TestCase):
+
+    def _callFUT(self, schema):
+        from zope.schema import getFieldsInOrder
+        return getFieldsInOrder(schema)
+
+    def test_simple(self):
+        fields = self._callFUT(_makeSchema())
         field_names = [name for name, field in fields]
         self.assertEqual(field_names, ['title', 'description', 'spam'])
         for key, value in fields:
             self.assertEqual(key, value.getName())
 
-    def test_getFieldsInOrderAll(self):
-        fields = getFieldsInOrder(ISchemaTestSubclass)
+    def test_derived(self):
+        fields = self._callFUT(_makeDerivedSchema())
         field_names = [name for name, field in fields]
         self.assertEqual(field_names, ['title', 'description', 'spam', 'foo'])
         for key, value in fields:
             self.assertEqual(key, value.getName())
 
-    def test_getFieldsNamesInOrder(self):
-        names = getFieldNamesInOrder(ISchemaTest)
+
+class Test_getFieldNames(unittest.TestCase):
+
+    def _callFUT(self, schema):
+        from zope.schema import getFieldNames
+        return getFieldNames(schema)
+
+    def test_simple(self):
+        names = self._callFUT(_makeSchema())
+        self.assertEqual(len(names),3)
+        self.assertTrue('title' in names)
+        self.assertTrue('description' in names)
+        self.assertTrue('spam' in names)
+
+    def test_derived(self):
+        names = self._callFUT(_makeDerivedSchema())
+        self.assertEqual(len(names),4)
+        self.assertTrue('title' in names)
+        self.assertTrue('description' in names)
+        self.assertTrue('spam' in names)
+        self.assertTrue('foo' in names)
+
+
+class Test_getFieldNamesInOrder(unittest.TestCase):
+
+    def _callFUT(self, schema):
+        from zope.schema import getFieldNamesInOrder
+        return getFieldNamesInOrder(schema)
+
+    def test_simple(self):
+        names = self._callFUT(_makeSchema())
         self.assertEqual(names, ['title', 'description', 'spam'])
 
-    def test_getFieldsNamesInOrderAll(self):
-        names = getFieldNamesInOrder(ISchemaTestSubclass)
+    def test_derived(self):
+        names = self._callFUT(_makeDerivedSchema())
         self.assertEqual(names, ['title', 'description', 'spam', 'foo'])
 
-def test_suite():
-    return makeSuite(SchemaTest)
 
-if __name__ == '__main__':
-    main(defaultTest='test_suite')
+class Test_getValidationErrors(unittest.TestCase):
+
+    def _callFUT(self, schema, object):
+        from zope.schema import getValidationErrors
+        return getValidationErrors(schema, object)
+
+    def test_schema(self):
+        from zope.interface import Interface
+        class IEmpty(Interface):
+            pass
+        errors = self._callFUT(IEmpty, object())
+        self.assertEqual(len(errors), 0)
+
+    def test_schema_with_field_errors(self):
+        from zope.interface import Interface
+        from zope.schema import Text
+        from zope.schema.interfaces import SchemaNotFullyImplemented
+        class IWithRequired(Interface):
+            must = Text(required=True)
+        errors = self._callFUT(IWithRequired, object())
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0][0], 'must')
+        self.assertEqual(errors[0][1].__class__, SchemaNotFullyImplemented)
+
+    def test_schema_with_invariant_errors(self):
+        from zope.interface import Interface
+        from zope.interface import invariant
+        from zope.interface.exceptions import Invalid
+        class IWithFailingInvariant(Interface):
+            @invariant
+            def _epic_fail(obj):
+                raise Invalid('testing')
+        errors = self._callFUT(IWithFailingInvariant, object())
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0][0], None)
+        self.assertEqual(errors[0][1].__class__, Invalid)
+
+    def test_schema_with_invariant_ok(self):
+        from zope.interface import Interface
+        from zope.interface import invariant
+        class IWithPassingInvariant(Interface):
+            @invariant
+            def _hall_pass(obj):
+                pass
+        errors = self._callFUT(IWithPassingInvariant, object())
+        self.assertEqual(len(errors), 0)
+
+
+class Test_getSchemaValidationErrors(unittest.TestCase):
+
+    def _callFUT(self, schema, object):
+        from zope.schema import getSchemaValidationErrors
+        return getSchemaValidationErrors(schema, object)
+
+    def test_schema_wo_fields(self):
+        from zope.interface import Interface
+        from zope.interface import Attribute
+        class INoFields(Interface):
+            def method():
+                pass
+            attr = Attribute('ignoreme')
+        errors = self._callFUT(INoFields, object())
+        self.assertEqual(len(errors), 0)
+
+    def test_schema_with_fields_ok(self):
+        from zope.interface import Interface
+        from zope.schema import Text
+        from zope.schema._compat import u
+        class IWithFields(Interface):
+            foo = Text()
+            bar = Text()
+        class Obj(object):
+            foo = u('Foo')
+            bar = u('Bar')
+        errors = self._callFUT(IWithFields, Obj())
+        self.assertEqual(len(errors), 0)
+
+    def test_schema_with_missing_field(self):
+        from zope.interface import Interface
+        from zope.schema import Text
+        from zope.schema.interfaces import SchemaNotFullyImplemented
+        class IWithRequired(Interface):
+            must = Text(required=True)
+        errors = self._callFUT(IWithRequired, object())
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0][0], 'must')
+        self.assertEqual(errors[0][1].__class__, SchemaNotFullyImplemented)
+
+    def test_schema_with_invalid_field(self):
+        from zope.interface import Interface
+        from zope.schema import Int
+        from zope.schema.interfaces import TooSmall
+        class IWithMinium(Interface):
+            value = Int(required=True, min=0)
+        class Obj(object):
+            value = -1
+        errors = self._callFUT(IWithMinium, Obj())
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0][0], 'value')
+        self.assertEqual(errors[0][1].__class__, TooSmall)
+
+
+def test_suite():
+    return unittest.TestSuite((
+        unittest.makeSuite(Test_getFields),
+        unittest.makeSuite(Test_getFieldsInOrder),
+        unittest.makeSuite(Test_getFieldNames),
+        unittest.makeSuite(Test_getFieldNamesInOrder),
+        unittest.makeSuite(Test_getValidationErrors),
+        unittest.makeSuite(Test_getSchemaValidationErrors),
+    ))

@@ -13,22 +13,26 @@
 ##############################################################################
 """Field equality tests
 """
-from unittest import TestCase, TestSuite, makeSuite
+import unittest
 
-from six import u
-from zope.schema import Text, Int
 
-class FieldEqualityTests(TestCase):
-
-    equality = [
-        'Text(title=u("Foo"), description=u("Bar"))',
-        'Int(title=u("Foo"), description=u("Bar"))',
-        ]
+class FieldEqualityTests(unittest.TestCase):
 
     def test_equality(self):
-        for text in self.equality:
+
+        from zope.schema._compat import u
+        from zope.schema import Int
+        from zope.schema import Text
+
+        equality = [
+            'Text(title=u("Foo"), description=u("Bar"))',
+            'Int(title=u("Foo"), description=u("Bar"))',
+        ]
+        for text in equality:
             self.assertEqual(eval(text), eval(text))
 
+
 def test_suite():
-    return TestSuite(
-        [makeSuite(FieldEqualityTests)])
+    return unittest.TestSuite((
+        unittest.makeSuite(FieldEqualityTests),
+        ))

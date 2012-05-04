@@ -42,7 +42,7 @@ class ValidationError(zope.interface.Invalid):
 
     __hash__ = zope.interface.Invalid.__hash__ # python3
 
-    def __repr__(self):
+    def __repr__(self): #pragma NO COVER
         return '%s(%s)' % (self.__class__.__name__,
             ', '.join(repr(arg) for arg in self.args))
 

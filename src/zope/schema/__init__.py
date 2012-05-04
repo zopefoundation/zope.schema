@@ -13,19 +13,52 @@
 ##############################################################################
 """Schema package constructor
 """
-from zope.schema._field import Field, Container, Iterable, Orderable
-from zope.schema._field import MinMaxLen, Choice
-from zope.schema._field import Bytes, ASCII, BytesLine, ASCIILine
-from zope.schema._field import Text, TextLine, Bool, Int, Float, Decimal
-from zope.schema._field import Tuple, List, Set, FrozenSet
-from zope.schema._field import Password, Dict, Datetime, Date, Timedelta
-from zope.schema._field import Time, SourceText
-from zope.schema._field import Object, URI, Id, DottedName
+# Field APIs
+from zope.schema._field import ASCII
+from zope.schema._field import ASCIILine
+from zope.schema._field import Bool
+from zope.schema._field import Bytes
+from zope.schema._field import BytesLine
+from zope.schema._field import Choice
+from zope.schema._field import Container
+from zope.schema._field import Date
+from zope.schema._field import Datetime
+from zope.schema._field import Decimal
+from zope.schema._field import Dict
+from zope.schema._field import DottedName
+from zope.schema._field import Field
+from zope.schema._field import Float
+from zope.schema._field import FrozenSet
+from zope.schema._field import Id
+from zope.schema._field import Int
 from zope.schema._field import InterfaceField
-from zope.schema._schema import (
-    getFields, getFieldsInOrder, getFieldNames, getFieldNamesInOrder,
-    getValidationErrors, getSchemaValidationErrors)
-from zope.schema.accessors import accessors
-from zope.schema.interfaces import ValidationError
+from zope.schema._field import Iterable
+from zope.schema._field import List
+from zope.schema._field import MinMaxLen
+from zope.schema._field import NativeString
+from zope.schema._field import NativeStringLine
+from zope.schema._field import Object
+from zope.schema._field import Orderable
+from zope.schema._field import Password
+from zope.schema._field import Set
+from zope.schema._field import SourceText
+from zope.schema._field import Text
+from zope.schema._field import TextLine
+from zope.schema._field import Time
+from zope.schema._field import Timedelta
+from zope.schema._field import Tuple
+from zope.schema._field import URI
 
-__all__ = tuple(name for name in globals() if not name.startswith('_'))
+# Schema APIs
+from zope.schema._schema import  getFields
+from zope.schema._schema import  getFieldsInOrder
+from zope.schema._schema import  getFieldNames
+from zope.schema._schema import  getFieldNamesInOrder
+from zope.schema._schema import  getValidationErrors
+from zope.schema._schema import  getSchemaValidationErrors
+
+# Acessor API
+from zope.schema.accessors import accessors
+
+# Error API
+from zope.schema.interfaces import ValidationError

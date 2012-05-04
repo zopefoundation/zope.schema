@@ -17,9 +17,7 @@ __docformat__ = "reStructuredText"
 
 from zope.interface import Interface, Attribute
 from zope.interface.common.mapping import IEnumerableMapping
-from six import u, PY3
 
-from zope.schema._messageid import _
 
 # Import from _bootstrapinterfaces only because other packages will expect
 # to find these interfaces here.
@@ -44,6 +42,10 @@ from zope.schema._bootstrapinterfaces import TooLong
 from zope.schema._bootstrapinterfaces import TooShort
 from zope.schema._bootstrapinterfaces import InvalidValue
 from zope.schema._bootstrapinterfaces import IContextAwareDefaultFactory
+
+from zope.schema._compat import PY3
+from zope.schema._compat import u
+from zope.schema._messageid import _
 
 
 class WrongContainedType(ValidationError):
@@ -290,12 +292,12 @@ class IText(IMinMaxLen, IIterable, IField):
     """Field containing a unicode string."""
 
 # for things which are of the str type on both Python 2 and 3
-if PY3:
-    _IStr = IText
-else:
-    _IStr = IBytes
+if PY3: #pragma NO COVER
+    INativeString = IText
+else: #pragma NO COVER
+    INativeString = IBytes
 
-class IASCII(_IStr):
+class IASCII(INativeString):
     """Field containing a 7-bit ASCII string. No characters > DEL
     (chr(127)) are allowed
 
@@ -314,10 +316,10 @@ class ISourceText(IText):
 class ITextLine(IText):
     """Field containing a unicode string without newlines."""
 
-if PY3:
-    _IStrLine = ITextLine
-else:
-    _IStrLine = IBytesLine
+if PY3: #pragma NO COVER
+    INativeStringLine = ITextLine
+else: #pragma NO COVER
+    INativeStringLine = IBytesLine
 
 class IPassword(ITextLine):
     "Field containing a unicode string without newlines that is a password."
@@ -373,18 +375,18 @@ def _fields(values):
     return True
 
 
-class IURI(IBytesLine):
+class IURI(INativeStringLine):
     """A field containing an absolute URI
     """
 
-class IId(_IStrLine):
+class IId(INativeStringLine):
     """A field containing a unique identifier
 
     A unique identifier is either an absolute URI or a dotted name.
     If it's a dotted name, it should have a module/package name as a prefix.
     """
 
-class IDottedName(_IStrLine):
+class IDottedName(INativeStringLine):
     """Dotted name field.
 
     Values of DottedName fields must be Python-style dotted names.

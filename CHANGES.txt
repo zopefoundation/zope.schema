@@ -2,10 +2,32 @@
 CHANGES
 =======
 
-4.1.2 (unreleased)
+4.2.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Introduce NativeString and NativeStringLine which are equal to Bytes and
+  BytesLine on Python 2 and Text and TextLine on Python 3.
+
+- Change IURI from a Bytes string to a "native" string. This is a backwards
+  incompatibility which only affects Python 3.
+
+- 100% unit test coverage.
+
+- Doctests moved from the package and wired up as normal Sphinx documentation.
+
+- Added explicit support for PyPy.
+
+- Added support for continuous integration using ``tox`` and ``jenkins``.
+
+- Dropped the external ``six`` dependency in favor of a much-trimmed
+  ``zope.schema._compat`` module.
+
+- Tests now pass when run under ``nose``.
+
+- Added ``setup.py dev`` alias (runs ``setup.py develop`` plus installs
+  ``nose`` and ``coverage``).
+
+- Added ``setup.py docs`` alias (installs ``Sphinx`` and dependencies).
 
 
 4.1.1 (2012-03-23)

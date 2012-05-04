@@ -13,17 +13,15 @@
 ##############################################################################
 """Vocabulary support for schema.
 """
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict
 
-from zope.interface.declarations import directlyProvides, implementer
-from zope.schema.interfaces import ValidationError
-from zope.schema.interfaces import IVocabularyRegistry
-from zope.schema.interfaces import IVocabulary, IVocabularyTokenized
+from zope.interface import directlyProvides
+from zope.interface import implementer
+from zope.schema.interfaces import ITitledTokenizedTerm
+from zope.schema.interfaces import ITokenizedTerm
 from zope.schema.interfaces import ITreeVocabulary
-from zope.schema.interfaces import ITokenizedTerm, ITitledTokenizedTerm
+from zope.schema.interfaces import IVocabularyRegistry
+from zope.schema.interfaces import IVocabularyTokenized
+from zope.schema._compat import OrderedDict
 
 # simple vocabularies performing enumerated-like tasks
 _marker = object()
@@ -384,9 +382,9 @@ def _clear():
 
 try:
     from zope.testing.cleanup import addCleanUp
-except ImportError:
+except ImportError: #pragma NO COVER
     # don't have that part of Zope
     pass
-else:
+else: #pragma NO COVER
     addCleanUp(_clear)
     del addCleanUp

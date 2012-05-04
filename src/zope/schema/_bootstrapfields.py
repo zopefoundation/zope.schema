@@ -15,19 +15,26 @@
 """
 __docformat__ = 'restructuredtext'
 
-import sys
+from zope.interface import Attribute
+from zope.interface import providedBy
+from zope.interface import implementer
 
-from six import u, b, text_type, integer_types
-from zope.interface import Attribute, providedBy, implementer
-from zope.schema._bootstrapinterfaces import StopValidation
-from zope.schema._bootstrapinterfaces import IFromUnicode
-from zope.schema._bootstrapinterfaces import RequiredMissing, WrongType
 from zope.schema._bootstrapinterfaces import ConstraintNotSatisfied
-from zope.schema._bootstrapinterfaces import NotAContainer, NotAnIterator
-from zope.schema._bootstrapinterfaces import TooSmall, TooBig
-from zope.schema._bootstrapinterfaces import TooShort, TooLong
-from zope.schema._bootstrapinterfaces import InvalidValue
 from zope.schema._bootstrapinterfaces import IContextAwareDefaultFactory
+from zope.schema._bootstrapinterfaces import IFromUnicode
+from zope.schema._bootstrapinterfaces import NotAContainer
+from zope.schema._bootstrapinterfaces import NotAnIterator
+from zope.schema._bootstrapinterfaces import RequiredMissing
+from zope.schema._bootstrapinterfaces import StopValidation
+from zope.schema._bootstrapinterfaces import TooBig
+from zope.schema._bootstrapinterfaces import TooLong
+from zope.schema._bootstrapinterfaces import TooShort
+from zope.schema._bootstrapinterfaces import TooSmall
+from zope.schema._bootstrapinterfaces import WrongType
+from zope.schema._compat import u
+from zope.schema._compat import b # used in docstring doctests
+from zope.schema._compat import text_type
+from zope.schema._compat import integer_types
 
 from zope.schema._schema import getFields
 
@@ -232,6 +239,9 @@ class Container(Field):
                 raise NotAContainer(value)
 
 
+# XXX This class violates the Liskov Substituability Principle:  it
+#     is derived from Container, but cannot be used everywhere an instance
+#     of Container could be, because it's '_validate' is more restrictive.
 class Iterable(Container):
 
     def _validate(self, value):
@@ -371,25 +381,19 @@ class Password(TextLine):
 class Bool(Field):
     """A field representing a Bool."""
 
-    _type = type(True)
+    _type = bool
 
-    if _type is not type(1):
-        # Python 2.2.1 and newer 2.2.x releases, True and False are
-        # integers, and bool() returns either 1 or 0.  We need to
-        # support using integers here so we don't invalidate schema
-        # that were perfectly valid with older versions of Python.
+    def _validate(self, value):
+        # Convert integers to bools to they don't get mis-flagged
+        # by the type check later.
+        if isinstance(value, int):
+            value = bool(value)
+        Field._validate(self, value)
 
-        def _validate(self, value):
-            # Convert integers to bools to they don't get mis-flagged
-            # by the type check later.
-            if isinstance(value, int):
-                value = bool(value)
-            Field._validate(self, value)
-
-        def set(self, object, value):
-            if isinstance(value, int):
-                value = bool(value)
-            Field.set(self, object, value)
+    def set(self, object, value):
+        if isinstance(value, int):
+            value = bool(value)
+        Field.set(self, object, value)
 
     def fromUnicode(self, str):
         """

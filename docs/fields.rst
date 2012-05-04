@@ -24,15 +24,17 @@ because they contain other types, which may also be described and constrained.
 For instance, imagine a list that contains non-negative floats and enforces
 uniqueness. In a schema, this might be written as follows:
 
-  >>> from zope.interface import Interface
-  >>> from zope.schema import List, Float
-  >>> from six import u
-  >>> class IInventoryItem(Interface):
-  ...     pricePoints = List(
-  ...         title=u("Price Points"),
-  ...         unique=True,
-  ...         value_type=Float(title=u("Price"), min=0.0)
-  ...     )
+.. doctest::
+
+   >>> from zope.interface import Interface
+   >>> from zope.schema import List, Float
+   >>> from zope.schema._compat import u
+   >>> class IInventoryItem(Interface):
+   ...     pricePoints = List(
+   ...         title=u("Price Points"),
+   ...         unique=True,
+   ...         value_type=Float(title=u("Price"), min=0.0)
+   ...     )
 
 This indicates several things.
 
@@ -47,13 +49,15 @@ This indicates several things.
 This declaration creates a field that implements a number of interfaces, among
 them these:
 
-  >>> from zope.schema.interfaces import IList, ISequence, ICollection
-  >>> IList.providedBy(IInventoryItem['pricePoints'])
-  True
-  >>> ISequence.providedBy(IInventoryItem['pricePoints'])
-  True
-  >>> ICollection.providedBy(IInventoryItem['pricePoints'])
-  True
+.. doctest::
+
+   >>> from zope.schema.interfaces import IList, ISequence, ICollection
+   >>> IList.providedBy(IInventoryItem['pricePoints'])
+   True
+   >>> ISequence.providedBy(IInventoryItem['pricePoints'])
+   True
+   >>> ICollection.providedBy(IInventoryItem['pricePoints'])
+   True
 
 Creating a custom collection field
 ----------------------------------
@@ -74,17 +78,19 @@ choice field can be contextually calculated.
 
 Simple choices do not have to explicitly use vocabularies:
 
-  >>> from zope.schema import Choice
-  >>> f = Choice((640, 1028, 1600))
-  >>> f.validate(640)
-  >>> f.validate(960)
-  Traceback (most recent call last):
-  ...
-  ConstraintNotSatisfied: 960
-  >>> f.validate('bing')
-  Traceback (most recent call last):
-  ...
-  ConstraintNotSatisfied: bing
+.. doctest::
+
+   >>> from zope.schema import Choice
+   >>> f = Choice((640, 1028, 1600))
+   >>> f.validate(640)
+   >>> f.validate(960)
+   Traceback (most recent call last):
+   ...
+   ConstraintNotSatisfied: 960
+   >>> f.validate('bing')
+   Traceback (most recent call last):
+   ...
+   ConstraintNotSatisfied: bing
 
 More complex choices will want to use registered vocabularies.  Vocabularies
 have a simple interface, as defined in
@@ -107,11 +113,13 @@ tasks may be found in zope.schema.vocabulary.SimpleVocabulary.  Because
 registered vocabularies are simply callables passed a context, many
 registered vocabularies can simply be functions that rely on SimpleVocabulary:
 
-  >>> from zope.schema.vocabulary import SimpleVocabulary
-  >>> def myDynamicVocabulary(context):
-  ...     v = dynamic_context_calculation_that_returns_an_iterable(context)
-  ...     return SimpleVocabulary.fromValues(v)
-  ... 
+.. doctest::
+
+   >>> from zope.schema.vocabulary import SimpleVocabulary
+   >>> def myDynamicVocabulary(context):
+   ...     v = dynamic_context_calculation_that_returns_an_iterable(context)
+   ...     return SimpleVocabulary.fromValues(v)
+   ... 
 
 The vocabulary interface is simple enough that writing a custom vocabulary is
 not too difficult itself.
