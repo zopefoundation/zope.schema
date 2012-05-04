@@ -5,6 +5,8 @@ CHANGES
 4.2.0 (unreleased)
 ------------------
 
+- 100% unit test coverage.
+
 - Doctests moved from the package and wired up as normal Sphinx documentation.
 
 - Added explicit support for PyPy.
