@@ -17,45 +17,33 @@
 import unittest
 
 
-class Test(unittest.TestCase):
+class _Base(unittest.TestCase):
 
-    def _getSchema(self):
-        from zope.schema._compat import b
-        from zope.schema._compat import u
-        from zope.interface import Interface
-        from zope.schema import Bytes
-        from zope.schema import Float
+    def _makeOne(self, field=None, name=None):
         from zope.schema import Text
+        if field is None:
+            field = Text(__name__='testing')
+        if name is None:
+            return self._getTargetClass()(field)
+        return self._getTargetClass()(field, name)
 
-        class Schema(Interface):
-            title = Text(description=u("Short summary"),
-                         default=u('say something'))
-            weight = Float(min=0.0)
-            code = Bytes(min_length=6, max_length=6, default=b('xxxxxx'))
-            date = Float(title=u('Date'), readonly=True)
 
-        return Schema
+class _Integration(object):
 
-    def _getTargetClass(self):
-        from zope.schema.fieldproperty import FieldProperty
-        schema = self._getSchema()
-
-        class Klass(object):
-            title = FieldProperty(schema['title'])
-            weight = FieldProperty(schema['weight'])
-            code = FieldProperty(schema['code'])
-            date = FieldProperty(schema['date'])
-
-        return Klass
-
-    def _makeOne(self):
-        return self._getTargetClass()()
+    def _makeImplementer(self):
+        schema = _getSchema()
+        class _Implementer(object):
+            title = self._makeOne(schema['title'])
+            weight = self._makeOne(schema['weight'])
+            code = self._makeOne(schema['code'])
+            date = self._makeOne(schema['date'])
+        return _Implementer()
 
     def test_basic(self):
         from zope.schema._compat import b
         from zope.schema._compat import u
         from zope.schema.interfaces import ValidationError
-        c = self._makeOne()
+        c = self._makeImplementer()
         self.assertEqual(c.title, u('say something'))
         self.assertEqual(c.weight, None)
         self.assertEqual(c.code, b('xxxxxx'))
@@ -76,31 +64,361 @@ class Test(unittest.TestCase):
         self.assertEqual(c.code, b('abcdef'))
 
     def test_readonly(self):
-        c = self._makeOne()
+        c = self._makeImplementer()
         # The date should be only settable once
         c.date = 0.0
         # Setting the value a second time should fail.
         self.assertRaises(ValueError, setattr, c, 'date', 1.0)
 
 
-class TestStoredThroughField(Test):
+class FieldPropertyTests(_Base, _Integration):
 
     def _getTargetClass(self):
-        schema = self._getSchema()
+        from zope.schema.fieldproperty import FieldProperty
+        return FieldProperty
 
-        class Klass(object):
-            from zope.schema.fieldproperty import \
-                FieldPropertyStoredThroughField
-            title = FieldPropertyStoredThroughField(schema['title'])
-            weight = FieldPropertyStoredThroughField(schema['weight'])
-            code = FieldPropertyStoredThroughField(schema['code'])
-            date = FieldPropertyStoredThroughField(schema['date'])
+    def test_ctor_defaults(self):
+        from zope.schema import Text
+        field = Text(__name__='testing')
+        cname = self._getTargetClass().__name__
+        prop = self._makeOne(field)
+        self.assertTrue(getattr(prop, '_%s__field' % cname) is field)
+        self.assertEqual(getattr(prop, '_%s__name' % cname), 'testing')
+        self.assertEqual(prop.__name__, 'testing')
+        self.assertEqual(prop.description, field.description)
+        self.assertEqual(prop.default, field.default)
+        self.assertEqual(prop.readonly, field.readonly)
+        self.assertEqual(prop.required, field.required)
 
-        return Klass
+    def test_ctor_explicit(self):
+        from zope.schema import Text
+        from zope.schema._compat import u
+        field = Text(__name__='testing',
+                     description=u('DESCRIPTION'),
+                     default=u('DEFAULT'),
+                     readonly=True,
+                     required=True,
+                    )
+        cname = self._getTargetClass().__name__
+        prop = self._makeOne(field, name='override')
+        self.assertTrue(getattr(prop, '_%s__field' % cname) is field)
+        self.assertEqual(getattr(prop, '_%s__name' % cname), 'override')
+        self.assertEqual(prop.description, field.description)
+        self.assertEqual(prop.default, field.default)
+        self.assertEqual(prop.readonly, field.readonly)
+        self.assertEqual(prop.required, field.required)
+
+    def test___get___from_class(self):
+        prop = self._makeOne()
+        class Foo(object):
+            testing = prop
+        self.assertTrue(Foo.testing is prop)
+
+    def test___get___from_instance_pseudo_field_wo_default(self):
+        class _Faux(object):
+            def bind(self, other):
+                return self
+        prop = self._makeOne(_Faux(), 'nonesuch')
+        class Foo(object):
+            testing = prop
+        foo = Foo()
+        self.assertRaises(AttributeError, getattr, foo, 'testing')
+
+    def test___get___from_instance_miss_uses_field_default(self):
+        prop = self._makeOne()
+        class Foo(object):
+            testing = prop
+        foo = Foo()
+        self.assertEqual(foo.testing, None)
+
+    def test___get___from_instance_hit(self):
+        prop = self._makeOne(name='other')
+        class Foo(object):
+            testing = prop
+        foo = Foo()
+        foo.other = '123'
+        self.assertEqual(foo.testing, '123')
+
+    def test___get___from_instance_hit_after_bind(self):
+        class _Faux(object):
+            default = '456'
+            def bind(self, other):
+                return self
+        prop = self._makeOne(_Faux(), 'testing')
+        class Foo(object):
+            testing = prop
+        foo = Foo()
+        self.assertEqual(foo.testing, '456')
+
+    def test___set___not_readonly(self):
+        class _Faux(object):
+            readonly = False
+            default = '456'
+            def bind(self, other):
+                return self
+        faux = _Faux()
+        _validated = []
+        faux.validate = _validated.append
+        prop = self._makeOne(faux, 'testing')
+        class Foo(object):
+            testing = prop
+        foo = Foo()
+        foo.testing = '123'
+        self.assertEqual(foo.__dict__['testing'], '123')
+
+    def test___set___w_readonly_not_already_set(self):
+        class _Faux(object):
+            readonly = True
+            default = '456'
+            def bind(self, other):
+                return self
+        faux = _Faux()
+        _validated = []
+        faux.validate = _validated.append
+        prop = self._makeOne(faux, 'testing')
+        class Foo(object):
+            testing = prop
+        foo = Foo()
+        foo.testing = '123'
+        self.assertEqual(foo.__dict__['testing'], '123')
+        self.assertEqual(_validated, ['123'])
+
+    def test___set___w_readonly_and_already_set(self):
+        class _Faux(object):
+            readonly = True
+            default = '456'
+            def bind(self, other):
+                return self
+        faux = _Faux()
+        _validated = []
+        faux.validate = _validated.append
+        prop = self._makeOne(faux, 'testing')
+        class Foo(object):
+            testing = prop
+        foo = Foo()
+        foo.__dict__['testing'] = '789'
+        self.assertRaises(ValueError, setattr, foo, 'testing', '123')
+        self.assertEqual(_validated, ['123'])
+
+
+class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
+
+    def _getTargetClass(self):
+        from zope.schema.fieldproperty import FieldPropertyStoredThroughField
+        return FieldPropertyStoredThroughField
+
+    def test_ctor_defaults(self):
+        from zope.schema import Text
+        field = Text(__name__='testing')
+        cname = self._getTargetClass().__name__
+        prop = self._makeOne(field)
+        self.assertTrue(isinstance(prop.field, field.__class__))
+        self.assertFalse(prop.field is field)
+        self.assertEqual(prop.field.__name__, '__st_testing_st')
+        self.assertEqual(prop.__name__, '__st_testing_st')
+        self.assertEqual(getattr(prop, '_%s__name' % cname), 'testing')
+        self.assertEqual(prop.description, field.description)
+        self.assertEqual(prop.default, field.default)
+        self.assertEqual(prop.readonly, field.readonly)
+        self.assertEqual(prop.required, field.required)
+
+    def test_ctor_explicit(self):
+        from zope.schema import Text
+        from zope.schema._compat import u
+        field = Text(__name__='testing',
+                     description=u('DESCRIPTION'),
+                     default=u('DEFAULT'),
+                     readonly=True,
+                     required=True,
+                    )
+        cname = self._getTargetClass().__name__
+        prop = self._makeOne(field, name='override')
+        self.assertTrue(isinstance(prop.field, field.__class__))
+        self.assertFalse(prop.field is field)
+        self.assertEqual(prop.field.__name__, '__st_testing_st')
+        self.assertEqual(prop.__name__, '__st_testing_st')
+        self.assertEqual(getattr(prop, '_%s__name' % cname), 'override')
+        self.assertEqual(prop.description, field.description)
+        self.assertEqual(prop.default, field.default)
+        self.assertEqual(prop.readonly, field.readonly)
+        self.assertEqual(prop.required, field.required)
+
+    def test_setValue(self):
+        from zope.schema import Text
+        class Foo(object):
+            pass
+        foo = Foo()
+        prop = self._makeOne()
+        field = Text(__name__='testing')
+        prop.setValue(foo, field, '123')
+        self.assertEqual(foo.testing, '123')
+
+    def test_getValue_miss(self):
+        from zope.schema import Text
+        from zope.schema.fieldproperty import _marker
+        class Foo(object):
+            pass
+        foo = Foo()
+        prop = self._makeOne()
+        field = Text(__name__='testing')
+        value = prop.getValue(foo, field)
+        self.assertTrue(value is _marker)
+
+    def test_getValue_hit(self):
+        from zope.schema import Text
+        class Foo(object):
+            pass
+        foo = Foo()
+        foo.testing = '123'
+        prop = self._makeOne()
+        field = Text(__name__='testing')
+        value = prop.getValue(foo, field)
+        self.assertEqual(value, '123')
+
+    def test_queryValue_miss(self):
+        from zope.schema import Text
+        class Foo(object):
+            pass
+        foo = Foo()
+        prop = self._makeOne()
+        field = Text(__name__='testing')
+        default = object()
+        value = prop.queryValue(foo, field, default)
+        self.assertTrue(value is default)
+
+    def test_queryValue_hit(self):
+        from zope.schema import Text
+        class Foo(object):
+            pass
+        foo = Foo()
+        foo.testing = '123'
+        prop = self._makeOne()
+        field = Text(__name__='testing')
+        default = object()
+        value = prop.queryValue(foo, field, default)
+        self.assertEqual(value, '123')
+
+    def test___get___from_class(self):
+        prop = self._makeOne()
+        class Foo(object):
+            testing = prop
+        self.assertTrue(Foo.testing is prop)
+
+    def test___get___from_instance_pseudo_field_wo_default(self):
+        class _Faux(object):
+            __name__ = 'Faux'
+            def bind(self, other):
+                return self
+            def query(self, inst, default):
+                return default
+        prop = self._makeOne(_Faux(), 'nonesuch')
+        class Foo(object):
+            testing = prop
+        foo = Foo()
+        self.assertRaises(AttributeError, getattr, foo, 'testing')
+
+    def test___get___from_instance_miss_uses_field_default(self):
+        prop = self._makeOne()
+        class Foo(object):
+            testing = prop
+        foo = Foo()
+        self.assertEqual(foo.testing, None)
+
+    def test___get___from_instance_hit(self):
+        from zope.schema import Text
+        field = Text(__name__='testing')
+        prop = self._makeOne(field, name='other')
+        class Foo(object):
+            testing = prop
+        foo = Foo()
+        foo.__dict__['__st_testing_st'] = '456'
+        foo.other = '123'
+        self.assertEqual(foo.testing, '456')
+
+    def test___set___not_readonly(self):
+        class _Faux(object):
+            __name__ = 'Faux'
+            readonly = False
+            default = '456'
+            def bind(self, other):
+                return self
+            def set(self, inst, value):
+                setattr(inst, 'faux', value)
+        faux = _Faux()
+        _validated = []
+        faux.validate = _validated.append
+        prop = self._makeOne(faux, 'testing')
+        class Foo(object):
+            testing = prop
+        foo = Foo()
+        foo.testing = '123'
+        self.assertEqual(foo.__dict__['faux'], '123')
+        self.assertEqual(_validated, ['123'])
+
+    def test___set___w_readonly_not_already_set(self):
+        class _Faux(object):
+            __name__ = 'Faux'
+            readonly = True
+            default = '456'
+            def bind(self, other):
+                return self
+            def query(self, inst, default):
+                return default
+            def set(self, inst, value):
+                if self.readonly:
+                    raise ValueError
+                setattr(inst, 'faux', value)
+        faux = _Faux()
+        _validated = []
+        faux.validate = _validated.append
+        prop = self._makeOne(faux, 'testing')
+        class Foo(object):
+            testing = prop
+        foo = Foo()
+        foo.testing = '123'
+        self.assertEqual(foo.__dict__['faux'], '123')
+        self.assertEqual(_validated, ['123'])
+
+    def test___set___w_readonly_and_already_set(self):
+        class _Faux(object):
+            __name__ = 'Faux'
+            readonly = True
+            default = '456'
+            def bind(self, other):
+                return self
+            def query(self, inst, default):
+                return '789'
+        faux = _Faux()
+        _validated = []
+        faux.validate = _validated.append
+        prop = self._makeOne(faux, 'testing')
+        class Foo(object):
+            testing = prop
+        foo = Foo()
+        foo.__dict__['testing'] = '789'
+        self.assertRaises(ValueError, setattr, foo, 'testing', '123')
+
+
+def _getSchema():
+    from zope.interface import Interface
+    from zope.schema import Bytes
+    from zope.schema import Float
+    from zope.schema import Text
+    from zope.schema._compat import b
+    from zope.schema._compat import u
+
+    class Schema(Interface):
+        title = Text(description=u("Short summary"),
+                     default=u('say something'))
+        weight = Float(min=0.0)
+        code = Bytes(min_length=6, max_length=6, default=b('xxxxxx'))
+        date = Float(title=u('Date'), readonly=True)
+
+    return Schema
 
 
 def test_suite():
     return unittest.TestSuite((
-        unittest.makeSuite(Test),
-        unittest.makeSuite(TestStoredThroughField),
-        ))
+        unittest.makeSuite(FieldPropertyTests),
+        unittest.makeSuite(FieldPropertyStoredThroughFieldTests),
+    ))
