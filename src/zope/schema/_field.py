@@ -150,12 +150,12 @@ class Bytes(MinMaxLen, Field):
 
 # for things which are of the str type on both Python 2 and 3
 if PY3: #pragma NO COVER
-    _Str = Text
+    NativeString = Text
 else: #pragma NO COVER
-    _Str = Bytes
+    NativeString = Bytes
 
 @implementer(IASCII)
-class ASCII(_Str):
+class ASCII(NativeString):
     __doc__ = IASCII.__doc__
 
     def _validate(self, value):
@@ -195,9 +195,9 @@ class BytesLine(Bytes):
 
 # for things which are of the str type on both Python 2 and 3
 if PY3: #pragma NO COVER
-    _StrLine = TextLine
+    NativeStringLine = TextLine
 else: #pragma NO COVER
-    _StrLine = BytesLine
+    NativeStringLine = BytesLine
 
 @implementer(IASCIILine)
 class ASCIILine(ASCII):
@@ -651,12 +651,10 @@ class Dict(MinMaxLen, Iterable):
 
 _isuri = r"[a-zA-z0-9+.-]+:" # scheme
 _isuri += r"\S*$" # non space (should be pickier)
-
-_isuri_bytes = re.compile(_isuri.encode('ascii')).match
 _isuri = re.compile(_isuri).match
 
 @implementer(IURI, IFromUnicode)
-class URI(BytesLine):
+class URI(NativeStringLine):
     """URI schema field
     """
 
@@ -672,7 +670,7 @@ class URI(BytesLine):
         """
 
         super(URI, self)._validate(value)
-        if _isuri_bytes(value):
+        if _isuri(value):
             return
 
         raise InvalidURI(value)
@@ -691,7 +689,7 @@ class URI(BytesLine):
         ...
         InvalidURI: http://www.python.org/ foo/bar
         """
-        v = value.strip().encode('ascii')
+        v = str(value.strip())
         self.validate(v)
         return v
 
@@ -704,7 +702,7 @@ _isdotted = re.compile(
 
 
 @implementer(IId, IFromUnicode)
-class Id(_StrLine):
+class Id(NativeStringLine):
     """Id field
 
     Values of id fields must be either uris or dotted names.
@@ -755,7 +753,7 @@ class Id(_StrLine):
 
 
 @implementer(IDottedName)
-class DottedName(_StrLine):
+class DottedName(NativeStringLine):
     """Dotted name field.
 
     Values of DottedName fields must be Python-style dotted names.

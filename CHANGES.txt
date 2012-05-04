@@ -5,6 +5,12 @@ CHANGES
 4.2.0 (unreleased)
 ------------------
 
+- Introduce NativeString and NativeStringLine which are equal to Bytes and
+  BytesLine on Python 2 and Text and TextLine on Python 3.
+
+- Change IURI from a Bytes string to a "native" string. This is a backwards
+  incompatibility which only affects Python 3.
+
 - 100% unit test coverage.
 
 - Doctests moved from the package and wired up as normal Sphinx documentation.

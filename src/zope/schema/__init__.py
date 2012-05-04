@@ -35,6 +35,8 @@ from zope.schema._field import InterfaceField
 from zope.schema._field import Iterable
 from zope.schema._field import List
 from zope.schema._field import MinMaxLen
+from zope.schema._field import NativeString
+from zope.schema._field import NativeStringLine
 from zope.schema._field import Object
 from zope.schema._field import Orderable
 from zope.schema._field import Password

@@ -293,11 +293,11 @@ class IText(IMinMaxLen, IIterable, IField):
 
 # for things which are of the str type on both Python 2 and 3
 if PY3: #pragma NO COVER
-    _IStr = IText
+    INativeString = IText
 else: #pragma NO COVER
-    _IStr = IBytes
+    INativeString = IBytes
 
-class IASCII(_IStr):
+class IASCII(INativeString):
     """Field containing a 7-bit ASCII string. No characters > DEL
     (chr(127)) are allowed
 
@@ -317,9 +317,9 @@ class ITextLine(IText):
     """Field containing a unicode string without newlines."""
 
 if PY3: #pragma NO COVER
-    _IStrLine = ITextLine
+    INativeStringLine = ITextLine
 else: #pragma NO COVER
-    _IStrLine = IBytesLine
+    INativeStringLine = IBytesLine
 
 class IPassword(ITextLine):
     "Field containing a unicode string without newlines that is a password."
@@ -375,18 +375,18 @@ def _fields(values):
     return True
 
 
-class IURI(IBytesLine):
+class IURI(INativeStringLine):
     """A field containing an absolute URI
     """
 
-class IId(_IStrLine):
+class IId(INativeStringLine):
     """A field containing a unique identifier
 
     A unique identifier is either an absolute URI or a dotted name.
     If it's a dotted name, it should have a module/package name as a prefix.
     """
 
-class IDottedName(_IStrLine):
+class IDottedName(INativeStringLine):
     """Dotted name field.
 
     Values of DottedName fields must be Python-style dotted names.

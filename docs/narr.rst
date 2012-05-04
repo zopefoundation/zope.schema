@@ -100,12 +100,13 @@ occurs a ``ValidationError`` will be raised; for example:
 
 .. doctest::
 
-   >>> url_bound.validate(u('http://zope.org/foo'))
+   >>> from zope.schema._compat import non_native_string
+   >>> url_bound.validate(non_native_string('http://zope.org/foo'))
    Traceback (most recent call last):
    ...
-   WrongType: (u'http://zope.org/foo', <type 'str'>, 'url')
+   WrongType: ...
 
-   >>> url_bound.validate(b('foo.bar'))
+   >>> url_bound.validate('foo.bar'))
    Traceback (most recent call last):
    ...
    InvalidURI: foo.bar
