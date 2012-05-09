@@ -5,6 +5,8 @@ CHANGES
 4.2.0 (unreleased)
 ------------------
 
+- Automated build of Sphinx HTML docs and running doctest snippets via tox.
+
 - Dropped explicit support for Python 3.1.
 
 - Introduce NativeString and NativeStringLine which are equal to Bytes and
