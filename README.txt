@@ -10,4 +10,4 @@ its value and provide a validation method.  Besides you can optionally
 specify characteristics such as its value being read-only or not
 required.
 
-See 'docs/index.rst' for more information.
+See http://docs.zope.org/zope.schema/ for more information.
