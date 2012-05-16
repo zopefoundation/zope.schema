@@ -1,3 +1,0 @@
-recursive-include src/zope/schema *.txt
-graft src/zope/schema/tests
-global-exclude *.pyc

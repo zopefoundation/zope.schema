@@ -1,8 +1,7 @@
-=======
-CHANGES
-=======
+zope.schema Changelog
+=====================
 
-4.2.0 (unreleased)
+4.2.0 (2012-05-12)
 ------------------
 
 - Automated build of Sphinx HTML docs and running doctest snippets via tox.

@@ -1,6 +1,5 @@
-***********
-zope.schema
-***********
+zope.schema README
+==================
 
 Schemas extend the notion of interfaces to detailed descriptions of
 Attributes (but not methods).  Every schema is an interface and
