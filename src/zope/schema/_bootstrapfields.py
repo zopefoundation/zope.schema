@@ -61,7 +61,7 @@ class DefaultProperty(ValidatedProperty):
 
     def __get__(self, inst, owner):
         name, check = self._info
-        defaultFactory = inst.__dict__['defaultFactory']
+        defaultFactory = inst.__dict__.get('defaultFactory')
         # If there is no default factory, simply return the default.
         if defaultFactory is None:
             return inst.__dict__[name]

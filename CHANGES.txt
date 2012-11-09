@@ -4,7 +4,7 @@ zope.schema Changelog
 4.2.1 (unreleased)
 ------------------
 
-- TBD
+- Fix the default property of fields that have no defaultFactory attribute.
 
 
 4.2.0 (2012-05-12)

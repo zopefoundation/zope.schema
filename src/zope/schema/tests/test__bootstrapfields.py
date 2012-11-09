@@ -90,6 +90,14 @@ class DefaultPropertyTests(unittest.TestCase):
         inst._prop = 'PROP'
         self.assertEqual(inst.prop, 'PROP')
 
+    def test__get___wo_defaultFactory_in_dict(self):
+        class Test(DummyInst):
+            _prop = None
+            prop = self._makeOne('_prop')
+        inst = Test()
+        inst._prop = 'PROP'
+        self.assertEqual(inst.prop, 'PROP')
+
     def test___get___w_defaultFactory_not_ICAF_no_check(self):
         class Test(DummyInst):
             _prop = None
