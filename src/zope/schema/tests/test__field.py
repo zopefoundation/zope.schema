@@ -1511,16 +1511,18 @@ class ObjectTests(unittest.TestCase):
         self.assertRaises(WrongContainedType, objf.validate, Broken())
         errors = self._getErrors(objf.validate, Broken())
         self.assertEqual(len(errors), 2)
+        errors = sorted(errors,
+                        key=lambda x: (type(x).__name__, str(x.args[0])))
         err = errors[0]
         self.assertTrue(isinstance(err, SchemaNotFullyImplemented))
         nested = err.args[0]
         self.assertTrue(isinstance(nested, AttributeError))
-        self.assertTrue("'foo'" in str(nested))
+        self.assertTrue("'bar'" in str(nested))
         err = errors[1]
         self.assertTrue(isinstance(err, SchemaNotFullyImplemented))
         nested = err.args[0]
         self.assertTrue(isinstance(nested, AttributeError))
-        self.assertTrue("'bar'" in str(nested))
+        self.assertTrue("'foo'" in str(nested))
 
     def test__validate_w_value_providing_schema_but_invalid_fields(self):
         from zope.interface import implementer
@@ -1538,6 +1540,7 @@ class ObjectTests(unittest.TestCase):
         self.assertRaises(WrongContainedType, objf.validate, Broken())
         errors = self._getErrors(objf.validate, Broken())
         self.assertEqual(len(errors), 2)
+        errors = sorted(errors, key=lambda x: type(x).__name__)
         err = errors[0]
         self.assertTrue(isinstance(err, RequiredMissing))
         self.assertEqual(err.args, ('foo',))
