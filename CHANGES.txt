@@ -4,6 +4,7 @@ zope.schema Changelog
 4.2.2 (unreleased)
 ------------------
 
+- Added support for Python 3.3.
 
 4.2.1 (2012-11-09)
 ------------------
