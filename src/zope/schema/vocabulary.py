@@ -147,7 +147,7 @@ def _createTermTree(ttree, dict_):
 
     See fromDict for more details.
     """
-    for key in dict_.keys():
+    for key in sorted(dict_.keys()):
         term = SimpleTerm(key[1], key[0], key[-1])
         ttree[term] = TreeVocabulary.terms_factory()
         _createTermTree(ttree[term], dict_[key])
