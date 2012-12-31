@@ -133,16 +133,7 @@ class Bytes(MinMaxLen, Field):
     _type = binary_type
 
     def fromUnicode(self, uc):
-        """
-        >>> obj = Bytes(constraint=lambda v: b('x') in v)
-
-        >>> obj.fromUnicode(u(" foo x.y.z bat"))
-        ' foo x.y.z bat'
-        >>> obj.fromUnicode(u(" foo y.z bat"))
-        Traceback (most recent call last):
-        ...
-        ConstraintNotSatisfied:  foo y.z bat
-
+        """ See IFromUnicode.
         """
         v = make_binary(uc)
         self.validate(v)
@@ -159,25 +150,6 @@ class ASCII(NativeString):
     __doc__ = IASCII.__doc__
 
     def _validate(self, value):
-        """
-        >>> ascii = ASCII()
-
-        Make sure we accept empty strings:
-
-        >>> empty = ''
-        >>> ascii._validate(empty)
-
-        and all kinds of alphanumeric strings:
-
-        >>> alphanumeric = "Bob\'s my 23rd uncle"
-        >>> ascii._validate(alphanumeric)
-
-        >>> umlauts = "Köhlerstraße"
-        >>> ascii._validate(umlauts)
-        Traceback (most recent call last):
-        ...
-        InvalidValue
-        """
         super(ASCII, self)._validate(value)
         if not value:
             return
@@ -217,14 +189,7 @@ class Float(Orderable, Field):
         super(Float, self).__init__(*args, **kw)
 
     def fromUnicode(self, uc):
-        """
-        >>> f = Float()
-        >>> f.fromUnicode("1.25")
-        1.25
-        >>> f.fromUnicode("1.25.6") #doctest: +IGNORE_EXCEPTION_DETAIL
-        Traceback (most recent call last):
-        ...
-        ValueError: invalid literal for float(): 1.25.6
+        """ See IFromUnicode.
         """
         v = float(uc)
         self.validate(v)
@@ -240,17 +205,7 @@ class Decimal(Orderable, Field):
         super(Decimal, self).__init__(*args, **kw)
 
     def fromUnicode(self, uc):
-        """
-        >>> f = Decimal()
-        >>> import decimal
-        >>> isinstance(f.fromUnicode("1.25"), decimal.Decimal)
-        True
-        >>> float(f.fromUnicode("1.25"))
-        1.25
-        >>> f.fromUnicode("1.25.6")
-        Traceback (most recent call last):
-        ...
-        ValueError: invalid literal for Decimal(): 1.25.6
+        """ See IFromUnicode.
         """
         try:
             v = decimal.Decimal(uc)
@@ -357,18 +312,7 @@ class Choice(Field):
         return clone
 
     def fromUnicode(self, str):
-        """
-        >>> from zope.schema.vocabulary import SimpleVocabulary
-        >>> t = Choice(
-        ...     vocabulary=SimpleVocabulary.fromValues([u('foo'),u('bar')]))
-        >>> IFromUnicode.providedBy(t)
-        True
-        >>> t.fromUnicode(u("baz"))
-        Traceback (most recent call last):
-        ...
-        ConstraintNotSatisfied: baz
-        >>> t.fromUnicode(u("foo"))
-        u'foo'
+        """ See IFromUnicode.
         """
         self.validate(str)
         return str
@@ -387,6 +331,104 @@ class Choice(Field):
                 raise ValueError("Can't validate value without vocabulary")
         if value not in vocabulary:
             raise ConstraintNotSatisfied(value)
+
+
+_isuri = r"[a-zA-z0-9+.-]+:" # scheme
+_isuri += r"\S*$" # non space (should be pickier)
+_isuri = re.compile(_isuri).match
+
+@implementer(IURI, IFromUnicode)
+class URI(NativeStringLine):
+    """URI schema field
+    """
+
+    def _validate(self, value):
+        super(URI, self)._validate(value)
+        if _isuri(value):
+            return
+
+        raise InvalidURI(value)
+
+    def fromUnicode(self, value):
+        """ See IFromUnicode.
+        """
+        v = str(value.strip())
+        self.validate(v)
+        return v
+
+
+_isdotted = re.compile(
+    r"([a-zA-Z][a-zA-Z0-9_]*)"
+    r"([.][a-zA-Z][a-zA-Z0-9_]*)*"
+    # use the whole line
+    r"$").match
+
+
+@implementer(IDottedName)
+class DottedName(NativeStringLine):
+    """Dotted name field.
+
+    Values of DottedName fields must be Python-style dotted names.
+    """
+
+    def __init__(self, *args, **kw):
+        self.min_dots = int(kw.pop("min_dots", 0))
+        if self.min_dots < 0:
+            raise ValueError("min_dots cannot be less than zero")
+        self.max_dots = kw.pop("max_dots", None)
+        if self.max_dots is not None:
+            self.max_dots = int(self.max_dots)
+            if self.max_dots < self.min_dots:
+                raise ValueError("max_dots cannot be less than min_dots")
+        super(DottedName, self).__init__(*args, **kw)
+
+    def _validate(self, value):
+        """
+
+        """
+        super(DottedName, self)._validate(value)
+        if not _isdotted(value):
+            raise InvalidDottedName(value)
+        dots = value.count(".")
+        if dots < self.min_dots:
+            raise InvalidDottedName("too few dots; %d required" % self.min_dots,
+                                    value)
+        if self.max_dots is not None and dots > self.max_dots:
+            raise InvalidDottedName("too many dots; no more than %d allowed" %
+                                    self.max_dots, value)
+
+    def fromUnicode(self, value):
+        v = value.strip()
+        if not isinstance(v, self._type):
+            v = v.encode('ascii')
+        self.validate(v)
+        return v
+
+
+@implementer(IId, IFromUnicode)
+class Id(NativeStringLine):
+    """Id field
+
+    Values of id fields must be either uris or dotted names.
+    """
+
+    def _validate(self, value):
+        super(Id, self)._validate(value)
+        if _isuri(value):
+            return
+        if _isdotted(value) and "." in value:
+            return
+
+        raise InvalidId(value)
+
+    def fromUnicode(self, value):
+        """ See IFromUnicode.
+        """
+        v = value.strip()
+        if not isinstance(v, self._type):
+            v = v.encode('ascii')
+        self.validate(v)
+        return v
 
 
 @implementer(IInterfaceField)
@@ -415,8 +457,8 @@ def _validate_sequence(value_type, value, errors=None):
     To validate a sequence of various values:
 
        >>> errors = _validate_sequence(field, (b('foo'), u('bar'), 1))
-       >>> errors
-       [WrongType(b'foo', <type 'unicode'>, ''), WrongType(1, <type 'unicode'>, '')]
+       >>> errors # XXX assumes Python2 reprs
+       [WrongType('foo', <type 'unicode'>, ''), WrongType(1, <type 'unicode'>, '')]
 
     The only valid value in the sequence is the second item. The others
     generated errors.
@@ -424,9 +466,9 @@ def _validate_sequence(value_type, value, errors=None):
     We can use the optional errors argument to collect additional errors
     for a new sequence:
 
-        >>> errors = _validate_sequence(field, (2, u('baz')), errors)
-        >>> errors
-        [WrongType(b'foo', <type 'unicode'>, ''), WrongType(1, <type 'unicode'>, ''), WrongType(2, <type 'unicode'>, '')]
+       >>> errors = _validate_sequence(field, (2, u('baz')), errors)
+       >>> errors # XXX assumes Python2 reprs
+       [WrongType('foo', <type 'unicode'>, ''), WrongType(1, <type 'unicode'>, ''), WrongType(2, <type 'unicode'>, '')]
 
     """
     if errors is None:
@@ -647,220 +689,3 @@ class Dict(MinMaxLen, Iterable):
         if clone.value_type is not None:
             clone.value_type = clone.value_type.bind(object)
         return clone
-
-
-_isuri = r"[a-zA-z0-9+.-]+:" # scheme
-_isuri += r"\S*$" # non space (should be pickier)
-_isuri = re.compile(_isuri).match
-
-@implementer(IURI, IFromUnicode)
-class URI(NativeStringLine):
-    """URI schema field
-    """
-
-    def _validate(self, value):
-        """
-        >>> uri = URI(__name__='test')
-        >>> uri.validate(b("http://www.python.org/foo/bar"))
-        >>> uri.validate(b("DAV:"))
-        >>> uri.validate(b("www.python.org/foo/bar"))
-        Traceback (most recent call last):
-        ...
-        InvalidURI: www.python.org/foo/bar
-        """
-
-        super(URI, self)._validate(value)
-        if _isuri(value):
-            return
-
-        raise InvalidURI(value)
-
-    def fromUnicode(self, value):
-        """
-        >>> uri = URI(__name__='test')
-        >>> uri.fromUnicode("http://www.python.org/foo/bar")
-        'http://www.python.org/foo/bar'
-        >>> uri.fromUnicode("          http://www.python.org/foo/bar")
-        'http://www.python.org/foo/bar'
-        >>> uri.fromUnicode("      \\n    http://www.python.org/foo/bar\\n")
-        'http://www.python.org/foo/bar'
-        >>> uri.fromUnicode("http://www.python.org/ foo/bar")
-        Traceback (most recent call last):
-        ...
-        InvalidURI: http://www.python.org/ foo/bar
-        """
-        v = str(value.strip())
-        self.validate(v)
-        return v
-
-
-_isdotted = re.compile(
-    r"([a-zA-Z][a-zA-Z0-9_]*)"
-    r"([.][a-zA-Z][a-zA-Z0-9_]*)*"
-    # use the whole line
-    r"$").match
-
-
-@implementer(IId, IFromUnicode)
-class Id(NativeStringLine):
-    """Id field
-
-    Values of id fields must be either uris or dotted names.
-    """
-
-    def _validate(self, value):
-        """
-        >>> id = Id(__name__='test')
-        >>> id.validate("http://www.python.org/foo/bar")
-        >>> id.validate("zope.app.content")
-        >>> id.validate("zope.app.content/a")
-        Traceback (most recent call last):
-        ...
-        InvalidId: zope.app.content/a
-        >>> id.validate("http://zope.app.content x y")
-        Traceback (most recent call last):
-        ...
-        InvalidId: http://zope.app.content x y
-        """
-        super(Id, self)._validate(value)
-        if _isuri(value):
-            return
-        if _isdotted(value) and "." in value:
-            return
-
-        raise InvalidId(value)
-
-    def fromUnicode(self, value):
-        """
-        >>> id = Id(__name__='test')
-        >>> id.fromUnicode("http://www.python.org/foo/bar")
-        'http://www.python.org/foo/bar'
-        >>> id.fromUnicode(u(" http://www.python.org/foo/bar "))
-        'http://www.python.org/foo/bar'
-        >>> id.fromUnicode("http://www.python.org/ foo/bar")
-        Traceback (most recent call last):
-        ...
-        InvalidId: http://www.python.org/ foo/bar
-        >>> id.fromUnicode("      \\n x.y.z \\n")
-        'x.y.z'
-
-        """
-        v = value.strip()
-        if not isinstance(v, self._type):
-            v = v.encode('ascii')
-        self.validate(v)
-        return v
-
-
-@implementer(IDottedName)
-class DottedName(NativeStringLine):
-    """Dotted name field.
-
-    Values of DottedName fields must be Python-style dotted names.
-    """
-
-    def __init__(self, *args, **kw):
-        """
-        >>> DottedName(min_dots=-1)
-        Traceback (most recent call last):
-        ...
-        ValueError: min_dots cannot be less than zero
-
-        >>> DottedName(max_dots=-1)
-        Traceback (most recent call last):
-        ...
-        ValueError: max_dots cannot be less than min_dots
-
-        >>> DottedName(max_dots=1, min_dots=2)
-        Traceback (most recent call last):
-        ...
-        ValueError: max_dots cannot be less than min_dots
-
-        >>> dotted_name = DottedName(max_dots=1, min_dots=1)
-
-        >>> from zope.interface.verify import verifyObject
-        >>> verifyObject(IDottedName, dotted_name)
-        True
-
-        >>> dotted_name = DottedName(max_dots=1)
-        >>> dotted_name.min_dots
-        0
-
-        >>> dotted_name = DottedName(min_dots=1)
-        >>> dotted_name.max_dots
-        >>> dotted_name.min_dots
-        1
-        """
-        self.min_dots = int(kw.pop("min_dots", 0))
-        if self.min_dots < 0:
-            raise ValueError("min_dots cannot be less than zero")
-        self.max_dots = kw.pop("max_dots", None)
-        if self.max_dots is not None:
-            self.max_dots = int(self.max_dots)
-            if self.max_dots < self.min_dots:
-                raise ValueError("max_dots cannot be less than min_dots")
-        super(DottedName, self).__init__(*args, **kw)
-
-    def _validate(self, value):
-        """
-        >>> dotted_name = DottedName(__name__='test')
-        >>> dotted_name.validate("a.b.c")
-        >>> dotted_name.validate("a")
-        >>> dotted_name.validate("   a")
-        Traceback (most recent call last):
-        ...
-        InvalidDottedName:    a
-
-        >>> dotted_name = DottedName(__name__='test', min_dots=1)
-        >>> dotted_name.validate('a.b')
-        >>> dotted_name.validate('a.b.c.d')
-        >>> dotted_name.validate('a')
-        Traceback (most recent call last):
-        ...
-        InvalidDottedName: ('too few dots; 1 required', 'a')
-
-        >>> dotted_name = DottedName(__name__='test', max_dots=0)
-        >>> dotted_name.validate('a')
-        >>> dotted_name.validate('a.b')
-        Traceback (most recent call last):
-        ...
-        InvalidDottedName: ('too many dots; no more than 0 allowed', 'a.b')
-
-        >>> dotted_name = DottedName(__name__='test', max_dots=2)
-        >>> dotted_name.validate('a')
-        >>> dotted_name.validate('a.b')
-        >>> dotted_name.validate('a.b.c')
-        >>> dotted_name.validate('a.b.c.d')
-        Traceback (most recent call last):
-        ...
-        InvalidDottedName: ('too many dots; no more than 2 allowed', 'a.b.c.d')
-
-        >>> dotted_name = DottedName(__name__='test', max_dots=1, min_dots=1)
-        >>> dotted_name.validate('a.b')
-        >>> dotted_name.validate('a')
-        Traceback (most recent call last):
-        ...
-        InvalidDottedName: ('too few dots; 1 required', 'a')
-        >>> dotted_name.validate('a.b.c')
-        Traceback (most recent call last):
-        ...
-        InvalidDottedName: ('too many dots; no more than 1 allowed', 'a.b.c')
-
-        """
-        super(DottedName, self)._validate(value)
-        if not _isdotted(value):
-            raise InvalidDottedName(value)
-        dots = value.count(".")
-        if dots < self.min_dots:
-            raise InvalidDottedName("too few dots; %d required" % self.min_dots,
-                                    value)
-        if self.max_dots is not None and dots > self.max_dots:
-            raise InvalidDottedName("too many dots; no more than %d allowed" %
-                                    self.max_dots, value)
-
-    def fromUnicode(self, value):
-        v = value.strip()
-        if not isinstance(v, self._type):
-            v = v.encode('ascii')
-        self.validate(v)
-        return v
