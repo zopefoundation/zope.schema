@@ -1,3 +1,10 @@
-recursive-include src/zope/schema *.txt
-graft src/zope/schema/tests
+include *.rst
+include *.txt
+
+recursive-include docs *
+recursive-include src *
+
+global-exclude *.dll
 global-exclude *.pyc
+global-exclude *.pyo
+global-exclude *.so
