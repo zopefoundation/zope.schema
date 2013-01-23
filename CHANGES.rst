@@ -1,10 +1,11 @@
 zope.schema Changelog
 =====================
 
-4.2.3 (unreleased)
+4.3.0 (unreleased)
 ------------------
 
-- TBD
+- Added `createFieldProperties` function which maps schema fields into
+  FieldProperties.
 
 4.2.2 (2012-11-21)
 ------------------
