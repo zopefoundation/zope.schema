@@ -417,8 +417,35 @@ def _getSchema():
     return Schema
 
 
+class CreateFieldPropertiesTests(unittest.TestCase):
+    """Testing ..fieldproperty.createFieldProperties."""
+
+    def test_creates_fieldproperties_on_class(self):
+        from ..fieldproperty import createFieldProperties
+        from zope.schema.fieldproperty import FieldProperty
+        schema = _getSchema()
+
+        class Dummy(object):
+            createFieldProperties(schema)
+
+        self.assertTrue(isinstance(Dummy.title, FieldProperty))
+        self.assertTrue(isinstance(Dummy.date, FieldProperty))
+        self.assertTrue(Dummy.date._FieldProperty__field is schema['date'])
+
+    def test_fields_in_omit_are_not_created_on_class(self):
+        from ..fieldproperty import createFieldProperties
+
+        class Dummy(object):
+            createFieldProperties(_getSchema(), omit=['date', 'code'])
+
+        self.assertFalse(hasattr(Dummy, 'date'))
+        self.assertFalse(hasattr(Dummy, 'code'))
+        self.assertTrue(hasattr(Dummy, 'title'))
+
+
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite(FieldPropertyTests),
         unittest.makeSuite(FieldPropertyStoredThroughFieldTests),
+        unittest.makeSuite(CreateFieldPropertiesTests),
     ))
