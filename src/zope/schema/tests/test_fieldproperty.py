@@ -421,7 +421,7 @@ class CreateFieldPropertiesTests(unittest.TestCase):
     """Testing ..fieldproperty.createFieldProperties."""
 
     def test_creates_fieldproperties_on_class(self):
-        from ..fieldproperty import createFieldProperties
+        from zope.schema.fieldproperty import createFieldProperties
         from zope.schema.fieldproperty import FieldProperty
         schema = _getSchema()
 
@@ -433,7 +433,7 @@ class CreateFieldPropertiesTests(unittest.TestCase):
         self.assertTrue(Dummy.date._FieldProperty__field is schema['date'])
 
     def test_fields_in_omit_are_not_created_on_class(self):
-        from ..fieldproperty import createFieldProperties
+        from zope.schema.fieldproperty import createFieldProperties
 
         class Dummy(object):
             createFieldProperties(_getSchema(), omit=['date', 'code'])
