@@ -1,7 +1,7 @@
 zope.schema Changelog
 =====================
 
-4.3.1 (unreleased)
+4.3.1 (2013-02-24)
 ------------------
 
 - Make sure that we do not fail during bytes decoding of term token when
