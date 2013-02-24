@@ -4,7 +4,9 @@ zope.schema Changelog
 4.3.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Make sure that we do not fail during bytes decoding of term token when
+  generated from a bytes value by ignoring all errors. (Another option would
+  have been to hexlify the value, but that would break way too many tests.)
 
 
 4.3.0 (2013-02-24)

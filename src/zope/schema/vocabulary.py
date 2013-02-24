@@ -13,7 +13,6 @@
 ##############################################################################
 """Vocabulary support for schema.
 """
-
 from zope.interface import directlyProvides
 from zope.interface import implementer
 from zope.schema.interfaces import ITitledTokenizedTerm
@@ -39,9 +38,11 @@ class SimpleTerm(object):
         if token is None:
             token = value
         # In Python 3 str(bytes) returns str(repr(bytes)), which is not what
-        # we want here.
+        # we want here. On the other hand, we want to try to keep the token as
+        # readable as possible.
         self.token = str(token) \
-                     if not isinstance(token, bytes) else str(token.decode())
+                     if not isinstance(token, bytes) \
+                     else token.decode(errors='ignore')
         self.title = title
         if title is not None:
             directlyProvides(self, ITitledTokenizedTerm)
