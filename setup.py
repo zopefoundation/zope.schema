@@ -73,7 +73,7 @@ if sys.version_info < (2, 7):
 TESTS_REQUIRE = ['zope.testing']
 
 setup(name='zope.schema',
-      version='4.3.1',
+      version='4.3.2.dev0',
       url='http://pypi.python.org/pypi/zope.schema',
       license='ZPL 2.1',
       description='zope.interface extension for defining data schemas',
