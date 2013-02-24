@@ -1,7 +1,7 @@
 zope.schema Changelog
 =====================
 
-4.3.0 (unreleased)
+4.3.0 (2013-02-24)
 ------------------
 
 - Fixed a bug where bytes values were turned into tokens inproperly in
