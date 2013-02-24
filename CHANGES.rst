@@ -1,10 +1,11 @@
 zope.schema Changelog
 =====================
 
-4.3.2 (unreleased)
+4.3.2 (2013-02-24)
 ------------------
 
-- Nothing changed yet.
+- Fix Python 2.6 support. (Forgot to run tox with all environments before last
+  release.)
 
 
 4.3.1 (2013-02-24)

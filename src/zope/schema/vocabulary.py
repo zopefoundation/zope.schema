@@ -42,7 +42,7 @@ class SimpleTerm(object):
         # readable as possible.
         self.token = str(token) \
                      if not isinstance(token, bytes) \
-                     else token.decode(errors='ignore')
+                     else str(token.decode('ascii', 'ignore'))
         self.title = title
         if title is not None:
             directlyProvides(self, ITitledTokenizedTerm)
