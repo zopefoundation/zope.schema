@@ -536,7 +536,8 @@ class ITokenizedTerm(ITerm):
     """Object representing a single value in a tokenized vocabulary.
     """
 
-    # TODO: There should be a more specialized field type for this.
+    # Should be a ``zope.schema.ASCIILine``, but `ASCIILine` is not a bootstrap
+    # field.
     token = Attribute(
         "token",
         """Token which can be used to represent the value on a stream.

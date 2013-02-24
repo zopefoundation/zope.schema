@@ -4,8 +4,11 @@ zope.schema Changelog
 4.3.0 (unreleased)
 ------------------
 
-- Added `createFieldProperties` function which maps schema fields into
-  FieldProperties.
+- Fixed a bug where bytes values were turned into tokens inproperly in
+  Python 3.
+
+- Added ``createFieldProperties()`` function which maps schema fields into
+  ``FieldProperty`` instances.
 
 4.2.2 (2012-11-21)
 ------------------

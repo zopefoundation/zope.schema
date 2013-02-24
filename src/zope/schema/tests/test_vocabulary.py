@@ -51,6 +51,13 @@ class SimpleTermTests(unittest.TestCase):
         self.assertEqual(term.title, 'TITLE')
         self.assertTrue(ITitledTokenizedTerm.providedBy(term))
 
+    def test_bytes_value(self):
+        from zope.schema.interfaces import ITitledTokenizedTerm
+        term = self._makeOne(b'term')
+        self.assertEqual(term.value, b'term')
+        self.assertEqual(term.token, 'term')
+        self.assertFalse(ITitledTokenizedTerm.providedBy(term))
+
 
 class SimpleVocabularyTests(unittest.TestCase):
 

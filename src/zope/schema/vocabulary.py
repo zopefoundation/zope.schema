@@ -32,13 +32,16 @@ class SimpleTerm(object):
 
     def __init__(self, value, token=None, title=None):
         """Create a term for value and token. If token is omitted,
-        str(value) is used for the token.  If title is provided, 
+        str(value) is used for the token.  If title is provided,
         term implements ITitledTokenizedTerm.
         """
         self.value = value
         if token is None:
             token = value
-        self.token = str(token)
+        # In Python 3 str(bytes) returns str(repr(bytes)), which is not what
+        # we want here.
+        self.token = str(token) \
+                     if not isinstance(token, bytes) else str(token.decode())
         self.title = title
         if title is not None:
             directlyProvides(self, ITitledTokenizedTerm)
@@ -142,7 +145,7 @@ class SimpleVocabulary(object):
 
 
 def _createTermTree(ttree, dict_):
-    """ Helper method that creates a tree-like dict with ITokenizedTerm 
+    """ Helper method that creates a tree-like dict with ITokenizedTerm
     objects as keys from a similar tree with tuples as keys.
 
     See fromDict for more details.
@@ -151,7 +154,7 @@ def _createTermTree(ttree, dict_):
         term = SimpleTerm(key[1], key[0], key[-1])
         ttree[term] = TreeVocabulary.terms_factory()
         _createTermTree(ttree[term], dict_[key])
-    return ttree 
+    return ttree
 
 
 @implementer(ITreeVocabulary)
@@ -164,8 +167,8 @@ class TreeVocabulary(object):
     terms_factory = OrderedDict
 
     def __init__(self, terms, *interfaces):
-        """Initialize the vocabulary given a recursive dict (i.e a tree) with 
-        ITokenizedTerm objects for keys and self-similar dicts representing the 
+        """Initialize the vocabulary given a recursive dict (i.e a tree) with
+        ITokenizedTerm objects for keys and self-similar dicts representing the
         branches for values.
 
         Refer to the method fromDict for more details.
@@ -186,7 +189,7 @@ class TreeVocabulary(object):
 
         if interfaces:
             directlyProvides(self, *interfaces)
-            
+
     def __contains__(self, value):
         """ See zope.schema.interfaces.IBaseVocabulary
 
@@ -197,7 +200,7 @@ class TreeVocabulary(object):
         except TypeError:
             # sometimes values are not hashable
             return False
-    
+
     def __getitem__(self, key):
         """x.__getitem__(y) <==> x[y]
         """
@@ -205,7 +208,7 @@ class TreeVocabulary(object):
 
     def __iter__(self):
         """See zope.schema.interfaces.IIterableVocabulary
-        
+
         x.__iter__() <==> iter(x)
         """
         return self._terms.__iter__()
@@ -221,7 +224,7 @@ class TreeVocabulary(object):
         The default is returned if there is no value for the key.
         """
         return self._terms.get(key, default)
-        
+
     def keys(self):
         """Return the keys of the mapping object.
         """
@@ -242,10 +245,10 @@ class TreeVocabulary(object):
         """Constructs a vocabulary from a dictionary-like object (like dict or
         OrderedDict), that has tuples for keys.
 
-        The tuples should have either 2 or 3 values, i.e: 
+        The tuples should have either 2 or 3 values, i.e:
         (token, value, title) or (token, value)
-        
-        For example, a dict with 2-valued tuples:  
+
+        For example, a dict with 2-valued tuples:
 
         dict_ = {
             ('exampleregions', 'Regions used in ATVocabExample'): {
@@ -269,14 +272,14 @@ class TreeVocabulary(object):
         They are: term_by_value, term_by_token and path_by_value
 
         This method recurses through the tree and populates these indexes.
-        
+
         tree:  The tree (a nested/recursive dictionary).
         """
         for term in tree.keys():
             value = getattr(term, 'value')
             token = getattr(term, 'token')
 
-            if value in self.term_by_value: 
+            if value in self.term_by_value:
                 raise ValueError(
                     "Term values must be unique: '%s'" % value)
 
@@ -290,7 +293,7 @@ class TreeVocabulary(object):
             if value not in self.path_by_value:
                self.path_by_value[value] = self._getPathToTreeNode(self, value)
             self._populateIndexes(tree[term])
-    
+
     def getTerm(self, value):
         """See zope.schema.interfaces.IBaseVocabulary"""
         try:
@@ -319,11 +322,11 @@ class TreeVocabulary(object):
             if path:
                 path.insert(0, parent.value)
                 break
-        return path 
+        return path
 
     def getTermPath(self, value):
-        """Returns a list of strings representing the path from the root node 
-        to the node with the given value in the tree. 
+        """Returns a list of strings representing the path from the root node
+        to the node with the given value in the tree.
 
         Returns an empty string if no node has that value.
         """
@@ -347,7 +350,7 @@ class VocabularyRegistry(object):
         self._map = {}
 
     def get(self, object, name):
-        """See zope.schema.interfaces.IVocabularyRegistry""" 
+        """See zope.schema.interfaces.IVocabularyRegistry"""
         try:
             vtype = self._map[name]
         except KeyError:
