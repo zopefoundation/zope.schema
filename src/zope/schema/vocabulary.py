@@ -51,7 +51,7 @@ class SimpleTerm(object):
 class SimpleVocabulary(object):
     """Vocabulary that works from a sequence of terms."""
 
-    def __init__(self, terms, *interfaces):
+    def __init__(self, terms, *interfaces, **kwargs):
         """Initialize the vocabulary given a list of terms.
 
         The vocabulary keeps a reference to the list of terms passed
@@ -59,17 +59,24 @@ class SimpleVocabulary(object):
 
         One or more interfaces may also be provided so that alternate
         widgets may be bound without subclassing.
+
+        By default, ValueErros are thrown if duplicate values or okens
+        are passed in. If you want to swallow these exceptions, pass
+        in swallow_duplicates=True. In this case, the values will
+        override themselves.
         """
         self.by_value = {}
         self.by_token = {}
         self._terms = terms
         for term in self._terms:
-            if term.value in self.by_value:
-                raise ValueError(
-                    'term values must be unique: %s' % repr(term.value))
-            if term.token in self.by_token:
-                raise ValueError(
-                    'term tokens must be unique: %s' % repr(term.token))
+            swallow_dupes = 'swallow_duplicates' in kwargs and kwargs['swallow_duplicates'] or False
+            if not swallow_dupes:
+                if term.value in self.by_value:
+                    raise ValueError(
+                        'term values must be unique: %s' % repr(term.value))
+                if term.token in self.by_token:
+                    raise ValueError(
+                        'term tokens must be unique: %s' % repr(term.token))
             self.by_value[term.value] = term
             self.by_token[term.token] = term
         if interfaces:
