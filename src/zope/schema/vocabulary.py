@@ -69,7 +69,7 @@ class SimpleVocabulary(object):
         self.by_token = {}
         self._terms = terms
         for term in self._terms:
-            swallow_dupes = swallow_dupes = kwargs.get('swallow_duplicates', False)
+            swallow_dupes = kwargs.get('swallow_duplicates', False)
             if not swallow_dupes:
                 if term.value in self.by_value:
                     raise ValueError(
