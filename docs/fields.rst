@@ -172,6 +172,13 @@ Conversion from Unicode enforces the constraint:
    >>> t.fromUnicode(u("foo"))
    u'foo'
 
+By default, ValueErrors are thrown if duplicate values or tokens
+are passed in. If you are using this vocabulary as part of a form 
+that is generated from non-pristine data, this may not be the 
+desired behavior. If you want to swallow these exceptions, pass
+in swallow_duplicates=True when initializing the vocabulary. See
+the test cases for an example.
+
 URI
 ###
 
