@@ -150,6 +150,13 @@ class SimpleVocabularyTests(unittest.TestCase):
         self.assertRaises(ValueError, klass.fromItems,
                             [(0, 'one'), (1, 'one')])
 
+    def test_nonunique_tokens_swallow(self):
+        klass = self._getTargetClass()
+        items = [(0, 'one'), (1, 'one')]
+        terms = [klass.createTerm(value, token) for (token, value) in items]
+        vocab = self._getTargetClass()(terms, swallow_duplicates=True)
+        self.assertEqual(vocab.getTerm('one').token, '1')
+
     def test_nonunique_token_message(self):
         try:
             self._getTargetClass().fromValues([2, '2'])

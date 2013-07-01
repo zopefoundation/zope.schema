@@ -4,7 +4,8 @@ zope.schema Changelog
 4.3.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add the ability to swallow ValueErrors when rendering a SimpleVocabulary 
+  where the items may be duplicated. 
 
 
 4.3.2 (2013-02-24)
