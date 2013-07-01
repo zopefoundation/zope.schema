@@ -60,7 +60,7 @@ class SimpleVocabulary(object):
         One or more interfaces may also be provided so that alternate
         widgets may be bound without subclassing.
 
-        By default, ValueErros are thrown if duplicate values or okens
+        By default, ValueErrors are thrown if duplicate values or tokens
         are passed in. If you want to swallow these exceptions, pass
         in swallow_duplicates=True. In this case, the values will
         override themselves.
@@ -69,7 +69,7 @@ class SimpleVocabulary(object):
         self.by_token = {}
         self._terms = terms
         for term in self._terms:
-            swallow_dupes = 'swallow_duplicates' in kwargs and kwargs['swallow_duplicates'] or False
+            swallow_dupes = swallow_dupes = kwargs.get('swallow_duplicates', False)
             if not swallow_dupes:
                 if term.value in self.by_value:
                     raise ValueError(
