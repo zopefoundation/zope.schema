@@ -4,6 +4,8 @@ zope.schema Changelog
 4.3.3 (unreleased)
 ------------------
 
+- Updated ``boostrap.py`` to version 2.2.
+
 - Add the ability to swallow ValueErrors when rendering a SimpleVocabulary,
   allowing for cases where vocabulary items may be duplicated (e.g., due to
   user input).
