@@ -57,6 +57,7 @@ class ValidatedProperty(object):
         name, check = self._info
         return inst.__dict__[name]
 
+
 class DefaultProperty(ValidatedProperty):
 
     def __get__(self, inst, owner):
@@ -74,7 +75,7 @@ class DefaultProperty(ValidatedProperty):
         # Check that the created value is valid.
         if check is not None:
             check(inst, value)
-        else:
+        elif value != inst.missing_value:
             inst.validate(value)
         return value
 

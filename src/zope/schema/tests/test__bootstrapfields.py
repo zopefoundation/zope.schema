@@ -235,6 +235,13 @@ class FieldTests(unittest.TestCase):
         self.assertEqual(_called_with, [self, obj])
         self.assertEqual(field.defaultFactory, _factory)
 
+    def test_explicit_defaultFactory_returning_missing_value(self):
+        def _factory():
+            return None
+        field = self._makeOne(required=True,
+                              defaultFactory=_factory)
+        self.assertEqual(field.default, None)
+
     def test_bind(self):
         obj = object()
         field = self._makeOne()

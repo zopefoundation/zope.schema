@@ -4,6 +4,9 @@ zope.schema Changelog
 4.3.3 (unreleased)
 ------------------
 
+- Don't raise RequiredMissing if a field's defaultFactory returns the field's
+  missing_value.
+
 - Updated ``boostrap.py`` to version 2.2.
 
 - Add the ability to swallow ValueErrors when rendering a SimpleVocabulary,
