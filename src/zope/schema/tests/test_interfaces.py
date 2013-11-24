@@ -1,5 +1,6 @@
 import unittest
 
+
 class Test__is_field(unittest.TestCase):
 
     def _callFUT(self, value):
@@ -37,8 +38,10 @@ class Test__is_field(unittest.TestCase):
     def test_w_explicitly_provided(self):
         from zope.interface import directlyProvides
         from zope.schema.interfaces import IField
+
         class Foo(object):
             pass
+
         foo = Foo()
         self.assertEqual(self._callFUT(foo), False)
         directlyProvides(foo, IField)
@@ -71,9 +74,10 @@ class Test__fields(unittest.TestCase):
         self.assertEqual(self._callFUT([Int()]), True)
         self.assertEqual(self._callFUT([Float()]), True)
         self.assertEqual(self._callFUT([Decimal()]), True)
-        self.assertEqual(self._callFUT(
-                             [Text(), Bytes(), Int(), Float(), Decimal()]),
-                         True)
+        self.assertEqual(
+            self._callFUT([Text(), Bytes(), Int(), Float(), Decimal()]),
+            True
+        )
 
     def test_w_mixed(self):
         from zope.schema import Text
@@ -82,9 +86,10 @@ class Test__fields(unittest.TestCase):
         from zope.schema import Float
         from zope.schema import Decimal
         self.assertEqual(self._callFUT([Text(), 0]), False)
-        self.assertEqual(self._callFUT(
-                             [Text(), Bytes(), Int(), Float(), Decimal(), 0]),
-                         False)
+        self.assertEqual(
+            self._callFUT([Text(), Bytes(), Int(), Float(), Decimal(), 0]),
+            False
+        )
 
 
 def test_suite():

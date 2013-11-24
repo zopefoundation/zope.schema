@@ -81,8 +81,10 @@ class SimpleVocabularyTests(unittest.TestCase):
     def test_ctor_additional_interfaces(self):
         from zope.interface import Interface
         from zope.schema.vocabulary import SimpleTerm
+
         class IStupid(Interface):
             pass
+
         VALUES = [1, 4, 2, 9]
         vocabulary = self._makeOne([SimpleTerm(x) for x in VALUES], IStupid)
         self.assertTrue(IStupid.providedBy(vocabulary))
@@ -99,8 +101,10 @@ class SimpleVocabularyTests(unittest.TestCase):
     def test_fromValues(self):
         from zope.interface import Interface
         from zope.schema.interfaces import ITokenizedTerm
+
         class IStupid(Interface):
             pass
+
         VALUES = [1, 4, 2, 9]
         vocabulary = self._getTargetClass().fromValues(VALUES)
         self.assertEqual(len(vocabulary), len(VALUES))
@@ -113,8 +117,10 @@ class SimpleVocabularyTests(unittest.TestCase):
     def test_fromItems(self):
         from zope.interface import Interface
         from zope.schema.interfaces import ITokenizedTerm
+
         class IStupid(Interface):
             pass
+
         ITEMS = [('one', 1), ('two', 2), ('three', 3), ('fore!', 4)]
         vocabulary = self._getTargetClass().fromItems(ITEMS)
         self.assertEqual(len(vocabulary), len(ITEMS))
@@ -145,10 +151,16 @@ class SimpleVocabularyTests(unittest.TestCase):
     def test_nonunique_tokens(self):
         klass = self._getTargetClass()
         self.assertRaises(ValueError, klass.fromValues, [2, '2'])
-        self.assertRaises(ValueError, klass.fromItems, 
-                            [(1, 'one'), ('1', 'another one')])
-        self.assertRaises(ValueError, klass.fromItems,
-                            [(0, 'one'), (1, 'one')])
+        self.assertRaises(
+            ValueError,
+            klass.fromItems,
+            [(1, 'one'), ('1', 'another one')]
+        )
+        self.assertRaises(
+            ValueError,
+            klass.fromItems,
+            [(0, 'one'), (1, 'one')]
+        )
 
     def test_nonunique_tokens_swallow(self):
         klass = self._getTargetClass()
@@ -196,43 +208,44 @@ class TreeVocabularyTests(unittest.TestCase):
         return TreeVocabulary
 
     def tree_vocab_2(self):
-        region_tree = { 
-                ('regions', 'Regions'): {
-                    ('aut', 'Austria'): {
-                        ('tyr', 'Tyrol'): {
-                            ('auss', 'Ausserfern'): {},
-                        }
-                    },
-                    ('ger', 'Germany'): {
-                        ('bav', 'Bavaria'):{}
-                    },
-                }
+        region_tree = {
+            ('regions', 'Regions'): {
+                ('aut', 'Austria'): {
+                    ('tyr', 'Tyrol'): {
+                        ('auss', 'Ausserfern'): {},
+                    }
+                },
+                ('ger', 'Germany'): {
+                    ('bav', 'Bavaria'): {}
+                },
             }
+        }
         return self._getTargetClass().fromDict(region_tree)
 
     def business_tree(self):
         return {
-                ('services', 'services', 'Services'): {
-                    ('reservations', 'reservations', 'Reservations'): {
-                        ('res_host', 'res_host', 'Res Host'): {},
-                        ('res_gui', 'res_gui', 'Res GUI'): {},
-                    },
-                    ('check_in', 'check_in', 'Check-in'): {
-                        ('dcs_host', 'dcs_host', 'DCS Host'): {},
-                    },
+            ('services', 'services', 'Services'): {
+                ('reservations', 'reservations', 'Reservations'): {
+                    ('res_host', 'res_host', 'Res Host'): {},
+                    ('res_gui', 'res_gui', 'Res GUI'): {},
                 },
-                ('infrastructure', 'infrastructure', 'Infrastructure'): {
-                    ('communication_network', 'communication_network',
-                     'Communication/Network'): {
-                        ('messaging', 'messaging', 'Messaging'): {},
-                    },
-                    ('data_transaction', 'data_transaction',
-                     'Data/Transaction'): {
-                        ('database', 'database', 'Database'): {},
-                    },
-                    ('security', 'security', 'Security'): {},
+                ('check_in', 'check_in', 'Check-in'): {
+                    ('dcs_host', 'dcs_host', 'DCS Host'): {},
                 },
-            }
+            },
+            ('infrastructure', 'infrastructure', 'Infrastructure'): {
+                ('communication_network', 'communication_network',
+                 'Communication/Network'): {
+                    ('messaging', 'messaging', 'Messaging'): {},
+                },
+                ('data_transaction', 'data_transaction',
+                 'Data/Transaction'): {
+                    ('database', 'database', 'Database'): {},
+                },
+                ('security', 'security', 'Security'): {},
+            },
+        }
+
     def tree_vocab_3(self):
         return self._getTargetClass().fromDict(self.business_tree())
 
@@ -250,8 +263,10 @@ class TreeVocabularyTests(unittest.TestCase):
 
     def test_additional_interfaces(self):
         from zope.interface import Interface
+
         class IStupid(Interface):
             pass
+
         v = self._getTargetClass().fromDict({('one', '1'): {}}, IStupid)
         self.assertTrue(IStupid.providedBy(v))
 
@@ -262,126 +277,149 @@ class TreeVocabularyTests(unittest.TestCase):
         #Check that they keys are indeed oredered.
         from zope.schema._compat import OrderedDict
 
-        d = {   (1, 'new_york', 'New York'): {
-                    (2, 'ny_albany', 'Albany'): {},
-                    (3, 'ny_new_york', 'New York'): {},
-                },
-                (4, 'california', 'California'): {
-                    (5, 'ca_los_angeles', 'Los Angeles'): {},
-                    (6, 'ca_san_francisco', 'San Francisco'): {},
-                },
-                (7, 'texas', 'Texas'): {},
-                (8, 'florida', 'Florida'): {},
-                (9, 'utah', 'Utah'): {},
-            }
+        d = {
+            (1, 'new_york', 'New York'): {
+                (2, 'ny_albany', 'Albany'): {},
+                (3, 'ny_new_york', 'New York'): {},
+            },
+            (4, 'california', 'California'): {
+                (5, 'ca_los_angeles', 'Los Angeles'): {},
+                (6, 'ca_san_francisco', 'San Francisco'): {},
+            },
+            (7, 'texas', 'Texas'): {},
+            (8, 'florida', 'Florida'): {},
+            (9, 'utah', 'Utah'): {},
+        }
         dict_ = OrderedDict(sorted(d.items(), key=lambda t: t[0]))
         vocab = self._getTargetClass().fromDict(dict_)
         # Test keys
-        self.assertEqual([k.token for k in vocab.keys()],
-                         ['1', '4', '7', '8', '9'])
+        self.assertEqual(
+            [k.token for k in vocab.keys()],
+            ['1', '4', '7', '8', '9']
+        )
         # Test __iter__
-        self.assertEqual([k.token for k in vocab],
-                         ['1', '4', '7', '8', '9'])
+        self.assertEqual(
+            [k.token for k in vocab],
+            ['1', '4', '7', '8', '9']
+        )
 
-        self.assertEqual([k.token for k in vocab[
-                                    [k for k in vocab.keys()][0]].keys()],
-                         ['2', '3'])
-        self.assertEqual([k.token for k in vocab[
-                                    [k for k in vocab.keys()][1]].keys()],
-                        ['5', '6'])
+        self.assertEqual(
+            [k.token for k in vocab[[k for k in vocab.keys()][0]].keys()],
+            ['2', '3']
+        )
+        self.assertEqual(
+            [k.token for k in vocab[[k for k in vocab.keys()][1]].keys()],
+            ['5', '6']
+        )
 
     def test_indexes(self):
         # TreeVocabulary creates three indexes for quick lookups,
         # term_by_value, term_by_value and path_by_value.
         tv2 = self.tree_vocab_2()
         self.assertEqual(
-            [k for k in sorted(tv2.term_by_value.keys())], 
-            ['Ausserfern','Austria','Bavaria','Germany','Regions','Tyrol'])
+            [k for k in sorted(tv2.term_by_value.keys())],
+            ['Ausserfern', 'Austria', 'Bavaria', 'Germany', 'Regions', 'Tyrol']
+        )
 
         self.assertEqual(
             [k for k in sorted(tv2.term_by_token.keys())],
-            ['auss', 'aut', 'bav', 'ger', 'regions', 'tyr'])
+            ['auss', 'aut', 'bav', 'ger', 'regions', 'tyr']
+        )
 
         self.assertEqual(
-            [k for k in sorted(tv2.path_by_value.keys())], 
-            ['Ausserfern','Austria','Bavaria','Germany','Regions','Tyrol'])
+            [k for k in sorted(tv2.path_by_value.keys())],
+            ['Ausserfern', 'Austria', 'Bavaria', 'Germany', 'Regions', 'Tyrol']
+        )
 
         self.assertEqual(
-            [k for k in sorted(tv2.path_by_value.values())], 
-            [['Regions'], 
-             ['Regions', 'Austria'], 
-             ['Regions', 'Austria', 'Tyrol'], 
-             ['Regions', 'Austria', 'Tyrol', 'Ausserfern'],
-             ['Regions', 'Germany'], 
-             ['Regions', 'Germany', 'Bavaria'], 
-            ])
+            [k for k in sorted(tv2.path_by_value.values())],
+            [
+                ['Regions'],
+                ['Regions', 'Austria'],
+                ['Regions', 'Austria', 'Tyrol'],
+                ['Regions', 'Austria', 'Tyrol', 'Ausserfern'],
+                ['Regions', 'Germany'],
+                ['Regions', 'Germany', 'Bavaria'],
+            ]
+        )
 
         self.assertEqual(
-            [k for k in sorted(self.tree_vocab_3().term_by_value.keys())], 
-            ['check_in', 
-             'communication_network', 
-             'data_transaction', 
-             'database', 
-             'dcs_host', 
-             'infrastructure', 
-             'messaging', 
-             'res_gui', 
-             'res_host', 
-             'reservations', 
-             'security',
-             'services', 
-            ])
+            [k for k in sorted(self.tree_vocab_3().term_by_value.keys())],
+            [
+                'check_in',
+                'communication_network',
+                'data_transaction',
+                'database',
+                'dcs_host',
+                'infrastructure',
+                'messaging',
+                'res_gui',
+                'res_host',
+                'reservations',
+                'security',
+                'services',
+            ]
+        )
 
         self.assertEqual(
             [k for k in sorted(self.tree_vocab_3().term_by_token.keys())],
-            ['check_in', 
-             'communication_network', 
-             'data_transaction', 
-             'database', 
-             'dcs_host', 
-             'infrastructure', 
-             'messaging', 
-             'res_gui', 
-             'res_host', 
-             'reservations', 
-             'security',
-             'services', 
-            ])
+            [
+                'check_in',
+                'communication_network',
+                'data_transaction',
+                'database',
+                'dcs_host',
+                'infrastructure',
+                'messaging',
+                'res_gui',
+                'res_host',
+                'reservations',
+                'security',
+                'services',
+            ]
+        )
 
         self.assertEqual(
-            [k for k in sorted(self.tree_vocab_3().path_by_value.values())], 
-            [['infrastructure'], 
-             ['infrastructure', 'communication_network'], 
-             ['infrastructure', 'communication_network', 'messaging'], 
-             ['infrastructure', 'data_transaction'], 
-             ['infrastructure', 'data_transaction', 'database'], 
-             ['infrastructure', 'security'],
-             ['services'], 
-             ['services', 'check_in'],
-             ['services', 'check_in', 'dcs_host'],
-             ['services', 'reservations'], 
-             ['services', 'reservations', 'res_gui'],
-             ['services', 'reservations', 'res_host'], 
-            ])
+            [k for k in sorted(self.tree_vocab_3().path_by_value.values())],
+            [
+                ['infrastructure'],
+                ['infrastructure', 'communication_network'],
+                ['infrastructure', 'communication_network', 'messaging'],
+                ['infrastructure', 'data_transaction'],
+                ['infrastructure', 'data_transaction', 'database'],
+                ['infrastructure', 'security'],
+                ['services'],
+                ['services', 'check_in'],
+                ['services', 'check_in', 'dcs_host'],
+                ['services', 'reservations'],
+                ['services', 'reservations', 'res_gui'],
+                ['services', 'reservations', 'res_host'],
+            ]
+        )
 
     def test_termpath(self):
         tv2 = self.tree_vocab_2()
         tv3 = self.tree_vocab_3()
         self.assertEqual(
-                    tv2.getTermPath('Bavaria'), 
-                    ['Regions', 'Germany', 'Bavaria'])
+            tv2.getTermPath('Bavaria'),
+            ['Regions', 'Germany', 'Bavaria']
+        )
         self.assertEqual(
-                    tv2.getTermPath('Austria'), 
-                    ['Regions', 'Austria'])
+            tv2.getTermPath('Austria'),
+            ['Regions', 'Austria']
+        )
         self.assertEqual(
-                    tv2.getTermPath('Ausserfern'), 
-                    ['Regions', 'Austria', 'Tyrol', 'Ausserfern'])
+            tv2.getTermPath('Ausserfern'),
+            ['Regions', 'Austria', 'Tyrol', 'Ausserfern']
+        )
         self.assertEqual(
-                    tv2.getTermPath('Non-existent'), 
-                    [])
+            tv2.getTermPath('Non-existent'),
+            []
+        )
         self.assertEqual(
-                    tv3.getTermPath('database'),
-                    ["infrastructure", "data_transaction", "database"])
+            tv3.getTermPath('database'),
+            ["infrastructure", "data_transaction", "database"]
+        )
 
     def test_len(self):
         # len returns the number of all nodes in the dict
@@ -390,22 +428,22 @@ class TreeVocabularyTests(unittest.TestCase):
 
     def test_contains(self):
         tv2 = self.tree_vocab_2()
-        self.assertTrue('Regions' in tv2 and 
-                        'Austria' in tv2 and 
+        self.assertTrue('Regions' in tv2 and
+                        'Austria' in tv2 and
                         'Bavaria' in tv2)
 
         self.assertTrue('bav' not in tv2)
         self.assertTrue('foo' not in tv2)
-        self.assertTrue({} not in tv2) # not hashable
+        self.assertTrue({} not in tv2)  # not hashable
 
         tv3 = self.tree_vocab_3()
-        self.assertTrue('database' in tv3 and 
-                        'security' in tv3 and 
+        self.assertTrue('database' in tv3 and
+                        'security' in tv3 and
                         'services' in tv3)
 
         self.assertTrue('Services' not in tv3)
         self.assertTrue('Database' not in tv3)
-        self.assertTrue({} not in tv3) # not hashable
+        self.assertTrue({} not in tv3)  # not hashable
 
     def test_values_and_items(self):
         for v in (self.tree_vocab_2(), self.tree_vocab_3()):
@@ -435,18 +473,21 @@ class TreeVocabularyTests(unittest.TestCase):
         # must be unique. This rule applies recursively.
         self.assertRaises(
             ValueError, self._getTargetClass().fromDict,
-            { ('one', '1'): {},
-              ('two', '1'): {},
+            {
+                ('one', '1'): {},
+                ('two', '1'): {},
             })
         self.assertRaises(
             ValueError, self._getTargetClass().fromDict,
-            { ('one', '1'): {},
-              ('one', '2'): {},
+            {
+                ('one', '1'): {},
+                ('one', '2'): {},
             })
         # Even nested tokens must be unique.
         self.assertRaises(
             ValueError, self._getTargetClass().fromDict,
-            { ('new_york', 'New York'): {
+            {
+                ('new_york', 'New York'): {
                     ('albany', 'Albany'): {},
                     ('new_york', 'New York'): {},
                 },
@@ -454,37 +495,38 @@ class TreeVocabularyTests(unittest.TestCase):
         # The same applies to nested values.
         self.assertRaises(
             ValueError, self._getTargetClass().fromDict,
-            { ('1', 'new_york'): {
+            {
+                ('1', 'new_york'): {
                     ('2', 'albany'): {},
                     ('3', 'new_york'): {},
                 },
             })
         # The title attribute does however not have to be unique.
-        self._getTargetClass().fromDict(
-            { ('1', 'new_york', 'New York'): {
-                    ('2', 'ny_albany', 'Albany'): {},
-                    ('3', 'ny_new_york', 'New York'): {},
-                },
-            })
         self._getTargetClass().fromDict({
-                ('one', '1', 'One'): {},
-                ('two', '2', 'One'): {},
-            })
+            ('1', 'new_york', 'New York'): {
+                ('2', 'ny_albany', 'Albany'): {},
+                ('3', 'ny_new_york', 'New York'): {},
+            },
+        })
+        self._getTargetClass().fromDict({
+            ('one', '1', 'One'): {},
+            ('two', '2', 'One'): {},
+        })
 
     def test_nonunique_value_message(self):
         try:
-            self._getTargetClass().fromDict(
-            { ('one', '1'): {},
-              ('two', '1'): {},
+            self._getTargetClass().fromDict({
+                ('one', '1'): {},
+                ('two', '1'): {},
             })
         except ValueError as e:
             self.assertEqual(str(e), "Term values must be unique: '1'")
 
     def test_nonunique_token_message(self):
         try:
-            self._getTargetClass().fromDict(
-            { ('one', '1'): {},
-              ('one', '2'): {},
+            self._getTargetClass().fromDict({
+                ('one', '1'): {},
+                ('one', '2'): {},
             })
         except ValueError as e:
             self.assertEqual(str(e), "Term tokens must be unique: 'one'")

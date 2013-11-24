@@ -24,6 +24,9 @@ class FieldEqualityTests(unittest.TestCase):
         from zope.schema import Int
         from zope.schema import Text
 
+        # pep 8 friendlyness
+        u, Int, Text
+
         equality = [
             'Text(title=u("Foo"), description=u("Bar"))',
             'Int(title=u("Foo"), description=u("Bar"))',

@@ -32,11 +32,13 @@ class _Integration(object):
 
     def _makeImplementer(self):
         schema = _getSchema()
+
         class _Implementer(object):
             title = self._makeOne(schema['title'])
             weight = self._makeOne(schema['weight'])
             code = self._makeOne(schema['code'])
             date = self._makeOne(schema['date'])
+
         return _Implementer()
 
     def test_basic(self):
@@ -93,12 +95,13 @@ class FieldPropertyTests(_Base, _Integration):
     def test_ctor_explicit(self):
         from zope.schema import Text
         from zope.schema._compat import u
-        field = Text(__name__='testing',
-                     description=u('DESCRIPTION'),
-                     default=u('DEFAULT'),
-                     readonly=True,
-                     required=True,
-                    )
+        field = Text(
+            __name__='testing',
+            description=u('DESCRIPTION'),
+            default=u('DEFAULT'),
+            readonly=True,
+            required=True,
+        )
         cname = self._getTargetClass().__name__
         prop = self._makeOne(field, name='override')
         self.assertTrue(getattr(prop, '_%s__field' % cname) is field)
@@ -110,8 +113,10 @@ class FieldPropertyTests(_Base, _Integration):
 
     def test___get___from_class(self):
         prop = self._makeOne()
+
         class Foo(object):
             testing = prop
+
         self.assertTrue(Foo.testing is prop)
 
     def test___get___from_instance_pseudo_field_wo_default(self):
@@ -119,22 +124,28 @@ class FieldPropertyTests(_Base, _Integration):
             def bind(self, other):
                 return self
         prop = self._makeOne(_Faux(), 'nonesuch')
+
         class Foo(object):
             testing = prop
+
         foo = Foo()
         self.assertRaises(AttributeError, getattr, foo, 'testing')
 
     def test___get___from_instance_miss_uses_field_default(self):
         prop = self._makeOne()
+
         class Foo(object):
             testing = prop
+
         foo = Foo()
         self.assertEqual(foo.testing, None)
 
     def test___get___from_instance_hit(self):
         prop = self._makeOne(name='other')
+
         class Foo(object):
             testing = prop
+
         foo = Foo()
         foo.other = '123'
         self.assertEqual(foo.testing, '123')
@@ -142,11 +153,15 @@ class FieldPropertyTests(_Base, _Integration):
     def test___get___from_instance_hit_after_bind(self):
         class _Faux(object):
             default = '456'
+
             def bind(self, other):
                 return self
+
         prop = self._makeOne(_Faux(), 'testing')
+
         class Foo(object):
             testing = prop
+
         foo = Foo()
         self.assertEqual(foo.testing, '456')
 
@@ -154,14 +169,18 @@ class FieldPropertyTests(_Base, _Integration):
         class _Faux(object):
             readonly = False
             default = '456'
+
             def bind(self, other):
                 return self
+
         faux = _Faux()
         _validated = []
         faux.validate = _validated.append
         prop = self._makeOne(faux, 'testing')
+
         class Foo(object):
             testing = prop
+
         foo = Foo()
         foo.testing = '123'
         self.assertEqual(foo.__dict__['testing'], '123')
@@ -170,14 +189,18 @@ class FieldPropertyTests(_Base, _Integration):
         class _Faux(object):
             readonly = True
             default = '456'
+
             def bind(self, other):
                 return self
+
         faux = _Faux()
         _validated = []
         faux.validate = _validated.append
         prop = self._makeOne(faux, 'testing')
+
         class Foo(object):
             testing = prop
+
         foo = Foo()
         foo.testing = '123'
         self.assertEqual(foo.__dict__['testing'], '123')
@@ -187,14 +210,18 @@ class FieldPropertyTests(_Base, _Integration):
         class _Faux(object):
             readonly = True
             default = '456'
+
             def bind(self, other):
                 return self
+
         faux = _Faux()
         _validated = []
         faux.validate = _validated.append
         prop = self._makeOne(faux, 'testing')
+
         class Foo(object):
             testing = prop
+
         foo = Foo()
         foo.__dict__['testing'] = '789'
         self.assertRaises(ValueError, setattr, foo, 'testing', '123')
@@ -225,12 +252,13 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
     def test_ctor_explicit(self):
         from zope.schema import Text
         from zope.schema._compat import u
-        field = Text(__name__='testing',
-                     description=u('DESCRIPTION'),
-                     default=u('DEFAULT'),
-                     readonly=True,
-                     required=True,
-                    )
+        field = Text(
+            __name__='testing',
+            description=u('DESCRIPTION'),
+            default=u('DEFAULT'),
+            readonly=True,
+            required=True,
+        )
         cname = self._getTargetClass().__name__
         prop = self._makeOne(field, name='override')
         self.assertTrue(isinstance(prop.field, field.__class__))
@@ -245,8 +273,10 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
 
     def test_setValue(self):
         from zope.schema import Text
+
         class Foo(object):
             pass
+
         foo = Foo()
         prop = self._makeOne()
         field = Text(__name__='testing')
@@ -256,8 +286,10 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
     def test_getValue_miss(self):
         from zope.schema import Text
         from zope.schema.fieldproperty import _marker
+
         class Foo(object):
             pass
+
         foo = Foo()
         prop = self._makeOne()
         field = Text(__name__='testing')
@@ -266,8 +298,10 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
 
     def test_getValue_hit(self):
         from zope.schema import Text
+
         class Foo(object):
             pass
+
         foo = Foo()
         foo.testing = '123'
         prop = self._makeOne()
@@ -277,8 +311,10 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
 
     def test_queryValue_miss(self):
         from zope.schema import Text
+
         class Foo(object):
             pass
+
         foo = Foo()
         prop = self._makeOne()
         field = Text(__name__='testing')
@@ -288,8 +324,10 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
 
     def test_queryValue_hit(self):
         from zope.schema import Text
+
         class Foo(object):
             pass
+
         foo = Foo()
         foo.testing = '123'
         prop = self._makeOne()
@@ -300,27 +338,36 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
 
     def test___get___from_class(self):
         prop = self._makeOne()
+
         class Foo(object):
             testing = prop
+
         self.assertTrue(Foo.testing is prop)
 
     def test___get___from_instance_pseudo_field_wo_default(self):
         class _Faux(object):
             __name__ = 'Faux'
+
             def bind(self, other):
                 return self
+
             def query(self, inst, default):
                 return default
+
         prop = self._makeOne(_Faux(), 'nonesuch')
+
         class Foo(object):
             testing = prop
+
         foo = Foo()
         self.assertRaises(AttributeError, getattr, foo, 'testing')
 
     def test___get___from_instance_miss_uses_field_default(self):
         prop = self._makeOne()
+
         class Foo(object):
             testing = prop
+
         foo = Foo()
         self.assertEqual(foo.testing, None)
 
@@ -328,8 +375,10 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
         from zope.schema import Text
         field = Text(__name__='testing')
         prop = self._makeOne(field, name='other')
+
         class Foo(object):
             testing = prop
+
         foo = Foo()
         foo.__dict__['__st_testing_st'] = '456'
         foo.other = '123'
@@ -340,16 +389,21 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
             __name__ = 'Faux'
             readonly = False
             default = '456'
+
             def bind(self, other):
                 return self
+
             def set(self, inst, value):
                 setattr(inst, 'faux', value)
+
         faux = _Faux()
         _validated = []
         faux.validate = _validated.append
         prop = self._makeOne(faux, 'testing')
+
         class Foo(object):
             testing = prop
+
         foo = Foo()
         foo.testing = '123'
         self.assertEqual(foo.__dict__['faux'], '123')
@@ -360,20 +414,26 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
             __name__ = 'Faux'
             readonly = True
             default = '456'
+
             def bind(self, other):
                 return self
+
             def query(self, inst, default):
                 return default
+
             def set(self, inst, value):
                 if self.readonly:
                     raise ValueError
                 setattr(inst, 'faux', value)
+
         faux = _Faux()
         _validated = []
         faux.validate = _validated.append
         prop = self._makeOne(faux, 'testing')
+
         class Foo(object):
             testing = prop
+
         foo = Foo()
         foo.testing = '123'
         self.assertEqual(foo.__dict__['faux'], '123')
@@ -384,16 +444,21 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
             __name__ = 'Faux'
             readonly = True
             default = '456'
+
             def bind(self, other):
                 return self
+
             def query(self, inst, default):
                 return '789'
+
         faux = _Faux()
         _validated = []
         faux.validate = _validated.append
         prop = self._makeOne(faux, 'testing')
+
         class Foo(object):
             testing = prop
+
         foo = Foo()
         foo.__dict__['testing'] = '789'
         self.assertRaises(ValueError, setattr, foo, 'testing', '123')

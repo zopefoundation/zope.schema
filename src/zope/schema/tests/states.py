@@ -91,7 +91,7 @@ class State(object):
         self.value = value
         self.title = title
 
-for v,p in _states.items():
+for v, p in _states.items():
     _states[v] = State(v, p)
 
 

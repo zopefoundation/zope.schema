@@ -19,6 +19,7 @@ def _skip_under_py3(testcase):
     if not PY3:
         return testcase
 
+
 class ValidationErrorTests(unittest.TestCase):
 
     def _getTargetClass(self):

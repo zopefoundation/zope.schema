@@ -15,6 +15,7 @@
 """
 import unittest
 
+
 def _makeSchema():
     from zope.schema._compat import b
     from zope.schema._compat import u
@@ -38,6 +39,7 @@ def _makeSchema():
             default=b(""),
             required=True)
     return ISchemaTest
+
 
 def _makeDerivedSchema(base=None):
     from zope.schema._compat import b
@@ -114,14 +116,14 @@ class Test_getFieldNames(unittest.TestCase):
 
     def test_simple(self):
         names = self._callFUT(_makeSchema())
-        self.assertEqual(len(names),3)
+        self.assertEqual(len(names), 3)
         self.assertTrue('title' in names)
         self.assertTrue('description' in names)
         self.assertTrue('spam' in names)
 
     def test_derived(self):
         names = self._callFUT(_makeDerivedSchema())
-        self.assertEqual(len(names),4)
+        self.assertEqual(len(names), 4)
         self.assertTrue('title' in names)
         self.assertTrue('description' in names)
         self.assertTrue('spam' in names)
@@ -151,8 +153,10 @@ class Test_getValidationErrors(unittest.TestCase):
 
     def test_schema(self):
         from zope.interface import Interface
+
         class IEmpty(Interface):
             pass
+
         errors = self._callFUT(IEmpty, object())
         self.assertEqual(len(errors), 0)
 
@@ -160,8 +164,10 @@ class Test_getValidationErrors(unittest.TestCase):
         from zope.interface import Interface
         from zope.schema import Text
         from zope.schema.interfaces import SchemaNotFullyImplemented
+
         class IWithRequired(Interface):
             must = Text(required=True)
+
         errors = self._callFUT(IWithRequired, object())
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0][0], 'must')
@@ -171,10 +177,12 @@ class Test_getValidationErrors(unittest.TestCase):
         from zope.interface import Interface
         from zope.interface import invariant
         from zope.interface.exceptions import Invalid
+
         class IWithFailingInvariant(Interface):
             @invariant
             def _epic_fail(obj):
                 raise Invalid('testing')
+
         errors = self._callFUT(IWithFailingInvariant, object())
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0][0], None)
@@ -183,10 +191,12 @@ class Test_getValidationErrors(unittest.TestCase):
     def test_schema_with_invariant_ok(self):
         from zope.interface import Interface
         from zope.interface import invariant
+
         class IWithPassingInvariant(Interface):
             @invariant
             def _hall_pass(obj):
                 pass
+
         errors = self._callFUT(IWithPassingInvariant, object())
         self.assertEqual(len(errors), 0)
 
@@ -200,10 +210,12 @@ class Test_getSchemaValidationErrors(unittest.TestCase):
     def test_schema_wo_fields(self):
         from zope.interface import Interface
         from zope.interface import Attribute
+
         class INoFields(Interface):
             def method():
                 pass
             attr = Attribute('ignoreme')
+
         errors = self._callFUT(INoFields, object())
         self.assertEqual(len(errors), 0)
 
@@ -211,12 +223,15 @@ class Test_getSchemaValidationErrors(unittest.TestCase):
         from zope.interface import Interface
         from zope.schema import Text
         from zope.schema._compat import u
+
         class IWithFields(Interface):
             foo = Text()
             bar = Text()
+
         class Obj(object):
             foo = u('Foo')
             bar = u('Bar')
+
         errors = self._callFUT(IWithFields, Obj())
         self.assertEqual(len(errors), 0)
 
@@ -224,8 +239,10 @@ class Test_getSchemaValidationErrors(unittest.TestCase):
         from zope.interface import Interface
         from zope.schema import Text
         from zope.schema.interfaces import SchemaNotFullyImplemented
+
         class IWithRequired(Interface):
             must = Text(required=True)
+
         errors = self._callFUT(IWithRequired, object())
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0][0], 'must')
@@ -235,10 +252,13 @@ class Test_getSchemaValidationErrors(unittest.TestCase):
         from zope.interface import Interface
         from zope.schema import Int
         from zope.schema.interfaces import TooSmall
+
         class IWithMinium(Interface):
             value = Int(required=True, min=0)
+
         class Obj(object):
             value = -1
+
         errors = self._callFUT(IWithMinium, Obj())
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0][0], 'value')
