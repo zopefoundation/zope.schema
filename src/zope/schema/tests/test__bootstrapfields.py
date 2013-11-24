@@ -232,11 +232,12 @@ class FieldTests(unittest.TestCase):
 
         def _factory():
             return obj
-        field = self._makeOne(required=False,
-                              readonly=True,
-                              constraint=_constraint,
-                              defaultFactory=_factory,
-                             )
+        field = self._makeOne(
+            required=False,
+            readonly=True,
+            constraint=_constraint,
+            defaultFactory=_factory,
+        )
         self.assertEqual(field.required, False)
         self.assertEqual(field.readonly, True)
         self.assertEqual(field.constraint(self), False)
@@ -659,7 +660,7 @@ class PasswordTests(unittest.TestCase):
         from zope.schema._bootstrapinterfaces import WrongType
         klass = self._getTargetClass()
         inst = DummyInst()
-        pw = self._makeOne(__name__= 'password').bind(inst)
+        pw = self._makeOne(__name__='password').bind(inst)
         self.assertRaises(WrongType,
                           pw.validate, klass.UNCHANGED_PASSWORD)
 
@@ -667,8 +668,8 @@ class PasswordTests(unittest.TestCase):
         klass = self._getTargetClass()
         inst = DummyInst()
         inst.password = 'foobar'
-        pw = self._makeOne(__name__= 'password').bind(inst)
-        pw.validate(klass.UNCHANGED_PASSWORD) # doesn't raise
+        pw = self._makeOne(__name__='password').bind(inst)
+        pw.validate(klass.UNCHANGED_PASSWORD)  # doesn't raise
 
     def test_constraint(self):
         from zope.schema._compat import u
