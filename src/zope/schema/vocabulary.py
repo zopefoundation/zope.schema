@@ -13,6 +13,7 @@
 ##############################################################################
 """Vocabulary support for schema.
 """
+
 from zope.interface import directlyProvides
 from zope.interface import implementer
 from zope.schema.interfaces import ITitledTokenizedTerm
@@ -24,6 +25,7 @@ from zope.schema._compat import OrderedDict
 
 # simple vocabularies performing enumerated-like tasks
 _marker = object()
+
 
 @implementer(ITokenizedTerm)
 class SimpleTerm(object):
@@ -41,11 +43,12 @@ class SimpleTerm(object):
         # we want here. On the other hand, we want to try to keep the token as
         # readable as possible.
         self.token = str(token) \
-                     if not isinstance(token, bytes) \
-                     else str(token.decode('ascii', 'ignore'))
+            if not isinstance(token, bytes) \
+            else str(token.decode('ascii', 'ignore'))
         self.title = title
         if title is not None:
             directlyProvides(self, ITitledTokenizedTerm)
+
 
 @implementer(IVocabularyTokenized)
 class SimpleVocabulary(object):
@@ -181,8 +184,8 @@ class TreeVocabulary(object):
 
         Refer to the method fromDict for more details.
 
-        Concerning the ITokenizedTerm keys, the 'value' and 'token' attributes of
-        each key (including nested ones) must be unique.
+        Concerning the ITokenizedTerm keys, the 'value' and 'token' attributes
+        of each key (including nested ones) must be unique.
 
         One or more interfaces may also be provided so that alternate
         widgets may be bound without subclassing.
@@ -299,7 +302,8 @@ class TreeVocabulary(object):
             self.term_by_token[token] = term
 
             if value not in self.path_by_value:
-               self.path_by_value[value] = self._getPathToTreeNode(self, value)
+                self.path_by_value[value] = self._getPathToTreeNode(self,
+                                                                    value)
             self._populateIndexes(tree[term])
 
     def getTerm(self, value):
@@ -340,6 +344,7 @@ class TreeVocabulary(object):
         """
         return self.path_by_value.get(value, [])
 
+
 # registry code
 class VocabularyRegistryError(LookupError):
     def __init__(self, name):
@@ -370,6 +375,7 @@ class VocabularyRegistry(object):
 
 _vocabularies = None
 
+
 def getVocabularyRegistry():
     """Return the vocabulary registry.
 
@@ -380,10 +386,12 @@ def getVocabularyRegistry():
         setVocabularyRegistry(VocabularyRegistry())
     return _vocabularies
 
+
 def setVocabularyRegistry(registry):
     """Set the vocabulary registry."""
     global _vocabularies
     _vocabularies = registry
+
 
 def _clear():
     """Remove the registries (for use by tests)."""
@@ -393,9 +401,9 @@ def _clear():
 
 try:
     from zope.testing.cleanup import addCleanUp
-except ImportError: #pragma NO COVER
+except ImportError:  # pragma NO COVER
     # don't have that part of Zope
     pass
-else: #pragma NO COVER
+else:  # pragma NO COVER
     addCleanUp(_clear)
     del addCleanUp

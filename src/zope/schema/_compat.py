@@ -4,10 +4,14 @@ PY3 = sys.version_info[0] >= 3
 
 try:
     from collections import OrderedDict
-except ImportError: #pragma NO COVER
+except ImportError:  # pragma NO COVER
     from ordereddict import OrderedDict
 
-if PY3: #pragma NO COVER
+# pep 8 friendlyness
+OrderedDict
+
+
+if PY3:  # pragma NO COVER
     import builtins
     def b(s):
         return s.encode("latin-1")
@@ -25,7 +29,7 @@ if PY3: #pragma NO COVER
         if isinstance(x, bytes):
             return x
         return x.encode('ascii')
-else: #pragma NO COVER
+else:  # pragma NO COVER
     def b(s):
         return s
     def u(s):

@@ -11,7 +11,7 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""\
+"""
 Field accessors
 ===============
 
@@ -24,7 +24,7 @@ To define accessors in an interface, use the accessors function::
 
      getFoo, setFoo = accessors(Text(title=u'Foo', ...))
 
-     getBar, = accessors(TextLine(title=u'Foo', readonly=True, ...)
+     getBar = accessors(TextLine(title=u'Foo', readonly=True, ...)
 
 
 Normally a read accessor and a write accessor are defined.  Only a
@@ -33,6 +33,7 @@ read accessor is defined for read-only fields.
 Read accessors function as access method specifications and as field
 specifications.  Write accessors are solely method specifications.
 """
+
 from zope.interface import providedBy, implementedBy
 from zope.interface.interface import Method
 
@@ -90,6 +91,7 @@ class FieldReadAccessor(Method):
         clone.field = self.field.bind(object)
         return clone
 
+
 class FieldWriteAccessor(Method):
 
     def __init__(self, field):
@@ -108,6 +110,7 @@ class FieldWriteAccessor(Method):
                 'kwargs': None,
                 }
 
+
 def accessors(field):
     reader = FieldReadAccessor(field)
     yield reader
@@ -115,5 +118,3 @@ def accessors(field):
         writer = FieldWriteAccessor(field)
         reader.writer = writer
         yield writer
-
-

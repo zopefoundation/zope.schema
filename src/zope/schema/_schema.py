@@ -35,8 +35,8 @@ def getFields(schema):
             fields[name] = attr
     return fields
 
-def getFieldsInOrder(schema,
-                     _field_key=lambda x: x[1].order):
+
+def getFieldsInOrder(schema, _field_key=lambda x: x[1].order):
     """Return a list of (name, value) tuples in native schema order.
     """
     return sorted(getFields(schema).items(), key=_field_key)
@@ -45,7 +45,7 @@ def getFieldsInOrder(schema,
 def getFieldNamesInOrder(schema):
     """Return a list of all the Field names in a schema in schema order.
     """
-    return [ name for name, field in getFieldsInOrder(schema) ]
+    return [name for name, field in getFieldsInOrder(schema)]
 
 
 def getValidationErrors(schema, object):

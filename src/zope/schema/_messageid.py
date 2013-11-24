@@ -14,7 +14,7 @@
 
 try:
     from zope.i18nmessageid import MessageFactory
-except ImportError: #pragma NO COVER
+except ImportError:  # pragma NO COVER
     from zope.schema._compat import text_type as _
-else: #pragma NO COVER
+else:  # pragma NO COVER
     _ = MessageFactory("zope")

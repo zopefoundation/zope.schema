@@ -22,14 +22,17 @@ import os
 import sys
 from setuptools import setup, find_packages
 
+
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
+
 
 def _modname(path, base, name=''):
     if path == base:
         return name
     dirname, basename = os.path.split(path)
     return _modname(dirname, base, basename + '.' + name)
+
 
 def alltests():
     import logging
@@ -61,32 +64,36 @@ def alltests():
             suite.addTest(mod.test_suite())
     return suite
 
+
 REQUIRES = [
-        'setuptools',
-        'zope.interface >= 3.6.0',
-        'zope.event',
-        ]
+    'setuptools',
+    'zope.interface >= 3.6.0',
+    'zope.event',
+]
+
 
 if sys.version_info < (2, 7):
     REQUIRES += ['ordereddict']
 
+
 TESTS_REQUIRE = ['zope.testing']
 
-setup(name='zope.schema',
-      version='4.3.3.dev0',
-      url='http://pypi.python.org/pypi/zope.schema',
-      license='ZPL 2.1',
-      description='zope.interface extension for defining data schemas',
-      author='Zope Foundation and Contributors',
-      author_email='zope-dev@zope.org',
-      long_description=(read('README.rst') + '\n\n' + read('CHANGES.rst')),
-      packages=find_packages('src'),
-      package_dir = {'': 'src'},
-      namespace_packages=['zope',],
-      #extras_require={
-      #                'docs': ['z3c.recipe.sphinxdoc']},
-      install_requires=REQUIRES,
-      classifiers=[
+
+setup(
+    name='zope.schema',
+    version='4.3.3.dev0',
+    url='http://pypi.python.org/pypi/zope.schema',
+    license='ZPL 2.1',
+    description='zope.interface extension for defining data schemas',
+    author='Zope Foundation and Contributors',
+    author_email='zope-dev@zope.org',
+    long_description=(read('README.rst') + '\n\n' + read('CHANGES.rst')),
+    packages=find_packages('src'),
+    package_dir = {'': 'src'},
+    namespace_packages=['zope', ],
+    #extras_require={'docs': ['z3c.recipe.sphinxdoc']},
+    install_requires=REQUIRES,
+    classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: Zope Public License",
@@ -102,14 +109,14 @@ setup(name='zope.schema',
         "Programming Language :: Python :: Implementation :: PyPy",
         "Framework :: Zope3",
         "Topic :: Software Development :: Libraries :: Python Modules",
-      ],
-      include_package_data = True,
-      zip_safe = False,
-      test_suite='__main__.alltests',
-      tests_require=TESTS_REQUIRE,
-      extras_require={
+    ],
+    include_package_data = True,
+    zip_safe = False,
+    test_suite='__main__.alltests',
+    tests_require=TESTS_REQUIRE,
+    extras_require={
         'docs': ['Sphinx'],
         'test': TESTS_REQUIRE,
         'testing': TESTS_REQUIRE + ['nose', 'coverage'],
-      },
+    },
 )

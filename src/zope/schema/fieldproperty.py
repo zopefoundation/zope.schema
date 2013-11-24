@@ -13,9 +13,11 @@
 ##############################################################################
 """Computed attributes based on schema fields
 """
+
 from copy import copy
 import sys
 import zope.schema
+
 _marker = object()
 
 

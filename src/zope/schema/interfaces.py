@@ -48,29 +48,44 @@ from zope.schema._compat import u
 from zope.schema._messageid import _
 
 
+# pep 8
+Field, Container, Iterable, Text, TextLine, Bool, Int
+StopValidation, ValidationError, IFromUnicode, RequiredMissing, WrongType
+ConstraintNotSatisfied, NotAContainer, NotAnIterator
+TooSmall, TooBig, TooLong, TooShort, InvalidValue, IContextAwareDefaultFactory
+
+
 class WrongContainedType(ValidationError):
     __doc__ = _("""Wrong contained type""")
+
 
 class NotUnique(ValidationError):
     __doc__ = _("""One or more entries of sequence are not unique.""")
 
+
 class SchemaNotFullyImplemented(ValidationError):
     __doc__ = _("""Schema not fully implemented""")
+
 
 class SchemaNotProvided(ValidationError):
     __doc__ = _("""Schema not provided""")
 
+
 class InvalidURI(ValidationError):
     __doc__ = _("""The specified URI is not valid.""")
+
 
 class InvalidId(ValidationError):
     __doc__ = _("""The specified id is not valid.""")
 
+
 class InvalidDottedName(ValidationError):
     __doc__ = _("""The specified dotted name is not valid.""")
 
+
 class Unbound(Exception):
     __doc__ = _("""The field is not bound.""")
+
 
 class IField(Interface):
     """Basic Schema Field Interface.
@@ -126,8 +141,7 @@ class IField(Interface):
 
     required = Bool(
         title=_("Required"),
-        description=(
-        _("Tells whether a field requires its value to exist.")),
+        description=(_("Tells whether a field requires its value to exist.")),
         default=True)
 
     readonly = Bool(
@@ -194,6 +208,7 @@ class IField(Interface):
         Raises a type error if the field is a read-only field.
         """
 
+
 class IIterable(IField):
     """Fields with a value that can be iterated over.
 
@@ -201,6 +216,7 @@ class IIterable(IField):
     is not constrained.  (Either `__iter__()` or `__getitem__()` may be
     used.)
     """
+
 
 class IContainer(IField):
     """Fields whose value allows an ``x in value`` check.
@@ -210,6 +226,7 @@ class IContainer(IField):
     or `__getitem__()` is immaterial).
     """
 
+
 class IOrderable(IField):
     """Field requiring its value to be orderable.
 
@@ -218,11 +235,13 @@ class IOrderable(IField):
     'rich comparison' methods may be used.
     """
 
+
 class ILen(IField):
     """A Field requiring its value to have a length.
 
     The value needs to have a conventional __len__ method.
     """
+
 
 class IMinMax(IOrderable):
     """Field requiring its value to be between min and max.
@@ -255,7 +274,7 @@ class IMinMaxLen(ILen):
         no minimum.
         """),
         required=False,
-        min=0, # needs to be a positive number
+        min=0,  # needs to be a positive number
         default=0)
 
     max_length = Int(
@@ -266,12 +285,14 @@ class IMinMaxLen(ILen):
         elements (if another sequence type). If `max_length` is
         ``None``, there is no maximum."""),
         required=False,
-        min=0, # needs to be a positive number
+        min=0,  # needs to be a positive number
         default=None)
+
 
 class IInterfaceField(IField):
     """Fields with a value that is an interface (implementing
     zope.interface.Interface)."""
+
 
 class IBool(IField):
     """Boolean Field."""
@@ -282,20 +303,24 @@ class IBool(IField):
                         field value""")
         )
 
+
 class IBytes(IMinMaxLen, IIterable, IField):
     """Field containing a byte string (like the python str).
 
     The value might be constrained to be with length limits.
     """
 
+
 class IText(IMinMaxLen, IIterable, IField):
     """Field containing a unicode string."""
 
+
 # for things which are of the str type on both Python 2 and 3
-if PY3: #pragma NO COVER
+if PY3:  # pragma NO COVER
     INativeString = IText
-else: #pragma NO COVER
+else:  # pragma NO COVER
     INativeString = IBytes
+
 
 class IASCII(INativeString):
     """Field containing a 7-bit ASCII string. No characters > DEL
@@ -304,25 +329,32 @@ class IASCII(INativeString):
     The value might be constrained to be with length limits.
     """
 
+
 class IBytesLine(IBytes):
     """Field containing a byte string without newlines."""
+
 
 class IASCIILine(IASCII):
     """Field containing a 7-bit ASCII string without newlines."""
 
+
 class ISourceText(IText):
     """Field for source text of object."""
+
 
 class ITextLine(IText):
     """Field containing a unicode string without newlines."""
 
-if PY3: #pragma NO COVER
+
+if PY3:  # pragma NO COVER
     INativeStringLine = ITextLine
-else: #pragma NO COVER
+else:  # pragma NO COVER
     INativeStringLine = IBytesLine
+
 
 class IPassword(ITextLine):
     "Field containing a unicode string without newlines that is a password."
+
 
 class IInt(IMinMax, IField):
     """Field containing an Integer Value."""
@@ -345,28 +377,36 @@ class IInt(IMinMax, IField):
                         field value""")
         )
 
+
 class IFloat(IMinMax, IField):
     """Field containing a Float."""
+
 
 class IDecimal(IMinMax, IField):
     """Field containing a Decimal."""
 
+
 class IDatetime(IMinMax, IField):
     """Field containing a DateTime."""
+
 
 class IDate(IMinMax, IField):
     """Field containing a date."""
 
+
 class ITimedelta(IMinMax, IField):
     """Field containing a timedelta."""
 
+
 class ITime(IMinMax, IField):
     """Field containing a time."""
+
 
 def _is_field(value):
     if not IField.providedBy(value):
         return False
     return True
+
 
 def _fields(values):
     for value in values:
@@ -379,12 +419,14 @@ class IURI(INativeStringLine):
     """A field containing an absolute URI
     """
 
+
 class IId(INativeStringLine):
     """A field containing a unique identifier
 
     A unique identifier is either an absolute URI or a dotted name.
     If it's a dotted name, it should have a module/package name as a prefix.
     """
+
 
 class IDottedName(INativeStringLine):
     """Dotted name field.
@@ -404,6 +446,7 @@ class IDottedName(INativeStringLine):
         required=False,
         default=None
         )
+
 
 class IChoice(IField):
     """Field whose value is contained in a predefined set
@@ -429,6 +472,7 @@ class IChoice(IField):
 
 # Abstract
 
+
 class ICollection(IMinMaxLen, IIterable, IContainer):
     """Abstract interface containing a collection value.
 
@@ -436,26 +480,30 @@ class ICollection(IMinMaxLen, IIterable, IContainer):
     """
 
     value_type = Field(
-        title = _("Value Type"),
-        description = _("Field value items must conform to the given type, "
-                        "expressed via a Field."))
+        title=_("Value Type"),
+        description=_("Field value items must conform to the given type, "
+                      "expressed via a Field."))
 
     unique = Bool(
-        title = _('Unique Members'),
-        description = _('Specifies whether the members of the collection '
-                        'must be unique.'),
+        title=_('Unique Members'),
+        description=_('Specifies whether the members of the collection '
+                      'must be unique.'),
         default=False)
+
 
 class ISequence(ICollection):
     """Abstract interface specifying that the value is ordered"""
 
+
 class IUnorderedCollection(ICollection):
     """Abstract interface specifying that the value cannot be ordered"""
+
 
 class IAbstractSet(IUnorderedCollection):
     """An unordered collection of unique values."""
 
     unique = Attribute("This ICollection interface attribute must be True")
+
 
 class IAbstractBag(IUnorderedCollection):
     """An unordered collection of values, with no limitations on whether
@@ -463,19 +511,24 @@ class IAbstractBag(IUnorderedCollection):
 
     unique = Attribute("This ICollection interface attribute must be False")
 
+
 # Concrete
+
 
 class ITuple(ISequence):
     """Field containing a value that implements the API of a conventional
     Python tuple."""
 
+
 class IList(ISequence):
     """Field containing a value that implements the API of a conventional
     Python list."""
 
+
 class ISet(IAbstractSet):
     """Field containing a value that implements the API of a Python2.4+ set.
     """
+
 
 class IFrozenSet(IAbstractSet):
     """Field containing a value that implements the API of a conventional
@@ -483,11 +536,15 @@ class IFrozenSet(IAbstractSet):
 
 # (end Collections)
 
+
 class IObject(IField):
     """Field containing an Object value."""
 
-    schema = Attribute("schema",
-        _("The Interface that defines the Fields comprising the Object."))
+    schema = Attribute(
+        "schema",
+        _("The Interface that defines the Fields comprising the Object.")
+    )
+
 
 class IBeforeObjectAssignedEvent(Interface):
     """An object is going to be assigned to an attribute on another object.
@@ -496,7 +553,6 @@ class IBeforeObjectAssignedEvent(Interface):
     what object is going to be assigned. This is useful, e.g. for wrapping
     or replacing objects before they get assigned to conform to application
     policy.
-
     """
 
     object = Attribute("The object that is going to be assigned.")
@@ -515,15 +571,17 @@ class IDict(IMinMaxLen, IIterable, IContainer):
     of restrictions for keys and values contained in the dict.
     """
 
-    key_type = Attribute("key_type",
-        _("""Field keys must conform to the given type, expressed
-           via a Field.
-        """))
+    key_type = Attribute(
+        "key_type",
+        _("Field keys must conform to the given type, expressed via a Field.")
+    )
 
-    value_type = Attribute("value_type",
-        _("""Field values must conform to the given type, expressed
-           via a Field.
-        """))
+    value_type = Attribute(
+        "value_type",
+        _("Field values must conform to the given type, expressed "
+          "via a Field.")
+    )
+
 
 class ITerm(Interface):
     """Object representing a single value in a vocabulary."""
@@ -546,10 +604,12 @@ class ITokenizedTerm(ITerm):
         Control characters are not allowed.
         """)
 
+
 class ITitledTokenizedTerm(ITokenizedTerm):
     """A tokenized term that includes a title."""
 
     title = TextLine(title=_("Title"))
+
 
 class ISource(Interface):
     """A set of values from which to choose
@@ -559,12 +619,12 @@ class ISource(Interface):
 
     Sources can be large (even infinite), in which case, they need to
     be queried to find out what their values are.
-
     """
 
     def __contains__(value):
         """Return whether the value is available in this source
         """
+
 
 class ISourceQueriables(Interface):
     """A collection of objects for querying sources
@@ -588,6 +648,7 @@ class ISourceQueriables(Interface):
           searching for items.
 
         """
+
 
 class IContextSourceBinder(Interface):
     def __call__(context):
@@ -657,13 +718,15 @@ class IVocabularyTokenized(IVocabulary):
         is raised.
         """
 
+
 class ITreeVocabulary(IVocabularyTokenized, IEnumerableMapping):
-    """A tokenized vocabulary with a tree-like structure. 
-    
+    """A tokenized vocabulary with a tree-like structure.
+
        The tree is implemented as dictionary, with keys being ITokenizedTerm
        terms and the values being similar dictionaries. Leaf values are empty
        dictionaries.
     """
+
 
 class IVocabularyRegistry(Interface):
     """Registry that provides IBaseVocabulary objects for specific fields.
@@ -681,5 +744,5 @@ class IVocabularyFactory(Interface):
     """Can create vocabularies."""
 
     def __call__(context):
-        """The context provides a location that the vocabulary can make use
-        of."""
+        """The context provides a location that the vocabulary can make use of.
+        """

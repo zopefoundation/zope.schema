@@ -32,11 +32,15 @@ from zope.schema._bootstrapinterfaces import TooShort
 from zope.schema._bootstrapinterfaces import TooSmall
 from zope.schema._bootstrapinterfaces import WrongType
 from zope.schema._compat import u
-from zope.schema._compat import b # used in docstring doctests
+from zope.schema._compat import b  # used in docstring doctests
 from zope.schema._compat import text_type
 from zope.schema._compat import integer_types
 
 from zope.schema._schema import getFields
+
+
+# pep 8 friendlyness
+b
 
 
 class ValidatedProperty(object):
@@ -190,7 +194,7 @@ class Field(Attribute):
             return False
 
         # should have the same properties
-        names = {} # used as set of property names, ignoring values
+        names = {}  # used as set of property names, ignoring values
         for interface in providedBy(self):
             names.update(getFields(interface))
 
