@@ -4,6 +4,8 @@ zope.schema Changelog
 4.3.3 (unreleased)
 ------------------
 
+- PEP 8 cleanup.
+
 - Don't raise RequiredMissing if a field's defaultFactory returns the field's
   missing_value.
 
