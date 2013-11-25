@@ -22,8 +22,6 @@ from zope.interface.common.mapping import IEnumerableMapping
 # Import from _bootstrapinterfaces only because other packages will expect
 # to find these interfaces here.
 from zope.schema._bootstrapfields import Field
-from zope.schema._bootstrapfields import Container
-from zope.schema._bootstrapfields import Iterable
 from zope.schema._bootstrapfields import Text
 from zope.schema._bootstrapfields import TextLine
 from zope.schema._bootstrapfields import Bool
@@ -48,8 +46,7 @@ from zope.schema._compat import u
 from zope.schema._messageid import _
 
 
-# pep 8
-Field, Container, Iterable, Text, TextLine, Bool, Int
+# pep 8 friendlyness
 StopValidation, ValidationError, IFromUnicode, RequiredMissing, WrongType
 ConstraintNotSatisfied, NotAContainer, NotAnIterator
 TooSmall, TooBig, TooLong, TooShort, InvalidValue, IContextAwareDefaultFactory

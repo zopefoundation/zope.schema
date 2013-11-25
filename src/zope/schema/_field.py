@@ -78,7 +78,7 @@ from zope.schema.interfaces import InvalidDottedName
 from zope.schema.interfaces import ConstraintNotSatisfied
 
 from zope.schema._bootstrapfields import Field
-from zope.schema._bootstrapfields import Container
+from zope.schema._bootstrapfields import Container  # API import for __init__
 from zope.schema._bootstrapfields import Iterable
 from zope.schema._bootstrapfields import Orderable
 from zope.schema._bootstrapfields import Text
@@ -92,7 +92,6 @@ from zope.schema.vocabulary import getVocabularyRegistry
 from zope.schema.vocabulary import VocabularyRegistryError
 from zope.schema.vocabulary import SimpleVocabulary
 
-from zope.schema._compat import u  # used in docstring doctests
 from zope.schema._compat import b
 from zope.schema._compat import text_type
 from zope.schema._compat import string_types
@@ -101,7 +100,7 @@ from zope.schema._compat import PY3
 from zope.schema._compat import make_binary
 
 # pep 8 friendlyness
-Container, u
+Container
 
 # Fix up bootstrap field types
 Field.title = FieldProperty(IField['title'])
@@ -460,6 +459,8 @@ def _validate_sequence(value_type, value, errors=None):
 
     To illustrate, we'll use a text value type. All values must be unicode.
 
+       >>> from zope.schema._compat import u
+       >>> from zope.schema._compat import b
        >>> field = TextLine(required=True)
 
     To validate a sequence of various values:

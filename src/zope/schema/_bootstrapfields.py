@@ -32,15 +32,10 @@ from zope.schema._bootstrapinterfaces import TooShort
 from zope.schema._bootstrapinterfaces import TooSmall
 from zope.schema._bootstrapinterfaces import WrongType
 from zope.schema._compat import u
-from zope.schema._compat import b  # used in docstring doctests
 from zope.schema._compat import text_type
 from zope.schema._compat import integer_types
 
 from zope.schema._schema import getFields
-
-
-# pep 8 friendlyness
-b
 
 
 class ValidatedProperty(object):
@@ -131,6 +126,7 @@ class Field(Attribute):
 
         Here are some examples:
 
+        >>> from zope.schema._compat import u
         >>> f = Field()
         >>> f.__doc__, f.title, f.description
         ('', u'', u'')
@@ -330,6 +326,8 @@ class Text(MinMaxLen, Field):
 
     def fromUnicode(self, str):
         """
+        >>> from zope.schema._compat import u
+        >>> from zope.schema._compat import b
         >>> t = Text(constraint=lambda v: 'x' in v)
         >>> t.fromUnicode(b("foo x spam"))
         Traceback (most recent call last):
@@ -402,6 +400,7 @@ class Bool(Field):
 
     def fromUnicode(self, str):
         """
+        >>> from zope.schema._compat import b
         >>> b = Bool()
         >>> IFromUnicode.providedBy(b)
         True
