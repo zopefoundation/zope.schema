@@ -313,9 +313,9 @@ class IText(IMinMaxLen, IIterable, IField):
 
 
 # for things which are of the str type on both Python 2 and 3
-if PY3:  # pragma NO COVER
+if PY3:  # pragma: no cover
     INativeString = IText
-else:  # pragma NO COVER
+else:  # pragma: no cover
     INativeString = IBytes
 
 
@@ -343,9 +343,9 @@ class ITextLine(IText):
     """Field containing a unicode string without newlines."""
 
 
-if PY3:  # pragma NO COVER
+if PY3:  # pragma: no cover
     INativeStringLine = ITextLine
-else:  # pragma NO COVER
+else:  # pragma: no cover
     INativeStringLine = IBytesLine
 
 

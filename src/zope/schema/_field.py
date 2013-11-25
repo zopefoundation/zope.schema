@@ -141,9 +141,9 @@ class Bytes(MinMaxLen, Field):
         return v
 
 # for things which are of the str type on both Python 2 and 3
-if PY3:  # pragma NO COVER
+if PY3:  # pragma: no cover
     NativeString = Text
-else:  # pragma NO COVER
+else:  # pragma: no cover
     NativeString = Bytes
 
 
@@ -168,9 +168,9 @@ class BytesLine(Bytes):
         return b('\n') not in value
 
 # for things which are of the str type on both Python 2 and 3
-if PY3:  # pragma NO COVER
+if PY3:  # pragma: no cover
     NativeStringLine = TextLine
-else:  # pragma NO COVER
+else:  # pragma: no cover
     NativeStringLine = BytesLine
 
 

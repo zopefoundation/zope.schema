@@ -401,9 +401,9 @@ def _clear():
 
 try:
     from zope.testing.cleanup import addCleanUp
-except ImportError:  # pragma NO COVER
+except ImportError:  # pragma: no cover
     # don't have that part of Zope
     pass
-else:  # pragma NO COVER
+else:  # pragma: no cover
     addCleanUp(_clear)
     del addCleanUp
