@@ -25,8 +25,10 @@ class ValidatedPropertyTests(unittest.TestCase):
 
     def test___set___not_missing_w_check(self):
         _checked = []
+
         def _check(inst, value):
             _checked.append((inst, value))
+
         class Test(DummyInst):
             _prop = None
             prop = self._makeOne('_prop', _check)
@@ -40,6 +42,7 @@ class ValidatedPropertyTests(unittest.TestCase):
             _prop = None
             prop = self._makeOne('_prop')
         inst = Test(ValueError)
+
         def _provoke(inst):
             inst.prop = 'PROP'
         self.assertRaises(ValueError, _provoke, inst)
@@ -77,6 +80,7 @@ class DefaultPropertyTests(unittest.TestCase):
             prop = self._makeOne('_prop')
         inst = Test()
         inst.defaultFactory = None
+
         def _provoke(inst):
             return inst.prop
         self.assertRaises(KeyError, _provoke, inst)
@@ -103,9 +107,11 @@ class DefaultPropertyTests(unittest.TestCase):
             _prop = None
             prop = self._makeOne('_prop')
         inst = Test(ValueError)
+
         def _factory():
             return 'PROP'
         inst.defaultFactory = _factory
+
         def _provoke(inst):
             return inst.prop
         self.assertRaises(ValueError, _provoke, inst)
@@ -115,14 +121,17 @@ class DefaultPropertyTests(unittest.TestCase):
         from zope.schema._bootstrapinterfaces \
             import IContextAwareDefaultFactory
         _checked = []
+
         def _check(inst, value):
             _checked.append((inst, value))
+
         class Test(DummyInst):
             _prop = None
             prop = self._makeOne('_prop', _check)
         inst = Test(ValueError)
         inst.context = object()
         _called_with = []
+
         def _factory(context):
             _called_with.append(context)
             return 'PROP'
@@ -199,14 +208,13 @@ class FieldTests(unittest.TestCase):
     def test_explicit_constraint_default(self):
         _called_with = []
         obj = object()
+
         def _constraint(value):
             _called_with.append(value)
             return value is obj
-        field = self._makeOne(required=False,
-                              readonly=True,
-                              constraint=_constraint,
-                              default=obj,
-                             )
+        field = self._makeOne(
+            required=False, readonly=True, constraint=_constraint, default=obj
+        )
         self.assertEqual(field.required, False)
         self.assertEqual(field.readonly, True)
         self.assertEqual(_called_with, [obj])
@@ -217,16 +225,19 @@ class FieldTests(unittest.TestCase):
     def test_explicit_defaultFactory(self):
         _called_with = []
         obj = object()
+
         def _constraint(value):
             _called_with.append(value)
             return value is obj
+
         def _factory():
             return obj
-        field = self._makeOne(required=False,
-                              readonly=True,
-                              constraint=_constraint,
-                              defaultFactory=_factory,
-                             )
+        field = self._makeOne(
+            required=False,
+            readonly=True,
+            constraint=_constraint,
+            defaultFactory=_factory,
+        )
         self.assertEqual(field.required, False)
         self.assertEqual(field.readonly, True)
         self.assertEqual(field.constraint(self), False)
@@ -255,57 +266,55 @@ class FieldTests(unittest.TestCase):
 
     def test_validate_missing_not_required(self):
         missing = object()
+
         def _fail(value):
             return False
-        field = self._makeOne(required=False,
-                              missing_value=missing,
-                              constraint=_fail,
-                             )
-        self.assertEqual(field.validate(missing), None) #doesn't raise
+        field = self._makeOne(
+            required=False, missing_value=missing, constraint=_fail,
+        )
+        self.assertEqual(field.validate(missing), None)  # doesn't raise
 
     def test_validate_missing_and_required(self):
         from zope.schema._bootstrapinterfaces import RequiredMissing
         missing = object()
+
         def _fail(value):
             return False
-        field = self._makeOne(required=True,
-                              missing_value=missing,
-                              constraint=_fail,
-                             )
+        field = self._makeOne(
+            required=True, missing_value=missing, constraint=_fail,
+        )
         self.assertRaises(RequiredMissing, field.validate, missing)
 
     def test_validate_wrong_type(self):
         from zope.schema._bootstrapinterfaces import WrongType
+
         def _fail(value):
             return False
-        field = self._makeOne(required=True,
-                              constraint=_fail,
-                             )
+        field = self._makeOne(required=True, constraint=_fail)
         field._type = str
         self.assertRaises(WrongType, field.validate, 1)
 
     def test_validate_constraint_fails(self):
         from zope.schema._bootstrapinterfaces import ConstraintNotSatisfied
+
         def _fail(value):
             return False
-        field = self._makeOne(required=True,
-                              constraint=_fail,
-                             )
+        field = self._makeOne(required=True, constraint=_fail)
         field._type = int
         self.assertRaises(ConstraintNotSatisfied, field.validate, 1)
 
     def test_validate_constraint_raises_StopValidation(self):
         from zope.schema._bootstrapinterfaces import StopValidation
+
         def _fail(value):
             raise StopValidation
-        field = self._makeOne(required=True,
-                              constraint=_fail,
-                             )
+        field = self._makeOne(required=True, constraint=_fail)
         field._type = int
-        field.validate(1) #doesn't raise
+        field.validate(1)  # doesn't raise
 
     def test___eq___different_type(self):
         left = self._makeOne()
+
         class Derived(self._getTargetClass()):
             pass
         right = Derived()
@@ -389,24 +398,26 @@ class ContainerTests(unittest.TestCase):
 
     def test__validate_collection_but_not_iterable(self):
         cont = self._makeOne()
+
         class Dummy(object):
             def __contains__(self, item):
                 return False
-        cont._validate(Dummy()) #doesn't raise
+        cont._validate(Dummy())  # doesn't raise
 
     def test__validate_not_collection_but_iterable(self):
         cont = self._makeOne()
+
         class Dummy(object):
             def __iter__(self):
                 return iter(())
-        cont._validate(Dummy()) #doesn't raise
+        cont._validate(Dummy())  # doesn't raise
 
     def test__validate_w_collections(self):
         cont = self._makeOne()
-        cont._validate(()) #doesn't raise
-        cont._validate([]) #doesn't raise
-        cont._validate('') #doesn't raise
-        cont._validate({}) #doesn't raise
+        cont._validate(())  # doesn't raise
+        cont._validate([])  # doesn't raise
+        cont._validate('')  # doesn't raise
+        cont._validate({})  # doesn't raise
 
 
 class IterableTests(ContainerTests):
@@ -418,6 +429,7 @@ class IterableTests(ContainerTests):
     def test__validate_collection_but_not_iterable(self):
         from zope.schema._bootstrapinterfaces import NotAnIterator
         itr = self._makeOne()
+
         class Dummy(object):
             def __contains__(self, item):
                 return False
@@ -433,6 +445,7 @@ class OrderableTests(unittest.TestCase):
     def _makeOne(self, *args, **kw):
         # Orderable is a mixin for a type derived from Field
         from zope.schema._bootstrapfields import Field
+
         class Mixed(self._getTargetClass(), Field):
             pass
         return Mixed(*args, **kw)
@@ -463,6 +476,7 @@ class MinMaxLenTests(unittest.TestCase):
     def _makeOne(self, *args, **kw):
         # MinMaxLen is a mixin for a type derived from Field
         from zope.schema._bootstrapfields import Field
+
         class Mixed(self._getTargetClass(), Field):
             pass
         return Mixed(*args, **kw)
@@ -617,12 +631,11 @@ class PasswordTests(unittest.TestCase):
         pw = self._makeOne()
         inst = DummyInst()
         before = dict(inst.__dict__)
-        pw.set(inst, klass.UNCHANGED_PASSWORD) #doesn't raise, doesn't write
+        pw.set(inst, klass.UNCHANGED_PASSWORD)  # doesn't raise, doesn't write
         after = dict(inst.__dict__)
         self.assertEqual(after, before)
 
     def test_set_normal(self):
-        klass = self._getTargetClass()
         pw = self._makeOne(__name__='password')
         inst = DummyInst()
         pw.set(inst, 'PASSWORD')
@@ -647,7 +660,7 @@ class PasswordTests(unittest.TestCase):
         from zope.schema._bootstrapinterfaces import WrongType
         klass = self._getTargetClass()
         inst = DummyInst()
-        pw = self._makeOne(__name__= 'password').bind(inst)
+        pw = self._makeOne(__name__='password').bind(inst)
         self.assertRaises(WrongType,
                           pw.validate, klass.UNCHANGED_PASSWORD)
 
@@ -655,8 +668,8 @@ class PasswordTests(unittest.TestCase):
         klass = self._getTargetClass()
         inst = DummyInst()
         inst.password = 'foobar'
-        pw = self._makeOne(__name__= 'password').bind(inst)
-        pw.validate(klass.UNCHANGED_PASSWORD) # doesn't raise
+        pw = self._makeOne(__name__='password').bind(inst)
+        pw.validate(klass.UNCHANGED_PASSWORD)  # doesn't raise
 
     def test_constraint(self):
         from zope.schema._compat import u
@@ -681,8 +694,8 @@ class BoolTests(unittest.TestCase):
 
     def test__validate_w_int(self):
         boo = self._makeOne()
-        boo._validate(0) #doesn't raise
-        boo._validate(1) #doesn't raise
+        boo._validate(0)  # doesn't raise
+        boo._validate(1)  # doesn't raise
 
     def test_set_w_int(self):
         boo = self._makeOne(__name__='boo')

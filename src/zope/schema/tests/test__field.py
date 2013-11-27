@@ -117,7 +117,7 @@ class ASCIITests(unittest.TestCase):
 
     def test__validate_empty(self):
         asc = self._makeOne()
-        asc._validate('') # no error
+        asc._validate('')  # no error
 
     def test__validate_non_empty_miss(self):
         from zope.schema.interfaces import InvalidValue
@@ -127,7 +127,7 @@ class ASCIITests(unittest.TestCase):
     def test__validate_non_empty_hit(self):
         asc = self._makeOne()
         for i in range(128):
-            asc._validate(chr(i)) #doesn't raise
+            asc._validate(chr(i))  # doesn't raise
 
 
 class BytesLineTests(unittest.TestCase):
@@ -451,8 +451,8 @@ class DatetimeTests(unittest.TestCase):
     def test_validate_not_required(self):
         from datetime import datetime
         field = self._makeOne(required=False)
-        field.validate(None) #doesn't raise
-        field.validate(datetime.now()) #doesn't raise
+        field.validate(None)  # doesn't raise
+        field.validate(datetime.now())  # doesn't raise
 
     def test_validate_required(self):
         from zope.schema.interfaces import RequiredMissing
@@ -462,37 +462,37 @@ class DatetimeTests(unittest.TestCase):
     def test_validate_w_min(self):
         from datetime import datetime
         from zope.schema.interfaces import TooSmall
-        d1 = datetime(2000,10,1)
-        d2 = datetime(2000,10,2)
+        d1 = datetime(2000, 10, 1)
+        d2 = datetime(2000, 10, 2)
         field = self._makeOne(min=d1)
-        field.validate(d1) #doesn't raise
-        field.validate(d2) #doesn't raise
-        self.assertRaises(TooSmall, field.validate, datetime(2000,9,30))
+        field.validate(d1)  # doesn't raise
+        field.validate(d2)  # doesn't raise
+        self.assertRaises(TooSmall, field.validate, datetime(2000, 9, 30))
 
     def test_validate_w_max(self):
         from datetime import datetime
         from zope.schema.interfaces import TooBig
-        d1 = datetime(2000,10,1)
-        d2 = datetime(2000,10,2)
-        d3 = datetime(2000,10,3)
+        d1 = datetime(2000, 10, 1)
+        d2 = datetime(2000, 10, 2)
+        d3 = datetime(2000, 10, 3)
         field = self._makeOne(max=d2)
-        field.validate(d1) #doesn't raise
-        field.validate(d2) #doesn't raise
+        field.validate(d1)  # doesn't raise
+        field.validate(d2)  # doesn't raise
         self.assertRaises(TooBig, field.validate, d3)
 
     def test_validate_w_min_and_max(self):
         from datetime import datetime
         from zope.schema.interfaces import TooBig
         from zope.schema.interfaces import TooSmall
-        d1 = datetime(2000,10,1)
-        d2 = datetime(2000,10,2)
-        d3 = datetime(2000,10,3)
-        d4 = datetime(2000,10,4)
-        d5 = datetime(2000,10,5)
+        d1 = datetime(2000, 10, 1)
+        d2 = datetime(2000, 10, 2)
+        d3 = datetime(2000, 10, 3)
+        d4 = datetime(2000, 10, 4)
+        d5 = datetime(2000, 10, 5)
         field = self._makeOne(min=d2, max=d4)
-        field.validate(d2) #doesn't raise
-        field.validate(d3) #doesn't raise
-        field.validate(d4) #doesn't raise
+        field.validate(d2)  # doesn't raise
+        field.validate(d3)  # doesn't raise
+        field.validate(d4)  # doesn't raise
         self.assertRaises(TooSmall, field.validate, d1)
         self.assertRaises(TooBig, field.validate, d5)
 
@@ -551,20 +551,20 @@ class DateTests(unittest.TestCase):
         from datetime import date
         from datetime import datetime
         from zope.schema.interfaces import TooSmall
-        d1 = date(2000,10,1)
-        d2 = date(2000,10,2)
+        d1 = date(2000, 10, 1)
+        d2 = date(2000, 10, 2)
         field = self._makeOne(min=d1)
         field.validate(d1)
         field.validate(d2)
         field.validate(datetime.now().date())
-        self.assertRaises(TooSmall, field.validate, date(2000,9,30))
+        self.assertRaises(TooSmall, field.validate, date(2000, 9, 30))
 
     def test_validate_w_max(self):
         from datetime import date
         from zope.schema.interfaces import TooBig
-        d1 = date(2000,10,1)
-        d2 = date(2000,10,2)
-        d3 = date(2000,10,3)
+        d1 = date(2000, 10, 1)
+        d2 = date(2000, 10, 2)
+        d3 = date(2000, 10, 3)
         field = self._makeOne(max=d2)
         field.validate(d1)
         field.validate(d2)
@@ -574,11 +574,11 @@ class DateTests(unittest.TestCase):
         from datetime import date
         from zope.schema.interfaces import TooBig
         from zope.schema.interfaces import TooSmall
-        d1 = date(2000,10,1)
-        d2 = date(2000,10,2)
-        d3 = date(2000,10,3)
-        d4 = date(2000,10,4)
-        d5 = date(2000,10,5)
+        d1 = date(2000, 10, 1)
+        d2 = date(2000, 10, 2)
+        d3 = date(2000, 10, 3)
+        d4 = date(2000, 10, 4)
+        d5 = date(2000, 10, 5)
         field = self._makeOne(min=d2, max=d4)
         field.validate(d2)
         field.validate(d3)
@@ -680,21 +680,21 @@ class TimeTests(unittest.TestCase):
         from datetime import time
         field = self._makeOne(required=False)
         field.validate(None)
-        field.validate(time(12,15,37))
+        field.validate(time(12, 15, 37))
 
     def test_validate_required(self):
         from datetime import time
         from zope.schema.interfaces import RequiredMissing
         field = self._makeOne()
-        field.validate(time(12,15,37))
+        field.validate(time(12, 15, 37))
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def test_validate_min(self):
         from datetime import time
         from zope.schema.interfaces import TooSmall
-        t1 = time(12,15,37)
-        t2 = time(12,25,18)
-        t3 = time(12,42,43)
+        t1 = time(12, 15, 37)
+        t2 = time(12, 25, 18)
+        t3 = time(12, 42, 43)
         field = self._makeOne(min=t2)
         field.validate(t2)
         field.validate(t3)
@@ -703,9 +703,9 @@ class TimeTests(unittest.TestCase):
     def test_validate_max(self):
         from datetime import time
         from zope.schema.interfaces import TooBig
-        t1 = time(12,15,37)
-        t2 = time(12,25,18)
-        t3 = time(12,42,43)
+        t1 = time(12, 15, 37)
+        t2 = time(12, 25, 18)
+        t3 = time(12, 42, 43)
         field = self._makeOne(max=t2)
         field.validate(t1)
         field.validate(t2)
@@ -715,11 +715,11 @@ class TimeTests(unittest.TestCase):
         from datetime import time
         from zope.schema.interfaces import TooBig
         from zope.schema.interfaces import TooSmall
-        t1 = time(12,15,37)
-        t2 = time(12,25,18)
-        t3 = time(12,42,43)
-        t4 = time(13,7,12)
-        t5 = time(14,22,9)
+        t1 = time(12, 15, 37)
+        t2 = time(12, 25, 18)
+        t3 = time(12, 42, 43)
+        t4 = time(13, 7, 12)
+        t5 = time(14, 22, 9)
         field = self._makeOne(min=t2, max=t4)
         field.validate(t2)
         field.validate(t3)
@@ -765,8 +765,10 @@ class ChoiceTests(unittest.TestCase):
         self.assertRaises(ValueError, self._makeOne, source=object())
 
     def test_ctor_both_vocabulary_and_source(self):
-        self.assertRaises(ValueError,
-                          self._makeOne, vocabulary='voc.name', source=object())
+        self.assertRaises(
+            ValueError,
+            self._makeOne, vocabulary='voc.name', source=object()
+        )
 
     def test_ctor_both_vocabulary_and_values(self):
         self.assertRaises(ValueError,
@@ -800,8 +802,10 @@ class ChoiceTests(unittest.TestCase):
         self.assertEqual(bound.vocabularyName, 'vocab')
         bound.default = 1
         self.assertEqual(bound.default, 1)
+
         def _provoke(bound):
             bound.default = 42
+
         self.assertRaises(ValidationError, _provoke, bound)
 
     def test_bind_w_voc_not_ICSB(self):
@@ -814,6 +818,7 @@ class ChoiceTests(unittest.TestCase):
         class Vocab(object):
             def __init__(self):
                 pass
+
         source = self._makeOne(vocabulary=Vocab())
         instance = DummyInstance()
         target = source.bind(instance)
@@ -829,8 +834,10 @@ class ChoiceTests(unittest.TestCase):
         class Vocab(object):
             def __init__(self, context):
                 self.context = context
+
             def __call__(self, context):
                 return self.__class__(context)
+
         # Chicken-egg
         source = self._makeOne(vocabulary='temp')
         source.vocabulary = Vocab(source)
@@ -847,8 +854,10 @@ class ChoiceTests(unittest.TestCase):
         class Vocab(object):
             def __init__(self, context):
                 self.context = context
+
             def __call__(self, context):
                 return self.__class__(context)
+
         # Chicken-egg
         source = self._makeOne(vocabulary='temp')
         source.vocabulary = Vocab(source)
@@ -874,33 +883,33 @@ class ChoiceTests(unittest.TestCase):
     def test__validate_int(self):
         from zope.schema.interfaces import ConstraintNotSatisfied
         choice = self._makeOne(values=[1, 3])
-        choice._validate(1) #doesn't raise
-        choice._validate(3) #doesn't raise
+        choice._validate(1)  # doesn't raise
+        choice._validate(3)  # doesn't raise
         self.assertRaises(ConstraintNotSatisfied, choice._validate, 4)
 
     def test__validate_string(self):
         from zope.schema._compat import u
         from zope.schema.interfaces import ConstraintNotSatisfied
         choice = self._makeOne(values=['a', 'c'])
-        choice._validate('a') #doesn't raise
-        choice._validate('c') #doesn't raise
-        choice._validate(u('c')) #doesn't raise
+        choice._validate('a')  # doesn't raise
+        choice._validate('c')  # doesn't raise
+        choice._validate(u('c'))  # doesn't raise
         self.assertRaises(ConstraintNotSatisfied, choice._validate, 'd')
 
     def test__validate_tuple(self):
         from zope.schema.interfaces import ConstraintNotSatisfied
         choice = self._makeOne(values=[(1, 2), (5, 6)])
-        choice._validate((1, 2)) #doesn't raise
-        choice._validate((5, 6)) #doesn't raise
+        choice._validate((1, 2))  # doesn't raise
+        choice._validate((5, 6))  # doesn't raise
         self.assertRaises(ConstraintNotSatisfied, choice._validate, [5, 6])
         self.assertRaises(ConstraintNotSatisfied, choice._validate, ())
 
     def test__validate_mixed(self):
         from zope.schema.interfaces import ConstraintNotSatisfied
         choice = self._makeOne(values=[1, 'b', (0.2,)])
-        choice._validate(1) #doesn't raise
-        choice._validate('b') #doesn't raise
-        choice._validate((0.2,)) #doesn't raise
+        choice._validate(1)  # doesn't raise
+        choice._validate('b')  # doesn't raise
+        choice._validate((0.2,))  # doesn't raise
         self.assertRaises(ConstraintNotSatisfied, choice._validate, '1')
         self.assertRaises(ConstraintNotSatisfied, choice._validate, 0.2)
 
@@ -921,10 +930,12 @@ class ChoiceTests(unittest.TestCase):
     def test__validate_source_is_ICSB_unbound(self):
         from zope.interface import implementer
         from zope.schema.interfaces import IContextSourceBinder
+
         @implementer(IContextSourceBinder)
         class SampleContextSourceBinder(object):
             def __call__(self, context):
                 pass
+
         choice = self._makeOne(source=SampleContextSourceBinder())
         self.assertRaises(TypeError, choice.validate, 1)
 
@@ -933,10 +944,12 @@ class ChoiceTests(unittest.TestCase):
         from zope.schema.interfaces import IContextSourceBinder
         from zope.schema.interfaces import ConstraintNotSatisfied
         from zope.schema.tests.test_vocabulary import _makeSampleVocabulary
+
         @implementer(IContextSourceBinder)
         class SampleContextSourceBinder(object):
             def __call__(self, context):
                 return _makeSampleVocabulary()
+
         s = SampleContextSourceBinder()
         choice = self._makeOne(source=s)
         # raises not iterable with unbound field
@@ -1240,8 +1253,10 @@ class InterfaceFieldTests(unittest.TestCase):
 
     def test_validate_not_required(self):
         from zope.interface import Interface
+
         class DummyInterface(Interface):
             pass
+
         field = self._makeOne(required=False)
         field.validate(DummyInterface)
         field.validate(None)
@@ -1249,8 +1264,10 @@ class InterfaceFieldTests(unittest.TestCase):
     def test_validate_required(self):
         from zope.interface import Interface
         from zope.schema.interfaces import RequiredMissing
+
         class DummyInterface(Interface):
             pass
+
         field = self._makeOne(required=True)
         field.validate(DummyInterface)
         self.assertRaises(RequiredMissing, field.validate, None)
@@ -1447,7 +1464,7 @@ class ListTests(unittest.TestCase):
         field.validate([1, 2])
         field.validate([1, 2, 3])
         self.assertRaises(TooShort, field.validate, [])
-        self.assertRaises(TooShort, field.validate, [1,])
+        self.assertRaises(TooShort, field.validate, [1, ])
 
     def test_validate_max_length(self):
         from zope.schema.interfaces import TooLong
@@ -1486,7 +1503,7 @@ class SetTests(unittest.TestCase):
         from zope.interface.verify import verifyObject
         from zope.schema.interfaces import ISet
         verifyObject(ISet, self._makeOne())
-    
+
     def test_ctor_disallows_unique(self):
         self.assertRaises(TypeError, self._makeOne, unique=False)
         self.assertRaises(TypeError, self._makeOne, unique=True)
@@ -1570,7 +1587,7 @@ class FrozenSetTests(unittest.TestCase):
         from zope.interface.verify import verifyObject
         from zope.schema.interfaces import IFrozenSet
         verifyObject(IFrozenSet, self._makeOne())
-    
+
     def test_ctor_disallows_unique(self):
         self.assertRaises(TypeError, self._makeOne, unique=False)
         self.assertRaises(TypeError, self._makeOne, unique=True)
@@ -1732,7 +1749,7 @@ class ObjectTests(unittest.TestCase):
     def test_validate_not_required(self):
         schema = self._makeSchema()
         objf = self._makeOne(schema, required=False)
-        objf.validate(None) # doesn't raise
+        objf.validate(None)  # doesn't raise
 
     def test_validate_required(self):
         from zope.schema.interfaces import RequiredMissing
@@ -1742,7 +1759,7 @@ class ObjectTests(unittest.TestCase):
     def test__validate_w_empty_schema(self):
         from zope.interface import Interface
         objf = self._makeOne(Interface)
-        objf.validate(object()) # doesn't raise
+        objf.validate(object())  # doesn't raise
 
     def test__validate_w_value_not_providing_schema(self):
         from zope.schema.interfaces import SchemaNotProvided
@@ -1757,9 +1774,11 @@ class ObjectTests(unittest.TestCase):
         from zope.schema.interfaces import WrongContainedType
         from zope.schema._bootstrapfields import Text
         schema = self._makeSchema(foo=Text(), bar=Text())
+
         @implementer(schema)
         class Broken(object):
             pass
+
         objf = self._makeOne(schema)
         self.assertRaises(WrongContainedType, objf.validate, Broken())
         errors = self._getErrors(objf.validate, Broken())
@@ -1785,10 +1804,12 @@ class ObjectTests(unittest.TestCase):
         from zope.schema._bootstrapfields import Text
         from zope.schema._compat import text_type
         schema = self._makeSchema(foo=Text(), bar=Text())
+
         @implementer(schema)
         class Broken(object):
             foo = None
             bar = 1
+
         objf = self._makeOne(schema)
         self.assertRaises(WrongContainedType, objf.validate, Broken())
         errors = self._getErrors(objf.validate, Broken())
@@ -1806,17 +1827,19 @@ class ObjectTests(unittest.TestCase):
         from zope.schema._bootstrapfields import Text
         from zope.schema._field import Choice
         from zope.schema._compat import u
-        schema = self._makeSchema(foo=Text(),
-                                  bar=Text(),
-                                  baz=Choice(values=[1, 2, 3]),
-                                 )
+        schema = self._makeSchema(
+            foo=Text(),
+            bar=Text(),
+            baz=Choice(values=[1, 2, 3]),
+        )
+
         @implementer(schema)
         class OK(object):
             foo = u('Foo')
             bar = u('Bar')
             baz = 2
         objf = self._makeOne(schema)
-        objf.validate(OK()) # doesn't raise
+        objf.validate(OK())  # doesn't raise
 
     def test_validate_w_cycles(self):
         IUnit, Person, Unit = self._makeCycles()
@@ -1826,7 +1849,7 @@ class ObjectTests(unittest.TestCase):
         unit = Unit(person1, [person1, person2])
         person1.unit = unit
         person2.unit = unit
-        field.validate(unit) #doesn't raise
+        field.validate(unit)  # doesn't raise
 
     def test_validate_w_cycles_object_not_valid(self):
         from zope.schema.interfaces import WrongContainedType
@@ -1859,10 +1882,12 @@ class ObjectTests(unittest.TestCase):
         from zope.schema._bootstrapfields import Text
         from zope.schema._field import Choice
         from zope.schema._compat import u
-        schema = self._makeSchema(foo=Text(),
-                                  bar=Text(),
-                                  baz=Choice(values=[1, 2, 3]),
-                                 )
+        schema = self._makeSchema(
+            foo=Text(),
+            bar=Text(),
+            baz=Choice(values=[1, 2, 3]),
+        )
+
         @implementer(schema)
         class OK(object):
             foo = u('Foo')
@@ -1887,10 +1912,12 @@ class ObjectTests(unittest.TestCase):
         from zope.schema._bootstrapfields import Text
         from zope.schema._field import Choice
         from zope.schema._compat import u
-        schema = self._makeSchema(foo=Text(),
-                                  bar=Text(),
-                                  baz=Choice(values=[1, 2, 3]),
-                                 )
+        schema = self._makeSchema(
+            foo=Text(),
+            bar=Text(),
+            baz=Choice(values=[1, 2, 3]),
+        )
+
         @implementer(schema)
         class OK(object):
             def __init__(self, foo=u('Foo'), bar=u('Bar'), baz=2):
@@ -1901,6 +1928,7 @@ class ObjectTests(unittest.TestCase):
         ok2 = OK(u('Foo2'), u('Bar2'), 3)
         log = []
         subscribers.append(log.append)
+
         def _replace(event):
             event.object = ok2
         subscribers.append(_replace)
@@ -2053,11 +2081,14 @@ def _makeSampleVocabulary():
 
     return SampleVocabulary()
 
+
 def _makeDummyRegistry(v):
     from zope.schema.vocabulary import VocabularyRegistry
+
     class DummyRegistry(VocabularyRegistry):
         def __init__(self, vocabulary):
             self._vocabulary = vocabulary
+
         def get(self, object, name):
             return self._vocabulary
     return DummyRegistry(v)
@@ -2088,4 +2119,3 @@ def test_suite():
         unittest.makeSuite(IdTests),
         unittest.makeSuite(DottedNameTests),
     ))
-

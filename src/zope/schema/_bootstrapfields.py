@@ -32,7 +32,6 @@ from zope.schema._bootstrapinterfaces import TooShort
 from zope.schema._bootstrapinterfaces import TooSmall
 from zope.schema._bootstrapinterfaces import WrongType
 from zope.schema._compat import u
-from zope.schema._compat import b # used in docstring doctests
 from zope.schema._compat import text_type
 from zope.schema._compat import integer_types
 
@@ -127,6 +126,7 @@ class Field(Attribute):
 
         Here are some examples:
 
+        >>> from zope.schema._compat import u
         >>> f = Field()
         >>> f.__doc__, f.title, f.description
         ('', u'', u'')
@@ -190,7 +190,7 @@ class Field(Attribute):
             return False
 
         # should have the same properties
-        names = {} # used as set of property names, ignoring values
+        names = {}  # used as set of property names, ignoring values
         for interface in providedBy(self):
             names.update(getFields(interface))
 
@@ -326,6 +326,8 @@ class Text(MinMaxLen, Field):
 
     def fromUnicode(self, str):
         """
+        >>> from zope.schema._compat import u
+        >>> from zope.schema._compat import b
         >>> t = Text(constraint=lambda v: 'x' in v)
         >>> t.fromUnicode(b("foo x spam"))
         Traceback (most recent call last):
@@ -398,6 +400,7 @@ class Bool(Field):
 
     def fromUnicode(self, str):
         """
+        >>> from zope.schema._compat import b
         >>> b = Bool()
         >>> IFromUnicode.providedBy(b)
         True

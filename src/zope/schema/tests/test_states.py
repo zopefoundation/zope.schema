@@ -35,6 +35,7 @@ class StateSelectionTest(unittest.TestCase):
         from zope.interface import Interface
         from zope.schema import Choice
         from zope.schema.tests.states import StateVocabulary
+
         class IBirthInfo(Interface):
             state1 = Choice(
                 title=u('State of Birth'),

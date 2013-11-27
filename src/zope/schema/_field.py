@@ -78,7 +78,7 @@ from zope.schema.interfaces import InvalidDottedName
 from zope.schema.interfaces import ConstraintNotSatisfied
 
 from zope.schema._bootstrapfields import Field
-from zope.schema._bootstrapfields import Container
+from zope.schema._bootstrapfields import Container  # API import for __init__
 from zope.schema._bootstrapfields import Iterable
 from zope.schema._bootstrapfields import Orderable
 from zope.schema._bootstrapfields import Text
@@ -92,7 +92,6 @@ from zope.schema.vocabulary import getVocabularyRegistry
 from zope.schema.vocabulary import VocabularyRegistryError
 from zope.schema.vocabulary import SimpleVocabulary
 
-from zope.schema._compat import u # used in docstring doctests
 from zope.schema._compat import b
 from zope.schema._compat import text_type
 from zope.schema._compat import string_types
@@ -100,6 +99,8 @@ from zope.schema._compat import binary_type
 from zope.schema._compat import PY3
 from zope.schema._compat import make_binary
 
+# pep 8 friendlyness
+Container
 
 # Fix up bootstrap field types
 Field.title = FieldProperty(IField['title'])
@@ -140,10 +141,11 @@ class Bytes(MinMaxLen, Field):
         return v
 
 # for things which are of the str type on both Python 2 and 3
-if PY3: #pragma NO COVER
+if PY3:  # pragma: no cover
     NativeString = Text
-else: #pragma NO COVER
+else:  # pragma: no cover
     NativeString = Bytes
+
 
 @implementer(IASCII)
 class ASCII(NativeString):
@@ -166,10 +168,11 @@ class BytesLine(Bytes):
         return b('\n') not in value
 
 # for things which are of the str type on both Python 2 and 3
-if PY3: #pragma NO COVER
+if PY3:  # pragma: no cover
     NativeStringLine = TextLine
-else: #pragma NO COVER
+else:  # pragma: no cover
     NativeStringLine = BytesLine
+
 
 @implementer(IASCIILine)
 class ASCIILine(ASCII):
@@ -256,8 +259,8 @@ class Choice(Field):
     def __init__(self, values=None, vocabulary=None, source=None, **kw):
         """Initialize object."""
         if vocabulary is not None:
-            if (not isinstance(vocabulary, string_types) and
-                not IBaseVocabulary.providedBy(vocabulary)):
+            if (not isinstance(vocabulary, string_types)
+                    and not IBaseVocabulary.providedBy(vocabulary)):
                 raise ValueError('vocabulary must be a string or implement '
                                  'IBaseVocabulary')
             if source is not None:
@@ -268,10 +271,12 @@ class Choice(Field):
 
         if (values is None and vocabulary is None):
             raise ValueError(
-               "You must specify either values or vocabulary.")
+                "You must specify either values or vocabulary."
+            )
         if values is not None and vocabulary is not None:
             raise ValueError(
-               "You cannot specify both values and vocabulary.")
+                "You cannot specify both values and vocabulary."
+            )
 
         self.vocabulary = None
         self.vocabularyName = None
@@ -280,8 +285,8 @@ class Choice(Field):
         elif isinstance(vocabulary, string_types):
             self.vocabularyName = vocabulary
         else:
-            if (not ISource.providedBy(vocabulary) and
-                not IContextSourceBinder.providedBy(vocabulary)):
+            if (not ISource.providedBy(vocabulary)
+                    and not IContextSourceBinder.providedBy(vocabulary)):
                 raise ValueError('Invalid vocabulary')
             self.vocabulary = vocabulary
         # Before a default value is checked, it is validated. However, a
@@ -333,9 +338,10 @@ class Choice(Field):
             raise ConstraintNotSatisfied(value)
 
 
-_isuri = r"[a-zA-z0-9+.-]+:" # scheme
-_isuri += r"\S*$" # non space (should be pickier)
+_isuri = r"[a-zA-z0-9+.-]+:"  # scheme
+_isuri += r"\S*$"  # non space (should be pickier)
 _isuri = re.compile(_isuri).match
+
 
 @implementer(IURI, IFromUnicode)
 class URI(NativeStringLine):
@@ -391,8 +397,9 @@ class DottedName(NativeStringLine):
             raise InvalidDottedName(value)
         dots = value.count(".")
         if dots < self.min_dots:
-            raise InvalidDottedName("too few dots; %d required" % self.min_dots,
-                                    value)
+            raise InvalidDottedName(
+                "too few dots; %d required" % self.min_dots, value
+            )
         if self.max_dots is not None and dots > self.max_dots:
             raise InvalidDottedName("too many dots; no more than %d allowed" %
                                     self.max_dots, value)
@@ -452,6 +459,8 @@ def _validate_sequence(value_type, value, errors=None):
 
     To illustrate, we'll use a text value type. All values must be unicode.
 
+       >>> from zope.schema._compat import u
+       >>> from zope.schema._compat import b
        >>> field = TextLine(required=True)
 
     To validate a sequence of various values:
@@ -540,7 +549,7 @@ class Set(AbstractCollection):
     _type = set
 
     def __init__(self, **kw):
-        if 'unique' in kw: # set members are always unique
+        if 'unique' in kw:  # set members are always unique
             raise TypeError(
                 "__init__() got an unexpected keyword argument 'unique'")
         super(Set, self).__init__(unique=True, **kw)
@@ -551,13 +560,14 @@ class FrozenSet(AbstractCollection):
     _type = frozenset
 
     def __init__(self, **kw):
-        if 'unique' in kw: # set members are always unique
+        if 'unique' in kw:  # set members are always unique
             raise TypeError(
                 "__init__() got an unexpected keyword argument 'unique'")
         super(FrozenSet, self).__init__(unique=True, **kw)
 
 
 VALIDATED_VALUES = threading.local()
+
 
 def _validate_fields(schema, value, errors=None):
     if errors is None:

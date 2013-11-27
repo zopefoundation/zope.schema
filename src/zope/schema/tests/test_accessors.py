@@ -34,7 +34,7 @@ class FieldReadAccessorTests(unittest.TestCase):
         field = Text(title=u('Hmm'))
         wrapped = self._makeOne(field)
         self.assertTrue(wrapped.field is field)
-        self.assertEqual(wrapped.__name__, '') #__name__ set when in interface
+        self.assertEqual(wrapped.__name__, '')  # __name__ set when in iface
         self.assertEqual(wrapped.__doc__, 'get Hmm')
 
     def test_ctor_created_inside_interface(self):
@@ -42,6 +42,7 @@ class FieldReadAccessorTests(unittest.TestCase):
         from zope.schema import Text
         from zope.schema._compat import u
         field = Text(title=u('Hmm'))
+
         class IFoo(Interface):
             getter = self._makeOne(field)
         getter = IFoo['getter']
@@ -62,7 +63,7 @@ class FieldReadAccessorTests(unittest.TestCase):
         field = Text()
         field_provides = list(providedBy(field))
         wrapped = self._makeOne(field)
-        wrapped_provides = list(providedBy(wrapped)) 
+        wrapped_provides = list(providedBy(wrapped))
         self.assertEqual(wrapped_provides[:len(field_provides)],
                          list(providedBy(field)))
         for iface in list(implementedBy(self._getTargetClass())):
@@ -83,18 +84,22 @@ class FieldReadAccessorTests(unittest.TestCase):
 
     def test_get_miss(self):
         from zope.interface import Interface
+
         class IFoo(Interface):
             getter = self._makeOne()
         getter = IFoo['getter']
+
         class Foo(object):
             pass
         self.assertRaises(AttributeError, getter.get, Foo())
 
     def test_get_hit(self):
         from zope.interface import Interface
+
         class IFoo(Interface):
             getter = self._makeOne()
         getter = IFoo['getter']
+
         class Foo(object):
             def getter(self):
                 return '123'
@@ -102,39 +107,48 @@ class FieldReadAccessorTests(unittest.TestCase):
 
     def test_query_miss_implicit_default(self):
         from zope.interface import Interface
+
         class IFoo(Interface):
             getter = self._makeOne()
         getter = IFoo['getter']
+
         class Foo(object):
             pass
         self.assertEqual(getter.query(Foo()), None)
 
     def test_query_miss_explicit_default(self):
         from zope.interface import Interface
+
         class IFoo(Interface):
             getter = self._makeOne()
         getter = IFoo['getter']
+
         class Foo(object):
             pass
         self.assertEqual(getter.query(Foo(), 234), 234)
 
     def test_query_hit(self):
         from zope.interface import Interface
+
         class IFoo(Interface):
             getter = self._makeOne()
         getter = IFoo['getter']
+
         class Foo(object):
             def getter(self):
                 return '123'
+
         self.assertEqual(getter.query(Foo()), '123')
 
     def test_set_readonly(self):
         from zope.interface import Interface
         from zope.schema import Text
         field = Text(readonly=True)
+
         class IFoo(Interface):
             getter = self._makeOne(field)
         getter = IFoo['getter']
+
         class Foo(object):
             def getter(self):
                 return '123'
@@ -142,35 +156,46 @@ class FieldReadAccessorTests(unittest.TestCase):
 
     def test_set_no_writer(self):
         from zope.interface import Interface
+
         class IFoo(Interface):
             getter = self._makeOne()
         getter = IFoo['getter']
+
         class Foo(object):
             def getter(self):
                 return '123'
+
         self.assertRaises(AttributeError, getter.set, Foo(), '456')
 
     def test_set_w_writer(self):
         from zope.interface import Interface
+
         class IFoo(Interface):
             getter = self._makeOne()
+
         getter = IFoo['getter']
         _called_with = []
+
         class Writer(object):
             pass
+
         writer = Writer()
         writer.__name__ = 'setMe'
         getter.writer = writer
+
         class Foo(object):
             def setMe(self, value):
                 _called_with.append(value)
+
         getter.set(Foo(), '456')
         self.assertEqual(_called_with, ['456'])
 
     def test_bind(self):
         from zope.interface import Interface
+
         class IFoo(Interface):
             getter = self._makeOne()
+
         getter = IFoo['getter']
         context = object()
         bound = getter.bind(context)
@@ -197,7 +222,7 @@ class FieldWriteAccessorTests(unittest.TestCase):
         field = Text(title=u('Hmm'))
         wrapped = self._makeOne(field)
         self.assertTrue(wrapped.field is field)
-        self.assertEqual(wrapped.__name__, '') #__name__ set when in interface
+        self.assertEqual(wrapped.__name__, '')  # __name__ set when in iface
         self.assertEqual(wrapped.__doc__, 'set Hmm')
 
     def test_ctor_created_inside_interface(self):
@@ -205,8 +230,10 @@ class FieldWriteAccessorTests(unittest.TestCase):
         from zope.schema import Text
         from zope.schema._compat import u
         field = Text(title=u('Hmm'))
+
         class IFoo(Interface):
             setter = self._makeOne(field)
+
         setter = IFoo['setter']
         self.assertEqual(setter.__name__, 'setter')
         self.assertEqual(setter.__doc__, 'set Hmm')
@@ -236,8 +263,10 @@ class Test_accessors(unittest.TestCase):
         from zope.schema import Text
         from zope.schema._compat import u
         field = Text(title=u('Hmm'), readonly=True)
+
         class IFoo(Interface):
             getter, = self._callFUT(field)
+
         getter = IFoo['getter']
         self.assertEqual(getter.__name__, 'getter')
         self.assertEqual(getter.__doc__, 'get Hmm')
@@ -254,8 +283,10 @@ class Test_accessors(unittest.TestCase):
         from zope.schema import Text
         from zope.schema._compat import u
         field = Text(title=u('Hmm'))
+
         class IFoo(Interface):
             getter, setter = self._callFUT(field)
+
         getter = IFoo['getter']
         self.assertEqual(getter.__name__, 'getter')
         self.assertEqual(getter.getSignatureString(), '()')

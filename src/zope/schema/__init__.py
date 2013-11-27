@@ -50,15 +50,26 @@ from zope.schema._field import Tuple
 from zope.schema._field import URI
 
 # Schema APIs
-from zope.schema._schema import  getFields
-from zope.schema._schema import  getFieldsInOrder
-from zope.schema._schema import  getFieldNames
-from zope.schema._schema import  getFieldNamesInOrder
-from zope.schema._schema import  getValidationErrors
-from zope.schema._schema import  getSchemaValidationErrors
+from zope.schema._schema import getFields
+from zope.schema._schema import getFieldsInOrder
+from zope.schema._schema import getFieldNames
+from zope.schema._schema import getFieldNamesInOrder
+from zope.schema._schema import getValidationErrors
+from zope.schema._schema import getSchemaValidationErrors
 
 # Acessor API
 from zope.schema.accessors import accessors
 
 # Error API
 from zope.schema.interfaces import ValidationError
+
+
+# pep 8 friendlyness
+ASCII, ASCIILine, Bool, Bytes, BytesLine, Choice, Container, Date, Datetime
+Decimal, Dict, DottedName, Field, Float, FrozenSet, Id, Int, InterfaceField
+Iterable, List, MinMaxLen, NativeString, NativeStringLine, Object, Orderable
+Password, Set, SourceText, Text, TextLine, Time, Timedelta, Tuple, URI
+getFields, getFieldsInOrder, getFieldNames, getFieldNamesInOrder,
+getValidationErrors, getSchemaValidationErrors
+accessors
+ValidationError
