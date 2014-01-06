@@ -335,7 +335,7 @@ class Choice(Field):
             except VocabularyRegistryError:
                 raise ValueError("Can't validate value without vocabulary")
         if value not in vocabulary:
-            raise ConstraintNotSatisfied(value)
+            raise ConstraintNotSatisfied(value, self.__name__)
 
 
 _isuri = r"[a-zA-z0-9+.-]+:"  # scheme

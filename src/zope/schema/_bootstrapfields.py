@@ -210,7 +210,7 @@ class Field(Attribute):
             raise WrongType(value, self._type, self.__name__)
 
         if not self.constraint(value):
-            raise ConstraintNotSatisfied(value)
+            raise ConstraintNotSatisfied(value, self.__name__)
 
     def get(self, object):
         return getattr(object, self.__name__)

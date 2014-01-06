@@ -15,6 +15,8 @@ zope.schema Changelog
   allowing for cases where vocabulary items may be duplicated (e.g., due to
   user input).
 
+- It was a pain that ``ConstraintNotSatisfied`` did not tell the field name.
+
 
 4.3.2 (2013-02-24)
 ------------------
@@ -96,7 +98,7 @@ zope.schema Changelog
 
 - Fix broken Object field validation where the schema contains a Choice with
   ICountextSourceBinder source. In this case the vocabulary was not iterable
-  because the field was not bound and the source binder didn't return the 
+  because the field was not bound and the source binder didn't return the
   real vocabulary. Added simple test for IContextSourceBinder validation. But a
   test with an Object field with a schema using a Choice with
   IContextSourceBinder is still missing.
@@ -120,7 +122,7 @@ zope.schema Changelog
 
 - fix broken Object field validation. Previous version was using a volatile
   property on object field values which ends in a ForbiddenAttribute error
-  on security proxied objects. 
+  on security proxied objects.
 
 3.8.0 (2011-03-18)
 ------------------
@@ -194,7 +196,7 @@ zope.schema Changelog
 
 - Extend validation error to hold the field name.
 
-- Add FieldProperty class that uses Field.get and Field.set methods 
+- Add FieldProperty class that uses Field.get and Field.set methods
   instead of storing directly on the instance __dict__.
 
 3.5.4 (2009-03-25)
@@ -202,7 +204,7 @@ zope.schema Changelog
 
 - Don't fail trying to validate default value for Choice fields with
   IContextSourceBinder object given as a source. See
-  https://bugs.launchpad.net/zope3/+bug/340416. 
+  https://bugs.launchpad.net/zope3/+bug/340416.
 
 - Add an interface for ``DottedName`` field.
 
