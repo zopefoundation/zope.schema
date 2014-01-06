@@ -1,7 +1,7 @@
 zope.schema Changelog
 =====================
 
-4.3.3 (unreleased)
+4.3.3 (2014-01-06)
 ------------------
 
 - PEP 8 cleanup.
