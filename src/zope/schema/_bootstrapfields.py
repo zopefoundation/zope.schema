@@ -338,7 +338,7 @@ class Text(MinMaxLen, Field):
         >>> t.fromUnicode(u("foo spam"))
         Traceback (most recent call last):
         ...
-        ConstraintNotSatisfied: foo spam
+        ConstraintNotSatisfied: (u'foo spam', '')
         """
         self.validate(str)
         return str
