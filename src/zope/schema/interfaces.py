@@ -743,3 +743,22 @@ class IVocabularyFactory(Interface):
     def __call__(context):
         """The context provides a location that the vocabulary can make use of.
         """
+
+
+class IFieldEvent(Interface):
+
+    field = Attribute("The field that has been changed")
+
+    object = Attribute("The object containing the field")
+
+
+class IFieldUpdatedEvent(IFieldEvent):
+    """
+    A field has been modified
+
+    Subscribers will get the old and the new value together with the field
+    """
+
+    old_value = Attribute("The value of the field before modification")
+
+    new_value = Attribute("The value of the field after modification")

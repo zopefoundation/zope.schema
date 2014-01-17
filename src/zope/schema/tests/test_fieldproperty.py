@@ -111,6 +111,44 @@ class FieldPropertyTests(_Base, _Integration):
         self.assertEqual(prop.readonly, field.readonly)
         self.assertEqual(prop.required, field.required)
 
+    def test_query_value_with_default(self):
+        from zope.schema import Text
+        from zope.schema._compat import u
+        field = Text(
+            __name__='testing',
+            description=u('DESCRIPTION'),
+            default=u('DEFAULT'),
+            readonly=True,
+            required=True,
+        )
+
+        prop = self._makeOne(field=field)
+
+        class Foo(object):
+            testing = prop
+        foo = Foo()
+        self.assertEqual(prop.queryValue(foo, 'test'), u('DEFAULT'))
+        foo.testing = u('NO')
+        self.assertEqual(prop.queryValue(foo, 'test'), u('NO'))
+
+    def test_query_value_without_default(self):
+        from zope.schema import Text
+        from zope.schema._compat import u
+        field = Text(
+            __name__='testing',
+            description=u('DESCRIPTION'),
+            readonly=True,
+            required=True,
+        )
+
+        prop = self._makeOne(field=field)
+
+        class Foo(object):
+            testing = prop
+        foo = Foo()
+        self.assertEqual(prop.queryValue(foo, 'test'), None)
+        # it should be NO_VALUE ...
+
     def test___get___from_class(self):
         prop = self._makeOne()
 
@@ -226,6 +264,60 @@ class FieldPropertyTests(_Base, _Integration):
         foo.__dict__['testing'] = '789'
         self.assertRaises(ValueError, setattr, foo, 'testing', '123')
         self.assertEqual(_validated, ['123'])
+
+    def test_field_event(self):
+        from zope.schema import Text
+        from zope.schema._compat import u
+        from zope.event import subscribers
+        from zope.schema.fieldproperty import FieldUpdatedEvent
+        log = []
+        subscribers.append(log.append)
+        self.assertEqual(log, [])
+        field = Text(
+            __name__='testing',
+            description=u('DESCRIPTION'),
+            default=u('DEFAULT'),
+            readonly=True,
+            required=True,
+        )
+        self.assertEqual(len(log), 6)
+        event = log[0]
+        self.assertTrue(isinstance(event, FieldUpdatedEvent))
+        self.assertEqual(event.inst, field)
+        self.assertEqual(event.old_value, 0)
+        self.assertEqual(event.new_value, 0)
+        self.assertEqual(
+            [ev.field.__name__ for ev in log],
+            ['min_length', 'max_length', 'title', 'description', 'required', 'readonly'])
+
+    def test_field_event_update(self):
+        from zope.schema import Text
+        from zope.schema._compat import u
+        from zope.event import subscribers
+        from zope.schema.fieldproperty import FieldUpdatedEvent
+        field = Text(
+            __name__='testing',
+            description=u('DESCRIPTION'),
+            default=u('DEFAULT'),
+            required=True,
+        )
+        prop = self._makeOne(field=field)
+
+        class Foo(object):
+            testing = prop
+        foo = Foo()
+
+        log = []
+        subscribers.append(log.append)
+        foo.testing = u'Bar'
+        foo.testing = u'Foo'
+        self.assertEqual(len(log), 2)
+        event = log[1]
+        self.assertTrue(isinstance(event, FieldUpdatedEvent))
+        self.assertEqual(event.inst, foo)
+        self.assertEqual(event.field, field)
+        self.assertEqual(event.old_value, u'Bar')
+        self.assertEqual(event.new_value, u'Foo')
 
 
 class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
@@ -390,6 +482,9 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
             readonly = False
             default = '456'
 
+            def query(self, inst, default):
+                return default
+
             def bind(self, other):
                 return self
 
@@ -462,6 +557,60 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
         foo = Foo()
         foo.__dict__['testing'] = '789'
         self.assertRaises(ValueError, setattr, foo, 'testing', '123')
+
+    def test_field_event(self):
+        from zope.schema import Text
+        from zope.schema._compat import u
+        from zope.event import subscribers
+        from zope.schema.fieldproperty import FieldUpdatedEvent
+        log = []
+        subscribers.append(log.append)
+        self.assertEqual(log, [])
+        field = Text(
+            __name__='testing',
+            description=u('DESCRIPTION'),
+            default=u('DEFAULT'),
+            readonly=True,
+            required=True,
+        )
+        self.assertEqual(len(log), 6)
+        event = log[0]
+        self.assertTrue(isinstance(event, FieldUpdatedEvent))
+        self.assertEqual(event.inst, field)
+        self.assertEqual(event.old_value, 0)
+        self.assertEqual(event.new_value, 0)
+        self.assertEqual(
+            [ev.field.__name__ for ev in log],
+            ['min_length', 'max_length', 'title', 'description', 'required', 'readonly'])
+
+    def test_field_event_update(self):
+        from zope.schema import Text
+        from zope.schema._compat import u
+        from zope.event import subscribers
+        from zope.schema.fieldproperty import FieldUpdatedEvent
+        field = Text(
+            __name__='testing',
+            description=u('DESCRIPTION'),
+            default=u('DEFAULT'),
+            required=True,
+        )
+        prop = self._makeOne(field=field)
+
+        class Foo(object):
+            testing = prop
+        foo = Foo()
+
+        log = []
+        subscribers.append(log.append)
+        foo.testing = u'Bar'
+        foo.testing = u'Foo'
+        self.assertEqual(len(log), 2)
+        event = log[1]
+        self.assertTrue(isinstance(event, FieldUpdatedEvent))
+        self.assertEqual(event.inst, foo)
+        self.assertEqual(event.field, field)
+        self.assertEqual(event.old_value, u'Bar')
+        self.assertEqual(event.new_value, u'Foo')
 
 
 def _getSchema():

@@ -1900,11 +1900,11 @@ class ObjectTests(unittest.TestCase):
         value = OK()
         objf.set(inst, value)
         self.assertEqual(inst.field is value, True)
-        self.assertEqual(len(log), 1)
-        self.assertEqual(IBeforeObjectAssignedEvent.providedBy(log[0]), True)
-        self.assertEqual(log[0].object, value)
-        self.assertEqual(log[0].name, 'field')
-        self.assertEqual(log[0].context, inst)
+        self.assertEqual(len(log), 5)
+        self.assertEqual(IBeforeObjectAssignedEvent.providedBy(log[-1]), True)
+        self.assertEqual(log[-1].object, value)
+        self.assertEqual(log[-1].name, 'field')
+        self.assertEqual(log[-1].context, inst)
 
     def test_set_allows_IBOAE_subscr_to_replace_value(self):
         from zope.event import subscribers
@@ -1934,12 +1934,13 @@ class ObjectTests(unittest.TestCase):
         subscribers.append(_replace)
         objf = self._makeOne(schema, __name__='field')
         inst = DummyInstance()
+        self.assertEqual(len(log), 4)
         objf.set(inst, ok1)
         self.assertEqual(inst.field is ok2, True)
-        self.assertEqual(len(log), 1)
-        self.assertEqual(log[0].object, ok2)
-        self.assertEqual(log[0].name, 'field')
-        self.assertEqual(log[0].context, inst)
+        self.assertEqual(len(log), 5)
+        self.assertEqual(log[-1].object, ok2)
+        self.assertEqual(log[-1].name, 'field')
+        self.assertEqual(log[-1].context, inst)
 
 
 class DictTests(unittest.TestCase):
