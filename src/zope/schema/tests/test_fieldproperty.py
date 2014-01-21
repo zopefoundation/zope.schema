@@ -146,8 +146,9 @@ class FieldPropertyTests(_Base, _Integration):
         class Foo(object):
             testing = prop
         foo = Foo()
+        # field initialize its default to None if it hasn't any default
+        # it should be zope.schema.NO_VALUE as 'None' has another semantic
         self.assertEqual(prop.queryValue(foo, 'test'), None)
-        # it should be NO_VALUE ...
 
     def test___get___from_class(self):
         prop = self._makeOne()
