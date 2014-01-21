@@ -310,15 +310,15 @@ class FieldPropertyTests(_Base, _Integration):
 
         log = []
         subscribers.append(log.append)
-        foo.testing = u'Bar'
-        foo.testing = u'Foo'
+        foo.testing = u('Bar')
+        foo.testing = u('Foo')
         self.assertEqual(len(log), 2)
         event = log[1]
         self.assertTrue(isinstance(event, FieldUpdatedEvent))
         self.assertEqual(event.inst, foo)
         self.assertEqual(event.field, field)
-        self.assertEqual(event.old_value, u'Bar')
-        self.assertEqual(event.new_value, u'Foo')
+        self.assertEqual(event.old_value, u('Bar'))
+        self.assertEqual(event.new_value, u('Foo'))
 
 
 class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
@@ -578,15 +578,15 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
 
         log = []
         subscribers.append(log.append)
-        foo.testing = u'Bar'
-        foo.testing = u'Foo'
+        foo.testing = u('Bar')
+        foo.testing = u('Foo')
         self.assertEqual(len(log), 2)
         event = log[1]
         self.assertTrue(isinstance(event, FieldUpdatedEvent))
         self.assertEqual(event.inst, foo)
         self.assertEqual(event.field, field)
-        self.assertEqual(event.old_value, u'Bar')
-        self.assertEqual(event.new_value, u'Foo')
+        self.assertEqual(event.old_value, u('Bar'))
+        self.assertEqual(event.new_value, u('Foo'))
 
     def test_field_event(self):
         # fieldproperties are everywhere including in field themselfs
