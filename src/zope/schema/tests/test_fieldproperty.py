@@ -558,31 +558,6 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
         foo.__dict__['testing'] = '789'
         self.assertRaises(ValueError, setattr, foo, 'testing', '123')
 
-    def test_field_event(self):
-        from zope.schema import Text
-        from zope.schema._compat import u
-        from zope.event import subscribers
-        from zope.schema.fieldproperty import FieldUpdatedEvent
-        log = []
-        subscribers.append(log.append)
-        self.assertEqual(log, [])
-        field = Text(
-            __name__='testing',
-            description=u('DESCRIPTION'),
-            default=u('DEFAULT'),
-            readonly=True,
-            required=True,
-        )
-        self.assertEqual(len(log), 6)
-        event = log[0]
-        self.assertTrue(isinstance(event, FieldUpdatedEvent))
-        self.assertEqual(event.inst, field)
-        self.assertEqual(event.old_value, 0)
-        self.assertEqual(event.new_value, 0)
-        self.assertEqual(
-            [ev.field.__name__ for ev in log],
-            ['min_length', 'max_length', 'title', 'description', 'required', 'readonly'])
-
     def test_field_event_update(self):
         from zope.schema import Text
         from zope.schema._compat import u
@@ -611,6 +586,34 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
         self.assertEqual(event.field, field)
         self.assertEqual(event.old_value, u'Bar')
         self.assertEqual(event.new_value, u'Foo')
+
+    def test_field_event(self):
+        # fieldproperties are everywhere including in field themselfs
+        # so event are triggered
+        from zope.schema import Text
+        from zope.schema._compat import u
+        from zope.event import subscribers
+        from zope.schema.fieldproperty import FieldUpdatedEvent
+        log = []
+        subscribers.append(log.append)
+        self.assertEqual(log, [])
+        field = Text(
+            __name__='testing',
+            description=u('DESCRIPTION'),
+            default=u('DEFAULT'),
+            readonly=True,
+            required=True,
+        )
+        self.assertEqual(len(log), 6)
+        # these are fieldproperties in the field
+        self.assertEqual(
+            [ev.field.__name__ for ev in log],
+            ['min_length', 'max_length', 'title', 'description', 'required', 'readonly'])
+        event = log[0]
+        self.assertTrue(isinstance(event, FieldUpdatedEvent))
+        self.assertEqual(event.inst, field)
+        self.assertEqual(event.old_value, 0)
+        self.assertEqual(event.new_value, 0)
 
 
 def _getSchema():
