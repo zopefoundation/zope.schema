@@ -4,7 +4,10 @@ zope.schema Changelog
 4.3.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add an event on field properties to notify that a field has been updated.
+  This event enables definition of subscribers based on an event, a context
+  and a field. The event contains also the old value and the new value.
+  (also see package ``zope.schemaevent`` that define a field event handler)
 
 
 4.3.3 (2014-01-06)
