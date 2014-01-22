@@ -1,7 +1,7 @@
 zope.schema Changelog
 =====================
 
-4.3.4 (unreleased)
+4.4.0 (2014-01-22)
 ------------------
 
 - Add an event on field properties to notify that a field has been updated.
