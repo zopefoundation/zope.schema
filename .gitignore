@@ -12,3 +12,7 @@ parts
 .coverage
 nosetests.xml
 coverage.xml
+devel
+include
+lib
+local

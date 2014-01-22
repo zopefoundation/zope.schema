@@ -62,6 +62,7 @@ from zope.schema.accessors import accessors
 
 # Error API
 from zope.schema.interfaces import ValidationError
+from zope.schema._bootstrapinterfaces import NO_VALUE
 
 
 # pep 8 friendlyness
@@ -73,3 +74,4 @@ getFields, getFieldsInOrder, getFieldNames, getFieldNamesInOrder,
 getValidationErrors, getSchemaValidationErrors
 accessors
 ValidationError
+NO_VALUE

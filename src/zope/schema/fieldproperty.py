@@ -17,8 +17,22 @@
 from copy import copy
 import sys
 import zope.schema
+from zope import interface
+from zope import event
+from zope.schema import interfaces
+from zope.schema._bootstrapinterfaces import NO_VALUE
 
 _marker = object()
+
+
+@interface.implementer(interfaces.IFieldUpdatedEvent)
+class FieldUpdatedEvent(object):
+
+    def __init__(self, inst, field, old_value, new_value):
+        self.inst = inst
+        self.field = field
+        self.old_value = old_value
+        self.new_value = new_value
 
 
 class FieldProperty(object):
@@ -51,12 +65,21 @@ class FieldProperty(object):
 
         return value
 
+    def queryValue(self, inst, default):
+        value = inst.__dict__.get(self.__name, default)
+        if value is default:
+            field = self.__field.bind(inst)
+            value = getattr(field, 'default', default)
+        return value
+
     def __set__(self, inst, value):
         field = self.__field.bind(inst)
         field.validate(value)
         if field.readonly and self.__name in inst.__dict__:
             raise ValueError(self.__name, 'field is readonly')
+        oldvalue = self.queryValue(inst, NO_VALUE)
         inst.__dict__[self.__name] = value
+        event.notify(FieldUpdatedEvent(inst, field, oldvalue, value))
 
     def __getattr__(self, name):
         return getattr(self.__field, name)
@@ -122,4 +145,6 @@ class FieldPropertyStoredThroughField(object):
                 return
             else:
                 raise ValueError(self.__name, 'field is readonly')
+        oldvalue = self.queryValue(inst, field, NO_VALUE)
         self.setValue(inst, field, value)
+        event.notify(FieldUpdatedEvent(inst, self.field, oldvalue, value))

@@ -111,3 +111,10 @@ class IContextAwareDefaultFactory(zope.interface.Interface):
 
     def __call__(context):
         """Returns a default value for the field."""
+
+
+class NO_VALUE(object):
+    def __repr__(self):
+        return '<NO_VALUE>'
+
+NO_VALUE = NO_VALUE()
