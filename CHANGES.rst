@@ -4,7 +4,8 @@ zope.schema Changelog
 4.4.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Attempt to gracefully handle the case where a unicode string is passed 
+  into SimpleTerm.
 
 
 4.4.0 (2014-01-22)
