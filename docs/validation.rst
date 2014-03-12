@@ -8,7 +8,7 @@ getValidationErrors
     first validates via the zope.schema field validators. If that succeeds the
     invariants are checked.
 getSchemaValidationErrors
-    *only* validateds via the zope.schema field validators. The invariants are
+    *only* validates via the zope.schema field validators. The invariants are
     *not* checked.
 
 
@@ -81,7 +81,7 @@ The `getSchemaValidationErrors` function returns the same result:
    ("'TwoInts' object has no attribute 'b'",)
  
 Note that see no error from the invariant because the invariants are not
-vaildated if there are other schema errors.
+validated if there are other schema errors.
 
 When we set a valid value for `a` we still get the same error for `b`:
 
@@ -161,7 +161,7 @@ Set `b=5` so everything is fine:
 Compare ValidationError
 -----------------------
 
-There was an issue with compare validation error with somthing else then an
+There was an issue with compare validation error with something else then an
 exceptions. Let's test if we can compare ValidationErrors with different things
 
 .. doctest::
@@ -185,7 +185,7 @@ but not with an error with different arguments:
    >>> v1 == v3
    False
 
-We can also compare validation erros with other things then errors. This 
+We can also compare validation errors with other things then errors. This 
 was running into an AttributeError in previous versions of zope.schema. e.g.
 AttributeError: 'NoneType' object has no attribute 'args'
 
