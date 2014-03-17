@@ -4,7 +4,7 @@ zope.schema Changelog
 4.4.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Added support for Python 3.4.
 
 
 4.4.0 (2014-01-22)
