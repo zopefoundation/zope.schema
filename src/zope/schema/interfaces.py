@@ -363,7 +363,7 @@ class IInt(IMinMax, IField):
         )
 
     max = Int(
-        title=_("End of the range (excluding the value itself)"),
+        title=_("End of the range (including the value itself)"),
         required=False,
         default=None
         )

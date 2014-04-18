@@ -4,6 +4,8 @@ zope.schema Changelog
 4.4.2 (unreleased)
 ------------------
 
+- Fix description of min max field: actually, max value is included, not excluded.
+
 - TBD
 
 
