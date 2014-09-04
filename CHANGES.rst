@@ -1,7 +1,7 @@
 zope.schema Changelog
 =====================
 
-4.4.2 (unreleased)
+4.4.2 (2014-09-04)
 ------------------
 
 - Fix description of min max field: max value is included, not excluded.
