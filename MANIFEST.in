@@ -8,6 +8,9 @@ global-exclude *.dll
 global-exclude *.pyc
 global-exclude *.pyo
 global-exclude *.so
+global-exclude coverage.xml
+
+prune docs/_build
 
 # added by check_manifest.py
 include *.py
