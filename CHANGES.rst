@@ -1,5 +1,5 @@
-zope.schema Changelog
-=====================
+Changes
+=======
 
 4.4.3 (unreleased)
 ------------------

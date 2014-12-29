@@ -1,5 +1,8 @@
-zope.schema README
-==================
+``zope.schema``
+===============
+
+.. image:: https://travis-ci.org/zopefoundation/zope.schema.png?branch=master
+        :target: https://travis-ci.org/zopefoundation/zope.schema
 
 Schemas extend the notion of interfaces to detailed descriptions of
 Attributes (but not methods).  Every schema is an interface and
