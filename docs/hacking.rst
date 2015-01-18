@@ -3,18 +3,24 @@ Hacking on :mod:`zope.schema`
 
 
 Getting the Code
------------------
+################
 
-The main repository for :mod:`zope.schema` is in the Zope Subversion
-repository:
+The main repository for :mod:`zope.schema` is in the Zope Foundation
+Github repository:
 
-http://svn.zope.org/zope.schema
+  https://github.com/zopefoundation/zope.schema
 
-You can get a read-only Subversion checkout from there:
+You can get a read-only checkout from there:
 
 .. code-block:: sh
 
-   $ svn checkout svn://svn.zope.org/repos/main/zope.schema/trunk zope.schema
+   $ git clone https://github.com/zopefoundation/zope.schema.git
+
+or fork it and get a writeable checkout of your fork:
+
+.. code-block:: sh
+
+   $ git clone git@github.com/jrandom/zope.schema.git
 
 The project also mirrors the trunk from the Subversion repository as a
 Bazaar branch on Launchpad:
@@ -28,8 +34,11 @@ You can branch the trunk from there using Bazaar:
    $ bzr branch lp:zope.schema
 
 
-Running the tests in a ``virtualenv``
--------------------------------------
+Working in a ``virtualenv``
+###########################
+
+Installing
+----------
 
 If you use the ``virtualenv`` package to create lightweight Python
 development environments, you can run the tests using nothing more
@@ -47,7 +56,10 @@ environment:
 
    $ /tmp/hack-zope.schema/bin/python setup.py develop
 
-Finally, run the tests using the build-in ``setuptools`` testrunner:
+Running the tests
+-----------------
+
+Run the tests using the build-in ``setuptools`` testrunner:
 
 .. code-block:: sh
 
@@ -117,8 +129,8 @@ you can see how well the tests cover the code:
    OK
 
 
-Building the documentation in a ``virtualenv``
-----------------------------------------------
+Building the documentation
+--------------------------
 
 :mod:`zope.schema` uses the nifty :mod:`Sphinx` documentation system
 for building its docs.  Using the same virtualenv you set up to run the
@@ -149,8 +161,11 @@ You can also test the code snippets in the documentation:
        results in _build/doctest/output.txt.
 
 
-Running the tests using  :mod:`zc.buildout`
--------------------------------------------
+Using :mod:`zc.buildout`
+########################
+
+Setting up the buildout
+-----------------------
 
 :mod:`zope.schema` ships with its own :file:`buildout.cfg` file and
 :file:`bootstrap.py` for setting up a development buildout:
@@ -166,7 +181,10 @@ Running the tests using  :mod:`zc.buildout`
    Generated script '.../bin/sphinx-quickstart'.
    Generated script '.../bin/sphinx-build'.
 
-You can now run the tests:
+Running the tests
+-----------------
+
+Run the tests:
 
 .. code-block:: sh
 
@@ -178,8 +196,8 @@ You can now run the tests:
      Tear down zope.testing.testrunner.layer.UnitTests in 0.000 seconds.
 
 
-Building the documentation using :mod:`zc.buildout`
----------------------------------------------------
+Building the documentation
+--------------------------
 
 The :mod:`zope.schema` buildout installs the Sphinx scripts required to build
 the documentation, including testing its code snippets:
@@ -201,8 +219,11 @@ the documentation, including testing its code snippets:
    build succeeded.
 
 
-Running Tests on Multiple Python Versions via :mod:`tox`
---------------------------------------------------------
+Using :mod:`tox`
+################
+
+Running Tests on Multiple Python Versions
+-----------------------------------------
 
 `tox <http://tox.testrun.org/latest/>`_ is a Python-based test automation
 tool designed to run tests against multiple Python versions.  It creates
@@ -213,20 +234,9 @@ configured commands.
 :mod:`zope.schema` configures the following :mod:`tox` environments via
 its ``tox.ini`` file:
 
-- The ``py26`` environment builds a ``virtualenv`` with ``python2.6``,
-  installs :mod:`zope.schema`, and runs the tests
-  via ``python setup.py test -q``.
-
-- The ``py27`` environment builds a ``virtualenv`` with ``python2.7``,
-  installs :mod:`zope.schema`, and runs the tests
-  via ``python setup.py test -q``.
-
-- The ``py32`` environment builds a ``virtualenv`` with ``python3.2``,
+- The ``py26``, ``py27``, ``py33``, ``py34``, and ``pypy`` environments
+  builds a ``virtualenv`` with ``pypy``,
   installs :mod:`zope.schema` and dependencies, and runs the tests
-  via ``python setup.py test -q``.
-
-- The ``pypy`` environment builds a ``virtualenv`` with ``pypy``,
-  installs :mod:`zope.schema`, and runs the tests
   via ``python setup.py test -q``.
 
 - The ``coverage`` environment builds a ``virtualenv`` with ``python2.6``,
@@ -283,12 +293,15 @@ including building the docs and testing their snippets:
    congratulations :)
 
 
+Contributing to :mod:`zope.schema`
+##################################
+
 Submitting a Bug Report
 -----------------------
 
-:mod:`zope.schema` tracks its bugs on Launchpad:
+:mod:`zope.schema` tracks its bugs on Github:
 
-https://bugs.launchpad.net/zope.schema
+  https://github.com/zopefoundation/zope.schema/issues
 
 Please submit bug reports and feature requests there.
 
@@ -303,16 +316,12 @@ Sharing Your Changes
    or bug fixes, although it is possible that you may have tested your
    new code by updating existing tests.
 
-If you got a read-only checkout from the Subversion repository, and you
-have made a change you would like to share, the best route is to let
-Subversion help you make a patch file:
+If have made a change you would like to share, the best route is to fork
+the Githb repository, check out your fork, make your changes on a branch
+in your fork, and push it.  You can then submit a pull request from your
+branch:
 
-.. code-block:: sh
-
-   $ svn diff > zope.schema-cool_feature.patch
-
-You can then upload that patch file as an attachment to a Launchpad bug
-report.
+  https://github.com/zopefoundation/zope.schema/pulls
 
 If you branched the code from Launchpad using Bazaar, you have another
 option:  you can "push" your branch to Launchpad:
