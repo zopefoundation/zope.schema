@@ -196,29 +196,6 @@ Run the tests:
      Tear down zope.testing.testrunner.layer.UnitTests in 0.000 seconds.
 
 
-Building the documentation
---------------------------
-
-The :mod:`zope.schema` buildout installs the Sphinx scripts required to build
-the documentation, including testing its code snippets:
-
-.. code-block:: sh
-
-   $ cd docs
-   $ bin/sphinx-build -b doctest -d docs/_build/doctrees   docs docs/_build/doctest
-   ...
-   Doctest summary
-   ===============
-     140 tests
-       0 failures in tests
-       0 failures in setup code
-   build succeeded.
-   Testing of doctests in the sources finished, look at the  results in .../docs/_build/doctest/output.txt.
-   .../bin/sphinx-build -b html -d .../docs/_build/doctrees   .../docs .../docs/_build/html
-   ...
-   build succeeded.
-
-
 Using :mod:`tox`
 ################
 
