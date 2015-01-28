@@ -1,8 +1,16 @@
 ``zope.schema``
 ===============
 
+.. image:: https://pypip.in/version/zope.schema/badge.svg?style=flat
+    :target: https://pypi.python.org/pypi/zope.schema/
+    :alt: Latest Version
+
 .. image:: https://travis-ci.org/zopefoundation/zope.schema.png?branch=master
         :target: https://travis-ci.org/zopefoundation/zope.schema
+
+.. image:: https://readthedocs.org/projects/zopeschema/badge/?version=latest
+        :target: http://zopeschema.readthedocs.org/en/latest/
+        :alt: Documentation Status
 
 Schemas extend the notion of interfaces to detailed descriptions of
 Attributes (but not methods).  Every schema is an interface and
