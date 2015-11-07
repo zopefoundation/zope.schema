@@ -1,7 +1,7 @@
 ``zope.schema``
 ===============
 
-.. image:: https://pypip.in/version/zope.schema/badge.svg?style=flat
+.. image:: https://img.shields.io/pypi/v/zope.schema.svg
     :target: https://pypi.python.org/pypi/zope.schema/
     :alt: Latest Version
 
