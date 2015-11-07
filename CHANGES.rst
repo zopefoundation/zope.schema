@@ -4,7 +4,7 @@ Changes
 4.4.3 (unreleased)
 ------------------
 
-- TBD
+- Claim support for Python 3.5.
 
 
 4.4.2 (2014-09-04)
