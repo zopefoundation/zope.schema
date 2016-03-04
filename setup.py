@@ -82,7 +82,7 @@ TESTS_REQUIRE = ['zope.testing']
 setup(
     name='zope.schema',
     version='4.4.3.dev0',
-    url='http://pypi.python.org/pypi/zope.schema',
+    url='https://github.com/zopefoundation/zope.schema',
     license='ZPL 2.1',
     description='zope.interface extension for defining data schemas',
     author='Zope Foundation and Contributors',
