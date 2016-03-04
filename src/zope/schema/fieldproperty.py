@@ -86,11 +86,15 @@ class FieldProperty(object):
 
 
 def createFieldProperties(schema, omit=[]):
-    """Creates a FieldProperty fields in `schema` on the class it is called on.
+    """For each fields in `schema` create a FieldProperty on the class.
 
     schema ... interface those fields should be added to class
     omit ... list of field names to be omitted in creation
 
+    Usage::
+
+        class A(object):
+            zope.schema.fieldproperty.createFieldProperties(IMySchema)
     """
     frame = sys._getframe(1)
     for name in zope.schema.getFieldNamesInOrder(schema):
