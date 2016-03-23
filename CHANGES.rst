@@ -108,7 +108,7 @@ Changes
 
 - Ensure tests pass when run under ``nose``.
 
-- Ad ``setup.py dev`` alias (runs ``setup.py develop`` plus installs
+- Add ``setup.py dev`` alias (runs ``setup.py develop`` plus installs
   ``nose`` and ``coverage``).
 
 - Add ``setup.py docs`` alias (installs ``Sphinx`` and dependencies).
