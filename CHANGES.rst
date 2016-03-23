@@ -1,10 +1,12 @@
 Changes
 =======
 
-4.4.3 (unreleased)
+4.5.0 (unreleased)
 ------------------
 
-- Claim support for Python 3.5.
+- Drop support for Python 2.6 and 3.2.
+
+- Add support for Python 3.5.
 
 
 4.4.2 (2014-09-04)
@@ -16,7 +18,7 @@ Changes
 4.4.1 (2014-03-19)
 ------------------
 
-- Added support for Python 3.4.
+- Add support for Python 3.4.
 
 
 4.4.0 (2014-01-22)
@@ -36,13 +38,13 @@ Changes
 - Don't raise RequiredMissing if a field's defaultFactory returns the field's
   missing_value.
 
-- Updated ``boostrap.py`` to version 2.2.
+- Update ``boostrap.py`` to version 2.2.
 
 - Add the ability to swallow ValueErrors when rendering a SimpleVocabulary,
   allowing for cases where vocabulary items may be duplicated (e.g., due to
   user input).
 
-- It was a pain that ``ConstraintNotSatisfied`` did not tell the field name.
+- Include the field name in ``ConstraintNotSatisfied``.
 
 
 4.3.2 (2013-02-24)
@@ -63,16 +65,16 @@ Changes
 4.3.0 (2013-02-24)
 ------------------
 
-- Fixed a bug where bytes values were turned into tokens inproperly in
+- Fix a bug where bytes values were turned into tokens inproperly in
   Python 3.
 
-- Added ``createFieldProperties()`` function which maps schema fields into
+- Add ``createFieldProperties()`` function which maps schema fields into
   ``FieldProperty`` instances.
 
 4.2.2 (2012-11-21)
 ------------------
 
-- Added support for Python 3.3.
+- Add support for Python 3.3.
 
 4.2.1 (2012-11-09)
 ------------------
@@ -83,9 +85,9 @@ Changes
 4.2.0 (2012-05-12)
 ------------------
 
-- Automated build of Sphinx HTML docs and running doctest snippets via tox.
+- Automate build of Sphinx HTML docs and running doctest snippets via tox.
 
-- Dropped explicit support for Python 3.1.
+- Drop explicit support for Python 3.1.
 
 - Introduce NativeString and NativeStringLine which are equal to Bytes and
   BytesLine on Python 2 and Text and TextLine on Python 3.
@@ -93,23 +95,23 @@ Changes
 - Change IURI from a Bytes string to a "native" string. This is a backwards
   incompatibility which only affects Python 3.
 
-- 100% unit test coverage.
+- Bring unit test coverage to 100%.
 
-- Doctests moved from the package and wired up as normal Sphinx documentation.
+- Move doctests from the package and wired up as normal Sphinx documentation.
 
-- Added explicit support for PyPy.
+- Add explicit support for PyPy.
 
-- Added support for continuous integration using ``tox`` and ``jenkins``.
+- Add support for continuous integration using ``tox`` and ``jenkins``.
 
-- Dropped the external ``six`` dependency in favor of a much-trimmed
+- Drop the external ``six`` dependency in favor of a much-trimmed
   ``zope.schema._compat`` module.
 
-- Tests now pass when run under ``nose``.
+- Ensure tests pass when run under ``nose``.
 
-- Added ``setup.py dev`` alias (runs ``setup.py develop`` plus installs
+- Ad ``setup.py dev`` alias (runs ``setup.py develop`` plus installs
   ``nose`` and ``coverage``).
 
-- Added ``setup.py docs`` alias (installs ``Sphinx`` and dependencies).
+- Add ``setup.py docs`` alias (installs ``Sphinx`` and dependencies).
 
 
 4.1.1 (2012-03-23)
@@ -147,14 +149,14 @@ Changes
 3.8.1 (2011-09-23)
 ------------------
 
-- fix broken Object field validation. Previous version was using a volatile
+- Fix broken Object field validation. Previous version was using a volatile
   property on object field values which ends in a ForbiddenAttribute error
   on security proxied objects.
 
 3.8.0 (2011-03-18)
 ------------------
 
-- Implemented a ``defaultFactory`` attribute for all fields. It is a callable
+- Implement a ``defaultFactory`` attribute for all fields. It is a callable
   that can be used to compute default values. The simplest case is::
 
     Date(defaultFactory=datetime.date.today)
@@ -171,8 +173,8 @@ Changes
 3.7.1 (2010-12-25)
 ------------------
 
-- The validation token, used in the validation of schema with Object
-  Field to avoid infinite recursion, has been renamed.
+- Rename the validation token, used in the validation of schema with Object
+  Field to avoid infinite recursion:
   ``__schema_being_validated`` became ``_v_schema_being_validated``,
   a volatile attribute, to avoid persistency and therefore,
   read/write conflicts.
@@ -202,7 +204,7 @@ Changes
 
 - Avoid maximum recursion when validating Object field that points to cycles
 
-- Made the dependency on ``zope.i18nmessageid`` optional.
+- Make the dependency on ``zope.i18nmessageid`` optional.
 
 3.6.1 (2010-01-05)
 ------------------
@@ -265,7 +267,7 @@ Changes
 - Made validation tests compatible with Python 2.5 again (hopefully not
   breaking Python 2.4)
 
-- Added an __all__ package attribute to expose documentation.
+- Add an __all__ package attribute to expose documentation.
 
 3.5.1 (2009-01-31)
 ------------------
@@ -295,15 +297,15 @@ Changes
 3.5.0a1 (2008-10-10)
 --------------------
 
-- Added the doctests to the long description.
+- Add the doctests to the long description.
 
-- Removed use of deprecated 'sets' module when running under Python 2.6.
+- Remove use of deprecated 'sets' module when running under Python 2.6.
 
-- Removed spurious doctest failure when running under Python 2.6.
+- Remove spurious doctest failure when running under Python 2.6.
 
-- Added support to bootstrap on Jython.
+- Add support to bootstrap on Jython.
 
-- Added helper methods for schema validation: ``getValidationErrors``
+- Add helper methods for schema validation: ``getValidationErrors``
   and ``getSchemaValidationErrors``.
 
 - zope.schema now works on Python2.5
@@ -311,7 +313,7 @@ Changes
 3.4.0 (2007-09-28)
 ------------------
 
-Added BeforeObjectAssignedEvent that is triggered before the object
+Add BeforeObjectAssignedEvent that is triggered before the object
 field sets a value.
 
 3.3.0 (2007-03-15)
@@ -326,7 +328,7 @@ the Zope 3.3.0 release.
 Corresponds to the version of the zope.schema package shipped as part of
 the Zope 3.2.1 release.
 
-Fixed missing import of 'VocabularyRegistryError'.  See
+Fix missing import of 'VocabularyRegistryError'.  See
 http://www.zope.org/Collectors/Zope3-dev/544 .
 
 3.2.0 (2006-01-05)
@@ -335,7 +337,7 @@ http://www.zope.org/Collectors/Zope3-dev/544 .
 Corresponds to the version of the zope.schema package shipped as part of
 the Zope 3.2.0 release.
 
-Added "iterable" sources to replace vocabularies, which are now deprecated
+Add "iterable" sources to replace vocabularies, which are now deprecated
 and scheduled for removal in Zope 3.3.
 
 3.1.0 (2005-10-03)
@@ -344,10 +346,10 @@ and scheduled for removal in Zope 3.3.
 Corresponds to the version of the zope.schema package shipped as part of
 the Zope 3.1.0 release.
 
-Allowed 'Choice' fields to take either a 'vocabulary' or a 'source'
+Allow 'Choice' fields to take either a 'vocabulary' or a 'source'
 argument (sources are a simpler implementation).
 
-Added 'TimeDelta' and 'ASCIILine' field types.
+Add 'TimeDelta' and 'ASCIILine' field types.
 
 3.0.0 (2004-11-07)
 ------------------

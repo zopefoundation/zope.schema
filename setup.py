@@ -81,7 +81,7 @@ TESTS_REQUIRE = ['zope.testing']
 
 setup(
     name='zope.schema',
-    version='4.4.3.dev0',
+    version='4.5.0.dev0',
     url='https://github.com/zopefoundation/zope.schema',
     license='ZPL 2.1',
     description='zope.interface extension for defining data schemas',
@@ -100,10 +100,8 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
