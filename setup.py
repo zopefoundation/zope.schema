@@ -19,7 +19,6 @@
 """Setup for zope.schema package
 """
 import os
-import sys
 from setuptools import setup, find_packages
 
 
@@ -70,10 +69,6 @@ REQUIRES = [
     'zope.interface >= 3.6.0',
     'zope.event',
 ]
-
-
-if sys.version_info < (2, 7):
-    REQUIRES += ['ordereddict']
 
 
 TESTS_REQUIRE = ['zope.testing']
