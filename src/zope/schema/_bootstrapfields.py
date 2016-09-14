@@ -126,16 +126,16 @@ class Field(Attribute):
 
         Here are some examples:
 
-        >>> from zope.schema._compat import u
+        >>> from zope.schema._bootstrapfields import Field
         >>> f = Field()
         >>> f.__doc__, f.title, f.description
         ('', u'', u'')
 
-        >>> f = Field(title=u('sample'))
+        >>> f = Field(title=u'sample')
         >>> f.__doc__, f.title, f.description
         (u'sample', u'sample', u'')
 
-        >>> f = Field(title=u('sample'), description=u('blah blah\\nblah'))
+        >>> f = Field(title=u'sample', description=u'blah blah\\nblah')
         >>> f.__doc__, f.title, f.description
         (u'sample\\n\\nblah blah\\nblah', u'sample', u'blah blah\\nblah')
         """
@@ -326,16 +326,15 @@ class Text(MinMaxLen, Field):
 
     def fromUnicode(self, str):
         """
-        >>> from zope.schema._compat import u
-        >>> from zope.schema._compat import b
+        >>> from zope.schema import Text
         >>> t = Text(constraint=lambda v: 'x' in v)
-        >>> t.fromUnicode(b("foo x spam"))
+        >>> t.fromUnicode(b"foo x spam")
         Traceback (most recent call last):
         ...
         WrongType: ('foo x spam', <type 'unicode'>, '')
-        >>> t.fromUnicode(u("foo x spam"))
+        >>> t.fromUnicode(u"foo x spam")
         u'foo x spam'
-        >>> t.fromUnicode(u("foo spam"))
+        >>> t.fromUnicode(u"foo spam")
         Traceback (most recent call last):
         ...
         ConstraintNotSatisfied: (u'foo spam', '')
@@ -400,7 +399,8 @@ class Bool(Field):
 
     def fromUnicode(self, str):
         """
-        >>> from zope.schema._compat import b
+        >>> from zope.schema._bootstrapfields import Bool
+        >>> from zope.schema.interfaces import IFromUnicode
         >>> b = Bool()
         >>> IFromUnicode.providedBy(b)
         True
@@ -428,6 +428,7 @@ class Int(Orderable, Field):
 
     def fromUnicode(self, str):
         """
+        >>> from zope.schema._bootstrapfields import Int
         >>> f = Int()
         >>> f.fromUnicode("125")
         125
