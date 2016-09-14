@@ -4,10 +4,10 @@ Schema Validation
 
 There are two helper methods to verify schemas and interfaces:
 
-getValidationErrors
+:func:`~.getValidationErrors`
     first validates via the zope.schema field validators. If that succeeds the
     invariants are checked.
-getSchemaValidationErrors
+:func:`~.getSchemaValidationErrors`
     *only* validates via the zope.schema field validators. The invariants are
     *not* checked.
 
@@ -28,7 +28,7 @@ Create an interface to validate against:
    ...         _a_greater_b_called.append(obj)
    ...         if obj.a <= obj.b:
    ...             raise zope.interface.Invalid("%s<=%s" % (obj.a, obj.b))
-   ...     
+   ...
 
 Create a silly model:
 
@@ -79,7 +79,7 @@ The `getSchemaValidationErrors` function returns the same result:
    'SchemaNotFullyImplemented'
    >>> r[1][1].args[0].args
    ("'TwoInts' object has no attribute 'b'",)
- 
+
 Note that see no error from the invariant because the invariants are not
 validated if there are other schema errors.
 
@@ -185,7 +185,7 @@ but not with an error with different arguments:
    >>> v1 == v3
    False
 
-We can also compare validation errors with other things then errors. This 
+We can also compare validation errors with other things then errors. This
 was running into an AttributeError in previous versions of zope.schema. e.g.
 AttributeError: 'NoneType' object has no attribute 'args'
 

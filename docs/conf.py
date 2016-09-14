@@ -25,7 +25,13 @@ import sys, os
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.viewcode']
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.doctest',
+    'sphinx.ext.viewcode',
+    'sphinx.ext.intersphinx',
+    'repoze.sphinx.autointerface',
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -240,3 +246,16 @@ texinfo_documents = [
 
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 #texinfo_show_urls = 'footnote'
+
+intersphinx_mapping = {
+    'https://docs.python.org/': None,
+}
+
+extlinks = {'issue': ('https://github.com/zopefoundation/zope.schema/issues/%s',
+                      'issue #'),
+            'pr': ('https://github.com/zopefoundation/zope.schema/pull/%s',
+                   'pull request #')}
+
+autodoc_default_flags = ['members', 'show-inheritance']
+autoclass_content = 'both'
+autodoc_member_order = 'bysource'
