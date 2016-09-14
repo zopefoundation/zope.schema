@@ -10,6 +10,7 @@ Contents:
    fields
    sources
    validation
+   api
    hacking
 
 Indices and tables

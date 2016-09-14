@@ -21,7 +21,7 @@ Scalar fields represent simple. immutable Python types.
 Bytes
 #####
 
-:class:`zope.schema._field.Bytes` fields contain binary data, represented
+:class:`zope.schema.Bytes` fields contain binary data, represented
 as a sequence of bytes (``str`` in Python2, ``bytes`` in Python3).
 
 Conversion from Unicode:
@@ -30,7 +30,7 @@ Conversion from Unicode:
 
    >>> from zope.schema._compat import b
    >>> from zope.schema._compat import u
-   >>> from zope.schema._field import Bytes
+   >>> from zope.schema import Bytes
    >>> obj = Bytes(constraint=lambda v: b('x') in v)
    >>> obj.fromUnicode(u(" foo x.y.z bat"))
    ' foo x.y.z bat'
@@ -42,14 +42,14 @@ Conversion from Unicode:
 ASCII
 #####
 
-:class:`zope.schema._field.ASCII` fields are a restricted form of
-:class:`zope.schema._field.Bytes`:  they can contain only 7-bit bytes.
+:class:`zope.schema.ASCII` fields are a restricted form of
+:class:`zope.schema.Bytes`:  they can contain only 7-bit bytes.
 
 Validation accepts empty strings:
 
 .. doctest::
 
-   >>> from zope.schema._field import ASCII
+   >>> from zope.schema import ASCII
    >>> ascii = ASCII()
    >>> empty = ''
    >>> ascii._validate(empty)
@@ -74,26 +74,26 @@ but fails with 8-bit (encoded) strings:
 BytesLine
 #########
 
-:class:`zope.schema._field.BytesLine` fields are a restricted form of
-:class:`zope.schema._field.Bytes`:  they cannot contain newlines.
+:class:`zope.schema.BytesLine` fields are a restricted form of
+:class:`zope.schema.Bytes`:  they cannot contain newlines.
 
 ASCIILine
 #########
 
-:class:`zope.schema._field.BytesLine` fields are a restricted form of
-:class:`zope.schema._field.ASCII`:  they cannot contain newlines.
+:class:`zope.schema.BytesLine` fields are a restricted form of
+:class:`zope.schema.ASCII`:  they cannot contain newlines.
 
 Float
 #####
 
-:class:`zope.schema._field.Float` fields contain binary data, represented
+:class:`zope.schema.Float` fields contain binary data, represented
 as a a Python ``float``.
 
 Conversion from Unicode:
 
 .. doctest::
 
-   >>> from zope.schema._field import Float
+   >>> from zope.schema import Float
    >>> f = Float()
    >>> f.fromUnicode("1.25")
    1.25
@@ -105,14 +105,14 @@ Conversion from Unicode:
 Decimal
 #######
 
-:class:`zope.schema._field.Decimal` fields contain binary data, represented
-as a a Python ``decimal.Decimal``.
+:class:`zope.schema.Decimal` fields contain binary data, represented
+as a a Python :class:`decimal.Decimal`.
 
 Conversion from Unicode:
 
 .. doctest::
 
-   >>> from zope.schema._field import Decimal
+   >>> from zope.schema import Decimal
    >>> f = Decimal()
    >>> import decimal
    >>> isinstance(f.fromUnicode("1.25"), decimal.Decimal)
@@ -127,31 +127,31 @@ Conversion from Unicode:
 DateTime
 ########
 
-:class:`zope.schema._field.DateTime` fields contain binary data, represented
-as a a Python ``datetime.DateTime``.
+:class:`zope.schema.DateTime` fields contain binary data, represented
+as a a Python :class:`datetime.datetime`.
 
 Date
 ####
 
-:class:`zope.schema._field.Date` fields contain binary data, represented
-as a a Python ``datetime.Date``.
+:class:`zope.schema.Date` fields contain binary data, represented
+as a a Python :class:`datetime.date`.
 
 TimeDelta
 #########
 
-:class:`zope.schema._field.TimeDelta` fields contain binary data, represented
-as a a Python ``datetime.TimeDelta``.
+:class:`zope.schema.TimeDelta` fields contain binary data, represented
+as a a Python :class:`datetime.timedelta`.
 
 Time
 ####
 
-:class:`zope.schema._field.Time` fields contain binary data, represented
-as a a Python ``datetime.Time``.
+:class:`zope.schema.Time` fields contain binary data, represented
+as a a Python :class:`datetime.time`.
 
 Choice
 ######
 
-:class:`zope.schema._field.Choice` fields are constrained to values drawn
+:class:`zope.schema.Choice` fields are constrained to values drawn
 from a specified set, which can be static or dynamic.
 
 Conversion from Unicode enforces the constraint:
@@ -160,7 +160,7 @@ Conversion from Unicode enforces the constraint:
 
    >>> from zope.schema.interfaces import IFromUnicode
    >>> from zope.schema.vocabulary import SimpleVocabulary
-   >>> from zope.schema._field import Choice
+   >>> from zope.schema import Choice
    >>> t = Choice(
    ...     vocabulary=SimpleVocabulary.fromValues([u('foo'),u('bar')]))
    >>> IFromUnicode.providedBy(t)
@@ -173,8 +173,8 @@ Conversion from Unicode enforces the constraint:
    u'foo'
 
 By default, ValueErrors are thrown if duplicate values or tokens
-are passed in. If you are using this vocabulary as part of a form 
-that is generated from non-pristine data, this may not be the 
+are passed in. If you are using this vocabulary as part of a form
+that is generated from non-pristine data, this may not be the
 desired behavior. If you want to swallow these exceptions, pass
 in swallow_duplicates=True when initializing the vocabulary. See
 the test cases for an example.
@@ -182,14 +182,14 @@ the test cases for an example.
 URI
 ###
 
-:class:`zope.schema._field.URI` fields contain native Python strings
+:class:`zope.schema.URI` fields contain native Python strings
 (``str``), matching the "scheme:data" pattern.
 
 Validation ensures that the pattern is matched:
 
 .. doctest::
 
-   >>> from zope.schema._field import URI
+   >>> from zope.schema import URI
    >>> uri = URI(__name__='test')
    >>> uri.validate(b("http://www.python.org/foo/bar"))
    >>> uri.validate(b("DAV:"))
@@ -217,14 +217,14 @@ Conversion from Unicode:
 DottedName
 ##########
 
-:class:`zope.schema._field.DottedName` fields contain native Python strings
+:class:`zope.schema.DottedName` fields contain native Python strings
 (``str``), containing zero or more "dots" separating elements of the
 name.  The minimum and maximum number of dots can be passed to the
 constructor:
 
 .. doctest::
 
-   >>> from zope.schema._field import DottedName
+   >>> from zope.schema import DottedName
    >>> DottedName(min_dots=-1)
    Traceback (most recent call last):
    ...
@@ -306,14 +306,14 @@ Validation ensures that the pattern is matched:
 Id
 ##
 
-:class:`zope.schema._field.Id` fields contain native Python strings
+:class:`zope.schema.Id` fields contain native Python strings
 (``str``), matching either the URI pattern or a "dotted name".
 
 Validation ensures that the pattern is matched:
 
 .. doctest::
 
-   >>> from zope.schema._field import Id
+   >>> from zope.schema import Id
    >>> id = Id(__name__='test')
    >>> id.validate("http://www.python.org/foo/bar")
    >>> id.validate("zope.app.content")
@@ -396,8 +396,8 @@ Creating a custom collection field
 Ideally, custom collection fields have interfaces that inherit appropriately
 from either zope.schema.interfaces.ISequence or
 zope.schema.interfaces.IUnorderedCollection.  Most collection fields should be
-able to subclass zope.schema._field.AbstractCollection to get the necessary
-behavior.  Notice the behavior of the Set field in zope.schema._field: this
+able to subclass :class:`zope.schema._field.AbstractCollection` to get the necessary
+behavior.  Notice the behavior of the Set field in zope.schema: this
 would also be necessary to implement a Bag.
 
 Choices and Vocabularies
@@ -405,7 +405,7 @@ Choices and Vocabularies
 
 Choice fields are the schema way of spelling enumerated fields and more.  By
 providing a dynamically generated vocabulary, the choices available to a
-choice field can be contextually calculated.  
+choice field can be contextually calculated.
 
 Simple choices do not have to explicitly use vocabularies:
 
@@ -428,7 +428,7 @@ have a simple interface, as defined in
 zope.schema.interfaces.IBaseVocabulary.  A vocabulary must minimally be able
 to determine whether it contains a value, to create a term object for a value,
 and to return a query interface (or None) to find items in itself.  Term
-objects are an abstraction that wraps a vocabulary value.  
+objects are an abstraction that wraps a vocabulary value.
 
 The Zope application server typically needs a fuller interface that provides
 "tokens" on its terms: ASCII values that have a one-to-one relationship to the
@@ -450,13 +450,13 @@ registered vocabularies can simply be functions that rely on SimpleVocabulary:
    >>> def myDynamicVocabulary(context):
    ...     v = dynamic_context_calculation_that_returns_an_iterable(context)
    ...     return SimpleVocabulary.fromValues(v)
-   ... 
+   ...
 
 The vocabulary interface is simple enough that writing a custom vocabulary is
 not too difficult itself.
 
 See zope.schema.vocabulary.TreeVocabulary for another
-IBaseVocabulary supporting vocabulary that provides a nested, tree-like 
+IBaseVocabulary supporting vocabulary that provides a nested, tree-like
 structure.
 
 Choices and Collections
@@ -476,7 +476,7 @@ While fields support several use cases, including code documentation and data
 description and even casting, a significant use case influencing their design is
 to support form generation -- generating widgets for a field.  Choice and
 collection fields are expected to be used within widget frameworks.  The
-zope.app approach typically (but configurably) uses multiple dispatches to 
+zope.app approach typically (but configurably) uses multiple dispatches to
 find widgets on the basis of various aspects of the fields.
 
 Widgets for all fields are found by looking up a browser view of the field
@@ -498,5 +498,4 @@ value_type field, and the vocabulary.  Further lookups may even be configured
 on the basis of uniqueness and other constraints.
 
 This level of indirection may be unnecessary for some applications, and can be
-disabled with simple ZCML changes within `zope.app`.
-
+disabled with simple ZCML changes within ``zope.app``.
