@@ -23,7 +23,8 @@ from setuptools import setup, find_packages
 
 
 def read(*rnames):
-    return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
+    with open(os.path.join(os.path.dirname(__file__), *rnames)) as f:
+        return f.read()
 
 
 def _modname(path, base, name=''):
@@ -76,7 +77,7 @@ TESTS_REQUIRE = ['zope.testing']
 
 setup(
     name='zope.schema',
-    version='4.5.0.dev0',
+    version=read('version.txt').strip(),
     url='https://github.com/zopefoundation/zope.schema',
     license='ZPL 2.1',
     description='zope.interface extension for defining data schemas',
