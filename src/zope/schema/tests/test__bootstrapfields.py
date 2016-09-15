@@ -152,12 +152,12 @@ class FieldTests(unittest.TestCase):
         return self._getTargetClass()(*args, **kw)
 
     def test_ctor_defaults(self):
-        from zope.schema._compat import u
+
         field = self._makeOne()
-        self.assertEqual(field.__name__, u(''))
-        self.assertEqual(field.__doc__, u(''))
-        self.assertEqual(field.title, u(''))
-        self.assertEqual(field.description, u(''))
+        self.assertEqual(field.__name__, u'')
+        self.assertEqual(field.__doc__, u'')
+        self.assertEqual(field.title, u'')
+        self.assertEqual(field.description, u'')
         self.assertEqual(field.required, True)
         self.assertEqual(field.readonly, False)
         self.assertEqual(field.constraint(object()), True)
@@ -167,28 +167,28 @@ class FieldTests(unittest.TestCase):
         self.assertEqual(field.context, None)
 
     def test_ctor_w_title_wo_description(self):
-        from zope.schema._compat import u
-        field = self._makeOne(u('TITLE'))
-        self.assertEqual(field.__name__, u(''))
-        self.assertEqual(field.__doc__, u('TITLE'))
-        self.assertEqual(field.title, u('TITLE'))
-        self.assertEqual(field.description, u(''))
+
+        field = self._makeOne(u'TITLE')
+        self.assertEqual(field.__name__, u'')
+        self.assertEqual(field.__doc__, u'TITLE')
+        self.assertEqual(field.title, u'TITLE')
+        self.assertEqual(field.description, u'')
 
     def test_ctor_wo_title_w_description(self):
-        from zope.schema._compat import u
-        field = self._makeOne(description=u('DESC'))
-        self.assertEqual(field.__name__, u(''))
-        self.assertEqual(field.__doc__, u('DESC'))
-        self.assertEqual(field.title, u(''))
-        self.assertEqual(field.description, u('DESC'))
+
+        field = self._makeOne(description=u'DESC')
+        self.assertEqual(field.__name__, u'')
+        self.assertEqual(field.__doc__, u'DESC')
+        self.assertEqual(field.title, u'')
+        self.assertEqual(field.description, u'DESC')
 
     def test_ctor_w_both_title_and_description(self):
-        from zope.schema._compat import u
-        field = self._makeOne(u('TITLE'), u('DESC'), u('NAME'))
-        self.assertEqual(field.__name__, u('NAME'))
-        self.assertEqual(field.__doc__, u('TITLE\n\nDESC'))
-        self.assertEqual(field.title, u('TITLE'))
-        self.assertEqual(field.description, u('DESC'))
+
+        field = self._makeOne(u'TITLE', u'DESC', u'NAME')
+        self.assertEqual(field.__name__, u'NAME')
+        self.assertEqual(field.__doc__, u'TITLE\n\nDESC')
+        self.assertEqual(field.title, u'TITLE')
+        self.assertEqual(field.description, u'DESC')
 
     def test_ctor_order_madness(self):
         klass = self._getTargetClass()
@@ -513,9 +513,9 @@ class TextTests(unittest.TestCase):
 
     def test_validate_wrong_types(self):
         from zope.schema.interfaces import WrongType
-        from zope.schema._compat import b
+
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, b(''))
+        self.assertRaises(WrongType, field.validate, b'')
         self.assertRaises(WrongType, field.validate, 1)
         self.assertRaises(WrongType, field.validate, 1.0)
         self.assertRaises(WrongType, field.validate, ())
@@ -526,37 +526,37 @@ class TextTests(unittest.TestCase):
         self.assertRaises(WrongType, field.validate, object())
 
     def test_validate_w_invalid_default(self):
-        from zope.schema._compat import b
+
         from zope.schema.interfaces import ValidationError
-        self.assertRaises(ValidationError, self._makeOne, default=b(''))
+        self.assertRaises(ValidationError, self._makeOne, default=b'')
 
     def test_validate_not_required(self):
-        from zope.schema._compat import u
+
         field = self._makeOne(required=False)
-        field.validate(u(''))
-        field.validate(u('abc'))
-        field.validate(u('abc\ndef'))
+        field.validate(u'')
+        field.validate(u'abc')
+        field.validate(u'abc\ndef')
         field.validate(None)
 
     def test_validate_required(self):
         from zope.schema.interfaces import RequiredMissing
-        from zope.schema._compat import u
+
         field = self._makeOne()
-        field.validate(u(''))
-        field.validate(u('abc'))
-        field.validate(u('abc\ndef'))
+        field.validate(u'')
+        field.validate(u'abc')
+        field.validate(u'abc\ndef')
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def test_fromUnicode_miss(self):
         from zope.schema._bootstrapinterfaces import WrongType
-        from zope.schema._compat import b
-        deadbeef = b('DEADBEEF')
+
+        deadbeef = b'DEADBEEF'
         txt = self._makeOne()
         self.assertRaises(WrongType, txt.fromUnicode, deadbeef)
 
     def test_fromUnicode_hit(self):
-        from zope.schema._compat import u
-        deadbeef = u('DEADBEEF')
+
+        deadbeef = u'DEADBEEF'
         txt = self._makeOne()
         self.assertEqual(txt.fromUnicode(deadbeef), deadbeef)
 
@@ -582,9 +582,9 @@ class TextLineTests(unittest.TestCase):
 
     def test_validate_wrong_types(self):
         from zope.schema.interfaces import WrongType
-        from zope.schema._compat import b
+
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, b(''))
+        self.assertRaises(WrongType, field.validate, b'')
         self.assertRaises(WrongType, field.validate, 1)
         self.assertRaises(WrongType, field.validate, 1.0)
         self.assertRaises(WrongType, field.validate, ())
@@ -595,26 +595,26 @@ class TextLineTests(unittest.TestCase):
         self.assertRaises(WrongType, field.validate, object())
 
     def test_validate_not_required(self):
-        from zope.schema._compat import u
+
         field = self._makeOne(required=False)
-        field.validate(u(''))
-        field.validate(u('abc'))
+        field.validate(u'')
+        field.validate(u'abc')
         field.validate(None)
 
     def test_validate_required(self):
         from zope.schema.interfaces import RequiredMissing
-        from zope.schema._compat import u
+
         field = self._makeOne()
-        field.validate(u(''))
-        field.validate(u('abc'))
+        field.validate(u'')
+        field.validate(u'abc')
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def test_constraint(self):
-        from zope.schema._compat import u
+
         field = self._makeOne()
-        self.assertEqual(field.constraint(u('')), True)
-        self.assertEqual(field.constraint(u('abc')), True)
-        self.assertEqual(field.constraint(u('abc\ndef')), False)
+        self.assertEqual(field.constraint(u''), True)
+        self.assertEqual(field.constraint(u'abc'), True)
+        self.assertEqual(field.constraint(u'abc\ndef'), False)
 
 
 class PasswordTests(unittest.TestCase):
@@ -642,18 +642,18 @@ class PasswordTests(unittest.TestCase):
         self.assertEqual(inst.password, 'PASSWORD')
 
     def test_validate_not_required(self):
-        from zope.schema._compat import u
+
         field = self._makeOne(required=False)
-        field.validate(u(''))
-        field.validate(u('abc'))
+        field.validate(u'')
+        field.validate(u'abc')
         field.validate(None)
 
     def test_validate_required(self):
         from zope.schema.interfaces import RequiredMissing
-        from zope.schema._compat import u
+
         field = self._makeOne()
-        field.validate(u(''))
-        field.validate(u('abc'))
+        field.validate(u'')
+        field.validate(u'abc')
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def test_validate_unchanged_not_already_set(self):
@@ -672,11 +672,11 @@ class PasswordTests(unittest.TestCase):
         pw.validate(klass.UNCHANGED_PASSWORD)  # doesn't raise
 
     def test_constraint(self):
-        from zope.schema._compat import u
+
         field = self._makeOne()
-        self.assertEqual(field.constraint(u('')), True)
-        self.assertEqual(field.constraint(u('abc')), True)
-        self.assertEqual(field.constraint(u('abc\ndef')), False)
+        self.assertEqual(field.constraint(u''), True)
+        self.assertEqual(field.constraint(u'abc'), True)
+        self.assertEqual(field.constraint(u'abc\ndef'), False)
 
 
 class BoolTests(unittest.TestCase):
@@ -706,19 +706,19 @@ class BoolTests(unittest.TestCase):
         self.assertEqual(inst.boo, True)
 
     def test_fromUnicode_miss(self):
-        from zope.schema._compat import u
+
         txt = self._makeOne()
-        self.assertEqual(txt.fromUnicode(u('')), False)
-        self.assertEqual(txt.fromUnicode(u('0')), False)
-        self.assertEqual(txt.fromUnicode(u('1')), False)
-        self.assertEqual(txt.fromUnicode(u('False')), False)
-        self.assertEqual(txt.fromUnicode(u('false')), False)
+        self.assertEqual(txt.fromUnicode(u''), False)
+        self.assertEqual(txt.fromUnicode(u'0'), False)
+        self.assertEqual(txt.fromUnicode(u'1'), False)
+        self.assertEqual(txt.fromUnicode(u'False'), False)
+        self.assertEqual(txt.fromUnicode(u'false'), False)
 
     def test_fromUnicode_hit(self):
-        from zope.schema._compat import u
+
         txt = self._makeOne()
-        self.assertEqual(txt.fromUnicode(u('True')), True)
-        self.assertEqual(txt.fromUnicode(u('true')), True)
+        self.assertEqual(txt.fromUnicode(u'True'), True)
+        self.assertEqual(txt.fromUnicode(u'true'), True)
 
 
 class IntTests(unittest.TestCase):
@@ -780,18 +780,18 @@ class IntTests(unittest.TestCase):
         self.assertRaises(TooBig, field.validate, 20)
 
     def test_fromUnicode_miss(self):
-        from zope.schema._compat import u
+
         txt = self._makeOne()
-        self.assertRaises(ValueError, txt.fromUnicode, u(''))
-        self.assertRaises(ValueError, txt.fromUnicode, u('False'))
-        self.assertRaises(ValueError, txt.fromUnicode, u('True'))
+        self.assertRaises(ValueError, txt.fromUnicode, u'')
+        self.assertRaises(ValueError, txt.fromUnicode, u'False')
+        self.assertRaises(ValueError, txt.fromUnicode, u'True')
 
     def test_fromUnicode_hit(self):
-        from zope.schema._compat import u
+
         txt = self._makeOne()
-        self.assertEqual(txt.fromUnicode(u('0')), 0)
-        self.assertEqual(txt.fromUnicode(u('1')), 1)
-        self.assertEqual(txt.fromUnicode(u('-1')), -1)
+        self.assertEqual(txt.fromUnicode(u'0'), 0)
+        self.assertEqual(txt.fromUnicode(u'1'), 1)
+        self.assertEqual(txt.fromUnicode(u'-1'), -1)
 
 
 class DummyInst(object):

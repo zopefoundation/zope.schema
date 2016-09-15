@@ -8,14 +8,12 @@ class Test__is_field(unittest.TestCase):
         return _is_field(value)
 
     def test_non_fields(self):
-        from zope.schema._compat import b
-        from zope.schema._compat import u
         self.assertEqual(self._callFUT(None), False)
         self.assertEqual(self._callFUT(0), False)
         self.assertEqual(self._callFUT(0.0), False)
         self.assertEqual(self._callFUT(True), False)
-        self.assertEqual(self._callFUT(b('')), False)
-        self.assertEqual(self._callFUT(u('')), False)
+        self.assertEqual(self._callFUT(b''), False)
+        self.assertEqual(self._callFUT(u''), False)
         self.assertEqual(self._callFUT(()), False)
         self.assertEqual(self._callFUT([]), False)
         self.assertEqual(self._callFUT({}), False)

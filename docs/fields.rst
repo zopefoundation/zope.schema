@@ -28,13 +28,11 @@ Conversion from Unicode:
 
 .. doctest::
 
-   >>> from zope.schema._compat import b
-   >>> from zope.schema._compat import u
    >>> from zope.schema import Bytes
-   >>> obj = Bytes(constraint=lambda v: b('x') in v)
-   >>> obj.fromUnicode(u(" foo x.y.z bat"))
+   >>> obj = Bytes(constraint=lambda v: b'x' in v)
+   >>> obj.fromUnicode(u" foo x.y.z bat")
    ' foo x.y.z bat'
-   >>> obj.fromUnicode(u(" foo y.z bat"))
+   >>> obj.fromUnicode(u" foo y.z bat")
    Traceback (most recent call last):
    ...
    ConstraintNotSatisfied:  foo y.z bat
@@ -162,14 +160,14 @@ Conversion from Unicode enforces the constraint:
    >>> from zope.schema.vocabulary import SimpleVocabulary
    >>> from zope.schema import Choice
    >>> t = Choice(
-   ...     vocabulary=SimpleVocabulary.fromValues([u('foo'),u('bar')]))
+   ...     vocabulary=SimpleVocabulary.fromValues([u'foo',u'bar']))
    >>> IFromUnicode.providedBy(t)
    True
-   >>> t.fromUnicode(u("baz"))
+   >>> t.fromUnicode(u"baz")
    Traceback (most recent call last):
    ...
    ConstraintNotSatisfied: baz
-   >>> t.fromUnicode(u("foo"))
+   >>> t.fromUnicode(u"foo")
    u'foo'
 
 By default, ValueErrors are thrown if duplicate values or tokens
@@ -191,9 +189,9 @@ Validation ensures that the pattern is matched:
 
    >>> from zope.schema import URI
    >>> uri = URI(__name__='test')
-   >>> uri.validate(b("http://www.python.org/foo/bar"))
-   >>> uri.validate(b("DAV:"))
-   >>> uri.validate(b("www.python.org/foo/bar"))
+   >>> uri.validate(b"http://www.python.org/foo/bar")
+   >>> uri.validate(b"DAV:")
+   >>> uri.validate(b"www.python.org/foo/bar")
    Traceback (most recent call last):
    ...
    InvalidURI: www.python.org/foo/bar
@@ -334,7 +332,7 @@ Conversion from Unicode:
    >>> id = Id(__name__='test')
    >>> id.fromUnicode("http://www.python.org/foo/bar")
    'http://www.python.org/foo/bar'
-   >>> id.fromUnicode(u(" http://www.python.org/foo/bar "))
+   >>> id.fromUnicode(u" http://www.python.org/foo/bar ")
    'http://www.python.org/foo/bar'
    >>> id.fromUnicode("http://www.python.org/ foo/bar")
    Traceback (most recent call last):
@@ -359,12 +357,11 @@ uniqueness. In a schema, this might be written as follows:
 
    >>> from zope.interface import Interface
    >>> from zope.schema import List, Float
-   >>> from zope.schema._compat import u
    >>> class IInventoryItem(Interface):
    ...     pricePoints = List(
-   ...         title=u("Price Points"),
+   ...         title=u"Price Points",
    ...         unique=True,
-   ...         value_type=Float(title=u("Price"), min=0.0)
+   ...         value_type=Float(title=u"Price", min=0.0)
    ...     )
 
 This indicates several things.

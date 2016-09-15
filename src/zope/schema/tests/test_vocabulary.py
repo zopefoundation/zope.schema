@@ -275,7 +275,7 @@ class TreeVocabularyTests(unittest.TestCase):
         #internal tree representation.
         #
         #Check that they keys are indeed oredered.
-        from zope.schema._compat import OrderedDict
+        from collections import OrderedDict
 
         d = {
             (1, 'new_york', 'New York'): {

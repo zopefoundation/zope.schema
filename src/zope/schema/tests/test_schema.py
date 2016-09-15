@@ -17,42 +17,41 @@ import unittest
 
 
 def _makeSchema():
-    from zope.schema._compat import b
-    from zope.schema._compat import u
+
     from zope.interface import Interface
     from zope.schema import Bytes
 
     class ISchemaTest(Interface):
         title = Bytes(
-            title=u("Title"),
-            description=u("Title"),
-            default=b(""),
+            title=u"Title",
+            description=u"Title",
+            default=b"",
             required=True)
         description = Bytes(
-            title=u("Description"),
-            description=u("Description"),
-            default=b(""),
+            title=u"Description",
+            description=u"Description",
+            default=b"",
             required=True)
         spam = Bytes(
-            title=u("Spam"),
-            description=u("Spam"),
-            default=b(""),
+            title=u"Spam",
+            description=u"Spam",
+            default=b"",
             required=True)
     return ISchemaTest
 
 
 def _makeDerivedSchema(base=None):
-    from zope.schema._compat import b
-    from zope.schema._compat import u
+
+
     from zope.schema import Bytes
     if base is None:
         base = _makeSchema()
 
     class ISchemaTestSubclass(base):
         foo = Bytes(
-            title=u('Foo'),
-            description=u('Fooness'),
-            default=b(""),
+            title=u'Foo',
+            description=u'Fooness',
+            default=b"",
             required=False)
     return ISchemaTestSubclass
 
@@ -222,15 +221,15 @@ class Test_getSchemaValidationErrors(unittest.TestCase):
     def test_schema_with_fields_ok(self):
         from zope.interface import Interface
         from zope.schema import Text
-        from zope.schema._compat import u
+
 
         class IWithFields(Interface):
             foo = Text()
             bar = Text()
 
         class Obj(object):
-            foo = u('Foo')
-            bar = u('Bar')
+            foo = u'Foo'
+            bar = u'Bar'
 
         errors = self._callFUT(IWithFields, Obj())
         self.assertEqual(len(errors), 0)

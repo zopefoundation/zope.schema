@@ -36,17 +36,16 @@ instances, we now use schema fields:
 
    >>> import zope.interface
    >>> import zope.schema
-   >>> from zope.schema._compat import u, b
 
    >>> class IBookmark(zope.interface.Interface):
    ...     title = zope.schema.TextLine(
-   ...         title=u('Title'),
-   ...         description=u('The title of the bookmark'),
+   ...         title=u'Title',
+   ...         description=u'The title of the bookmark',
    ...         required=True)
    ...
    ...     url = zope.schema.URI(
-   ...         title=u('Bookmark URL'),
-   ...         description=u('URL of the Bookmark'),
+   ...         title=u'Bookmark URL',
+   ...         description=u'URL of the Bookmark',
    ...         required=True)
    ...
 
@@ -69,8 +68,8 @@ is to define some data:
 
 .. doctest::
 
-   >>> title = u('Zope 3 Website')
-   >>> url = b('http://dev.zope.org/Zope3')
+   >>> title = u'Zope 3 Website'
+   >>> url = b'http://dev.zope.org/Zope3'
 
 Now we, get the fields from the interface:
 
@@ -147,16 +146,16 @@ down example from the programmer's tutorial:
    >>> class IContact(zope.interface.Interface):
    ...     """Provides access to basic contact information."""
    ...
-   ...     first = zope.schema.TextLine(title=u("First name"))
+   ...     first = zope.schema.TextLine(title=u"First name")
    ...
-   ...     last = zope.schema.TextLine(title=u("Last name"))
+   ...     last = zope.schema.TextLine(title=u"Last name")
    ...
-   ...     email = zope.schema.TextLine(title=u("Electronic mail address"))
+   ...     email = zope.schema.TextLine(title=u"Electronic mail address")
    ...
-   ...     address = zope.schema.Text(title=u("Postal address"))
+   ...     address = zope.schema.Text(title=u"Postal address")
    ...
    ...     postalCode = zope.schema.TextLine(
-   ...         title=u("Postal code"),
+   ...         title=u"Postal code",
    ...         constraint=re.compile("\d{5,5}(-\d{4,4})?$").match)
 
 ``TextLine`` is a field and expresses that an attribute is a single line
@@ -184,8 +183,8 @@ schema:
 
 .. doctest::
 
-   >>> someone = Contact(u('Tim'), u('Roberts'), u('tim@roberts'), u(''),
-   ...                   u('12032-3492'))
+   >>> someone = Contact(u'Tim', u'Roberts', u'tim@roberts', u'',
+   ...                   u'12032-3492')
 
    >>> for field in zope.schema.getFields(IContact).values():
    ...     bound = field.bind(someone)

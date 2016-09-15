@@ -20,19 +20,14 @@ class FieldEqualityTests(unittest.TestCase):
 
     def test_equality(self):
 
-        from zope.schema._compat import u
         from zope.schema import Int
         from zope.schema import Text
 
-        # pep 8 friendlyness
-        u, Int, Text
+        def _makeOne(cls):
+            return cls(title=u"Foo", description=u"Bar")
 
-        equality = [
-            'Text(title=u("Foo"), description=u("Bar"))',
-            'Int(title=u("Foo"), description=u("Bar"))',
-        ]
-        for text in equality:
-            self.assertEqual(eval(text), eval(text))
+        for cls in (Int, Text):
+            self.assertEqual(_makeOne(cls), _makeOne(cls))
 
 
 def test_suite():

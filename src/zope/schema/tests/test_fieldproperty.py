@@ -42,28 +42,27 @@ class _Integration(object):
         return _Implementer()
 
     def test_basic(self):
-        from zope.schema._compat import b
-        from zope.schema._compat import u
+
         from zope.schema.interfaces import ValidationError
         c = self._makeImplementer()
-        self.assertEqual(c.title, u('say something'))
+        self.assertEqual(c.title, u'say something')
         self.assertEqual(c.weight, None)
-        self.assertEqual(c.code, b('xxxxxx'))
-        self.assertRaises(ValidationError, setattr, c, 'title', b('foo'))
-        self.assertRaises(ValidationError, setattr, c, 'weight', b('foo'))
+        self.assertEqual(c.code, b'xxxxxx')
+        self.assertRaises(ValidationError, setattr, c, 'title', b'foo')
+        self.assertRaises(ValidationError, setattr, c, 'weight', b'foo')
         self.assertRaises(ValidationError, setattr, c, 'weight', -1.0)
         self.assertRaises(ValidationError, setattr, c, 'weight', 2)
         self.assertRaises(ValidationError, setattr, c, 'code', -1)
-        self.assertRaises(ValidationError, setattr, c, 'code', b('xxxx'))
-        self.assertRaises(ValidationError, setattr, c, 'code', u('xxxxxx'))
+        self.assertRaises(ValidationError, setattr, c, 'code', b'xxxx')
+        self.assertRaises(ValidationError, setattr, c, 'code', u'xxxxxx')
 
-        c.title = u('c is good')
+        c.title = u'c is good'
         c.weight = 10.0
-        c.code = b('abcdef')
+        c.code = b'abcdef'
 
-        self.assertEqual(c.title, u('c is good'))
+        self.assertEqual(c.title, u'c is good')
         self.assertEqual(c.weight, 10)
-        self.assertEqual(c.code, b('abcdef'))
+        self.assertEqual(c.code, b'abcdef')
 
     def test_readonly(self):
         c = self._makeImplementer()
@@ -94,11 +93,11 @@ class FieldPropertyTests(_Base, _Integration):
 
     def test_ctor_explicit(self):
         from zope.schema import Text
-        from zope.schema._compat import u
+
         field = Text(
             __name__='testing',
-            description=u('DESCRIPTION'),
-            default=u('DEFAULT'),
+            description=u'DESCRIPTION',
+            default=u'DEFAULT',
             readonly=True,
             required=True,
         )
@@ -113,11 +112,11 @@ class FieldPropertyTests(_Base, _Integration):
 
     def test_query_value_with_default(self):
         from zope.schema import Text
-        from zope.schema._compat import u
+
         field = Text(
             __name__='testing',
-            description=u('DESCRIPTION'),
-            default=u('DEFAULT'),
+            description=u'DESCRIPTION',
+            default=u'DEFAULT',
             readonly=True,
             required=True,
         )
@@ -127,16 +126,16 @@ class FieldPropertyTests(_Base, _Integration):
         class Foo(object):
             testing = prop
         foo = Foo()
-        self.assertEqual(prop.queryValue(foo, 'test'), u('DEFAULT'))
-        foo.testing = u('NO')
-        self.assertEqual(prop.queryValue(foo, 'test'), u('NO'))
+        self.assertEqual(prop.queryValue(foo, 'test'), u'DEFAULT')
+        foo.testing = u'NO'
+        self.assertEqual(prop.queryValue(foo, 'test'), u'NO')
 
     def test_query_value_without_default(self):
         from zope.schema import Text
-        from zope.schema._compat import u
+
         field = Text(
             __name__='testing',
-            description=u('DESCRIPTION'),
+            description=u'DESCRIPTION',
             readonly=True,
             required=True,
         )
@@ -268,7 +267,7 @@ class FieldPropertyTests(_Base, _Integration):
 
     def test_field_event(self):
         from zope.schema import Text
-        from zope.schema._compat import u
+
         from zope.event import subscribers
         from zope.schema.fieldproperty import FieldUpdatedEvent
         log = []
@@ -276,8 +275,8 @@ class FieldPropertyTests(_Base, _Integration):
         self.assertEqual(log, [])
         field = Text(
             __name__='testing',
-            description=u('DESCRIPTION'),
-            default=u('DEFAULT'),
+            description=u'DESCRIPTION',
+            default=u'DEFAULT',
             readonly=True,
             required=True,
         )
@@ -293,13 +292,13 @@ class FieldPropertyTests(_Base, _Integration):
 
     def test_field_event_update(self):
         from zope.schema import Text
-        from zope.schema._compat import u
+
         from zope.event import subscribers
         from zope.schema.fieldproperty import FieldUpdatedEvent
         field = Text(
             __name__='testing',
-            description=u('DESCRIPTION'),
-            default=u('DEFAULT'),
+            description=u'DESCRIPTION',
+            default=u'DEFAULT',
             required=True,
         )
         prop = self._makeOne(field=field)
@@ -310,15 +309,15 @@ class FieldPropertyTests(_Base, _Integration):
 
         log = []
         subscribers.append(log.append)
-        foo.testing = u('Bar')
-        foo.testing = u('Foo')
+        foo.testing = u'Bar'
+        foo.testing = u'Foo'
         self.assertEqual(len(log), 2)
         event = log[1]
         self.assertTrue(isinstance(event, FieldUpdatedEvent))
         self.assertEqual(event.inst, foo)
         self.assertEqual(event.field, field)
-        self.assertEqual(event.old_value, u('Bar'))
-        self.assertEqual(event.new_value, u('Foo'))
+        self.assertEqual(event.old_value, u'Bar')
+        self.assertEqual(event.new_value, u'Foo')
 
 
 class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
@@ -344,11 +343,11 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
 
     def test_ctor_explicit(self):
         from zope.schema import Text
-        from zope.schema._compat import u
+
         field = Text(
             __name__='testing',
-            description=u('DESCRIPTION'),
-            default=u('DEFAULT'),
+            description=u'DESCRIPTION',
+            default=u'DEFAULT',
             readonly=True,
             required=True,
         )
@@ -561,13 +560,13 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
 
     def test_field_event_update(self):
         from zope.schema import Text
-        from zope.schema._compat import u
+
         from zope.event import subscribers
         from zope.schema.fieldproperty import FieldUpdatedEvent
         field = Text(
             __name__='testing',
-            description=u('DESCRIPTION'),
-            default=u('DEFAULT'),
+            description=u'DESCRIPTION',
+            default=u'DEFAULT',
             required=True,
         )
         prop = self._makeOne(field=field)
@@ -578,21 +577,21 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
 
         log = []
         subscribers.append(log.append)
-        foo.testing = u('Bar')
-        foo.testing = u('Foo')
+        foo.testing = u'Bar'
+        foo.testing = u'Foo'
         self.assertEqual(len(log), 2)
         event = log[1]
         self.assertTrue(isinstance(event, FieldUpdatedEvent))
         self.assertEqual(event.inst, foo)
         self.assertEqual(event.field, field)
-        self.assertEqual(event.old_value, u('Bar'))
-        self.assertEqual(event.new_value, u('Foo'))
+        self.assertEqual(event.old_value, u'Bar')
+        self.assertEqual(event.new_value, u'Foo')
 
     def test_field_event(self):
         # fieldproperties are everywhere including in field themselfs
         # so event are triggered
         from zope.schema import Text
-        from zope.schema._compat import u
+
         from zope.event import subscribers
         from zope.schema.fieldproperty import FieldUpdatedEvent
         log = []
@@ -600,8 +599,8 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
         self.assertEqual(log, [])
         field = Text(
             __name__='testing',
-            description=u('DESCRIPTION'),
-            default=u('DEFAULT'),
+            description=u'DESCRIPTION',
+            default=u'DEFAULT',
             readonly=True,
             required=True,
         )
@@ -622,15 +621,15 @@ def _getSchema():
     from zope.schema import Bytes
     from zope.schema import Float
     from zope.schema import Text
-    from zope.schema._compat import b
-    from zope.schema._compat import u
+
+
 
     class Schema(Interface):
-        title = Text(description=u("Short summary"),
-                     default=u('say something'))
+        title = Text(description=u"Short summary",
+                     default=u'say something')
         weight = Float(min=0.0)
-        code = Bytes(min_length=6, max_length=6, default=b('xxxxxx'))
-        date = Float(title=u('Date'), readonly=True)
+        code = Bytes(min_length=6, max_length=6, default=b'xxxxxx')
+        date = Float(title=u'Date', readonly=True)
 
     return Schema
 
