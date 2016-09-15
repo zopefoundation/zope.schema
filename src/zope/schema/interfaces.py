@@ -42,7 +42,7 @@ from zope.schema._bootstrapinterfaces import InvalidValue
 from zope.schema._bootstrapinterfaces import IContextAwareDefaultFactory
 
 from zope.schema._compat import PY3
-from zope.schema._compat import u
+
 from zope.schema._messageid import _
 
 
@@ -125,14 +125,14 @@ class IField(Interface):
     title = TextLine(
         title=_("Title"),
         description=_("A short summary or label"),
-        default=u(""),
+        default=u"",
         required=False,
         )
 
     description = Text(
         title=_("Description"),
         description=_("A description of the field"),
-        default=u(""),
+        default=u"",
         required=False,
         )
 

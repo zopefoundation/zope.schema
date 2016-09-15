@@ -92,7 +92,7 @@ from zope.schema.vocabulary import getVocabularyRegistry
 from zope.schema.vocabulary import VocabularyRegistryError
 from zope.schema.vocabulary import SimpleVocabulary
 
-from zope.schema._compat import b
+
 from zope.schema._compat import text_type
 from zope.schema._compat import string_types
 from zope.schema._compat import binary_type
@@ -165,7 +165,7 @@ class BytesLine(Bytes):
 
     def constraint(self, value):
         # TODO: we should probably use a more general definition of newlines
-        return b('\n') not in value
+        return b'\n' not in value
 
 # for things which are of the str type on both Python 2 and 3
 if PY3:  # pragma: no cover
@@ -459,13 +459,11 @@ def _validate_sequence(value_type, value, errors=None):
 
     To illustrate, we'll use a text value type. All values must be unicode.
 
-       >>> from zope.schema._compat import u
-       >>> from zope.schema._compat import b
        >>> field = TextLine(required=True)
 
     To validate a sequence of various values:
 
-       >>> errors = _validate_sequence(field, (b('foo'), u('bar'), 1))
+       >>> errors = _validate_sequence(field, (b'foo', u'bar', 1))
        >>> errors # XXX assumes Python2 reprs
        [WrongType('foo', <type 'unicode'>, ''), WrongType(1, <type 'unicode'>, '')]
 
@@ -475,7 +473,7 @@ def _validate_sequence(value_type, value, errors=None):
     We can use the optional errors argument to collect additional errors
     for a new sequence:
 
-       >>> errors = _validate_sequence(field, (2, u('baz')), errors)
+       >>> errors = _validate_sequence(field, (2, u'baz'), errors)
        >>> errors # XXX assumes Python2 reprs
        [WrongType('foo', <type 'unicode'>, ''), WrongType(1, <type 'unicode'>, ''), WrongType(2, <type 'unicode'>, '')]
 

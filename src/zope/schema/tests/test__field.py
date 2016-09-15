@@ -35,9 +35,9 @@ class BytesTests(unittest.TestCase):
 
     def test_validate_wrong_types(self):
         from zope.schema.interfaces import WrongType
-        from zope.schema._compat import u
+
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, u(''))
+        self.assertRaises(WrongType, field.validate, u'')
         self.assertRaises(WrongType, field.validate, 1)
         self.assertRaises(WrongType, field.validate, 1.0)
         self.assertRaises(WrongType, field.validate, ())
@@ -48,38 +48,40 @@ class BytesTests(unittest.TestCase):
         self.assertRaises(WrongType, field.validate, object())
 
     def test_validate_w_invalid_default(self):
-        from zope.schema._compat import u
+
         from zope.schema.interfaces import ValidationError
-        self.assertRaises(ValidationError, self._makeOne, default=u(''))
+        self.assertRaises(ValidationError, self._makeOne, default=u'')
 
     def test_validate_not_required(self):
-        from zope.schema._compat import b
+
         field = self._makeOne(required=False)
-        field.validate(b(''))
-        field.validate(b('abc'))
-        field.validate(b('abc\ndef'))
+        field.validate(b'')
+        field.validate(b'abc')
+        field.validate(b'abc\ndef')
         field.validate(None)
 
     def test_validate_required(self):
         from zope.schema.interfaces import RequiredMissing
-        from zope.schema._compat import b
+
         field = self._makeOne()
-        field.validate(b(''))
-        field.validate(b('abc'))
-        field.validate(b('abc\ndef'))
+        field.validate(b'')
+        field.validate(b'abc')
+        field.validate(b'abc\ndef')
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def test_fromUnicode_miss(self):
-        from zope.schema._compat import u
+        from zope.schema._compat import text_type
         byt = self._makeOne()
-        self.assertRaises(UnicodeEncodeError, byt.fromUnicode, u(chr(129)))
+        u = chr(129)
+        if not isinstance(u, text_type):
+            u = text_type(u, 'unicode_escape') # PY2
+        self.assertRaises(UnicodeEncodeError, byt.fromUnicode, u)
 
     def test_fromUnicode_hit(self):
-        from zope.schema._compat import u
-        from zope.schema._compat import b
+
         byt = self._makeOne()
-        self.assertEqual(byt.fromUnicode(u('')), b(''))
-        self.assertEqual(byt.fromUnicode(u('DEADBEEF')), b('DEADBEEF'))
+        self.assertEqual(byt.fromUnicode(u''), b'')
+        self.assertEqual(byt.fromUnicode(u'DEADBEEF'), b'DEADBEEF')
 
 
 class ASCIITests(unittest.TestCase):
@@ -151,9 +153,9 @@ class BytesLineTests(unittest.TestCase):
 
     def test_validate_wrong_types(self):
         from zope.schema.interfaces import WrongType
-        from zope.schema._compat import u
+
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, u(''))
+        self.assertRaises(WrongType, field.validate, u'')
         self.assertRaises(WrongType, field.validate, 1)
         self.assertRaises(WrongType, field.validate, 1.0)
         self.assertRaises(WrongType, field.validate, ())
@@ -164,30 +166,30 @@ class BytesLineTests(unittest.TestCase):
         self.assertRaises(WrongType, field.validate, object())
 
     def test_validate_not_required(self):
-        from zope.schema._compat import b
+
         field = self._makeOne(required=False)
         field.validate(None)
-        field.validate(b(''))
-        field.validate(b('abc'))
-        field.validate(b('\xab\xde'))
+        field.validate(b'')
+        field.validate(b'abc')
+        field.validate(b'\xab\xde')
 
     def test_validate_required(self):
         from zope.schema.interfaces import RequiredMissing
-        from zope.schema._compat import b
+
         field = self._makeOne()
-        field.validate(b(''))
-        field.validate(b('abc'))
-        field.validate(b('\xab\xde'))
+        field.validate(b'')
+        field.validate(b'abc')
+        field.validate(b'\xab\xde')
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def test_constraint(self):
-        from zope.schema._compat import b
+
         field = self._makeOne()
-        self.assertEqual(field.constraint(b('')), True)
-        self.assertEqual(field.constraint(b('abc')), True)
-        self.assertEqual(field.constraint(b('abc')), True)
-        self.assertEqual(field.constraint(b('\xab\xde')), True)
-        self.assertEqual(field.constraint(b('abc\ndef')), False)
+        self.assertEqual(field.constraint(b''), True)
+        self.assertEqual(field.constraint(b'abc'), True)
+        self.assertEqual(field.constraint(b'abc'), True)
+        self.assertEqual(field.constraint(b'\xab\xde'), True)
+        self.assertEqual(field.constraint(b'abc\ndef'), False)
 
 
 class ASCIILineTests(unittest.TestCase):
@@ -313,18 +315,18 @@ class FloatTests(unittest.TestCase):
         self.assertRaises(TooBig, field.validate, 20.02)
 
     def test_fromUnicode_miss(self):
-        from zope.schema._compat import u
+
         flt = self._makeOne()
-        self.assertRaises(ValueError, flt.fromUnicode, u(''))
-        self.assertRaises(ValueError, flt.fromUnicode, u('abc'))
-        self.assertRaises(ValueError, flt.fromUnicode, u('14.G'))
+        self.assertRaises(ValueError, flt.fromUnicode, u'')
+        self.assertRaises(ValueError, flt.fromUnicode, u'abc')
+        self.assertRaises(ValueError, flt.fromUnicode, u'14.G')
 
     def test_fromUnicode_hit(self):
-        from zope.schema._compat import u
+
         flt = self._makeOne()
-        self.assertEqual(flt.fromUnicode(u('0')), 0.0)
-        self.assertEqual(flt.fromUnicode(u('1.23')), 1.23)
-        self.assertEqual(flt.fromUnicode(u('1.23e6')), 1230000.0)
+        self.assertEqual(flt.fromUnicode(u'0'), 0.0)
+        self.assertEqual(flt.fromUnicode(u'1.23'), 1.23)
+        self.assertEqual(flt.fromUnicode(u'1.23e6'), 1230000.0)
 
 
 class DecimalTests(unittest.TestCase):
@@ -396,19 +398,19 @@ class DecimalTests(unittest.TestCase):
         self.assertRaises(TooBig, field.validate, decimal.Decimal("20.02"))
 
     def test_fromUnicode_miss(self):
-        from zope.schema._compat import u
+
         flt = self._makeOne()
-        self.assertRaises(ValueError, flt.fromUnicode, u(''))
-        self.assertRaises(ValueError, flt.fromUnicode, u('abc'))
-        self.assertRaises(ValueError, flt.fromUnicode, u('1.4G'))
+        self.assertRaises(ValueError, flt.fromUnicode, u'')
+        self.assertRaises(ValueError, flt.fromUnicode, u'abc')
+        self.assertRaises(ValueError, flt.fromUnicode, u'1.4G')
 
     def test_fromUnicode_hit(self):
         from decimal import Decimal
-        from zope.schema._compat import u
+
         flt = self._makeOne()
-        self.assertEqual(flt.fromUnicode(u('0')), Decimal('0.0'))
-        self.assertEqual(flt.fromUnicode(u('1.23')), Decimal('1.23'))
-        self.assertEqual(flt.fromUnicode(u('12345.6')), Decimal('12345.6'))
+        self.assertEqual(flt.fromUnicode(u'0'), Decimal('0.0'))
+        self.assertEqual(flt.fromUnicode(u'1.23'), Decimal('1.23'))
+        self.assertEqual(flt.fromUnicode(u'12345.6'), Decimal('12345.6'))
 
 
 class DatetimeTests(unittest.TestCase):
@@ -433,11 +435,11 @@ class DatetimeTests(unittest.TestCase):
     def test_validate_wrong_types(self):
         from datetime import date
         from zope.schema.interfaces import WrongType
-        from zope.schema._compat import u
-        from zope.schema._compat import b
+
+
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, u(''))
-        self.assertRaises(WrongType, field.validate, b(''))
+        self.assertRaises(WrongType, field.validate, u'')
+        self.assertRaises(WrongType, field.validate, u'')
         self.assertRaises(WrongType, field.validate, 1)
         self.assertRaises(WrongType, field.validate, 1.0)
         self.assertRaises(WrongType, field.validate, ())
@@ -519,11 +521,11 @@ class DateTests(unittest.TestCase):
     def test_validate_wrong_types(self):
         from datetime import datetime
         from zope.schema.interfaces import WrongType
-        from zope.schema._compat import u
-        from zope.schema._compat import b
+
+
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, u(''))
-        self.assertRaises(WrongType, field.validate, b(''))
+        self.assertRaises(WrongType, field.validate, u'')
+        self.assertRaises(WrongType, field.validate, u'')
         self.assertRaises(WrongType, field.validate, 1)
         self.assertRaises(WrongType, field.validate, 1.0)
         self.assertRaises(WrongType, field.validate, ())
@@ -867,18 +869,18 @@ class ChoiceTests(unittest.TestCase):
 
     def test_fromUnicode_miss(self):
         from zope.schema.interfaces import ConstraintNotSatisfied
-        from zope.schema._compat import u
-        flt = self._makeOne(values=(u('foo'), u('bar'), u('baz')))
-        self.assertRaises(ConstraintNotSatisfied, flt.fromUnicode, u(''))
-        self.assertRaises(ConstraintNotSatisfied, flt.fromUnicode, u('abc'))
-        self.assertRaises(ConstraintNotSatisfied, flt.fromUnicode, u('1.4G'))
+
+        flt = self._makeOne(values=(u'foo', u'bar', u'baz'))
+        self.assertRaises(ConstraintNotSatisfied, flt.fromUnicode, u'')
+        self.assertRaises(ConstraintNotSatisfied, flt.fromUnicode, u'abc')
+        self.assertRaises(ConstraintNotSatisfied, flt.fromUnicode, u'1.4G')
 
     def test_fromUnicode_hit(self):
-        from zope.schema._compat import u
-        flt = self._makeOne(values=(u('foo'), u('bar'), u('baz')))
-        self.assertEqual(flt.fromUnicode(u('foo')), u('foo'))
-        self.assertEqual(flt.fromUnicode(u('bar')), u('bar'))
-        self.assertEqual(flt.fromUnicode(u('baz')), u('baz'))
+
+        flt = self._makeOne(values=(u'foo', u'bar', u'baz'))
+        self.assertEqual(flt.fromUnicode(u'foo'), u'foo')
+        self.assertEqual(flt.fromUnicode(u'bar'), u'bar')
+        self.assertEqual(flt.fromUnicode(u'baz'), u'baz')
 
     def test__validate_int(self):
         from zope.schema.interfaces import ConstraintNotSatisfied
@@ -888,12 +890,12 @@ class ChoiceTests(unittest.TestCase):
         self.assertRaises(ConstraintNotSatisfied, choice._validate, 4)
 
     def test__validate_string(self):
-        from zope.schema._compat import u
+
         from zope.schema.interfaces import ConstraintNotSatisfied
         choice = self._makeOne(values=['a', 'c'])
         choice._validate('a')  # doesn't raise
         choice._validate('c')  # doesn't raise
-        choice._validate(u('c'))  # doesn't raise
+        choice._validate(u'c')  # doesn't raise
         self.assertRaises(ConstraintNotSatisfied, choice._validate, 'd')
 
     def test__validate_tuple(self):
@@ -1016,20 +1018,20 @@ class URITests(unittest.TestCase):
                           field.validate, 'http://example.com/\nDAV:')
 
     def test_fromUnicode_ok(self):
-        from zope.schema._compat import u
+
         field = self._makeOne()
-        self.assertEqual(field.fromUnicode(u('http://example.com/')),
+        self.assertEqual(field.fromUnicode(u'http://example.com/'),
                          'http://example.com/')
 
     def test_fromUnicode_invalid(self):
         from zope.schema.interfaces import ConstraintNotSatisfied
         from zope.schema.interfaces import InvalidURI
-        from zope.schema._compat import u
+
         field = self._makeOne()
-        self.assertRaises(InvalidURI, field.fromUnicode, u(''))
-        self.assertRaises(InvalidURI, field.fromUnicode, u('abc'))
+        self.assertRaises(InvalidURI, field.fromUnicode, u'')
+        self.assertRaises(InvalidURI, field.fromUnicode, u'abc')
         self.assertRaises(ConstraintNotSatisfied,
-                          field.fromUnicode, u('http://example.com/\nDAV:'))
+                          field.fromUnicode, u'http://example.com/\nDAV:')
 
 
 class DottedNameTests(unittest.TestCase):
@@ -1122,18 +1124,18 @@ class DottedNameTests(unittest.TestCase):
                           field.validate, 'http://example.com/\nDAV:')
 
     def test_fromUnicode_dotted_name_ok(self):
-        from zope.schema._compat import u
+
         field = self._makeOne()
-        self.assertEqual(field.fromUnicode(u('dotted.name')), 'dotted.name')
+        self.assertEqual(field.fromUnicode(u'dotted.name'), 'dotted.name')
 
     def test_fromUnicode_invalid(self):
         from zope.schema.interfaces import ConstraintNotSatisfied
         from zope.schema.interfaces import InvalidDottedName
-        from zope.schema._compat import u
+
         field = self._makeOne()
-        self.assertRaises(InvalidDottedName, field.fromUnicode, u(''))
+        self.assertRaises(InvalidDottedName, field.fromUnicode, u'')
         self.assertRaises(ConstraintNotSatisfied,
-                          field.fromUnicode, u('http://example.com/\nDAV:'))
+                          field.fromUnicode, u'http://example.com/\nDAV:')
 
 
 class IdTests(unittest.TestCase):
@@ -1193,25 +1195,25 @@ class IdTests(unittest.TestCase):
                           field.validate, 'http://example.com/\nDAV:')
 
     def test_fromUnicode_url_ok(self):
-        from zope.schema._compat import u
+
         field = self._makeOne()
-        self.assertEqual(field.fromUnicode(u('http://example.com/')),
+        self.assertEqual(field.fromUnicode(u'http://example.com/'),
                          'http://example.com/')
 
     def test_fromUnicode_dotted_name_ok(self):
-        from zope.schema._compat import u
+
         field = self._makeOne()
-        self.assertEqual(field.fromUnicode(u('dotted.name')), 'dotted.name')
+        self.assertEqual(field.fromUnicode(u'dotted.name'), 'dotted.name')
 
     def test_fromUnicode_invalid(self):
         from zope.schema.interfaces import ConstraintNotSatisfied
         from zope.schema.interfaces import InvalidId
-        from zope.schema._compat import u
+
         field = self._makeOne()
-        self.assertRaises(InvalidId, field.fromUnicode, u(''))
-        self.assertRaises(InvalidId, field.fromUnicode, u('abc'))
+        self.assertRaises(InvalidId, field.fromUnicode, u'')
+        self.assertRaises(InvalidId, field.fromUnicode, u'abc')
         self.assertRaises(ConstraintNotSatisfied,
-                          field.fromUnicode, u('http://example.com/\nDAV:'))
+                          field.fromUnicode, u'http://example.com/\nDAV:')
 
 
 class InterfaceFieldTests(unittest.TestCase):
@@ -1236,11 +1238,11 @@ class InterfaceFieldTests(unittest.TestCase):
     def test_validate_wrong_types(self):
         from datetime import date
         from zope.schema.interfaces import WrongType
-        from zope.schema._compat import u
-        from zope.schema._compat import b
+
+
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, u(''))
-        self.assertRaises(WrongType, field.validate, b(''))
+        self.assertRaises(WrongType, field.validate, u'')
+        self.assertRaises(WrongType, field.validate, b'')
         self.assertRaises(WrongType, field.validate, 1)
         self.assertRaises(WrongType, field.validate, 1.0)
         self.assertRaises(WrongType, field.validate, ())
@@ -1328,10 +1330,10 @@ class AbstractCollectionTests(unittest.TestCase):
     def test__validate_miss_uniqueness(self):
         from zope.schema.interfaces import NotUnique
         from zope.schema._bootstrapfields import Text
-        from zope.schema._compat import u
+
         text = Text()
         absc = self._makeOne(text, True)
-        self.assertRaises(NotUnique, absc.validate, [u('a'), u('a')])
+        self.assertRaises(NotUnique, absc.validate, [u'a', u'a'])
 
 
 class TupleTests(unittest.TestCase):
@@ -1355,11 +1357,11 @@ class TupleTests(unittest.TestCase):
 
     def test_validate_wrong_types(self):
         from zope.schema.interfaces import WrongType
-        from zope.schema._compat import u
-        from zope.schema._compat import b
+
+
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, u(''))
-        self.assertRaises(WrongType, field.validate, b(''))
+        self.assertRaises(WrongType, field.validate, u'')
+        self.assertRaises(WrongType, field.validate, b'')
         self.assertRaises(WrongType, field.validate, 1)
         self.assertRaises(WrongType, field.validate, 1.0)
         self.assertRaises(WrongType, field.validate, [])
@@ -1430,11 +1432,11 @@ class ListTests(unittest.TestCase):
 
     def test_validate_wrong_types(self):
         from zope.schema.interfaces import WrongType
-        from zope.schema._compat import u
-        from zope.schema._compat import b
+
+
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, u(''))
-        self.assertRaises(WrongType, field.validate, b(''))
+        self.assertRaises(WrongType, field.validate, u'')
+        self.assertRaises(WrongType, field.validate, b'')
         self.assertRaises(WrongType, field.validate, 1)
         self.assertRaises(WrongType, field.validate, 1.0)
         self.assertRaises(WrongType, field.validate, ())
@@ -1511,11 +1513,11 @@ class SetTests(unittest.TestCase):
 
     def test_validate_wrong_types(self):
         from zope.schema.interfaces import WrongType
-        from zope.schema._compat import u
-        from zope.schema._compat import b
+
+
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, u(''))
-        self.assertRaises(WrongType, field.validate, b(''))
+        self.assertRaises(WrongType, field.validate, u'')
+        self.assertRaises(WrongType, field.validate, b'')
         self.assertRaises(WrongType, field.validate, 1)
         self.assertRaises(WrongType, field.validate, 1.0)
         self.assertRaises(WrongType, field.validate, ())
@@ -1595,11 +1597,11 @@ class FrozenSetTests(unittest.TestCase):
 
     def test_validate_wrong_types(self):
         from zope.schema.interfaces import WrongType
-        from zope.schema._compat import u
-        from zope.schema._compat import b
+
+
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, u(''))
-        self.assertRaises(WrongType, field.validate, b(''))
+        self.assertRaises(WrongType, field.validate, u'')
+        self.assertRaises(WrongType, field.validate, b'')
         self.assertRaises(WrongType, field.validate, 1)
         self.assertRaises(WrongType, field.validate, 1.0)
         self.assertRaises(WrongType, field.validate, ())
@@ -1826,7 +1828,7 @@ class ObjectTests(unittest.TestCase):
         from zope.interface import implementer
         from zope.schema._bootstrapfields import Text
         from zope.schema._field import Choice
-        from zope.schema._compat import u
+
         schema = self._makeSchema(
             foo=Text(),
             bar=Text(),
@@ -1835,8 +1837,8 @@ class ObjectTests(unittest.TestCase):
 
         @implementer(schema)
         class OK(object):
-            foo = u('Foo')
-            bar = u('Bar')
+            foo = u'Foo'
+            bar = u'Bar'
             baz = 2
         objf = self._makeOne(schema)
         objf.validate(OK())  # doesn't raise
@@ -1881,7 +1883,7 @@ class ObjectTests(unittest.TestCase):
         from zope.schema.interfaces import IBeforeObjectAssignedEvent
         from zope.schema._bootstrapfields import Text
         from zope.schema._field import Choice
-        from zope.schema._compat import u
+
         schema = self._makeSchema(
             foo=Text(),
             bar=Text(),
@@ -1890,8 +1892,8 @@ class ObjectTests(unittest.TestCase):
 
         @implementer(schema)
         class OK(object):
-            foo = u('Foo')
-            bar = u('Bar')
+            foo = u'Foo'
+            bar = u'Bar'
             baz = 2
         log = []
         subscribers.append(log.append)
@@ -1911,7 +1913,7 @@ class ObjectTests(unittest.TestCase):
         from zope.interface import implementer
         from zope.schema._bootstrapfields import Text
         from zope.schema._field import Choice
-        from zope.schema._compat import u
+
         schema = self._makeSchema(
             foo=Text(),
             bar=Text(),
@@ -1920,12 +1922,12 @@ class ObjectTests(unittest.TestCase):
 
         @implementer(schema)
         class OK(object):
-            def __init__(self, foo=u('Foo'), bar=u('Bar'), baz=2):
+            def __init__(self, foo=u'Foo', bar=u'Bar', baz=2):
                 self.foo = foo
                 self.bar = bar
                 self.baz = baz
         ok1 = OK()
-        ok2 = OK(u('Foo2'), u('Bar2'), 3)
+        ok2 = OK(u'Foo2', u'Bar2', 3)
         log = []
         subscribers.append(log.append)
 
@@ -1970,11 +1972,11 @@ class DictTests(unittest.TestCase):
 
     def test_validate_wrong_types(self):
         from zope.schema.interfaces import WrongType
-        from zope.schema._compat import u
-        from zope.schema._compat import b
+
+
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, u(''))
-        self.assertRaises(WrongType, field.validate, b(''))
+        self.assertRaises(WrongType, field.validate, u'')
+        self.assertRaises(WrongType, field.validate, u'')
         self.assertRaises(WrongType, field.validate, 1)
         self.assertRaises(WrongType, field.validate, 1.0)
         self.assertRaises(WrongType, field.validate, ())

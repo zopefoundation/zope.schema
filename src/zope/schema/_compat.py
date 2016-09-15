@@ -2,22 +2,13 @@ import sys
 
 PY3 = sys.version_info[0] >= 3
 
-try:
-    from collections import OrderedDict
-except ImportError:  # pragma: no cover
-    from ordereddict import OrderedDict
+from collections import OrderedDict
 
 # pep 8 friendlyness
 OrderedDict
 
 
 if PY3:  # pragma: no cover
-
-    def b(s):
-        return s.encode("latin-1")
-
-    def u(s):
-        return s
 
     string_types = str,
     text_type = str
@@ -35,12 +26,6 @@ if PY3:  # pragma: no cover
         return x.encode('ascii')
 
 else:  # pragma: no cover
-
-    def b(s):
-        return s
-
-    def u(s):
-        return unicode(s, "unicode_escape")
 
     string_types = basestring,
     text_type = unicode

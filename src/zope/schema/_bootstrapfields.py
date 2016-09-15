@@ -31,7 +31,7 @@ from zope.schema._bootstrapinterfaces import TooLong
 from zope.schema._bootstrapinterfaces import TooShort
 from zope.schema._bootstrapinterfaces import TooSmall
 from zope.schema._bootstrapinterfaces import WrongType
-from zope.schema._compat import u
+
 from zope.schema._compat import text_type
 from zope.schema._compat import integer_types
 
@@ -110,7 +110,7 @@ class Field(Attribute):
     interface = None
     _Element__tagged_values = None
 
-    def __init__(self, title=u(''), description=u(''), __name__='',
+    def __init__(self, title=u'', description=u'', __name__='',
                  required=True, readonly=False, constraint=None, default=None,
                  defaultFactory=None, missing_value=__missing_value_marker):
         """Pass in field values as keyword parameters.

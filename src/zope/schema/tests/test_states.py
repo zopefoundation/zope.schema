@@ -31,32 +31,32 @@ class StateSelectionTest(unittest.TestCase):
         _clear()
 
     def _makeSchema(self):
-        from zope.schema._compat import u
+
         from zope.interface import Interface
         from zope.schema import Choice
         from zope.schema.tests.states import StateVocabulary
 
         class IBirthInfo(Interface):
             state1 = Choice(
-                title=u('State of Birth'),
-                description=u('The state in which you were born.'),
+                title=u'State of Birth',
+                description=u'The state in which you were born.',
                 vocabulary="states",
                 default="AL",
                 )
             state2 = Choice(
-                title=u('State of Birth'),
-                description=u('The state in which you were born.'),
+                title=u'State of Birth',
+                description=u'The state in which you were born.',
                 vocabulary="states",
                 default="AL",
                 )
             state3 = Choice(
-                title=u('Favorite State'),
-                description=u('The state you like the most.'),
+                title=u'Favorite State',
+                description=u'The state you like the most.',
                 vocabulary=StateVocabulary(),
                 )
             state4 = Choice(
-                title=u("Name"),
-                description=u("The name of your new state"),
+                title=u"Name",
+                description=u"The name of your new state",
                 vocabulary="states",
                 )
         return IBirthInfo
