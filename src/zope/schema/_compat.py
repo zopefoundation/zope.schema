@@ -2,12 +2,6 @@ import sys
 
 PY3 = sys.version_info[0] >= 3
 
-from collections import OrderedDict
-
-# pep 8 friendlyness
-OrderedDict
-
-
 if PY3:  # pragma: no cover
 
     string_types = str,

@@ -26,7 +26,7 @@ class FieldEqualityTests(unittest.TestCase):
         def _makeOne(cls):
             return cls(title=u"Foo", description=u"Bar")
 
-        for cls in Int,Text:
+        for cls in (Int, Text):
             self.assertEqual(_makeOne(cls), _makeOne(cls))
 
 

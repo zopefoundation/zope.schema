@@ -21,7 +21,7 @@ from zope.schema.interfaces import ITokenizedTerm
 from zope.schema.interfaces import ITreeVocabulary
 from zope.schema.interfaces import IVocabularyRegistry
 from zope.schema.interfaces import IVocabularyTokenized
-from zope.schema._compat import OrderedDict
+from collections import OrderedDict
 
 # simple vocabularies performing enumerated-like tasks
 _marker = object()

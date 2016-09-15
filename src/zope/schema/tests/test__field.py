@@ -72,10 +72,7 @@ class BytesTests(unittest.TestCase):
     def test_fromUnicode_miss(self):
         from zope.schema._compat import text_type
         byt = self._makeOne()
-        u = chr(129)
-        if not isinstance(u, text_type):
-            u = text_type(u, 'unicode_escape') # PY2
-        self.assertRaises(UnicodeEncodeError, byt.fromUnicode, u)
+        self.assertRaises(UnicodeEncodeError, byt.fromUnicode, u'\x81')
 
     def test_fromUnicode_hit(self):
 
