@@ -933,7 +933,7 @@ class ChoiceTests(unittest.TestCase):
         @implementer(IContextSourceBinder)
         class SampleContextSourceBinder(object):
             def __call__(self, context):
-                pass
+                raise AssertionError("This is not called")
 
         choice = self._makeOne(source=SampleContextSourceBinder())
         self.assertRaises(TypeError, choice.validate, 1)
@@ -1675,14 +1675,9 @@ class ObjectTests(unittest.TestCase):
 
     def _getErrors(self, f, *args, **kw):
         from zope.schema.interfaces import WrongContainedType
-        try:
+        with self.assertRaises(WrongContainedType) as e:
             f(*args, **kw)
-        except WrongContainedType as e:
-            try:
-                return e.args[0]
-            except:
-                return []
-        self.fail('Expected WrongContainedType Error')
+        return e.exception.args[0]
 
     def _makeCycles(self):
         from zope.interface import Interface
@@ -2063,21 +2058,16 @@ def _makeSampleVocabulary():
     class SampleVocabulary(object):
 
         def __iter__(self):
-            return iter([self.getTerm(x) for x in range(0, 10)])
+            raise AssertionError("Not implemented")
 
         def __contains__(self, value):
             return 0 <= value < 10
 
-        def __len__(self):
+        def __len__(self): # pragma: no cover
             return 10
 
         def getTerm(self, value):
-            if value in self:
-                t = SampleTerm()
-                t.value = value
-                t.double = 2 * value
-                return t
-            raise LookupError("no such value: %r" % value)
+            raise AssertionError("Not implemented")
 
     return SampleVocabulary()
 
@@ -2092,30 +2082,3 @@ def _makeDummyRegistry(v):
         def get(self, object, name):
             return self._vocabulary
     return DummyRegistry(v)
-
-
-def test_suite():
-    return unittest.TestSuite((
-        unittest.makeSuite(BytesTests),
-        unittest.makeSuite(ASCIITests),
-        unittest.makeSuite(BytesLineTests),
-        unittest.makeSuite(ASCIILineTests),
-        unittest.makeSuite(FloatTests),
-        unittest.makeSuite(DecimalTests),
-        unittest.makeSuite(DatetimeTests),
-        unittest.makeSuite(DateTests),
-        unittest.makeSuite(TimedeltaTests),
-        unittest.makeSuite(TimeTests),
-        unittest.makeSuite(ChoiceTests),
-        unittest.makeSuite(InterfaceFieldTests),
-        unittest.makeSuite(AbstractCollectionTests),
-        unittest.makeSuite(TupleTests),
-        unittest.makeSuite(ListTests),
-        unittest.makeSuite(SetTests),
-        unittest.makeSuite(FrozenSetTests),
-        unittest.makeSuite(ObjectTests),
-        unittest.makeSuite(DictTests),
-        unittest.makeSuite(URITests),
-        unittest.makeSuite(IdTests),
-        unittest.makeSuite(DottedNameTests),
-    ))

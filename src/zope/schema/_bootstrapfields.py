@@ -128,16 +128,16 @@ class Field(Attribute):
 
         >>> from zope.schema._bootstrapfields import Field
         >>> f = Field()
-        >>> f.__doc__, f.title, f.description
-        ('', u'', u'')
+        >>> f.__doc__, str(f.title), str(f.description)
+        ('', '', '')
 
         >>> f = Field(title=u'sample')
-        >>> f.__doc__, f.title, f.description
-        (u'sample', u'sample', u'')
+        >>> str(f.__doc__), str(f.title), str(f.description)
+        ('sample', 'sample', '')
 
         >>> f = Field(title=u'sample', description=u'blah blah\\nblah')
-        >>> f.__doc__, f.title, f.description
-        (u'sample\\n\\nblah blah\\nblah', u'sample', u'blah blah\\nblah')
+        >>> str(f.__doc__), str(f.title), str(f.description)
+        ('sample\\n\\nblah blah\\nblah', 'sample', 'blah blah\\nblah')
         """
         __doc__ = ''
         if title:
@@ -332,8 +332,11 @@ class Text(MinMaxLen, Field):
         Traceback (most recent call last):
         ...
         WrongType: ('foo x spam', <type 'unicode'>, '')
-        >>> t.fromUnicode(u"foo x spam")
-        u'foo x spam'
+        >>> result = t.fromUnicode(u"foo x spam")
+        >>> isinstance(result, bytes)
+        False
+        >>> str(result)
+        'foo x spam'
         >>> t.fromUnicode(u"foo spam")
         Traceback (most recent call last):
         ...

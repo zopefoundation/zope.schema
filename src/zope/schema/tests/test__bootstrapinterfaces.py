@@ -16,9 +16,7 @@ import unittest
 
 def _skip_under_py3(testcase):
     from zope.schema._compat import PY3
-    if not PY3:
-        return testcase
-
+    return unittest.skipIf(PY3, "Not under Python 3")(testcase)
 
 class ValidationErrorTests(unittest.TestCase):
 
@@ -60,9 +58,3 @@ class ValidationErrorTests(unittest.TestCase):
         self.assertEqual(left == right, False)
         self.assertEqual(left == left, True)
         self.assertEqual(right == right, True)
-
-
-def test_suite():
-    return unittest.TestSuite((
-        unittest.makeSuite(ValidationErrorTests),
-    ))

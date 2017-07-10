@@ -1,20 +1,29 @@
 language: python
 sudo: false
-matrix:
-  include:
-    - python: 3.5
-      env: TOXENV=py35
-env:
-    - TOXENV=py27
-    - TOXENV=py33
-    - TOXENV=py34
-    - TOXENV=pypy
-    - TOXENV=pypy3
-    - TOXENV=coverage
-    - TOXENV=docs
-install:
-    - pip install tox
+python:
+  - 2.7
+  - 3.4
+  - 3.5
+  - 3.6
+  - pypy-5.6.0
+
 script:
-    - tox
+  - coverage run -m zope.testrunner --test-path=src
+  - sphinx-build                         -b html    -d docs/_build/doctrees docs docs/_build/html
+  - coverage run -a `which sphinx-build` -b doctest -d docs/_build/doctrees docs docs/_build/doctest
+
+after_success:
+  - coveralls
 notifications:
-    email: false
+  email: false
+
+install:
+  - pip install -U pip setuptools
+  - pip install -U coveralls coverage
+  - pip install -U -e ".[test,docs]"
+
+
+cache: pip
+
+before_cache:
+  - rm -f $HOME/.cache/pip/log/debug.log

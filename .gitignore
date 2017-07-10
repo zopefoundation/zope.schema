@@ -10,6 +10,7 @@ parts
 *.egg-info
 .tox
 .coverage
+htmlcov/
 nosetests.xml
 coverage.xml
 devel

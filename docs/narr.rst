@@ -69,7 +69,7 @@ is to define some data:
 .. doctest::
 
    >>> title = u'Zope 3 Website'
-   >>> url = b'http://dev.zope.org/Zope3'
+   >>> url = 'http://dev.zope.org/Zope3'
 
 Now we, get the fields from the interface:
 
@@ -168,8 +168,8 @@ Now we want a class that adheres to the ``IContact`` schema:
 
 .. doctest::
 
-   >>> class Contact(object):
-   ...     zope.interface.implements(IContact)
+   >>> @zope.interface.implementer(IContact)
+   ... class Contact(object):
    ...
    ...     def __init__(self, first, last, email, address, pc):
    ...         self.first = first
