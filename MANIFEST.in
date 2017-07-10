@@ -17,3 +17,4 @@ include *.py
 include .travis.yml
 include buildout.cfg
 include tox.ini
+include .coveragerc
