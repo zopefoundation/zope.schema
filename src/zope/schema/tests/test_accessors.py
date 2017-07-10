@@ -151,7 +151,7 @@ class FieldReadAccessorTests(unittest.TestCase):
 
         class Foo(object):
             def getter(self):
-                return '123'
+                raise AssertionError("Not called")
         self.assertRaises(TypeError, getter.set, Foo(), '456')
 
     def test_set_no_writer(self):
@@ -163,7 +163,7 @@ class FieldReadAccessorTests(unittest.TestCase):
 
         class Foo(object):
             def getter(self):
-                return '123'
+                raise AssertionError("Not called")
 
         self.assertRaises(AttributeError, getter.set, Foo(), '456')
 
@@ -305,11 +305,3 @@ class Test_accessors(unittest.TestCase):
         self.assertEqual(info['optional'], ())
         self.assertEqual(info['varargs'], None)
         self.assertEqual(info['kwargs'], None)
-
-
-def test_suite():
-    return unittest.TestSuite((
-        unittest.makeSuite(FieldReadAccessorTests),
-        unittest.makeSuite(FieldWriteAccessorTests),
-        unittest.makeSuite(Test_accessors),
-    ))

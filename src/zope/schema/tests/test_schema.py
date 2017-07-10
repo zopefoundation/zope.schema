@@ -212,7 +212,7 @@ class Test_getSchemaValidationErrors(unittest.TestCase):
 
         class INoFields(Interface):
             def method():
-                pass
+                "A method."
             attr = Attribute('ignoreme')
 
         errors = self._callFUT(INoFields, object())
@@ -262,14 +262,3 @@ class Test_getSchemaValidationErrors(unittest.TestCase):
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0][0], 'value')
         self.assertEqual(errors[0][1].__class__, TooSmall)
-
-
-def test_suite():
-    return unittest.TestSuite((
-        unittest.makeSuite(Test_getFields),
-        unittest.makeSuite(Test_getFieldsInOrder),
-        unittest.makeSuite(Test_getFieldNames),
-        unittest.makeSuite(Test_getFieldNamesInOrder),
-        unittest.makeSuite(Test_getValidationErrors),
-        unittest.makeSuite(Test_getSchemaValidationErrors),
-    ))

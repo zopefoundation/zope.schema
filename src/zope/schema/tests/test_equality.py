@@ -28,9 +28,3 @@ class FieldEqualityTests(unittest.TestCase):
 
         for cls in (Int, Text):
             self.assertEqual(_makeOne(cls), _makeOne(cls))
-
-
-def test_suite():
-    return unittest.TestSuite((
-        unittest.makeSuite(FieldEqualityTests),
-        ))

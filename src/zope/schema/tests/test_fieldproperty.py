@@ -517,7 +517,7 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
                 return default
 
             def set(self, inst, value):
-                if self.readonly:
+                if self.readonly: # pragma: no cover
                     raise ValueError
                 setattr(inst, 'faux', value)
 
@@ -658,11 +658,3 @@ class CreateFieldPropertiesTests(unittest.TestCase):
         self.assertFalse(hasattr(Dummy, 'date'))
         self.assertFalse(hasattr(Dummy, 'code'))
         self.assertTrue(hasattr(Dummy, 'title'))
-
-
-def test_suite():
-    return unittest.TestSuite((
-        unittest.makeSuite(FieldPropertyTests),
-        unittest.makeSuite(FieldPropertyStoredThroughFieldTests),
-        unittest.makeSuite(CreateFieldPropertiesTests),
-    ))

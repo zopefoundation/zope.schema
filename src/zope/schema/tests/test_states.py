@@ -98,9 +98,3 @@ class StateSelectionTest(unittest.TestCase):
         self.assertTrue(bound.vocabularyName is None)
         self.assertTrue(verifyObject(IVocabulary, bound.vocabulary))
         self.assertTrue("AL" in bound.vocabulary)
-
-
-def test_suite():
-    return unittest.TestSuite((
-        unittest.makeSuite(StateSelectionTest),
-    ))

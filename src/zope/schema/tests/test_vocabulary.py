@@ -602,21 +602,16 @@ def _makeSampleVocabulary():
     class SampleVocabulary(object):
 
         def __iter__(self):
-            return iter([self.getTerm(x) for x in range(0, 10)])
+            raise AssertionError("Not called")
 
         def __contains__(self, value):
             return 0 <= value < 10
 
-        def __len__(self):
+        def __len__(self): # pragma: no cover
             return 10
 
         def getTerm(self, value):
-            if value in self:
-                t = SampleTerm()
-                t.value = value
-                t.double = 2 * value
-                return t
-            raise LookupError("no such value: %r" % value)
+            raise AssertionError("Not called.")
 
     return SampleVocabulary()
 
@@ -626,17 +621,5 @@ def _makeDummyRegistry():
 
     class DummyRegistry(VocabularyRegistry):
         def get(self, object, name):
-            v = _makeSampleVocabulary()
-            v.object = object
-            v.name = name
-            return v
+            raise AssertionError("Not called")
     return DummyRegistry()
-
-
-def test_suite():
-    return unittest.TestSuite((
-        unittest.makeSuite(SimpleTermTests),
-        unittest.makeSuite(SimpleVocabularyTests),
-        unittest.makeSuite(TreeVocabularyTests),
-        unittest.makeSuite(RegistryTests),
-    ))

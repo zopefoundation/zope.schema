@@ -267,10 +267,8 @@ class FieldTests(unittest.TestCase):
     def test_validate_missing_not_required(self):
         missing = object()
 
-        def _fail(value):
-            return False
         field = self._makeOne(
-            required=False, missing_value=missing, constraint=_fail,
+            required=False, missing_value=missing, constraint=lambda x: False,
         )
         self.assertEqual(field.validate(missing), None)  # doesn't raise
 
@@ -278,28 +276,22 @@ class FieldTests(unittest.TestCase):
         from zope.schema._bootstrapinterfaces import RequiredMissing
         missing = object()
 
-        def _fail(value):
-            return False
         field = self._makeOne(
-            required=True, missing_value=missing, constraint=_fail,
+            required=True, missing_value=missing, constraint=lambda x: False,
         )
         self.assertRaises(RequiredMissing, field.validate, missing)
 
     def test_validate_wrong_type(self):
         from zope.schema._bootstrapinterfaces import WrongType
 
-        def _fail(value):
-            return False
-        field = self._makeOne(required=True, constraint=_fail)
+        field = self._makeOne(required=True, constraint=lambda x: False)
         field._type = str
         self.assertRaises(WrongType, field.validate, 1)
 
     def test_validate_constraint_fails(self):
         from zope.schema._bootstrapinterfaces import ConstraintNotSatisfied
 
-        def _fail(value):
-            return False
-        field = self._makeOne(required=True, constraint=_fail)
+        field = self._makeOne(required=True, constraint=lambda x: False)
         field._type = int
         self.assertRaises(ConstraintNotSatisfied, field.validate, 1)
 
@@ -401,7 +393,7 @@ class ContainerTests(unittest.TestCase):
 
         class Dummy(object):
             def __contains__(self, item):
-                return False
+                raise AssertionError("Not called")
         cont._validate(Dummy())  # doesn't raise
 
     def test__validate_not_collection_but_iterable(self):
@@ -432,7 +424,7 @@ class IterableTests(ContainerTests):
 
         class Dummy(object):
             def __contains__(self, item):
-                return False
+                raise AssertionError("Not called")
         self.assertRaises(NotAnIterator, itr._validate, Dummy())
 
 
@@ -803,20 +795,3 @@ class DummyInst(object):
     def validate(self, value):
         if self._exc is not None:
             raise self._exc()
-
-
-def test_suite():
-    return unittest.TestSuite((
-        unittest.makeSuite(ValidatedPropertyTests),
-        unittest.makeSuite(DefaultPropertyTests),
-        unittest.makeSuite(FieldTests),
-        unittest.makeSuite(ContainerTests),
-        unittest.makeSuite(IterableTests),
-        unittest.makeSuite(OrderableTests),
-        unittest.makeSuite(MinMaxLenTests),
-        unittest.makeSuite(TextTests),
-        unittest.makeSuite(TextLineTests),
-        unittest.makeSuite(PasswordTests),
-        unittest.makeSuite(BoolTests),
-        unittest.makeSuite(IntTests),
-    ))

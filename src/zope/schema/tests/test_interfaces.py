@@ -88,10 +88,3 @@ class Test__fields(unittest.TestCase):
             self._callFUT([Text(), Bytes(), Int(), Float(), Decimal(), 0]),
             False
         )
-
-
-def test_suite():
-    return unittest.TestSuite((
-        unittest.makeSuite(Test__is_field),
-        unittest.makeSuite(Test__fields),
-    ))

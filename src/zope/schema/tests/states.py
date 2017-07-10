@@ -117,14 +117,3 @@ class StateVocabulary(object):
 
     def getTerm(self, value):
         return _states[value]
-
-
-class StateSelectionField(Choice):
-
-    vocabulary = StateVocabulary()
-
-    def __init__(self, **kw):
-        super(StateSelectionField, self).__init__(
-            vocabulary=StateSelectionField.vocabulary,
-            **kw)
-        self.vocabularyName = "states"

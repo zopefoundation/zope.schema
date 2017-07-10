@@ -114,7 +114,7 @@ class IContextAwareDefaultFactory(zope.interface.Interface):
 
 
 class NO_VALUE(object):
-    def __repr__(self):
+    def __repr__(self): # pragma: no cover
         return '<NO_VALUE>'
 
 NO_VALUE = NO_VALUE()
