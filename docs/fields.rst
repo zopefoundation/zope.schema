@@ -30,7 +30,10 @@ Conversion from Unicode:
 
    >>> from zope.schema import Bytes
    >>> obj = Bytes(constraint=lambda v: b'x' in v)
-   >>> obj.fromUnicode(u" foo x.y.z bat")
+   >>> result = obj.fromUnicode(u" foo x.y.z bat")
+   >>> isinstance(result, bytes)
+   True
+   >>> str(result.decode("ascii"))
    ' foo x.y.z bat'
    >>> obj.fromUnicode(u" foo y.z bat")
    Traceback (most recent call last):
@@ -167,8 +170,11 @@ Conversion from Unicode enforces the constraint:
    Traceback (most recent call last):
    ...
    ConstraintNotSatisfied: baz
-   >>> t.fromUnicode(u"foo")
-   u'foo'
+   >>> result = t.fromUnicode(u"foo")
+   >>> isinstance(result, bytes)
+   False
+   >>> print(result)
+   foo
 
 By default, ValueErrors are thrown if duplicate values or tokens
 are passed in. If you are using this vocabulary as part of a form
@@ -189,9 +195,9 @@ Validation ensures that the pattern is matched:
 
    >>> from zope.schema import URI
    >>> uri = URI(__name__='test')
-   >>> uri.validate(b"http://www.python.org/foo/bar")
-   >>> uri.validate(b"DAV:")
-   >>> uri.validate(b"www.python.org/foo/bar")
+   >>> uri.validate("http://www.python.org/foo/bar")
+   >>> uri.validate("DAV:")
+   >>> uri.validate("www.python.org/foo/bar")
    Traceback (most recent call last):
    ...
    InvalidURI: www.python.org/foo/bar

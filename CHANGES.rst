@@ -8,6 +8,8 @@ Changes
 
 - Add support for Python 3.5 and 3.6.
 
+- Drop support for 'setup.py test'. Use zope.testrunner instead.
+
 
 4.4.2 (2014-09-04)
 ------------------

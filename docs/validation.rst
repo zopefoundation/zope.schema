@@ -94,8 +94,8 @@ When we set a valid value for `a` we still get the same error for `b`:
    2
    >>> errors[0][0]
    'a'
-   >>> errors[0][1].doc()
-   u'Value is too big'
+   >>> print(errors[0][1].doc())
+   Value is too big
    >>> errors[0][1].__class__.__name__
    'TooBig'
    >>> errors[0][1].args
