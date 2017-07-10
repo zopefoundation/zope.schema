@@ -27,44 +27,6 @@ def read(*rnames):
         return f.read()
 
 
-def _modname(path, base, name=''):
-    if path == base:
-        return name
-    dirname, basename = os.path.split(path)
-    return _modname(dirname, base, basename + '.' + name)
-
-
-def alltests():
-    import logging
-    import pkg_resources
-    import unittest
-
-    class NullHandler(logging.Handler):
-        level = 50
-
-        def emit(self, record):
-            pass
-
-    logging.getLogger().addHandler(NullHandler())
-
-    suite = unittest.TestSuite()
-    base = pkg_resources.working_set.find(
-        pkg_resources.Requirement.parse('zope.schema')).location
-    for dirpath, dirnames, filenames in os.walk(base):
-        if os.path.basename(dirpath) == 'tests':
-            for filename in filenames:
-                if filename.endswith('.py') and filename.startswith('test'):
-                    mod = __import__(
-                        _modname(dirpath, base, os.path.splitext(filename)[0]),
-                        {}, {}, ['*'])
-                    suite.addTest(mod.test_suite())
-        elif 'tests.py' in filenames:
-            continue
-            mod = __import__(_modname(dirpath, base, 'tests'), {}, {}, ['*'])
-            suite.addTest(mod.test_suite())
-    return suite
-
-
 REQUIRES = [
     'setuptools',
     'zope.interface >= 3.6.0',
@@ -72,7 +34,10 @@ REQUIRES = [
 ]
 
 
-TESTS_REQUIRE = ['zope.testing']
+TESTS_REQUIRE = [
+    'zope.testing',
+    'zope.testrunner',
+]
 
 
 setup(
@@ -98,9 +63,9 @@ setup(
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Framework :: Zope3",
@@ -108,11 +73,12 @@ setup(
     ],
     include_package_data = True,
     zip_safe = False,
-    test_suite='__main__.alltests',
     tests_require=TESTS_REQUIRE,
     extras_require={
-        'docs': ['Sphinx'],
+        'docs': [
+            'Sphinx',
+            'repoze.sphinx.autointerface',
+        ],
         'test': TESTS_REQUIRE,
-        'testing': TESTS_REQUIRE + ['nose', 'coverage'],
     },
 )
