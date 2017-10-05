@@ -5,7 +5,7 @@
     :target: https://pypi.python.org/pypi/zope.schema/
     :alt: Latest Version
 
-.. image:: https://travis-ci.org/zopefoundation/zope.schema.png?branch=master
+.. image:: https://travis-ci.org/zopefoundation/zope.schema.svg?branch=master
         :target: https://travis-ci.org/zopefoundation/zope.schema
 
 .. image:: https://readthedocs.org/projects/zopeschema/badge/?version=latest
