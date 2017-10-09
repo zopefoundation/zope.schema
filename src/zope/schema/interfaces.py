@@ -384,7 +384,7 @@ class IDecimal(IMinMax, IField):
 
 
 class IDatetime(IMinMax, IField):
-    """Field containing a DateTime."""
+    """Field containing a datetime."""
 
 
 class IDate(IMinMax, IField):
