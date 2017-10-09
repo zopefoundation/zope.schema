@@ -125,10 +125,10 @@ Conversion from Unicode:
    ...
    ValueError: invalid literal for Decimal(): 1.25.6
 
-DateTime
+Datetime
 ########
 
-:class:`zope.schema.DateTime` fields contain binary data, represented
+:class:`zope.schema.Datetime` fields contain binary data, represented
 as a a Python :class:`datetime.datetime`.
 
 Date
