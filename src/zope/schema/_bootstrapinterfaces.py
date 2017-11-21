@@ -93,7 +93,7 @@ class IFromUnicode(zope.interface.Interface):
     """Parse a unicode string to a value
 
     We will often adapt fields to this interface to support views and
-    other applications that need to conver raw data as unicode
+    other applications that need to convert raw data as unicode
     values.
     """
 
