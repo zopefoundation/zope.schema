@@ -76,8 +76,8 @@ Changes
 - Fix a bug where bytes values were turned into tokens inproperly in
   Python 3.
 
-- Add ``createFieldProperties()`` function which maps schema fields into
-  ``FieldProperty`` instances.
+- Add ``zope.schema.fieldproperty.createFieldProperties()`` function which
+  maps schema fields into ``FieldProperty`` instances.
 
 4.2.2 (2012-11-21)
 ------------------
