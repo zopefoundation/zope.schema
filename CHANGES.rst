@@ -4,7 +4,8 @@ Changes
 4.5.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Attempt to gracefully handle the case where a unicode string is passed 
+  into SimpleTerm.
 
 
 4.5.0 (2017-07-10)
