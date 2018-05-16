@@ -184,6 +184,19 @@ class Field(Attribute):
             except StopValidation:
                 pass
 
+    def __hash__(self):
+        # See <https://github.com/zopefoundation/zope.schema/issues/36>.
+        # XXX Good solution that is backwards-incompatible, though:
+        # Depend on an immutable subset of the equality criteria used in
+        # __eq__ to ensure that instances comparing equal by value have equal
+        # hash values, which boils down to the field type alone.
+
+        # return hash(type(self))
+
+        # XXX Temporary solution to make fields hashable in Python 3 without
+        # breaking backwards compatibility in Python 2:
+        return id(self)
+
     def __eq__(self, other):
         # should be the same type
         if type(self) != type(other):

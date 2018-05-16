@@ -364,6 +364,26 @@ class FieldTests(unittest.TestCase):
         field.set(inst, 'AFTER')
         self.assertEqual(inst.extant, 'AFTER')
 
+    def test_is_hashable(self):
+        field = self._makeOne()
+        hash(field)  # doesn't raise
+
+    # XXX See <https://github.com/zopefoundation/zope.schema/issues/36>.
+    # Test should work when the final hash implementation is used.
+    # def test_equal_instances_have_same_hash(self):
+    #     field1 = self._makeOne()
+    #     field2 = self._makeOne()
+    #     assert field1 is not field2
+    #     assert field1 == field2
+    #     self.assertTrue(hash(field1) == hash(field2))
+
+    def test_hash_varies_across_unequal_instances(self):
+        field1 = self._makeOne(title=u'foo')
+        field2 = self._makeOne(title=u'bar')
+        assert field1 is not field2
+        assert field1 != field2
+        self.assertFalse(hash(field1) == hash(field2))
+
 
 class ContainerTests(unittest.TestCase):
 
