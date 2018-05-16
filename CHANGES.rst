@@ -4,7 +4,9 @@ Changes
 4.5.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Make fields hashable in Python 3 (#36).
+  This fix should be improved according to the comments for the next release
+  that allows backwards incompatibilities in Python 2.
 
 
 4.5.0 (2017-07-10)
