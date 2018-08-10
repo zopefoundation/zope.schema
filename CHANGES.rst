@@ -4,7 +4,14 @@ Changes
 4.5.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- ``Field`` instances are hashable on Python 3, and use a defined
+  hashing algorithm that matches what equality does on all versions of
+  Python. Previously, on Python 2, fields were hashed based on their
+  identity. This violated the rule that equal objects should have
+  equal hashes, and now they do. Since having equal hashes does not
+  imply that the objects are equal, this is not expected to be a
+  compatibility problem. See `issue 36
+  <https://github.com/zopefoundation/zope.schema/issues/36>`_.
 
 
 4.5.0 (2017-07-10)

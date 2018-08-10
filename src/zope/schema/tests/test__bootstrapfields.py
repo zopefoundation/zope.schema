@@ -364,6 +364,34 @@ class FieldTests(unittest.TestCase):
         field.set(inst, 'AFTER')
         self.assertEqual(inst.extant, 'AFTER')
 
+    def test_is_hashable(self):
+        field = self._makeOne()
+        hash(field)  # doesn't raise
+
+    def test_equal_instances_have_same_hash(self):
+        # Equal objects should have equal hashes
+        field1 = self._makeOne()
+        field2 = self._makeOne()
+        self.assertIsNot(field1, field2)
+        self.assertEqual(field1, field2)
+        self.assertEqual(hash(field1), hash(field2))
+
+    def test_hash_across_unequal_instances(self):
+        # Hash equality does not imply equal objects.
+        # Our implementation only considers property names,
+        # not values. That's OK, a dict still does the right thing.
+        field1 = self._makeOne(title=u'foo')
+        field2 = self._makeOne(title=u'bar')
+        self.assertIsNot(field1, field2)
+        self.assertNotEqual(field1, field2)
+        self.assertEqual(hash(field1), hash(field2))
+
+        d = {field1: 42}
+        self.assertIn(field1, d)
+        self.assertEqual(42, d[field1])
+        self.assertNotIn(field2, d)
+        with self.assertRaises(KeyError):
+            d[field2]
 
 class ContainerTests(unittest.TestCase):
 
