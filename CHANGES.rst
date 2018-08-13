@@ -13,6 +13,14 @@
   ``validate_invariants=False`` to the ``Object`` constructor. See
   `issue 10 <https://github.com/zopefoundation/zope.schema/issues/10>`_.
 
+- ``ValidationError`` can be sorted on Python 3.
+
+- ``DottedName`` and ``Id`` consistently handle non-ASCII unicode
+  values on Python 2 and 3 by raising ``InvalidDottedName`` and
+  ``InvalidId`` in ``fromUnicode`` respectively. Previously, a
+  ``UnicodeEncodeError`` would be raised on Python 2 while Python 3
+  would raise the descriptive exception.
+
 - ``Field`` instances are hashable on Python 3, and use a defined
   hashing algorithm that matches what equality does on all versions of
   Python. Previously, on Python 2, fields were hashed based on their
@@ -33,6 +41,7 @@
   them with the ``backslashreplace`` error handler. See `issue 15
   <https://github.com/zopefoundation/zope.schema/issues/15>`_ and `PR
   6 <https://github.com/zopefoundation/zope.schema/pull/6>`_.
+
 
 4.5.0 (2017-07-10)
 ==================
