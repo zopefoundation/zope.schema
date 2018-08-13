@@ -741,7 +741,29 @@ class BoolTests(unittest.TestCase):
         self.assertEqual(txt.fromUnicode(u'true'), True)
 
 
-class IntTests(unittest.TestCase):
+class OrderableMissingValueMixin(object):
+
+    mvm_missing_value = -1
+    mvm_default = 0
+
+    def test_missing_value_no_min_or_max(self):
+        # We should be able to provide a missing_value without
+        # also providing a min or max. But note that we must still
+        # provide a default.
+        # See https://github.com/zopefoundation/zope.schema/issues/9
+        Kind = self._getTargetClass()
+        self.assertTrue(Kind.min._allow_none)
+        self.assertTrue(Kind.max._allow_none)
+
+        field = self._makeOne(missing_value=self.mvm_missing_value,
+                              default=self.mvm_default)
+        self.assertIsNone(field.min)
+        self.assertIsNone(field.max)
+        self.assertEqual(self.mvm_missing_value, field.missing_value)
+
+
+class IntTests(OrderableMissingValueMixin,
+               unittest.TestCase):
 
     def _getTargetClass(self):
         from zope.schema._bootstrapfields import Int

@@ -11,8 +11,11 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
+import datetime
+import decimal
 import unittest
 
+from zope.schema.tests.test__bootstrapfields import OrderableMissingValueMixin
 
 class BytesTests(unittest.TestCase):
 
@@ -249,7 +252,11 @@ class ASCIILineTests(unittest.TestCase):
         self.assertEqual(field.constraint('abc\ndef'), False)
 
 
-class FloatTests(unittest.TestCase):
+class FloatTests(OrderableMissingValueMixin,
+                 unittest.TestCase):
+
+    mvm_missing_value = -1.0
+    mvm_default = 0.0
 
     def _getTargetClass(self):
         from zope.schema._field import Float
@@ -326,7 +333,11 @@ class FloatTests(unittest.TestCase):
         self.assertEqual(flt.fromUnicode(u'1.23e6'), 1230000.0)
 
 
-class DecimalTests(unittest.TestCase):
+class DecimalTests(OrderableMissingValueMixin,
+                   unittest.TestCase):
+
+    mvm_missing_value = decimal.Decimal("-1")
+    mvm_default = decimal.Decimal("0")
 
     def _getTargetClass(self):
         from zope.schema._field import Decimal
@@ -346,7 +357,6 @@ class DecimalTests(unittest.TestCase):
         verifyObject(IDecimal, self._makeOne())
 
     def test_validate_not_required(self):
-        import decimal
         field = self._makeOne(required=False)
         field.validate(decimal.Decimal("10.0"))
         field.validate(decimal.Decimal("0.93"))
@@ -354,7 +364,6 @@ class DecimalTests(unittest.TestCase):
         field.validate(None)
 
     def test_validate_required(self):
-        import decimal
         from zope.schema.interfaces import RequiredMissing
         field = self._makeOne()
         field.validate(decimal.Decimal("10.0"))
@@ -363,7 +372,6 @@ class DecimalTests(unittest.TestCase):
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def test_validate_min(self):
-        import decimal
         from zope.schema.interfaces import TooSmall
         field = self._makeOne(min=decimal.Decimal("10.5"))
         field.validate(decimal.Decimal("10.6"))
@@ -372,7 +380,6 @@ class DecimalTests(unittest.TestCase):
         self.assertRaises(TooSmall, field.validate, decimal.Decimal("10.4"))
 
     def test_validate_max(self):
-        import decimal
         from zope.schema.interfaces import TooBig
         field = self._makeOne(max=decimal.Decimal("10.5"))
         field.validate(decimal.Decimal("5.3"))
@@ -381,7 +388,6 @@ class DecimalTests(unittest.TestCase):
         self.assertRaises(TooBig, field.validate, decimal.Decimal("20.7"))
 
     def test_validate_min_and_max(self):
-        import decimal
         from zope.schema.interfaces import TooBig
         from zope.schema.interfaces import TooSmall
         field = self._makeOne(min=decimal.Decimal("-0.6"),
@@ -410,7 +416,11 @@ class DecimalTests(unittest.TestCase):
         self.assertEqual(flt.fromUnicode(u'12345.6'), Decimal('12345.6'))
 
 
-class DatetimeTests(unittest.TestCase):
+class DatetimeTests(OrderableMissingValueMixin,
+                    unittest.TestCase):
+
+    mvm_missing_value = datetime.datetime.now()
+    mvm_default = datetime.datetime.now()
 
     def _getTargetClass(self):
         from zope.schema._field import Datetime
@@ -496,7 +506,11 @@ class DatetimeTests(unittest.TestCase):
         self.assertRaises(TooBig, field.validate, d5)
 
 
-class DateTests(unittest.TestCase):
+class DateTests(OrderableMissingValueMixin,
+                unittest.TestCase):
+
+    mvm_missing_value = datetime.date.today()
+    mvm_default = datetime.date.today()
 
     def _getTargetClass(self):
         from zope.schema._field import Date
@@ -586,7 +600,11 @@ class DateTests(unittest.TestCase):
         self.assertRaises(TooBig, field.validate, d5)
 
 
-class TimedeltaTests(unittest.TestCase):
+class TimedeltaTests(OrderableMissingValueMixin,
+                     unittest.TestCase):
+
+    mvm_missing_value = datetime.timedelta(minutes=15)
+    mvm_default = datetime.timedelta(minutes=12)
 
     def _getTargetClass(self):
         from zope.schema._field import Timedelta
@@ -656,7 +674,11 @@ class TimedeltaTests(unittest.TestCase):
         self.assertRaises(TooBig, field.validate, t5)
 
 
-class TimeTests(unittest.TestCase):
+class TimeTests(OrderableMissingValueMixin,
+                unittest.TestCase):
+
+    mvm_missing_value = datetime.time(12, 15, 37)
+    mvm_default = datetime.time(12, 25, 42)
 
     def _getTargetClass(self):
         from zope.schema._field import Time

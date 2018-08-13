@@ -14,6 +14,12 @@ Changes
   <https://github.com/zopefoundation/zope.schema/issues/36>`_.
 
 
+- Orderable fields, including ``Int``, ``Float``, ``Decimal``,
+  ``Timedelta``, ``Date`` and ``Time``, can now have a
+  ``missing_value`` without needing to specify concrete ``min`` and
+  ``max`` values (they must still specify a ``default`` value). See
+  `issue 9 <https://github.com/zopefoundation/zope.schema/issues/9>`_.
+
 4.5.0 (2017-07-10)
 ------------------
 
