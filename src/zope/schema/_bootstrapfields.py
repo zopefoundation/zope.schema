@@ -184,12 +184,9 @@ class Field(Attribute):
             except StopValidation:
                 pass
 
-    def __eq__(self, other):
-        # should be the same type
-        if type(self) != type(other):
-            return False
-
-        # should have the same properties
+    def __get_property_names_to_compare(self):
+        # Return the set of property names to compare, ignoring
+        # order
         names = {}  # used as set of property names, ignoring values
         for interface in providedBy(self):
             names.update(getFields(interface))
@@ -197,6 +194,25 @@ class Field(Attribute):
         # order will be different always, don't compare it
         if 'order' in names:
             del names['order']
+        return names
+
+    def __hash__(self):
+        # Equal objects should have equal hashes;
+        # equal hashes does not imply equal objects.
+        value = (type(self),) + tuple(self.__get_property_names_to_compare())
+        return hash(value)
+
+    def __eq__(self, other):
+        # should be the same type
+        if type(self) != type(other):
+            return False
+
+        # should have the same properties
+        names = self.__get_property_names_to_compare()
+        # XXX: What about the property names of the other object? Even
+        # though it's the same type, it could theoretically have
+        # another interface that it `alsoProvides`.
+
         for name in names:
             if getattr(self, name) != getattr(other, name):
                 return False
