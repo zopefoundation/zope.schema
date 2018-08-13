@@ -535,11 +535,22 @@ class IFrozenSet(IAbstractSet):
 
 
 class IObject(IField):
-    """Field containing an Object value."""
+    """
+    Field containing an Object value.
+
+    .. versionchanged:: 4.6.0
+       Add the *validate_invariants* attribute.
+    """
 
     schema = Attribute(
         "schema",
         _("The Interface that defines the Fields comprising the Object.")
+    )
+
+    validate_invariants = Attribute(
+        "validate_invariants",
+        _("A boolean that says whether ``schema.validateInvariants`` "
+          "is called from ``self.validate()``. The default is true.")
     )
 
 

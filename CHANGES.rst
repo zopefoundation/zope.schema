@@ -4,6 +4,12 @@ Changes
 4.5.1 (unreleased)
 ------------------
 
+- ``Object`` instances call their schema's ``validateInvariants``
+  method by default to collect errors from functions decorated with
+  ``@invariant`` when validating. This can be disabled by passing
+  ``validate_invariants=False`` to the ``Object`` constructor. See
+  `issue 10 <https://github.com/zopefoundation/zope.schema/issues/10>`_.
+
 - ``Field`` instances are hashable on Python 3, and use a defined
   hashing algorithm that matches what equality does on all versions of
   Python. Previously, on Python 2, fields were hashed based on their
