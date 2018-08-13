@@ -40,31 +40,35 @@ from zope.schema._schema import getFields
 
 class ValidatedProperty(object):
 
-    def __init__(self, name, check=None):
-        self._info = name, check
+    def __init__(self, name, check=None, allow_none=False):
+        self._name = name
+        self._check = check
+        self._allow_none = allow_none
 
     def __set__(self, inst, value):
-        name, check = self._info
-        if value != inst.missing_value:
-            if check is not None:
-                check(inst, value)
+        bypass_validation = (value is None and self._allow_none) or value == inst.missing_value
+        if not bypass_validation:
+            if self._check is not None:
+                self._check(inst, value)
             else:
                 inst.validate(value)
-        inst.__dict__[name] = value
+        inst.__dict__[self._name] = value
 
     def __get__(self, inst, owner):
-        name, check = self._info
-        return inst.__dict__[name]
+        if inst is None:
+            return self
+        return inst.__dict__[self._name]
 
 
 class DefaultProperty(ValidatedProperty):
 
     def __get__(self, inst, owner):
-        name, check = self._info
+        if inst is None:
+            return self
         defaultFactory = inst.__dict__.get('defaultFactory')
         # If there is no default factory, simply return the default.
         if defaultFactory is None:
-            return inst.__dict__[name]
+            return inst.__dict__[self._name]
         # Get the default value by calling the factory. Some factories might
         # require a context to produce a value.
         if IContextAwareDefaultFactory.providedBy(defaultFactory):
@@ -72,8 +76,8 @@ class DefaultProperty(ValidatedProperty):
         else:
             value = defaultFactory()
         # Check that the created value is valid.
-        if check is not None:
-            check(inst, value)
+        if self._check is not None:
+            self._check(inst, value)
         elif value != inst.missing_value:
             inst.validate(value)
         return value
@@ -279,8 +283,8 @@ class Orderable(object):
     Orderable is a mixin used in combination with Field.
     """
 
-    min = ValidatedProperty('min')
-    max = ValidatedProperty('max')
+    min = ValidatedProperty('min', allow_none=True)
+    max = ValidatedProperty('max', allow_none=True)
 
     def __init__(self, min=None, max=None, default=None, **kw):
 
