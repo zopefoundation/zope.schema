@@ -20,6 +20,13 @@ Changes
   ``max`` values (they must still specify a ``default`` value). See
   `issue 9 <https://github.com/zopefoundation/zope.schema/issues/9>`_.
 
+- ``Choice``, ``SimpleVocabulary`` and  ``SimpleTerm`` all gracefully
+  handle using Unicode token values with non-ASCII characters by encoding
+  them with the ``backslashreplace`` error handler. See `issue 15
+  <https://github.com/zopefoundation/zope.schema/issues/15>`_ and `PR
+  6 <https://github.com/zopefoundation/zope.schema/pull/6>`_.
+
+
 4.5.0 (2017-07-10)
 ------------------
 

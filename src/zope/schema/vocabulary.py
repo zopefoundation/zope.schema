@@ -13,15 +13,18 @@
 ##############################################################################
 """Vocabulary support for schema.
 """
+from collections import OrderedDict
 
 from zope.interface import directlyProvides
 from zope.interface import implementer
+
+from zope.schema._compat import text_type
 from zope.schema.interfaces import ITitledTokenizedTerm
 from zope.schema.interfaces import ITokenizedTerm
 from zope.schema.interfaces import ITreeVocabulary
 from zope.schema.interfaces import IVocabularyRegistry
 from zope.schema.interfaces import IVocabularyTokenized
-from collections import OrderedDict
+
 
 # simple vocabularies performing enumerated-like tasks
 _marker = object()
@@ -32,19 +35,31 @@ class SimpleTerm(object):
     """Simple tokenized term used by SimpleVocabulary."""
 
     def __init__(self, value, token=None, title=None):
-        """Create a term for value and token. If token is omitted,
-        str(value) is used for the token.  If title is provided,
-        term implements ITitledTokenizedTerm.
+        """Create a term for *value* and *token*. If *token* is
+        omitted, str(value) is used for the token, escaping any
+        non-ASCII characters.
+
+        If *title* is provided, term implements `ITitledTokenizedTerm`.
         """
         self.value = value
         if token is None:
             token = value
         # In Python 3 str(bytes) returns str(repr(bytes)), which is not what
         # we want here. On the other hand, we want to try to keep the token as
-        # readable as possible.
-        self.token = str(token) \
-            if not isinstance(token, bytes) \
-            else str(token.decode('ascii', 'ignore'))
+        # readable as possible. On both 2 and 3, self.token should be a native
+        # string (ASCIILine).
+        if not isinstance(token, (str, bytes, text_type)):
+            # Nothing we recognize as intended to be textual data.
+            # Get its str() as promised
+            token = str(token)
+
+        if isinstance(token, text_type):
+            token = token.encode('ascii', 'backslashreplace')
+        # Token should be bytes at this point. Now back to native string,
+        # if needed.
+        if not isinstance(token, str):
+            token = token.decode('ascii')
+        self.token = token
         self.title = title
         if title is not None:
             directlyProvides(self, ITitledTokenizedTerm)

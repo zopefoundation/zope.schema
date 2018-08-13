@@ -592,13 +592,14 @@ class ITokenizedTerm(ITerm):
     """
 
     # Should be a ``zope.schema.ASCIILine``, but `ASCIILine` is not a bootstrap
-    # field.
+    # field. `ASCIILine` is a type of NativeString.
     token = Attribute(
         "token",
         """Token which can be used to represent the value on a stream.
 
-        The value of this attribute must be a non-empty 7-bit string.
-        Control characters are not allowed.
+        The value of this attribute must be a non-empty 7-bit native string
+        (i.e., the ``str`` type on both Python 2 and 3).
+        Control characters, including newline, are not allowed.
         """)
 
 
