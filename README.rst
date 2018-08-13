@@ -1,16 +1,26 @@
-``zope.schema``
-===============
+=============
+ zope.schema
+=============
 
 .. image:: https://img.shields.io/pypi/v/zope.schema.svg
-    :target: https://pypi.python.org/pypi/zope.schema/
-    :alt: Latest Version
+   :target: https://pypi.python.org/pypi/zope.schema/
+   :alt: Latest Version
+
+.. image:: https://img.shields.io/pypi/pyversions/zope.schema.svg
+   :target: https://pypi.org/project/zope.schema/
+   :alt: Supported Python versions
 
 .. image:: https://travis-ci.org/zopefoundation/zope.schema.svg?branch=master
-        :target: https://travis-ci.org/zopefoundation/zope.schema
+   :target: https://travis-ci.org/zopefoundation/zope.schema
+   :alt: Build Status
 
 .. image:: https://readthedocs.org/projects/zopeschema/badge/?version=latest
-        :target: http://zopeschema.readthedocs.org/en/latest/
-        :alt: Documentation Status
+   :target: http://zopeschema.readthedocs.org/en/latest/
+   :alt: Documentation Status
+
+.. image:: https://coveralls.io/repos/github/zopefoundation/zope.schema/badge.svg
+   :target: https://coveralls.io/github/zopefoundation/zope.schema
+   :alt: Code Coverage
 
 Schemas extend the notion of interfaces to detailed descriptions of
 Attributes (but not methods).  Every schema is an interface and
