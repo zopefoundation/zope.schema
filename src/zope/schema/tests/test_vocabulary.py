@@ -58,6 +58,13 @@ class SimpleTermTests(unittest.TestCase):
         self.assertEqual(term.token, 'term')
         self.assertFalse(ITitledTokenizedTerm.providedBy(term))
 
+    def test_unicode_non_ascii_value(self):
+        from zope.schema.interfaces import ITitledTokenizedTerm
+        term = self._makeOne(u'Snowman \u2603')
+        self.assertEqual(term.value, u'Snowman \u2603')
+        self.assertEqual(term.token, 'Snowman \\u2603')
+        self.assertFalse(ITitledTokenizedTerm.providedBy(term))
+
 
 class SimpleVocabularyTests(unittest.TestCase):
 

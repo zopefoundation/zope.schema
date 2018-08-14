@@ -802,6 +802,18 @@ class ChoiceTests(unittest.TestCase):
         self.assertEqual(sorted(choose.vocabulary.by_value.keys()), [1, 2])
         self.assertEqual(sorted(choose.source.by_value.keys()), [1, 2])
 
+    def test_ctor_w_unicode_non_ascii_values(self):
+        values = [u'K\xf6ln', u'D\xfcsseldorf', 'Bonn']
+        choose = self._makeOne(values=values)
+        self.assertEqual(sorted(choose.vocabulary.by_value.keys()),
+                         sorted(values))
+        self.assertEqual(sorted(choose.source.by_value.keys()),
+                         sorted(values))
+        self.assertEqual(
+            sorted(choose.vocabulary.by_token.keys()),
+            sorted([x.encode('ascii', 'backslashreplace').decode('ascii') for x in values]))
+
+
     def test_ctor_w_named_vocabulary(self):
         choose = self._makeOne(vocabulary="vocab")
         self.assertEqual(choose.vocabularyName, 'vocab')
