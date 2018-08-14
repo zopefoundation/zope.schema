@@ -617,7 +617,7 @@ class Object(Field):
 
     def __init__(self, schema, **kw):
         """
-        Object(schema, validate_invariants=True, **kwargs)
+        Object(schema, *, validate_invariants=True, **kwargs)
 
         Create an `~.IObject` field. The keyword arguments are as for `~.Field`.
 
@@ -649,7 +649,7 @@ class Object(Field):
             except Invalid:
                 # validateInvariants raises a wrapper error around
                 # all the errors it got if it got errors, in addition
-                # no appending them to the errors list. We don't want
+                # to appending them to the errors list. We don't want
                 # that, we raise our own error.
                 pass
 
