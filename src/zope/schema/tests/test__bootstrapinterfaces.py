@@ -37,6 +37,7 @@ class ValidationErrorTests(unittest.TestCase):
     def test___cmp___no_args(self):
         ve = self._makeOne()
         self.assertEqual(compare(ve, object()), -1)
+        self.assertEqual(compare(object(), ve), 1)
 
     def test___cmp___hit(self):
         left = self._makeOne('abc')

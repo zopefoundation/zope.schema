@@ -37,7 +37,7 @@ class ValidationError(zope.interface.Invalid):
 
     def __lt__(self, other):
         if not hasattr(other, 'args'):
-            return -1
+            return True
         return self.args < other.args
 
     def __eq__(self, other):
