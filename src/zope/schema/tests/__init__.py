@@ -42,7 +42,7 @@ if PY3:
         (re.compile(r"zope.schema._bootstrapinterfaces.WrongType:"),
                     r"WrongType:"),
       ])
-else:
+else: # pragma: no cover
     py3_checker = renormalizing.RENormalizing([
         (re.compile(r"([^'])b'([^']*)'"),
                     r"\1'\2'"),

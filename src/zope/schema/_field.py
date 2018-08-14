@@ -371,12 +371,34 @@ _isdotted = re.compile(
     r"$").match
 
 
+class _StrippedNativeStringLine(NativeStringLine):
+
+    _invalid_exc_type = None
+
+    def fromUnicode(self, value):
+        v = value.strip()
+        # On Python 2, self._type is bytes, so we need to encode
+        # unicode down to ASCII bytes. On Python 3, self._type is
+        # unicode, but we don't want to allow non-ASCII values, to match
+        # Python 2 (our regexs would reject that anyway.)
+        try:
+            v = v.encode('ascii') # bytes
+        except UnicodeEncodeError:
+            raise self._invalid_exc_type(value)
+        if not isinstance(v, self._type):
+            v = v.decode('ascii')
+        self.validate(v)
+        return v
+
+
 @implementer(IDottedName)
-class DottedName(NativeStringLine):
+class DottedName(_StrippedNativeStringLine):
     """Dotted name field.
 
     Values of DottedName fields must be Python-style dotted names.
     """
+
+    _invalid_exc_type = InvalidDottedName
 
     def __init__(self, *args, **kw):
         self.min_dots = int(kw.pop("min_dots", 0))
@@ -405,20 +427,16 @@ class DottedName(NativeStringLine):
             raise InvalidDottedName("too many dots; no more than %d allowed" %
                                     self.max_dots, value)
 
-    def fromUnicode(self, value):
-        v = value.strip()
-        if not isinstance(v, self._type):
-            v = v.encode('ascii')
-        self.validate(v)
-        return v
 
 
 @implementer(IId, IFromUnicode)
-class Id(NativeStringLine):
+class Id(_StrippedNativeStringLine):
     """Id field
 
     Values of id fields must be either uris or dotted names.
     """
+
+    _invalid_exc_type = InvalidId
 
     def _validate(self, value):
         super(Id, self)._validate(value)
@@ -428,15 +446,6 @@ class Id(NativeStringLine):
             return
 
         raise InvalidId(value)
-
-    def fromUnicode(self, value):
-        """ See IFromUnicode.
-        """
-        v = value.strip()
-        if not isinstance(v, self._type):
-            v = v.encode('ascii')
-        self.validate(v)
-        return v
 
 
 @implementer(IInterfaceField)

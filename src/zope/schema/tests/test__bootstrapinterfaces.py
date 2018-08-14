@@ -13,10 +13,11 @@
 ##############################################################################
 import unittest
 
-
-def _skip_under_py3(testcase):
-    from zope.schema._compat import PY3
-    return unittest.skipIf(PY3, "Not under Python 3")(testcase)
+try:
+    compare = cmp
+except NameError:
+    def compare(a, b):
+        return -1 if a < b else (0 if a == b else 1)
 
 class ValidationErrorTests(unittest.TestCase):
 
@@ -33,20 +34,17 @@ class ValidationErrorTests(unittest.TestCase):
         inst = Derived()
         self.assertEqual(inst.doc(), 'DERIVED')
 
-    @_skip_under_py3
     def test___cmp___no_args(self):
-        # Py3k??
         ve = self._makeOne()
-        self.assertEqual(cmp(ve, object()), -1)
+        self.assertEqual(compare(ve, object()), -1)
+        self.assertEqual(compare(object(), ve), 1)
 
-    @_skip_under_py3
     def test___cmp___hit(self):
-        # Py3k??
         left = self._makeOne('abc')
         right = self._makeOne('def')
-        self.assertEqual(cmp(left, right), -1)
-        self.assertEqual(cmp(left, left), 0)
-        self.assertEqual(cmp(right, left), 1)
+        self.assertEqual(compare(left, right), -1)
+        self.assertEqual(compare(left, left), 0)
+        self.assertEqual(compare(right, left), 1)
 
     def test___eq___no_args(self):
         ve = self._makeOne()

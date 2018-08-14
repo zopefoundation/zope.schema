@@ -1,14 +1,25 @@
-Changes
-=======
+=========
+ Changes
+=========
 
-4.5.1 (unreleased)
-------------------
+4.6.0 (unreleased)
+==================
+
+- Add support for Python 3.7.
 
 - ``Object`` instances call their schema's ``validateInvariants``
   method by default to collect errors from functions decorated with
   ``@invariant`` when validating. This can be disabled by passing
   ``validate_invariants=False`` to the ``Object`` constructor. See
   `issue 10 <https://github.com/zopefoundation/zope.schema/issues/10>`_.
+
+- ``ValidationError`` can be sorted on Python 3.
+
+- ``DottedName`` and ``Id`` consistently handle non-ASCII unicode
+  values on Python 2 and 3 by raising ``InvalidDottedName`` and
+  ``InvalidId`` in ``fromUnicode`` respectively. Previously, a
+  ``UnicodeEncodeError`` would be raised on Python 2 while Python 3
+  would raise the descriptive exception.
 
 - ``Field`` instances are hashable on Python 3, and use a defined
   hashing algorithm that matches what equality does on all versions of
@@ -18,7 +29,6 @@ Changes
   imply that the objects are equal, this is not expected to be a
   compatibility problem. See `issue 36
   <https://github.com/zopefoundation/zope.schema/issues/36>`_.
-
 
 - Orderable fields, including ``Int``, ``Float``, ``Decimal``,
   ``Timedelta``, ``Date`` and ``Time``, can now have a
@@ -34,7 +44,7 @@ Changes
 
 
 4.5.0 (2017-07-10)
-------------------
+==================
 
 - Drop support for Python 2.6, 3.2, and 3.3.
 
@@ -44,19 +54,19 @@ Changes
 
 
 4.4.2 (2014-09-04)
-------------------
+==================
 
 - Fix description of min max field: max value is included, not excluded.
 
 
 4.4.1 (2014-03-19)
-------------------
+==================
 
 - Add support for Python 3.4.
 
 
 4.4.0 (2014-01-22)
-------------------
+==================
 
 - Add an event on field properties to notify that a field has been updated.
   This event enables definition of subscribers based on an event, a context
@@ -65,7 +75,7 @@ Changes
 
 
 4.3.3 (2014-01-06)
-------------------
+==================
 
 - PEP 8 cleanup.
 
@@ -82,14 +92,14 @@ Changes
 
 
 4.3.2 (2013-02-24)
-------------------
+==================
 
 - Fix Python 2.6 support. (Forgot to run tox with all environments before last
   release.)
 
 
 4.3.1 (2013-02-24)
-------------------
+==================
 
 - Make sure that we do not fail during bytes decoding of term token when
   generated from a bytes value by ignoring all errors. (Another option would
@@ -97,7 +107,7 @@ Changes
 
 
 4.3.0 (2013-02-24)
-------------------
+==================
 
 - Fix a bug where bytes values were turned into tokens inproperly in
   Python 3.
@@ -106,18 +116,18 @@ Changes
   maps schema fields into ``FieldProperty`` instances.
 
 4.2.2 (2012-11-21)
-------------------
+==================
 
 - Add support for Python 3.3.
 
 4.2.1 (2012-11-09)
-------------------
+==================
 
 - Fix the default property of fields that have no defaultFactory attribute.
 
 
 4.2.0 (2012-05-12)
-------------------
+==================
 
 - Automate build of Sphinx HTML docs and running doctest snippets via tox.
 
@@ -149,13 +159,13 @@ Changes
 
 
 4.1.1 (2012-03-23)
-------------------
+==================
 
 - Remove trailing slash in MANIFEST.in, it causes Winbot to crash.
 
 
 4.1.0 (2012-03-23)
-------------------
+==================
 
 - Add TreeVocabulary for nested tree-like vocabularies.
 
@@ -167,13 +177,13 @@ Changes
   IContextSourceBinder is still missing.
 
 4.0.1 (2011-11-14)
-------------------
+==================
 
 - Fix bug in ``fromUnicode`` method of ``DottedName`` which would fail
   validation on being given unicode. Introduced in 4.0.0.
 
 4.0.0 (2011-11-09)
-------------------
+==================
 
 - Fix deprecated unittest methods.
 
@@ -181,14 +191,14 @@ Changes
   Python 2.5.
 
 3.8.1 (2011-09-23)
-------------------
+==================
 
 - Fix broken Object field validation. Previous version was using a volatile
   property on object field values which ends in a ForbiddenAttribute error
   on security proxied objects.
 
 3.8.0 (2011-03-18)
-------------------
+==================
 
 - Implement a ``defaultFactory`` attribute for all fields. It is a callable
   that can be used to compute default values. The simplest case is::
@@ -205,7 +215,7 @@ Changes
     Date(defaultFactory=today)
 
 3.7.1 (2010-12-25)
-------------------
+==================
 
 - Rename the validation token, used in the validation of schema with Object
   Field to avoid infinite recursion:
@@ -217,31 +227,31 @@ Changes
   https://bugs.launchpad.net/zope.schema/+bug/191236
 
 3.7.0 (2010-09-12)
-------------------
+==================
 
 - Improve error messages when term tokens or values are duplicates.
 
 - Fix the buildout so the tests run.
 
 3.6.4 (2010-06-08)
-------------------
+==================
 
 - fix validation of schema with Object Field that specify Interface schema.
 
 3.6.3 (2010-04-30)
-------------------
+==================
 
 - Prefer the standard libraries doctest module to the one from zope.testing.
 
 3.6.2 (2010-04-30)
-------------------
+==================
 
 - Avoid maximum recursion when validating Object field that points to cycles
 
 - Make the dependency on ``zope.i18nmessageid`` optional.
 
 3.6.1 (2010-01-05)
-------------------
+==================
 
 - Allow "setup.py test" to run at least a subset of the tests runnable
   via ``bin/test`` (227 for ``setup.py test`` vs. 258. for
@@ -253,7 +263,7 @@ Changes
 - Make "setup.py test" tests pass on Jython.
 
 3.6.0 (2009-12-22)
-------------------
+==================
 
 - Prefer zope.testing.doctest over doctestunit.
 
@@ -263,7 +273,7 @@ Changes
   instead of storing directly on the instance __dict__.
 
 3.5.4 (2009-03-25)
-------------------
+==================
 
 - Don't fail trying to validate default value for Choice fields with
   IContextSourceBinder object given as a source. See
@@ -281,7 +291,7 @@ Changes
 
 
 3.5.3 (2009-03-10)
-------------------
+==================
 
 - Make Choice and Bool fields implement IFromUnicode interface, because
   they do provide the ``fromUnicode`` method.
@@ -296,7 +306,7 @@ Changes
 - Remove zpkg-related file.
 
 3.5.2 (2009-02-04)
-------------------
+==================
 
 - Made validation tests compatible with Python 2.5 again (hopefully not
   breaking Python 2.4)
@@ -304,7 +314,7 @@ Changes
 - Add an __all__ package attribute to expose documentation.
 
 3.5.1 (2009-01-31)
-------------------
+==================
 
 - Stop using the old old set type.
 
@@ -318,7 +328,7 @@ Changes
   much more sense for debugging for developers.
 
 3.5.0a2 (2008-12-11)
---------------------
+====================
 
 - Move zope.testing to "test" extras_require, as it is not needed
   for zope.schema itself.
@@ -329,7 +339,7 @@ Changes
   example is z3c.form's converter.
 
 3.5.0a1 (2008-10-10)
---------------------
+====================
 
 - Add the doctests to the long description.
 
@@ -345,19 +355,19 @@ Changes
 - zope.schema now works on Python2.5
 
 3.4.0 (2007-09-28)
-------------------
+==================
 
 Add BeforeObjectAssignedEvent that is triggered before the object
 field sets a value.
 
 3.3.0 (2007-03-15)
-------------------
+==================
 
 Corresponds to the version of the zope.schema package shipped as part of
 the Zope 3.3.0 release.
 
 3.2.1 (2006-03-26)
-------------------
+==================
 
 Corresponds to the version of the zope.schema package shipped as part of
 the Zope 3.2.1 release.
@@ -366,7 +376,7 @@ Fix missing import of 'VocabularyRegistryError'.  See
 http://www.zope.org/Collectors/Zope3-dev/544 .
 
 3.2.0 (2006-01-05)
-------------------
+==================
 
 Corresponds to the version of the zope.schema package shipped as part of
 the Zope 3.2.0 release.
@@ -375,7 +385,7 @@ Add "iterable" sources to replace vocabularies, which are now deprecated
 and scheduled for removal in Zope 3.3.
 
 3.1.0 (2005-10-03)
-------------------
+==================
 
 Corresponds to the version of the zope.schema package shipped as part of
 the Zope 3.1.0 release.
@@ -386,7 +396,7 @@ argument (sources are a simpler implementation).
 Add 'TimeDelta' and 'ASCIILine' field types.
 
 3.0.0 (2004-11-07)
-------------------
+==================
 
 Corresponds to the version of the zope.schema package shipped as part of
 the Zope X3.0.0 release.

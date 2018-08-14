@@ -1152,7 +1152,6 @@ class DottedNameTests(unittest.TestCase):
                           field.validate, 'http://example.com/\nDAV:')
 
     def test_fromUnicode_dotted_name_ok(self):
-
         field = self._makeOne()
         self.assertEqual(field.fromUnicode(u'dotted.name'), 'dotted.name')
 
@@ -1162,6 +1161,7 @@ class DottedNameTests(unittest.TestCase):
 
         field = self._makeOne()
         self.assertRaises(InvalidDottedName, field.fromUnicode, u'')
+        self.assertRaises(InvalidDottedName, field.fromUnicode, u'\u2603')
         self.assertRaises(ConstraintNotSatisfied,
                           field.fromUnicode, u'http://example.com/\nDAV:')
 
@@ -1240,6 +1240,7 @@ class IdTests(unittest.TestCase):
         field = self._makeOne()
         self.assertRaises(InvalidId, field.fromUnicode, u'')
         self.assertRaises(InvalidId, field.fromUnicode, u'abc')
+        self.assertRaises(InvalidId, field.fromUnicode, u'\u2603')
         self.assertRaises(ConstraintNotSatisfied,
                           field.fromUnicode, u'http://example.com/\nDAV:')
 

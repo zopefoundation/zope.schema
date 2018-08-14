@@ -13,6 +13,8 @@
 ##############################################################################
 """Bootstrap schema interfaces and exceptions
 """
+from functools import total_ordering
+
 import zope.interface
 
 from zope.schema._messageid import _
@@ -26,27 +28,33 @@ class StopValidation(Exception):
     """
 
 
+@total_ordering
 class ValidationError(zope.interface.Invalid):
     """Raised if the Validation process fails."""
 
     def doc(self):
         return self.__class__.__doc__
 
-    def __cmp__(self, other):
+    def __lt__(self, other):
+        # There's no particular reason we choose to sort this way,
+        # it's just the way we used to do it with __cmp__.
         if not hasattr(other, 'args'):
-            return -1
-        return cmp(self.args, other.args)
+            return True
+        return self.args < other.args
 
     def __eq__(self, other):
         if not hasattr(other, 'args'):
             return False
         return self.args == other.args
 
+    # XXX : This is probably inconsistent with __eq__, which is
+    # a violation of the language spec.
     __hash__ = zope.interface.Invalid.__hash__  # python3
 
     def __repr__(self):  # pragma: no cover
-        return '%s(%s)' % (self.__class__.__name__,
-               ', '.join(repr(arg) for arg in self.args))
+        return '%s(%s)' % (
+            self.__class__.__name__,
+            ', '.join(repr(arg) for arg in self.args))
 
 
 class RequiredMissing(ValidationError):
