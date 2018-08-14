@@ -370,6 +370,7 @@ _isdotted = re.compile(
     # use the whole line
     r"$").match
 
+
 class _StrippedNativeStringLine(NativeStringLine):
 
     _invalid_exc_type = None

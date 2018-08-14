@@ -14,8 +14,8 @@
 """Bootstrap schema interfaces and exceptions
 """
 from functools import total_ordering
-import zope.interface
 
+import zope.interface
 
 from zope.schema._messageid import _
 
@@ -26,6 +26,7 @@ class StopValidation(Exception):
     Note that this exception should be always caught, since it is just
     a way for the validator to save time.
     """
+
 
 @total_ordering
 class ValidationError(zope.interface.Invalid):

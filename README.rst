@@ -3,7 +3,7 @@
 =============
 
 .. image:: https://img.shields.io/pypi/v/zope.schema.svg
-   :target: https://pypi.python.org/pypi/zope.schema/
+   :target: https://pypi.org/project/zope.schema/
    :alt: Latest Version
 
 .. image:: https://img.shields.io/pypi/pyversions/zope.schema.svg
@@ -15,7 +15,7 @@
    :alt: Build Status
 
 .. image:: https://readthedocs.org/projects/zopeschema/badge/?version=latest
-   :target: http://zopeschema.readthedocs.org/en/latest/
+   :target: https://zopeschema.readthedocs.org/en/latest/
    :alt: Documentation Status
 
 .. image:: https://coveralls.io/repos/github/zopefoundation/zope.schema/badge.svg
