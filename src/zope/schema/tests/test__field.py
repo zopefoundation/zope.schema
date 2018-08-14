@@ -17,6 +17,12 @@ import unittest
 
 from zope.schema.tests.test__bootstrapfields import OrderableMissingValueMixin
 
+# pylint:disable=protected-access
+# pylint:disable=too-many-lines
+# pylint:disable=inherit-non-class
+# pylint:disable=no-member
+# pylint:disable=blacklisted-name
+
 class BytesTests(unittest.TestCase):
 
     def _getTargetClass(self):
@@ -73,7 +79,6 @@ class BytesTests(unittest.TestCase):
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def test_fromUnicode_miss(self):
-        from zope.schema._compat import text_type
         byt = self._makeOne()
         self.assertRaises(UnicodeEncodeError, byt.fromUnicode, u'\x81')
 
@@ -458,10 +463,9 @@ class DatetimeTests(OrderableMissingValueMixin,
         self.assertRaises(WrongType, field.validate, date.today())
 
     def test_validate_not_required(self):
-        from datetime import datetime
         field = self._makeOne(required=False)
         field.validate(None)  # doesn't raise
-        field.validate(datetime.now())  # doesn't raise
+        field.validate(datetime.datetime.now())  # doesn't raise
 
     def test_validate_required(self):
         from zope.schema.interfaces import RequiredMissing
@@ -469,35 +473,32 @@ class DatetimeTests(OrderableMissingValueMixin,
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def test_validate_w_min(self):
-        from datetime import datetime
         from zope.schema.interfaces import TooSmall
-        d1 = datetime(2000, 10, 1)
-        d2 = datetime(2000, 10, 2)
+        d1 = datetime.datetime(2000, 10, 1)
+        d2 = datetime.datetime(2000, 10, 2)
         field = self._makeOne(min=d1)
         field.validate(d1)  # doesn't raise
         field.validate(d2)  # doesn't raise
-        self.assertRaises(TooSmall, field.validate, datetime(2000, 9, 30))
+        self.assertRaises(TooSmall, field.validate, datetime.datetime(2000, 9, 30))
 
     def test_validate_w_max(self):
-        from datetime import datetime
         from zope.schema.interfaces import TooBig
-        d1 = datetime(2000, 10, 1)
-        d2 = datetime(2000, 10, 2)
-        d3 = datetime(2000, 10, 3)
+        d1 = datetime.datetime(2000, 10, 1)
+        d2 = datetime.datetime(2000, 10, 2)
+        d3 = datetime.datetime(2000, 10, 3)
         field = self._makeOne(max=d2)
         field.validate(d1)  # doesn't raise
         field.validate(d2)  # doesn't raise
         self.assertRaises(TooBig, field.validate, d3)
 
     def test_validate_w_min_and_max(self):
-        from datetime import datetime
         from zope.schema.interfaces import TooBig
         from zope.schema.interfaces import TooSmall
-        d1 = datetime(2000, 10, 1)
-        d2 = datetime(2000, 10, 2)
-        d3 = datetime(2000, 10, 3)
-        d4 = datetime(2000, 10, 4)
-        d5 = datetime(2000, 10, 5)
+        d1 = datetime.datetime(2000, 10, 1)
+        d2 = datetime.datetime(2000, 10, 2)
+        d3 = datetime.datetime(2000, 10, 3)
+        d4 = datetime.datetime(2000, 10, 4)
+        d5 = datetime.datetime(2000, 10, 5)
         field = self._makeOne(min=d2, max=d4)
         field.validate(d2)  # doesn't raise
         field.validate(d3)  # doesn't raise
@@ -530,9 +531,7 @@ class DateTests(OrderableMissingValueMixin,
         verifyObject(IDate, self._makeOne())
 
     def test_validate_wrong_types(self):
-        from datetime import datetime
         from zope.schema.interfaces import WrongType
-
 
         field = self._makeOne()
         self.assertRaises(WrongType, field.validate, u'')
@@ -545,7 +544,7 @@ class DateTests(OrderableMissingValueMixin,
         self.assertRaises(WrongType, field.validate, set())
         self.assertRaises(WrongType, field.validate, frozenset())
         self.assertRaises(WrongType, field.validate, object())
-        self.assertRaises(WrongType, field.validate, datetime.now())
+        self.assertRaises(WrongType, field.validate, datetime.datetime.now())
 
     def test_validate_not_required(self):
         from datetime import date
@@ -554,22 +553,20 @@ class DateTests(OrderableMissingValueMixin,
         field.validate(date.today())
 
     def test_validate_required(self):
-        from datetime import datetime
         from zope.schema.interfaces import RequiredMissing
         field = self._makeOne()
-        field.validate(datetime.now().date())
+        field.validate(datetime.datetime.now().date())
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def test_validate_w_min(self):
         from datetime import date
-        from datetime import datetime
         from zope.schema.interfaces import TooSmall
         d1 = date(2000, 10, 1)
         d2 = date(2000, 10, 2)
         field = self._makeOne(min=d1)
         field.validate(d1)
         field.validate(d2)
-        field.validate(datetime.now().date())
+        field.validate(datetime.datetime.now().date())
         self.assertRaises(TooSmall, field.validate, date(2000, 9, 30))
 
     def test_validate_w_max(self):
@@ -1970,6 +1967,64 @@ class ObjectTests(unittest.TestCase):
         self.assertEqual(log[-1].name, 'field')
         self.assertEqual(log[-1].context, inst)
 
+    def test_validates_invariants_by_default(self):
+        from zope.interface import invariant
+        from zope.interface import Interface
+        from zope.interface import implementer
+        from zope.interface import Invalid
+        from zope.schema import Text
+        from zope.schema import Bytes
+
+        class ISchema(Interface):
+
+            foo = Text()
+            bar = Bytes()
+
+            @invariant
+            def check_foo(o):
+                if o.foo == u'bar':
+                    raise Invalid("Foo is not valid")
+
+            @invariant
+            def check_bar(o):
+                if o.bar == b'foo':
+                    raise Invalid("Bar is not valid")
+
+        @implementer(ISchema)
+        class O(object):
+            foo = u''
+            bar = b''
+
+
+        field = self._makeOne(ISchema)
+        inst = O()
+
+        # Fine at first
+        field.validate(inst)
+
+        inst.foo = u'bar'
+        errors = self._getErrors(field.validate, inst)
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0].args[0], "Foo is not valid")
+
+        del inst.foo
+        inst.bar = b'foo'
+        errors = self._getErrors(field.validate, inst)
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0].args[0], "Bar is not valid")
+
+        # Both invalid
+        inst.foo = u'bar'
+        errors = self._getErrors(field.validate, inst)
+        self.assertEqual(len(errors), 2)
+        errors.sort(key=lambda i: i.args)
+        self.assertEqual(errors[0].args[0], "Bar is not valid")
+        self.assertEqual(errors[1].args[0], "Foo is not valid")
+
+        # We can specifically ask for invariants to be turned off.
+        field = self._makeOne(ISchema, validate_invariants=False)
+        field.validate(inst)
+
 
 class DictTests(unittest.TestCase):
 
@@ -2084,9 +2139,6 @@ class DummyInstance(object):
 def _makeSampleVocabulary():
     from zope.interface import implementer
     from zope.schema.interfaces import IVocabulary
-
-    class SampleTerm(object):
-        pass
 
     @implementer(IVocabulary)
     class SampleVocabulary(object):

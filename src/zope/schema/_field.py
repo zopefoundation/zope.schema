@@ -27,6 +27,7 @@ from zope.event import notify
 from zope.interface import classImplements
 from zope.interface import implementer
 from zope.interface import Interface
+from zope.interface import Invalid
 from zope.interface.interfaces import IInterface
 from zope.interface.interfaces import IMethod
 
@@ -615,10 +616,21 @@ class Object(Field):
     __doc__ = IObject.__doc__
 
     def __init__(self, schema, **kw):
+        """
+        Object(schema, *, validate_invariants=True, **kwargs)
+
+        Create an `~.IObject` field. The keyword arguments are as for `~.Field`.
+
+        .. versionchanged:: 4.6.0
+           Add the keyword argument *validate_invariants*. When true (the default),
+           the schema's ``validateInvariants`` method will be invoked to check
+           the ``@invariant`` properties of the schema.
+        """
         if not IInterface.providedBy(schema):
             raise WrongType
 
         self.schema = schema
+        self.validate_invariants = kw.pop('validate_invariants', True)
         super(Object, self).__init__(**kw)
 
     def _validate(self, value):
@@ -630,6 +642,17 @@ class Object(Field):
 
         # check the value against schema
         errors = _validate_fields(self.schema, value)
+
+        if self.validate_invariants:
+            try:
+                self.schema.validateInvariants(value, errors)
+            except Invalid:
+                # validateInvariants raises a wrapper error around
+                # all the errors it got if it got errors, in addition
+                # to appending them to the errors list. We don't want
+                # that, we raise our own error.
+                pass
+
         if errors:
             raise WrongContainedType(errors, self.__name__)
 
