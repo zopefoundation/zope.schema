@@ -36,6 +36,8 @@ class ValidationError(zope.interface.Invalid):
         return self.__class__.__doc__
 
     def __lt__(self, other):
+        # There's no particular reason we choose to sort this way,
+        # it's just the way we used to do it with __cmp__.
         if not hasattr(other, 'args'):
             return True
         return self.args < other.args
@@ -45,6 +47,8 @@ class ValidationError(zope.interface.Invalid):
             return False
         return self.args == other.args
 
+    # XXX : This is probably inconsistent with __eq__, which is
+    # a violation of the language spec.
     __hash__ = zope.interface.Invalid.__hash__  # python3
 
     def __repr__(self):  # pragma: no cover
