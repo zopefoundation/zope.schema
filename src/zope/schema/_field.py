@@ -663,7 +663,7 @@ class Object(Field):
 
         # schema has to be provided by value
         if not self.schema.providedBy(value):
-            raise SchemaNotProvided
+            raise SchemaNotProvided(self.schema, value).with_field_and_value(self, value)
 
         # check the value against schema
         schema_error_dict = _validate_fields(self.schema, value)

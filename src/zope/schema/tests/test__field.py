@@ -1887,7 +1887,14 @@ class ObjectTests(unittest.TestCase):
         from zope.schema._bootstrapfields import Text
         schema = self._makeSchema(foo=Text(), bar=Text())
         objf = self._makeOne(schema)
-        self.assertRaises(SchemaNotProvided, objf.validate, object())
+        bad_value = object()
+        with self.assertRaises(SchemaNotProvided) as exc:
+            objf.validate(bad_value)
+
+        not_provided = exc.exception
+        self.assertIs(not_provided.field, objf)
+        self.assertIs(not_provided.value, bad_value)
+        self.assertEqual(not_provided.args, (schema, bad_value), )
 
     def test__validate_w_value_providing_schema_but_missing_fields(self):
         from zope.interface import implementer
