@@ -414,7 +414,13 @@ class ContainerTests(unittest.TestCase):
     def test__validate_not_collection_not_iterable(self):
         from zope.schema._bootstrapinterfaces import NotAContainer
         cont = self._makeOne()
-        self.assertRaises(NotAContainer, cont._validate, object())
+        bad_value = object()
+        with self.assertRaises(NotAContainer) as exc:
+            cont._validate(bad_value)
+
+        not_cont = exc.exception
+        self.assertIs(not_cont.field, cont)
+        self.assertIs(not_cont.value, bad_value)
 
     def test__validate_collection_but_not_iterable(self):
         cont = self._makeOne()
@@ -453,7 +459,13 @@ class IterableTests(ContainerTests):
         class Dummy(object):
             def __contains__(self, item):
                 raise AssertionError("Not called")
-        self.assertRaises(NotAnIterator, itr._validate, Dummy())
+        dummy = Dummy()
+        with self.assertRaises(NotAnIterator) as exc:
+            itr._validate(dummy)
+
+        not_it = exc.exception
+        self.assertIs(not_it.field, itr)
+        self.assertIs(not_it.value, dummy)
 
 
 class OrderableTests(unittest.TestCase):

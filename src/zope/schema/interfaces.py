@@ -56,6 +56,18 @@ class WrongContainedType(ValidationError):
     __doc__ = _("""Wrong contained type""")
 
 
+class SchemaNotCorrectlyImplemented(WrongContainedType):
+    __doc__ = _("""An object failed schema or invariant validation.""")
+
+    #: A dictionary mapping failed attribute names of the
+    #: *value* to the underlying exception
+    schema_errors = None
+
+    #: A list of exceptions from validating the invariants
+    #: of the schema.
+    invariant_errors = ()
+
+
 class NotUnique(ValidationError):
     __doc__ = _("""One or more entries of sequence are not unique.""")
 

@@ -42,6 +42,17 @@
   <https://github.com/zopefoundation/zope.schema/issues/15>`_ and `PR
   6 <https://github.com/zopefoundation/zope.schema/pull/6>`_.
 
+- All instances of ``ValidationError`` have a ``field`` and ``value``
+  attribute that is set to the field that raised the exception and the
+  value that failed validation.
+
+- Add a new exception ``SchemaNotCorrectlyImplemented``, a subclass of
+  ``WrongContainedType`` that is raised by the ``Object`` field. It
+  has a dictionary (``schema_errors``) mapping invalid schema
+  attributes to their corresponding exception, and a list
+  (``invariant_errors``) containing the exceptions raised by
+  validating invariants. See `issue 16
+  <https://github.com/zopefoundation/zope.schema/issues/16>`_.
 
 4.5.0 (2017-07-10)
 ==================
