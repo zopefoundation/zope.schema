@@ -15,6 +15,12 @@
 """
 __docformat__ = 'restructuredtext'
 
+try:
+    from collections import abc
+except ImportError: # pragma: no cover
+    # Python 2
+    import collections as abc
+
 from datetime import datetime
 from datetime import date
 from datetime import timedelta
@@ -54,9 +60,13 @@ from zope.schema.interfaces import IInt
 from zope.schema.interfaces import IInterfaceField
 from zope.schema.interfaces import IList
 from zope.schema.interfaces import IMinMaxLen
+from zope.schema.interfaces import IMapping
+from zope.schema.interfaces import IMutableMapping
+from zope.schema.interfaces import IMutableSequence
 from zope.schema.interfaces import IObject
 from zope.schema.interfaces import IPassword
 from zope.schema.interfaces import ISet
+from zope.schema.interfaces import ISequence
 from zope.schema.interfaces import ISource
 from zope.schema.interfaces import ISourceText
 from zope.schema.interfaces import IText
@@ -562,14 +572,34 @@ class AbstractCollection(MinMaxLen, Iterable):
             _validate_uniqueness(self, value)
 
 
+@implementer(ISequence)
+class Sequence(AbstractCollection):
+    """
+    A field representing an ordered sequence.
+
+    .. versionadded:: 4.6.0
+    """
+    _type = abc.Sequence
+
+
 @implementer(ITuple)
-class Tuple(AbstractCollection):
+class Tuple(Sequence):
     """A field representing a Tuple."""
     _type = tuple
 
 
+@implementer(IMutableSequence)
+class MutableSequence(Sequence):
+    """
+    A field representing a mutable sequence.
+
+    .. versionadded:: 4.6.0
+    """
+    _type = abc.MutableSequence
+
+
 @implementer(IList)
-class List(AbstractCollection):
+class List(MutableSequence):
     """A field representing a List."""
     _type = list
 
@@ -725,15 +755,19 @@ class BeforeObjectAssignedEvent(object):
         self.context = context
 
 
-@implementer(IDict)
-class Dict(MinMaxLen, Iterable):
-    """A field representing a Dict."""
-    _type = dict
+@implementer(IMapping)
+class Mapping(MinMaxLen, Iterable):
+    """
+    A field representing a mapping.
+
+    .. versionadded:: 4.6.0
+    """
+    _type = abc.Mapping
     key_type = None
     value_type = None
 
     def __init__(self, key_type=None, value_type=None, **kw):
-        super(Dict, self).__init__(**kw)
+        super(Mapping, self).__init__(**kw)
         # whine if key_type or value_type is not a field
         if key_type is not None and not IField.providedBy(key_type):
             raise ValueError("'key_type' must be field instance.")
@@ -743,7 +777,7 @@ class Dict(MinMaxLen, Iterable):
         self.value_type = value_type
 
     def _validate(self, value):
-        super(Dict, self)._validate(value)
+        super(Mapping, self)._validate(value)
         errors = []
         if self.value_type:
             errors = _validate_sequence(self.value_type, value.values(),
@@ -759,7 +793,7 @@ class Dict(MinMaxLen, Iterable):
 
     def bind(self, object):
         """See zope.schema._bootstrapinterfaces.IField."""
-        clone = super(Dict, self).bind(object)
+        clone = super(Mapping, self).bind(object)
         # binding value_type is necessary for choices with named vocabularies,
         # and possibly also for other fields.
         if clone.key_type is not None:
@@ -767,3 +801,19 @@ class Dict(MinMaxLen, Iterable):
         if clone.value_type is not None:
             clone.value_type = clone.value_type.bind(object)
         return clone
+
+
+@implementer(IMutableMapping)
+class MutableMapping(Mapping):
+    """
+    A field representing a mutable mapping.
+
+    .. versionadded:: 4.6.0
+    """
+    _type = abc.MutableMapping
+
+
+@implementer(IDict)
+class Dict(MutableMapping):
+    """A field representing a Dict."""
+    _type = dict

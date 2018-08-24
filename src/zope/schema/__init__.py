@@ -34,6 +34,9 @@ from zope.schema._field import Int
 from zope.schema._field import InterfaceField
 from zope.schema._field import Iterable
 from zope.schema._field import List
+from zope.schema._field import Mapping
+from zope.schema._field import MutableMapping
+from zope.schema._field import MutableSequence
 from zope.schema._field import MinMaxLen
 from zope.schema._field import NativeString
 from zope.schema._field import NativeStringLine
@@ -41,6 +44,7 @@ from zope.schema._field import Object
 from zope.schema._field import Orderable
 from zope.schema._field import Password
 from zope.schema._field import Set
+from zope.schema._field import Sequence
 from zope.schema._field import SourceText
 from zope.schema._field import Text
 from zope.schema._field import TextLine
@@ -64,14 +68,52 @@ from zope.schema.accessors import accessors
 from zope.schema.interfaces import ValidationError
 from zope.schema._bootstrapinterfaces import NO_VALUE
 
-
-# pep 8 friendlyness
-ASCII, ASCIILine, Bool, Bytes, BytesLine, Choice, Container, Date, Datetime
-Decimal, Dict, DottedName, Field, Float, FrozenSet, Id, Int, InterfaceField
-Iterable, List, MinMaxLen, NativeString, NativeStringLine, Object, Orderable
-Password, Set, SourceText, Text, TextLine, Time, Timedelta, Tuple, URI
-getFields, getFieldsInOrder, getFieldNames, getFieldNamesInOrder,
-getValidationErrors, getSchemaValidationErrors
-accessors
-ValidationError
-NO_VALUE
+__all__ = [
+    'ASCII',
+    'ASCIILine',
+    'Bool',
+    'Bytes',
+    'BytesLine',
+    'Choice',
+    'Container',
+    'Date',
+    'Datetime',
+    'Decimal',
+    'Dict',
+    'DottedName',
+    'Field',
+    'Float',
+    'FrozenSet',
+    'Id',
+    'Int',
+    'InterfaceField',
+    'Iterable',
+    'List',
+    'Mapping',
+    'MutableMapping',
+    'MutableSequence',
+    'MinMaxLen',
+    'NativeString',
+    'NativeStringLine',
+    'Object',
+    'Orderable',
+    'Password',
+    'Set',
+    'Sequence',
+    'SourceText',
+    'Text',
+    'TextLine',
+    'Time',
+    'Timedelta',
+    'Tuple',
+    'URI',
+    'getFields',
+    'getFieldsInOrder',
+    'getFieldNames',
+    'getFieldNamesInOrder',
+    'getValidationErrors',
+    'getSchemaValidationErrors',
+    'accessors',
+    'ValidationError',
+    'NO_VALUE'
+]
