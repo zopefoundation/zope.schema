@@ -422,7 +422,7 @@ class DecimalTests(OrderableMissingValueMixin,
         self.assertEqual(too_big.value, decimal.Decimal("20.02"))
 
     def test_fromUnicode_miss(self):
-
+        from zope.schema.interfaces import ValidationError
         flt = self._makeOne()
         self.assertRaises(ValueError, flt.fromUnicode, u'')
         self.assertRaises(ValueError, flt.fromUnicode, u'abc')
@@ -432,6 +432,7 @@ class DecimalTests(OrderableMissingValueMixin,
         value_error = exc.exception
         self.assertIs(value_error.field, flt)
         self.assertEqual(value_error.value, u'1.4G')
+        self.assertIsInstance(value_error, ValidationError)
 
     def test_fromUnicode_hit(self):
         from decimal import Decimal
@@ -1921,8 +1922,11 @@ class ObjectTests(unittest.TestCase):
             ['bar', 'foo']
         )
         for name in ('foo', 'bar'):
-            self.assertIsInstance(wct.schema_errors[name],
+            error = wct.schema_errors[name]
+            self.assertIsInstance(error,
                                   SchemaNotFullyImplemented)
+            self.assertEqual(schema[name], error.field)
+            self.assertIsNone(error.value)
 
         # The legacy arg[0] errors list
         errors = self._getErrors(objf.validate, Broken())

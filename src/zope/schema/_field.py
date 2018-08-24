@@ -201,6 +201,13 @@ class Float(Orderable, Field):
         return v
 
 
+class InvalidDecimalLiteral(ValueError, ValidationError):
+
+    def __init__(self, literal):
+        super(InvalidDecimalLiteral, self).__init__(
+            "invalid literal for Decimal(): %s" % literal)
+
+
 @implementer(IDecimal, IFromUnicode)
 class Decimal(Orderable, Field):
     __doc__ = IDecimal.__doc__
@@ -215,13 +222,7 @@ class Decimal(Orderable, Field):
         try:
             v = decimal.Decimal(uc)
         except decimal.InvalidOperation:
-            exc = ValueError('invalid literal for Decimal(): %s' % uc)
-            exc.value = uc
-            exc.field = self
-            try:
-                raise exc
-            finally:
-                del exc
+            raise InvalidDecimalLiteral(uc).with_field_and_value(self, uc)
         self.validate(v)
         return v
 
@@ -630,7 +631,7 @@ def _validate_fields(schema, value):
                 errors[name] = error
             except AttributeError as error:
                 # property for the given name is not implemented
-                errors[name] = SchemaNotFullyImplemented(error)
+                errors[name] = SchemaNotFullyImplemented(error).with_field_and_value(attribute, None)
     finally:
         del VALIDATED_VALUES.__dict__[id(value)]
     return errors
