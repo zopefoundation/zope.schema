@@ -58,6 +58,14 @@
   validating invariants. See `issue 16
   <https://github.com/zopefoundation/zope.schema/issues/16>`_.
 
+- Add new fields ``Mapping`` and ``MutableMapping``, corresponding to
+  the collections ABCs of the same name; ``Dict`` now extends and
+  specializes ``MutableMapping`` to only accept instances of ``dict``.
+
+- Add new fields ``Sequence`` and ``MutableSequence``, corresponding
+  to the collections ABCs of the same name; ``Tuple`` now extends
+  ``Sequence`` and ``List`` now extends ``MutableSequence``.
+
 4.5.0 (2017-07-10)
 ==================
 

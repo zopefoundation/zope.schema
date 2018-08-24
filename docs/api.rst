@@ -60,6 +60,7 @@ Collections
 .. autoclass:: zope.schema.interfaces.IContainer
 .. autoclass:: zope.schema.interfaces.ICollection
 .. autoclass:: zope.schema.interfaces.ISequence
+.. autoclass:: zope.schema.interfaces.IMutableSequence
 .. autoclass:: zope.schema.interfaces.IUnorderedCollection
 .. autoclass:: zope.schema.interfaces.IAbstractSet
 .. autoclass:: zope.schema.interfaces.IAbstractBag
@@ -160,7 +161,6 @@ Fields
 .. autoclass:: zope.schema.Decimal
    :no-show-inheritance:
 .. autoclass:: zope.schema.Dict
-   :no-show-inheritance:
 .. autoclass:: zope.schema.DottedName
    :no-show-inheritance:
 
@@ -177,6 +177,10 @@ Fields
 .. autoclass:: zope.schema.Iterable
    :no-show-inheritance:
 .. autoclass:: zope.schema.List
+.. autoclass:: zope.schema.Mapping
+   :no-show-inheritance:
+.. autoclass:: zope.schema.MutableMapping
+.. autoclass:: zope.schema.MutableSequence
 .. autoclass:: zope.schema.MinMaxLen
 .. autoclass:: zope.schema.NativeString
 .. autoclass:: zope.schema.NativeStringLine
@@ -186,6 +190,7 @@ Fields
 .. autoclass:: zope.schema.Password
    :no-show-inheritance:
 .. autoclass:: zope.schema.Set
+.. autoclass:: zope.schema.Sequence
 .. autoclass:: zope.schema.SourceText
    :no-show-inheritance:
 .. autoclass:: zope.schema.Text

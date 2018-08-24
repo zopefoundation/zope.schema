@@ -504,6 +504,14 @@ class ISequence(ICollection):
     """Abstract interface specifying that the value is ordered"""
 
 
+class IMutableSequence(ISequence):
+    """
+    Abstract interface specifying that the value is ordered and
+    mutable.
+
+    .. versionadded:: 4.6.0
+    """
+
 class IUnorderedCollection(ICollection):
     """Abstract interface specifying that the value cannot be ordered"""
 
@@ -529,7 +537,7 @@ class ITuple(ISequence):
     Python tuple."""
 
 
-class IList(ISequence):
+class IList(IMutableSequence):
     """Field containing a value that implements the API of a conventional
     Python list."""
 
@@ -583,14 +591,14 @@ class IBeforeObjectAssignedEvent(Interface):
     context = Attribute("The context object where the object will be "
                         "assigned to.")
 
-
-class IDict(IMinMaxLen, IIterable, IContainer):
-    """Field containing a conventional dict.
-
-    The key_type and value_type fields allow specification
-    of restrictions for keys and values contained in the dict.
+class IMapping(IMinMaxLen, IIterable, IContainer):
     """
+    Field containing an instance of :class:`collections.Mapping`.
 
+    The *key_type* and *value_type* fields allow specification
+    of restrictions for keys and values contained in the dict.
+
+    """
     key_type = Attribute(
         "key_type",
         _("Field keys must conform to the given type, expressed via a Field.")
@@ -601,6 +609,17 @@ class IDict(IMinMaxLen, IIterable, IContainer):
         _("Field values must conform to the given type, expressed "
           "via a Field.")
     )
+
+
+class IMutableMapping(IMapping):
+    """
+    Field containing an instance of :class:`collections.MutableMapping`.
+    """
+
+
+class IDict(IMutableMapping):
+    """Field containing a conventional dict.
+    """
 
 
 class ITerm(Interface):

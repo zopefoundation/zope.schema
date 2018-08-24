@@ -1536,35 +1536,33 @@ class TupleTests(unittest.TestCase):
         self.assertRaises(TooLong, field.validate, (1, 2, 3))
 
 
-class ListTests(unittest.TestCase):
+class SequenceTests(unittest.TestCase):
 
     def _getTargetClass(self):
-        from zope.schema._field import List
-        return List
+        from zope.schema._field import Sequence
+        return Sequence
+
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import ISequence
+        return ISequence
 
     def _makeOne(self, *args, **kw):
         return self._getTargetClass()(*args, **kw)
 
-    def test_class_conforms_to_IList(self):
+    def test_class_conforms_to_iface(self):
         from zope.interface.verify import verifyClass
-        from zope.schema.interfaces import IList
-        verifyClass(IList, self._getTargetClass())
+        verifyClass(self._getTargetInterface(), self._getTargetClass())
 
     def test_instance_conforms_to_IList(self):
         from zope.interface.verify import verifyObject
-        from zope.schema.interfaces import IList
-        verifyObject(IList, self._makeOne())
+        verifyObject(self._getTargetInterface(), self._makeOne())
 
     def test_validate_wrong_types(self):
         from zope.schema.interfaces import WrongType
 
-
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, u'')
-        self.assertRaises(WrongType, field.validate, b'')
         self.assertRaises(WrongType, field.validate, 1)
         self.assertRaises(WrongType, field.validate, 1.0)
-        self.assertRaises(WrongType, field.validate, ())
         self.assertRaises(WrongType, field.validate, {})
         self.assertRaises(WrongType, field.validate, set())
         self.assertRaises(WrongType, field.validate, frozenset())
@@ -1610,6 +1608,80 @@ class ListTests(unittest.TestCase):
         field.validate([1, 2])
         self.assertRaises(TooShort, field.validate, [])
         self.assertRaises(TooLong, field.validate, [1, 2, 3])
+
+    def test_sequence(self):
+        from zope.schema._field import abc
+
+        class Sequence(abc.Sequence):
+            def __getitem__(self, i):
+                raise AssertionError("Not implemented")
+            def __len__(self):
+                return 0
+
+        sequence = Sequence()
+        field = self._makeOne()
+        field.validate(sequence)
+
+    def test_mutable_sequence(self):
+        from zope.schema._field import abc
+
+        class MutableSequence(abc.MutableSequence):
+            def insert(self, item, ix):
+                raise AssertionError("not implemented")
+            def __getitem__(self, name):
+                raise AssertionError("not implemented")
+            def __iter__(self):
+                return iter(())
+            def __setitem__(self, name, value):
+                raise AssertionError("Not implemented")
+            def __len__(self):
+                return 0
+            __delitem__ = __getitem__
+
+
+        sequence = MutableSequence()
+        field = self._makeOne()
+        field.validate(sequence)
+
+class MutableSequenceTests(SequenceTests):
+
+    def _getTargetClass(self):
+        from zope.schema._field import MutableSequence
+        return MutableSequence
+
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import IMutableSequence
+        return IMutableSequence
+
+    def test_validate_wrong_types(self):
+        from zope.schema.interfaces import WrongType
+        field = self._makeOne()
+        self.assertRaises(WrongType, field.validate, u'')
+        self.assertRaises(WrongType, field.validate, b'')
+        self.assertRaises(WrongType, field.validate, ())
+
+        super(MutableSequenceTests, self).test_validate_wrong_types()
+
+    def test_sequence(self):
+        from zope.schema.interfaces import WrongType
+        with self.assertRaises(WrongType):
+            super(MutableSequenceTests, self).test_sequence()
+
+
+class ListTests(MutableSequenceTests):
+
+    def _getTargetClass(self):
+        from zope.schema._field import List
+        return List
+
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import IList
+        return IList
+
+    def test_mutable_sequence(self):
+        from zope.schema.interfaces import WrongType
+        with self.assertRaises(WrongType):
+            super(ListTests, self).test_mutable_sequence()
 
 
 class SetTests(unittest.TestCase):
@@ -2164,24 +2236,26 @@ class ObjectTests(unittest.TestCase):
         field.validate(inst)
 
 
-class DictTests(unittest.TestCase):
+class MappingTests(unittest.TestCase):
 
     def _getTargetClass(self):
-        from zope.schema._field import Dict
-        return Dict
+        from zope.schema._field import Mapping
+        return Mapping
+
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import IMapping
+        return IMapping
 
     def _makeOne(self, *args, **kw):
         return self._getTargetClass()(*args, **kw)
 
-    def test_class_conforms_to_IDict(self):
+    def test_class_conforms_to_iface(self):
         from zope.interface.verify import verifyClass
-        from zope.schema.interfaces import IDict
-        verifyClass(IDict, self._getTargetClass())
+        verifyClass(self._getTargetInterface(), self._getTargetClass())
 
-    def test_instance_conforms_to_IDict(self):
+    def test_instance_conforms_to_iface(self):
         from zope.interface.verify import verifyObject
-        from zope.schema.interfaces import IDict
-        verifyObject(IDict, self._makeOne())
+        verifyObject(self._getTargetInterface(), self._makeOne())
 
     def test_ctor_key_type_not_IField(self):
         self.assertRaises(ValueError, self._makeOne, key_type=object())
@@ -2191,7 +2265,6 @@ class DictTests(unittest.TestCase):
 
     def test_validate_wrong_types(self):
         from zope.schema.interfaces import WrongType
-
 
         field = self._makeOne()
         self.assertRaises(WrongType, field.validate, u'')
@@ -2278,6 +2351,74 @@ class DictTests(unittest.TestCase):
         field2 = field.bind(context)
         self.assertEqual(field2.key_type.context, context)
         self.assertEqual(field2.value_type.context, context)
+
+    def test_mapping(self):
+        from zope.schema._field import abc
+
+        class Mapping(abc.Mapping):
+
+            def __getitem__(self, name):
+                raise AssertionError("not implemented")
+            def __iter__(self):
+                return iter(())
+            def __len__(self):
+                return 0
+
+
+        mm = Mapping()
+        field = self._makeOne()
+        field.validate(mm)
+
+    def test_mutable_mapping(self):
+        from zope.schema._field import abc
+
+        class MutableMapping(abc.MutableMapping):
+
+            def __getitem__(self, name):
+                raise AssertionError("not implemented")
+            def __iter__(self):
+                return iter(())
+            def __setitem__(self, name, value):
+                raise AssertionError("Not implemented")
+            def __len__(self):
+                return 0
+            __delitem__ = __getitem__
+
+        mm = MutableMapping()
+        field = self._makeOne()
+        field.validate(mm)
+
+
+class MutableMappingTests(MappingTests):
+
+    def _getTargetClass(self):
+        from zope.schema._field import MutableMapping
+        return MutableMapping
+
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import IMutableMapping
+        return IMutableMapping
+
+    def test_mapping(self):
+        from zope.schema.interfaces import WrongType
+        with self.assertRaises(WrongType):
+            super(MutableMappingTests, self).test_mapping()
+
+
+class DictTests(MutableMappingTests):
+
+    def _getTargetClass(self):
+        from zope.schema._field import Dict
+        return Dict
+
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import IDict
+        return IDict
+
+    def test_mutable_mapping(self):
+        from zope.schema.interfaces import WrongType
+        with self.assertRaises(WrongType):
+            super(DictTests, self).test_mutable_mapping()
 
 
 class DummyInstance(object):
