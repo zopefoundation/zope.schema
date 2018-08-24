@@ -19,6 +19,7 @@ from zope.interface import Attribute
 from zope.interface import providedBy
 from zope.interface import implementer
 
+from zope.schema._bootstrapinterfaces import ValidationError
 from zope.schema._bootstrapinterfaces import ConstraintNotSatisfied
 from zope.schema._bootstrapinterfaces import IContextAwareDefaultFactory
 from zope.schema._bootstrapinterfaces import IFromUnicode
@@ -181,7 +182,7 @@ class Field(Attribute):
     def validate(self, value):
         if value == self.missing_value:
             if self.required:
-                raise RequiredMissing(self.__name__)
+                raise RequiredMissing(self.__name__).with_field_and_value(self, value)
         else:
             try:
                 self._validate(value)
@@ -227,10 +228,10 @@ class Field(Attribute):
 
     def _validate(self, value):
         if self._type is not None and not isinstance(value, self._type):
-            raise WrongType(value, self._type, self.__name__)
+            raise WrongType(value, self._type, self.__name__).with_field_and_value(self, value)
 
         if not self.constraint(value):
-            raise ConstraintNotSatisfied(value, self.__name__)
+            raise ConstraintNotSatisfied(value, self.__name__).with_field_and_value(self, value)
 
     def get(self, object):
         return getattr(object, self.__name__)
@@ -257,7 +258,7 @@ class Container(Field):
             try:
                 iter(value)
             except TypeError:
-                raise NotAContainer(value)
+                raise NotAContainer(value).with_field_and_value(self, value)
 
 
 # XXX This class violates the Liskov Substituability Principle:  it
@@ -272,7 +273,7 @@ class Iterable(Container):
         try:
             iter(value)
         except TypeError:
-            raise NotAnIterator(value)
+            raise NotAnIterator(value).with_field_and_value(self, value)
 
 
 class Orderable(object):
@@ -307,10 +308,10 @@ class Orderable(object):
         super(Orderable, self)._validate(value)
 
         if self.min is not None and value < self.min:
-            raise TooSmall(value, self.min)
+            raise TooSmall(value, self.min).with_field_and_value(self, value)
 
         if self.max is not None and value > self.max:
-            raise TooBig(value, self.max)
+            raise TooBig(value, self.max).with_field_and_value(self, value)
 
 
 class MinMaxLen(object):
@@ -330,10 +331,10 @@ class MinMaxLen(object):
         super(MinMaxLen, self)._validate(value)
 
         if self.min_length is not None and len(value) < self.min_length:
-            raise TooShort(value, self.min_length)
+            raise TooShort(value, self.min_length).with_field_and_value(self, value)
 
         if self.max_length is not None and len(value) > self.max_length:
-            raise TooLong(value, self.max_length)
+            raise TooLong(value, self.max_length).with_field_and_value(self, value)
 
 
 @implementer(IFromUnicode)
@@ -440,6 +441,9 @@ class Bool(Field):
         self.validate(v)
         return v
 
+class InvalidIntLiteral(ValueError, ValidationError):
+    """Invalid int literal."""
+
 
 @implementer(IFromUnicode)
 class Int(Orderable, Field):
@@ -458,8 +462,11 @@ class Int(Orderable, Field):
         >>> f.fromUnicode("125.6") #doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
-        ValueError: invalid literal for int(): 125.6
+        InvalidIntLiteral: invalid literal for int(): 125.6
         """
-        v = int(str)
+        try:
+            v = int(str)
+        except ValueError as v:
+            raise InvalidIntLiteral(*v.args).with_field_and_value(self, str)
         self.validate(v)
         return v

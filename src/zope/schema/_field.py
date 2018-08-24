@@ -72,6 +72,7 @@ from zope.schema.interfaces import WrongType
 from zope.schema.interfaces import WrongContainedType
 from zope.schema.interfaces import NotUnique
 from zope.schema.interfaces import SchemaNotProvided
+from zope.schema.interfaces import SchemaNotCorrectlyImplemented
 from zope.schema.interfaces import SchemaNotFullyImplemented
 from zope.schema.interfaces import InvalidURI
 from zope.schema.interfaces import InvalidId
@@ -157,7 +158,7 @@ class ASCII(NativeString):
         if not value:
             return
         if not max(map(ord, value)) < 128:
-            raise InvalidValue
+            raise InvalidValue().with_field_and_value(self, value)
 
 
 @implementer(IBytesLine)
@@ -184,6 +185,10 @@ class ASCIILine(ASCII):
         return '\n' not in value
 
 
+class InvalidFloatLiteral(ValueError, ValidationError):
+    """Raised by Float fields."""
+
+
 @implementer(IFloat, IFromUnicode)
 class Float(Orderable, Field):
     __doc__ = IFloat.__doc__
@@ -195,9 +200,19 @@ class Float(Orderable, Field):
     def fromUnicode(self, uc):
         """ See IFromUnicode.
         """
-        v = float(uc)
+        try:
+            v = float(uc)
+        except ValueError as v:
+            raise InvalidFloatLiteral(*v.args).with_field_and_value(self, uc)
         self.validate(v)
         return v
+
+
+class InvalidDecimalLiteral(ValueError, ValidationError):
+
+    def __init__(self, literal):
+        super(InvalidDecimalLiteral, self).__init__(
+            "invalid literal for Decimal(): %s" % literal)
 
 
 @implementer(IDecimal, IFromUnicode)
@@ -214,7 +229,7 @@ class Decimal(Orderable, Field):
         try:
             v = decimal.Decimal(uc)
         except decimal.InvalidOperation:
-            raise ValueError('invalid literal for Decimal(): %s' % uc)
+            raise InvalidDecimalLiteral(uc).with_field_and_value(self, uc)
         self.validate(v)
         return v
 
@@ -236,7 +251,7 @@ class Date(Orderable, Field):
     def _validate(self, value):
         super(Date, self)._validate(value)
         if isinstance(value, datetime):
-            raise WrongType(value, self._type, self.__name__)
+            raise WrongType(value, self._type, self.__name__).with_field_and_value(self, value)
 
 
 @implementer(ITimedelta)
@@ -336,7 +351,7 @@ class Choice(Field):
             except VocabularyRegistryError:
                 raise ValueError("Can't validate value without vocabulary")
         if value not in vocabulary:
-            raise ConstraintNotSatisfied(value, self.__name__)
+            raise ConstraintNotSatisfied(value, self.__name__).with_field_and_value(self, value)
 
 
 _isuri = r"[a-zA-z0-9+.-]+:"  # scheme
@@ -354,7 +369,7 @@ class URI(NativeStringLine):
         if _isuri(value):
             return
 
-        raise InvalidURI(value)
+        raise InvalidURI(value).with_field_and_value(self, value)
 
     def fromUnicode(self, value):
         """ See IFromUnicode.
@@ -384,7 +399,7 @@ class _StrippedNativeStringLine(NativeStringLine):
         try:
             v = v.encode('ascii') # bytes
         except UnicodeEncodeError:
-            raise self._invalid_exc_type(value)
+            raise self._invalid_exc_type(value).with_field_and_value(self, value)
         if not isinstance(v, self._type):
             v = v.decode('ascii')
         self.validate(v)
@@ -417,15 +432,15 @@ class DottedName(_StrippedNativeStringLine):
         """
         super(DottedName, self)._validate(value)
         if not _isdotted(value):
-            raise InvalidDottedName(value)
+            raise InvalidDottedName(value).with_field_and_value(self, value)
         dots = value.count(".")
         if dots < self.min_dots:
             raise InvalidDottedName(
                 "too few dots; %d required" % self.min_dots, value
-            )
+            ).with_field_and_value(self, value)
         if self.max_dots is not None and dots > self.max_dots:
             raise InvalidDottedName("too many dots; no more than %d allowed" %
-                                    self.max_dots, value)
+                                    self.max_dots, value).with_field_and_value(self, value)
 
 
 
@@ -445,7 +460,7 @@ class Id(_StrippedNativeStringLine):
         if _isdotted(value) and "." in value:
             return
 
-        raise InvalidId(value)
+        raise InvalidId(value).with_field_and_value(self, value)
 
 
 @implementer(IInterfaceField)
@@ -455,7 +470,11 @@ class InterfaceField(Field):
     def _validate(self, value):
         super(InterfaceField, self)._validate(value)
         if not IInterface.providedBy(value):
-            raise WrongType("An interface is required", value, self.__name__)
+            raise WrongType(
+                "An interface is required",
+                value,
+                self.__name__
+            ).with_field_and_value(self, value)
 
 
 def _validate_sequence(value_type, value, errors=None):
@@ -500,11 +519,11 @@ def _validate_sequence(value_type, value, errors=None):
     return errors
 
 
-def _validate_uniqueness(value):
+def _validate_uniqueness(self, value):
     temp_values = []
     for item in value:
         if item in temp_values:
-            raise NotUnique(item)
+            raise NotUnique(item).with_field_and_value(self, value)
 
         temp_values.append(item)
 
@@ -534,9 +553,13 @@ class AbstractCollection(MinMaxLen, Iterable):
         super(AbstractCollection, self)._validate(value)
         errors = _validate_sequence(self.value_type, value)
         if errors:
-            raise WrongContainedType(errors, self.__name__)
+            try:
+                raise WrongContainedType(errors, self.__name__).with_field_and_value(self, value)
+            finally:
+                # Break cycles
+                del errors
         if self.unique:
-            _validate_uniqueness(value)
+            _validate_uniqueness(self, value)
 
 
 @implementer(ITuple)
@@ -577,9 +600,8 @@ class FrozenSet(AbstractCollection):
 VALIDATED_VALUES = threading.local()
 
 
-def _validate_fields(schema, value, errors=None):
-    if errors is None:
-        errors = []
+def _validate_fields(schema, value):
+    errors = {}
     # Interface can be used as schema property for Object fields that plan to
     # hold values of any type.
     # Because Interface does not include any Attribute, it is obviously not
@@ -599,22 +621,24 @@ def _validate_fields(schema, value, errors=None):
     # that supports attribute assignment.)
     try:
         for name in schema.names(all=True):
-            if not IMethod.providedBy(schema[name]):
-                try:
-                    attribute = schema[name]
-                    if IChoice.providedBy(attribute):
-                        # Choice must be bound before validation otherwise
-                        # IContextSourceBinder is not iterable in validation
-                        bound = attribute.bind(value)
-                        bound.validate(getattr(value, name))
-                    elif IField.providedBy(attribute):
-                        # validate attributes that are fields
-                        attribute.validate(getattr(value, name))
-                except ValidationError as error:
-                    errors.append(error)
-                except AttributeError as error:
-                    # property for the given name is not implemented
-                    errors.append(SchemaNotFullyImplemented(error))
+            attribute = schema[name]
+            if IMethod.providedBy(attribute):
+                continue # pragma: no cover
+
+            try:
+                if IChoice.providedBy(attribute):
+                    # Choice must be bound before validation otherwise
+                    # IContextSourceBinder is not iterable in validation
+                    bound = attribute.bind(value)
+                    bound.validate(getattr(value, name))
+                elif IField.providedBy(attribute):
+                    # validate attributes that are fields
+                    attribute.validate(getattr(value, name))
+            except ValidationError as error:
+                errors[name] = error
+            except AttributeError as error:
+                # property for the given name is not implemented
+                errors[name] = SchemaNotFullyImplemented(error).with_field_and_value(attribute, None)
     finally:
         del VALIDATED_VALUES.__dict__[id(value)]
     return errors
@@ -647,14 +671,14 @@ class Object(Field):
 
         # schema has to be provided by value
         if not self.schema.providedBy(value):
-            raise SchemaNotProvided
+            raise SchemaNotProvided(self.schema, value).with_field_and_value(self, value)
 
         # check the value against schema
-        errors = _validate_fields(self.schema, value)
-
+        schema_error_dict = _validate_fields(self.schema, value)
+        invariant_errors = []
         if self.validate_invariants:
             try:
-                self.schema.validateInvariants(value, errors)
+                self.schema.validateInvariants(value, invariant_errors)
             except Invalid:
                 # validateInvariants raises a wrapper error around
                 # all the errors it got if it got errors, in addition
@@ -662,8 +686,22 @@ class Object(Field):
                 # that, we raise our own error.
                 pass
 
-        if errors:
-            raise WrongContainedType(errors, self.__name__)
+        if schema_error_dict or invariant_errors:
+            errors = list(schema_error_dict.values()) + invariant_errors
+            exception = SchemaNotCorrectlyImplemented(
+                errors,
+                self.__name__
+            ).with_field_and_value(self, value)
+            exception.schema_errors = schema_error_dict
+            exception.invariant_errors = invariant_errors
+            try:
+                raise exception
+            finally:
+                # Break cycles
+                del exception
+                del invariant_errors
+                del schema_error_dict
+                del errors
 
     def set(self, object, value):
         # Announce that we're going to assign the value to the object.
@@ -707,17 +745,17 @@ class Dict(MinMaxLen, Iterable):
     def _validate(self, value):
         super(Dict, self)._validate(value)
         errors = []
-        try:
-            if self.value_type:
-                errors = _validate_sequence(self.value_type, value.values(),
-                                            errors)
-            errors = _validate_sequence(self.key_type, value, errors)
+        if self.value_type:
+            errors = _validate_sequence(self.value_type, value.values(),
+                                        errors)
+        errors = _validate_sequence(self.key_type, value, errors)
 
-            if errors:
-                raise WrongContainedType(errors, self.__name__)
-
-        finally:
-            errors = None
+        if errors:
+            try:
+                raise WrongContainedType(errors, self.__name__).with_field_and_value(self, value)
+            finally:
+                # Break cycles
+                del errors
 
     def bind(self, object):
         """See zope.schema._bootstrapinterfaces.IField."""

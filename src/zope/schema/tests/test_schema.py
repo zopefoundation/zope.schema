@@ -171,6 +171,9 @@ class Test_getValidationErrors(unittest.TestCase):
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0][0], 'must')
         self.assertEqual(errors[0][1].__class__, SchemaNotFullyImplemented)
+        self.assertIsNone(errors[0][1].value)
+        self.assertEqual(IWithRequired['must'],
+                         errors[0][1].field)
 
     def test_schema_with_invariant_errors(self):
         from zope.interface import Interface
@@ -246,6 +249,9 @@ class Test_getSchemaValidationErrors(unittest.TestCase):
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0][0], 'must')
         self.assertEqual(errors[0][1].__class__, SchemaNotFullyImplemented)
+        self.assertIsNone(errors[0][1].value)
+        self.assertEqual(IWithRequired['must'],
+                         errors[0][1].field)
 
     def test_schema_with_invalid_field(self):
         from zope.interface import Interface

@@ -80,8 +80,9 @@ def getSchemaValidationErrors(schema, object):
             value = getattr(object, name)
         except AttributeError as error:
             # property for the given name is not implemented
-            errors.append((
-                name, zope.schema.interfaces.SchemaNotFullyImplemented(error)))
+            error = zope.schema.interfaces.SchemaNotFullyImplemented(error)
+            error = error.with_field_and_value(attribute, None)
+            errors.append((name, error))
         else:
             try:
                 attribute.bind(object).validate(value)

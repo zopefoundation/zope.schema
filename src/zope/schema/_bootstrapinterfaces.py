@@ -32,6 +32,17 @@ class StopValidation(Exception):
 class ValidationError(zope.interface.Invalid):
     """Raised if the Validation process fails."""
 
+    #: The field that raised the error, if known.
+    field = None
+
+    #: The value that failed validation.
+    value = None
+
+    def with_field_and_value(self, field, value):
+        self.field = field
+        self.value = value
+        return self
+
     def doc(self):
         return self.__class__.__doc__
 
