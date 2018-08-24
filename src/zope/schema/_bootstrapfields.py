@@ -19,6 +19,7 @@ from zope.interface import Attribute
 from zope.interface import providedBy
 from zope.interface import implementer
 
+from zope.schema._bootstrapinterfaces import ValidationError
 from zope.schema._bootstrapinterfaces import ConstraintNotSatisfied
 from zope.schema._bootstrapinterfaces import IContextAwareDefaultFactory
 from zope.schema._bootstrapinterfaces import IFromUnicode
@@ -440,6 +441,9 @@ class Bool(Field):
         self.validate(v)
         return v
 
+class InvalidIntLiteral(ValueError, ValidationError):
+    """Invalid int literal."""
+
 
 @implementer(IFromUnicode)
 class Int(Orderable, Field):
@@ -458,8 +462,11 @@ class Int(Orderable, Field):
         >>> f.fromUnicode("125.6") #doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
-        ValueError: invalid literal for int(): 125.6
+        InvalidIntLiteral: invalid literal for int(): 125.6
         """
-        v = int(str)
+        try:
+            v = int(str)
+        except ValueError as v:
+            raise InvalidIntLiteral(*v.args).with_field_and_value(self, str)
         self.validate(v)
         return v

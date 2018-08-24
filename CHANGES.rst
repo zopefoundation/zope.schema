@@ -46,6 +46,10 @@
   attribute that is set to the field that raised the exception and the
   value that failed validation.
 
+- ``Float``, ``Int`` and ``Decimal`` fields raise ``ValidationError``
+  subclasses for literals that cannot be parsed. These subclasses also
+  subclass ``ValueError`` for backwards compatibility.
+
 - Add a new exception ``SchemaNotCorrectlyImplemented``, a subclass of
   ``WrongContainedType`` that is raised by the ``Object`` field. It
   has a dictionary (``schema_errors``) mapping invalid schema

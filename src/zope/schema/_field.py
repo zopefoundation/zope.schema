@@ -185,6 +185,10 @@ class ASCIILine(ASCII):
         return '\n' not in value
 
 
+class InvalidFloatLiteral(ValueError, ValidationError):
+    """Raised by Float fields."""
+
+
 @implementer(IFloat, IFromUnicode)
 class Float(Orderable, Field):
     __doc__ = IFloat.__doc__
@@ -196,7 +200,10 @@ class Float(Orderable, Field):
     def fromUnicode(self, uc):
         """ See IFromUnicode.
         """
-        v = float(uc)
+        try:
+            v = float(uc)
+        except ValueError as v:
+            raise InvalidFloatLiteral(*v.args).with_field_and_value(self, uc)
         self.validate(v)
         return v
 

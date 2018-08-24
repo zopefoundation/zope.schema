@@ -101,7 +101,27 @@ Conversion from Unicode:
    >>> f.fromUnicode("1.25.6") #doctest: +IGNORE_EXCEPTION_DETAIL
    Traceback (most recent call last):
    ...
-   ValueError: invalid literal for float(): 1.25.6
+   InvalidFloatLiteral: invalid literal for float(): 1.25.6
+
+Int
+###
+
+:class:`zope.schema.Int` fields contain binary data, represented
+as a a Python ``int``.
+
+Conversion from Unicode:
+
+.. doctest::
+
+   >>> from zope.schema import Int
+   >>> f = Int()
+   >>> f.fromUnicode("1")
+   1
+   >>> f.fromUnicode("1.25.6") #doctest: +IGNORE_EXCEPTION_DETAIL
+   Traceback (most recent call last):
+   ...
+   InvalidIntLiteral: invalid literal for int() with base 10: 1.25.6
+
 
 Decimal
 #######
@@ -123,7 +143,7 @@ Conversion from Unicode:
    >>> f.fromUnicode("1.25.6")
    Traceback (most recent call last):
    ...
-   ValueError: invalid literal for Decimal(): 1.25.6
+   InvalidDecimalLiteral: invalid literal for Decimal(): 1.25.6
 
 Datetime
 ########
