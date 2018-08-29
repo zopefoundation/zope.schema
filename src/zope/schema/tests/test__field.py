@@ -1536,15 +1536,15 @@ class TupleTests(unittest.TestCase):
         self.assertRaises(TooLong, field.validate, (1, 2, 3))
 
 
-class SequenceTests(unittest.TestCase):
+class AbstractCollectionTests(unittest.TestCase):
 
     def _getTargetClass(self):
-        from zope.schema._field import Sequence
-        return Sequence
+        from zope.schema._field import AbstractCollection
+        return AbstractCollection
 
     def _getTargetInterface(self):
-        from zope.schema.interfaces import ISequence
-        return ISequence
+        from zope.schema.interfaces import ICollection
+        return ICollection
 
     def _makeOne(self, *args, **kw):
         return self._getTargetClass()(*args, **kw)
@@ -1553,9 +1553,50 @@ class SequenceTests(unittest.TestCase):
         from zope.interface.verify import verifyClass
         verifyClass(self._getTargetInterface(), self._getTargetClass())
 
-    def test_instance_conforms_to_IList(self):
+    def test_instance_conforms_to_iface(self):
         from zope.interface.verify import verifyObject
         verifyObject(self._getTargetInterface(), self._makeOne())
+
+
+    def test_schema_defined_by_subclass(self):
+        from zope import interface
+        from zope.schema import Object
+        from zope.schema.interfaces import WrongContainedType
+
+        class IValueType(interface.Interface):
+            "The value type schema"
+
+        the_value_type = Object(IValueType)
+
+        class Field(self._getTargetClass()):
+            value_type = the_value_type
+
+        field = Field()
+        self.assertIs(field.value_type, the_value_type)
+
+        # Empty collection is fine
+        field.validate([])
+
+        # Collection with a non-implemented object is bad
+        self.assertRaises(WrongContainedType, field.validate, [object()])
+
+        # Actual implementation works
+        @interface.implementer(IValueType)
+        class ValueType(object):
+            "The value type"
+
+
+        field.validate([ValueType()])
+
+class SequenceTests(AbstractCollectionTests):
+
+    def _getTargetClass(self):
+        from zope.schema._field import Sequence
+        return Sequence
+
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import ISequence
+        return ISequence
 
     def test_validate_wrong_types(self):
         from zope.schema.interfaces import WrongType
@@ -2234,6 +2275,31 @@ class ObjectTests(unittest.TestCase):
         # We can specifically ask for invariants to be turned off.
         field = self._makeOne(ISchema, validate_invariants=False)
         field.validate(inst)
+
+    def test_schema_defined_by_subclass(self):
+        from zope import interface
+        from zope.schema import Object
+        from zope.schema.interfaces import SchemaNotProvided
+
+        class IValueType(interface.Interface):
+            "The value type schema"
+
+        class Field(self._getTargetClass()):
+            schema = IValueType
+
+        field = Field()
+        self.assertIs(field.schema, IValueType)
+
+        # Non implementation is bad
+        self.assertRaises(SchemaNotProvided, field.validate, object())
+
+        # Actual implementation works
+        @interface.implementer(IValueType)
+        class ValueType(object):
+            "The value type"
+
+
+        field.validate(ValueType())
 
 
 class MappingTests(unittest.TestCase):

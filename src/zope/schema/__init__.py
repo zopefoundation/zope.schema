@@ -20,6 +20,7 @@ from zope.schema._field import Bool
 from zope.schema._field import Bytes
 from zope.schema._field import BytesLine
 from zope.schema._field import Choice
+from zope.schema._field import Collection
 from zope.schema._field import Container
 from zope.schema._field import Date
 from zope.schema._field import Datetime
@@ -75,6 +76,7 @@ __all__ = [
     'Bytes',
     'BytesLine',
     'Choice',
+    'Collection',
     'Container',
     'Date',
     'Datetime',

@@ -45,6 +45,7 @@ from zope.schema.interfaces import IBool
 from zope.schema.interfaces import IBytes
 from zope.schema.interfaces import IBytesLine
 from zope.schema.interfaces import IChoice
+from zope.schema.interfaces import ICollection
 from zope.schema.interfaces import IContextSourceBinder
 from zope.schema.interfaces import IDate
 from zope.schema.interfaces import IDatetime
@@ -99,6 +100,7 @@ from zope.schema._bootstrapfields import Bool
 from zope.schema._bootstrapfields import Int
 from zope.schema._bootstrapfields import Password
 from zope.schema._bootstrapfields import MinMaxLen
+from zope.schema._bootstrapfields import _NotGiven
 from zope.schema.fieldproperty import FieldProperty
 from zope.schema.vocabulary import getVocabularyRegistry
 from zope.schema.vocabulary import VocabularyRegistryError
@@ -131,6 +133,7 @@ classImplements(Password, IPassword)
 classImplements(Bool, IBool)
 classImplements(Bool, IFromUnicode)
 classImplements(Int, IInt)
+
 
 
 @implementer(ISourceText)
@@ -538,21 +541,40 @@ def _validate_uniqueness(self, value):
         temp_values.append(item)
 
 
-class AbstractCollection(MinMaxLen, Iterable):
+@implementer(ICollection)
+class Collection(MinMaxLen, Iterable):
+    """
+    A generic collection implementing :class:`zope.schema.interfaces.ICollection`.
+
+    Subclasses can define the attribute ``value_type`` to be a field
+    such as an :class:`Object` that will be checked for each member of
+    the collection. This can then be omitted from the constructor call.
+
+    They can also define the attribute ``_type`` to be a concrete
+    class (or tuple of classes) that the collection itself will
+    be checked to be an instance of. This cannot be set in the constructor.
+
+    .. versionchanged:: 4.6.0
+       Add the ability for subclasses to specify ``value_type``
+       and ``unique``, and allow eliding them from the constructor.
+    """
     value_type = None
     unique = False
 
-    def __init__(self, value_type=None, unique=False, **kw):
-        super(AbstractCollection, self).__init__(**kw)
+    def __init__(self, value_type=_NotGiven, unique=_NotGiven, **kw):
+        super(Collection, self).__init__(**kw)
         # whine if value_type is not a field
-        if value_type is not None and not IField.providedBy(value_type):
+        if value_type is not _NotGiven:
+            self.value_type = value_type
+
+        if self.value_type is not None and not IField.providedBy(self.value_type):
             raise ValueError("'value_type' must be field instance.")
-        self.value_type = value_type
-        self.unique = unique
+        if unique is not _NotGiven:
+            self.unique = unique
 
     def bind(self, object):
         """See zope.schema._bootstrapinterfaces.IField."""
-        clone = super(AbstractCollection, self).bind(object)
+        clone = super(Collection, self).bind(object)
         # binding value_type is necessary for choices with named vocabularies,
         # and possibly also for other fields.
         if clone.value_type is not None:
@@ -560,7 +582,7 @@ class AbstractCollection(MinMaxLen, Iterable):
         return clone
 
     def _validate(self, value):
-        super(AbstractCollection, self)._validate(value)
+        super(Collection, self)._validate(value)
         errors = _validate_sequence(self.value_type, value)
         if errors:
             try:
@@ -572,8 +594,15 @@ class AbstractCollection(MinMaxLen, Iterable):
             _validate_uniqueness(self, value)
 
 
+#: An alternate name for :class:`.Collection`.
+#:
+#: .. deprecated:: 4.6.0
+#:   Use :class:`.Collection` instead.
+AbstractCollection = Collection
+
+
 @implementer(ISequence)
-class Sequence(AbstractCollection):
+class Sequence(Collection):
     """
     A field representing an ordered sequence.
 
@@ -605,7 +634,7 @@ class List(MutableSequence):
 
 
 @implementer(ISet)
-class Set(AbstractCollection):
+class Set(Collection):
     """A field representing a set."""
     _type = set
 
@@ -617,7 +646,7 @@ class Set(AbstractCollection):
 
 
 @implementer(IFrozenSet)
-class FrozenSet(AbstractCollection):
+class FrozenSet(Collection):
     _type = frozenset
 
     def __init__(self, **kw):
@@ -677,10 +706,11 @@ def _validate_fields(schema, value):
 @implementer(IObject)
 class Object(Field):
     __doc__ = IObject.__doc__
+    schema = None
 
-    def __init__(self, schema, **kw):
+    def __init__(self, schema=_NotGiven, **kw):
         """
-        Object(schema, *, validate_invariants=True, **kwargs)
+        Object(schema=<Not Given>, *, validate_invariants=True, **kwargs)
 
         Create an `~.IObject` field. The keyword arguments are as for `~.Field`.
 
@@ -688,7 +718,13 @@ class Object(Field):
            Add the keyword argument *validate_invariants*. When true (the default),
            the schema's ``validateInvariants`` method will be invoked to check
            the ``@invariant`` properties of the schema.
+        .. versionchanged:: 4.6.0
+           The *schema* argument can be ommitted in a subclass
+           that specifies a ``schema`` attribute.
         """
+        if schema is _NotGiven:
+            schema = self.schema
+
         if not IInterface.providedBy(schema):
             raise WrongType
 
