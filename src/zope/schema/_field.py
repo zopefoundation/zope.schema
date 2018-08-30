@@ -257,10 +257,7 @@ class Float(Real):
 
 
 class InvalidDecimalLiteral(ValueError, ValidationError):
-
-    def __init__(self, literal):
-        super(InvalidDecimalLiteral, self).__init__(
-            "invalid literal for Decimal(): %s" % literal)
+    "Raised by decimal fields"
 
 
 @implementer(IDecimal, IFromUnicode)
