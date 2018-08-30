@@ -139,6 +139,7 @@ Fields
 ======
 
 .. autoclass:: zope.schema.Field
+.. autoclass:: zope.schema.Collection
 .. autoclass:: zope.schema._field.AbstractCollection
 .. autoclass:: zope.schema.ASCII
    :no-show-inheritance:

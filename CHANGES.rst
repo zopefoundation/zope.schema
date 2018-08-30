@@ -66,6 +66,17 @@
   to the collections ABCs of the same name; ``Tuple`` now extends
   ``Sequence`` and ``List`` now extends ``MutableSequence``.
 
+- Add new field ``Collection``, implementing ``ICollection``. This is
+  the base class of ``Sequence``. Previously this was known as
+  ``AbstractCollection`` and was not public. It can be subclassed to
+  add ``value_type``, ``_type`` and ``unique`` attributes at the class
+  level, enabling a simpler constructor call. See `issue 23
+  <https://github.com/zopefoundation/zope.schema/issues/23>`_.
+
+- Make ``Object`` respect a ``schema`` attribute defined by a
+  subclass, enabling a simpler constructor call. See `issue 23
+  <https://github.com/zopefoundation/zope.schema/issues/23>`_.
+
 4.5.0 (2017-07-10)
 ==================
 

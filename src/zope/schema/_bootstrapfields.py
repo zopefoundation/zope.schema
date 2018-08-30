@@ -39,6 +39,15 @@ from zope.schema._compat import integer_types
 from zope.schema._schema import getFields
 
 
+class _NotGiven(object):
+
+    def __repr__(self): # pragma: no cover
+        return "<Not Given>"
+
+
+_NotGiven = _NotGiven()
+
+
 class ValidatedProperty(object):
 
     def __init__(self, name, check=None, allow_none=False):
@@ -97,7 +106,7 @@ class Field(Attribute):
     # Field constructor.  A marker is helpful since we don't want to
     # overwrite missing_value if it is set differently on a Field
     # subclass and isn't specified via the constructor.
-    __missing_value_marker = object()
+    __missing_value_marker = _NotGiven
 
     # Note that the "order" field has a dual existance:
     # 1. The class variable Field.order is used as a source for the
