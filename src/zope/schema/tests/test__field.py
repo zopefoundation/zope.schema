@@ -13,9 +13,11 @@
 ##############################################################################
 import datetime
 import decimal
+import doctest
 import unittest
 
 from zope.schema.tests.test__bootstrapfields import OrderableMissingValueMixin
+from zope.schema.tests.test__bootstrapfields import ConformanceMixin
 
 # pylint:disable=protected-access
 # pylint:disable=too-many-lines
@@ -23,24 +25,15 @@ from zope.schema.tests.test__bootstrapfields import OrderableMissingValueMixin
 # pylint:disable=no-member
 # pylint:disable=blacklisted-name
 
-class BytesTests(unittest.TestCase):
+class BytesTests(ConformanceMixin, unittest.TestCase):
 
     def _getTargetClass(self):
         from zope.schema._field import Bytes
         return Bytes
 
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
-
-    def test_class_conforms_to_IBytes(self):
-        from zope.interface.verify import verifyClass
+    def _getTargetInterface(self):
         from zope.schema.interfaces import IBytes
-        verifyClass(IBytes, self._getTargetClass())
-
-    def test_instance_conforms_to_IBytes(self):
-        from zope.interface.verify import verifyObject
-        from zope.schema.interfaces import IBytes
-        verifyObject(IBytes, self._makeOne())
+        return IBytes
 
     def test_validate_wrong_types(self):
         from zope.schema.interfaces import WrongType
@@ -272,18 +265,9 @@ class FloatTests(OrderableMissingValueMixin,
         from zope.schema._field import Float
         return Float
 
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
-
-    def test_class_conforms_to_IFloat(self):
-        from zope.interface.verify import verifyClass
+    def _getTargetInterface(self):
         from zope.schema.interfaces import IFloat
-        verifyClass(IFloat, self._getTargetClass())
-
-    def test_instance_conforms_to_IFloat(self):
-        from zope.interface.verify import verifyObject
-        from zope.schema.interfaces import IFloat
-        verifyObject(IFloat, self._makeOne())
+        return IFloat
 
     def test_validate_not_required(self):
         field = self._makeOne(required=False)
@@ -353,18 +337,9 @@ class DecimalTests(OrderableMissingValueMixin,
         from zope.schema._field import Decimal
         return Decimal
 
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
-
-    def test_class_conforms_to_IDecimal(self):
-        from zope.interface.verify import verifyClass
+    def _getTargetInterface(self):
         from zope.schema.interfaces import IDecimal
-        verifyClass(IDecimal, self._getTargetClass())
-
-    def test_instance_conforms_to_IDecimal(self):
-        from zope.interface.verify import verifyObject
-        from zope.schema.interfaces import IDecimal
-        verifyObject(IDecimal, self._makeOne())
+        return IDecimal
 
     def test_validate_not_required(self):
         field = self._makeOne(required=False)
@@ -453,18 +428,9 @@ class DatetimeTests(OrderableMissingValueMixin,
         from zope.schema._field import Datetime
         return Datetime
 
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
-
-    def test_class_conforms_to_IDatetime(self):
-        from zope.interface.verify import verifyClass
+    def _getTargetInterface(self):
         from zope.schema.interfaces import IDatetime
-        verifyClass(IDatetime, self._getTargetClass())
-
-    def test_instance_conforms_to_IDatetime(self):
-        from zope.interface.verify import verifyObject
-        from zope.schema.interfaces import IDatetime
-        verifyObject(IDatetime, self._makeOne())
+        return IDatetime
 
     def test_validate_wrong_types(self):
         from datetime import date
@@ -539,18 +505,9 @@ class DateTests(OrderableMissingValueMixin,
         from zope.schema._field import Date
         return Date
 
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
-
-    def test_class_conforms_to_IDate(self):
-        from zope.interface.verify import verifyClass
+    def _getTargetInterface(self):
         from zope.schema.interfaces import IDate
-        verifyClass(IDate, self._getTargetClass())
-
-    def test_instance_conforms_to_IDate(self):
-        from zope.interface.verify import verifyObject
-        from zope.schema.interfaces import IDate
-        verifyObject(IDate, self._makeOne())
+        return IDate
 
     def test_validate_wrong_types(self):
         from zope.schema.interfaces import WrongType
@@ -635,18 +592,9 @@ class TimedeltaTests(OrderableMissingValueMixin,
         from zope.schema._field import Timedelta
         return Timedelta
 
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
-
-    def test_class_conforms_to_ITimedelta(self):
-        from zope.interface.verify import verifyClass
+    def _getTargetInterface(self):
         from zope.schema.interfaces import ITimedelta
-        verifyClass(ITimedelta, self._getTargetClass())
-
-    def test_instance_conforms_to_ITimedelta(self):
-        from zope.interface.verify import verifyObject
-        from zope.schema.interfaces import ITimedelta
-        verifyObject(ITimedelta, self._makeOne())
+        return ITimedelta
 
     def test_validate_not_required(self):
         from datetime import timedelta
@@ -709,18 +657,9 @@ class TimeTests(OrderableMissingValueMixin,
         from zope.schema._field import Time
         return Time
 
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
-
-    def test_class_conforms_to_ITime(self):
-        from zope.interface.verify import verifyClass
+    def _getTargetInterface(self):
         from zope.schema.interfaces import ITime
-        verifyClass(ITime, self._getTargetClass())
-
-    def test_instance_conforms_to_ITime(self):
-        from zope.interface.verify import verifyObject
-        from zope.schema.interfaces import ITime
-        verifyObject(ITime, self._makeOne())
+        return ITime
 
     def test_validate_not_required(self):
         from datetime import time
@@ -1310,24 +1249,16 @@ class IdTests(unittest.TestCase):
                           field.fromUnicode, u'http://example.com/\nDAV:')
 
 
-class InterfaceFieldTests(unittest.TestCase):
+class InterfaceFieldTests(ConformanceMixin,
+                          unittest.TestCase):
 
     def _getTargetClass(self):
         from zope.schema._field import InterfaceField
         return InterfaceField
 
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
-
-    def test_class_conforms_to_IInterfaceField(self):
-        from zope.interface.verify import verifyClass
+    def _getTargetInterface(self):
         from zope.schema.interfaces import IInterfaceField
-        verifyClass(IInterfaceField, self._getTargetClass())
-
-    def test_instance_conforms_to_IInterfaceField(self):
-        from zope.interface.verify import verifyObject
-        from zope.schema.interfaces import IInterfaceField
-        verifyObject(IInterfaceField, self._makeOne())
+        return IInterfaceField
 
     def test_validate_wrong_types(self):
         from datetime import date
@@ -2347,3 +2278,10 @@ def _makeDummyRegistry(v):
         def get(self, object, name):
             return self._vocabulary
     return DummyRegistry(v)
+
+
+def test_suite():
+    import zope.schema._field
+    suite = unittest.defaultTestLoader.loadTestsFromName(__name__)
+    suite.addTests(doctest.DocTestSuite(zope.schema._field))
+    return suite

@@ -45,6 +45,7 @@ from zope.schema.interfaces import IBool
 from zope.schema.interfaces import IBytes
 from zope.schema.interfaces import IBytesLine
 from zope.schema.interfaces import IChoice
+from zope.schema.interfaces import IComplex
 from zope.schema.interfaces import ICollection
 from zope.schema.interfaces import IContextSourceBinder
 from zope.schema.interfaces import IDate
@@ -58,6 +59,7 @@ from zope.schema.interfaces import IFromUnicode
 from zope.schema.interfaces import IFrozenSet
 from zope.schema.interfaces import IId
 from zope.schema.interfaces import IInt
+from zope.schema.interfaces import IIntegral
 from zope.schema.interfaces import IInterfaceField
 from zope.schema.interfaces import IList
 from zope.schema.interfaces import IMinMaxLen
@@ -65,7 +67,10 @@ from zope.schema.interfaces import IMapping
 from zope.schema.interfaces import IMutableMapping
 from zope.schema.interfaces import IMutableSequence
 from zope.schema.interfaces import IObject
+from zope.schema.interfaces import INumber
 from zope.schema.interfaces import IPassword
+from zope.schema.interfaces import IReal
+from zope.schema.interfaces import IRational
 from zope.schema.interfaces import ISet
 from zope.schema.interfaces import ISequence
 from zope.schema.interfaces import ISource
@@ -91,6 +96,7 @@ from zope.schema.interfaces import InvalidDottedName
 from zope.schema.interfaces import ConstraintNotSatisfied
 
 from zope.schema._bootstrapfields import Field
+from zope.schema._bootstrapfields import Complex
 from zope.schema._bootstrapfields import Container  # API import for __init__
 from zope.schema._bootstrapfields import Iterable
 from zope.schema._bootstrapfields import Orderable
@@ -98,7 +104,11 @@ from zope.schema._bootstrapfields import Text
 from zope.schema._bootstrapfields import TextLine
 from zope.schema._bootstrapfields import Bool
 from zope.schema._bootstrapfields import Int
+from zope.schema._bootstrapfields import Integral
+from zope.schema._bootstrapfields import Number
 from zope.schema._bootstrapfields import Password
+from zope.schema._bootstrapfields import Rational
+from zope.schema._bootstrapfields import Real
 from zope.schema._bootstrapfields import MinMaxLen
 from zope.schema._bootstrapfields import _NotGiven
 from zope.schema.fieldproperty import FieldProperty
@@ -132,6 +142,12 @@ classImplements(TextLine, ITextLine)
 classImplements(Password, IPassword)
 classImplements(Bool, IBool)
 classImplements(Bool, IFromUnicode)
+
+classImplements(Number, INumber)
+classImplements(Complex, IComplex)
+classImplements(Real, IReal)
+classImplements(Rational, IRational)
+classImplements(Integral, IIntegral)
 classImplements(Int, IInt)
 
 
@@ -203,22 +219,41 @@ class InvalidFloatLiteral(ValueError, ValidationError):
 
 
 @implementer(IFloat, IFromUnicode)
-class Float(Orderable, Field):
-    __doc__ = IFloat.__doc__
+class Float(Real):
+    """
+    A field representing a native :class:`float` and implementing
+    :class:`zope.schema.interfaces.IFloat`.
+
+    The class :class:`zope.schema.Real` is a more general version,
+    accepting floats, integers, and fractions.
+
+    The :meth:`fromUnicode` method only accepts values that can be parsed
+    by the ``float`` constructor::
+
+        >>> from zope.schema._field import Float
+        >>> f = Float()
+        >>> f.fromUnicode("1")
+        1.0
+        >>> f.fromUnicode("125.6")
+        125.6
+        >>> f.fromUnicode("1+0j") # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        InvalidFloatLiteral: Invalid literal for float(): 1+0j
+        >>> f.fromUnicode("1/2") # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        InvalidFloatLiteral: invalid literal for float(): 1/2
+        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256)) # doctest: +ELLIPSIS
+        inf
+        >>> f.fromUnicode("not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        InvalidFloatLiteral: could not convert string to float: not a number
+    """
     _type = float
-
-    def __init__(self, *args, **kw):
-        super(Float, self).__init__(*args, **kw)
-
-    def fromUnicode(self, uc):
-        """ See IFromUnicode.
-        """
-        try:
-            v = float(uc)
-        except ValueError as v:
-            raise InvalidFloatLiteral(*v.args).with_field_and_value(self, uc)
-        self.validate(v)
-        return v
+    _unicode_converters = (float,)
+    _validation_error = InvalidFloatLiteral
 
 
 class InvalidDecimalLiteral(ValueError, ValidationError):
@@ -229,22 +264,38 @@ class InvalidDecimalLiteral(ValueError, ValidationError):
 
 
 @implementer(IDecimal, IFromUnicode)
-class Decimal(Orderable, Field):
-    __doc__ = IDecimal.__doc__
+class Decimal(Number):
+    """
+    A field representing a native :class:`decimal.Decimal` and implementing
+    :class:`zope.schema.interfaces.IDecimal`.
+
+    The :meth:`fromUnicode` method only accepts values that can be parsed
+    by the ``Decimal`` constructor::
+
+        >>> from zope.schema._field import Decimal
+        >>> f = Decimal()
+        >>> f.fromUnicode("1")
+        Decimal('1')
+        >>> f.fromUnicode("125.6")
+        Decimal('125.6')
+        >>> f.fromUnicode("1+0j") # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        InvalidDecimalLiteral: Invalid literal for Decimal(): 1+0j
+        >>> f.fromUnicode("1/2") # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        InvalidDecimalLiteral: Invalid literal for Decimal(): 1/2
+        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256)) # doctest: +ELLIPSIS
+        Decimal('2349...936')
+        >>> f.fromUnicode("not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        InvalidDecimalLiteral: could not convert string to float: not a number
+    """
     _type = decimal.Decimal
-
-    def __init__(self, *args, **kw):
-        super(Decimal, self).__init__(*args, **kw)
-
-    def fromUnicode(self, uc):
-        """ See IFromUnicode.
-        """
-        try:
-            v = decimal.Decimal(uc)
-        except decimal.InvalidOperation:
-            raise InvalidDecimalLiteral(uc).with_field_and_value(self, uc)
-        self.validate(v)
-        return v
+    _unicode_converters = (decimal.Decimal,)
+    _validation_error = InvalidDecimalLiteral
 
 
 @implementer(IDatetime)
@@ -505,9 +556,14 @@ def _validate_sequence(value_type, value, errors=None):
 
     To validate a sequence of various values:
 
+       >>> from zope.schema._compat import text_type
        >>> errors = _validate_sequence(field, (b'foo', u'bar', 1))
-       >>> errors # XXX assumes Python2 reprs
-       [WrongType('foo', <type 'unicode'>, ''), WrongType(1, <type 'unicode'>, '')]
+       >>> len(errors)
+       2
+       >>> errors[0].args == (b'foo', text_type, '')
+       True
+       >>> errors[1].args == (1, text_type, '')
+       True
 
     The only valid value in the sequence is the second item. The others
     generated errors.
@@ -516,8 +572,14 @@ def _validate_sequence(value_type, value, errors=None):
     for a new sequence:
 
        >>> errors = _validate_sequence(field, (2, u'baz'), errors)
-       >>> errors # XXX assumes Python2 reprs
-       [WrongType('foo', <type 'unicode'>, ''), WrongType(1, <type 'unicode'>, ''), WrongType(2, <type 'unicode'>, '')]
+       >>> len(errors)
+       3
+       >>> errors[0].args == (b'foo', text_type, '')
+       True
+       >>> errors[1].args == (1, text_type, '')
+       True
+       >>> errors[2].args == (2, text_type, '')
+       True
 
     """
     if errors is None:

@@ -21,6 +21,7 @@ from zope.schema._field import Bytes
 from zope.schema._field import BytesLine
 from zope.schema._field import Choice
 from zope.schema._field import Collection
+from zope.schema._field import Complex
 from zope.schema._field import Container
 from zope.schema._field import Date
 from zope.schema._field import Datetime
@@ -32,20 +33,24 @@ from zope.schema._field import Float
 from zope.schema._field import FrozenSet
 from zope.schema._field import Id
 from zope.schema._field import Int
+from zope.schema._field import Integral
 from zope.schema._field import InterfaceField
 from zope.schema._field import Iterable
 from zope.schema._field import List
 from zope.schema._field import Mapping
+from zope.schema._field import MinMaxLen
 from zope.schema._field import MutableMapping
 from zope.schema._field import MutableSequence
-from zope.schema._field import MinMaxLen
 from zope.schema._field import NativeString
 from zope.schema._field import NativeStringLine
+from zope.schema._field import Number
 from zope.schema._field import Object
 from zope.schema._field import Orderable
 from zope.schema._field import Password
-from zope.schema._field import Set
+from zope.schema._field import Rational
+from zope.schema._field import Real
 from zope.schema._field import Sequence
+from zope.schema._field import Set
 from zope.schema._field import SourceText
 from zope.schema._field import Text
 from zope.schema._field import TextLine
@@ -77,6 +82,7 @@ __all__ = [
     'BytesLine',
     'Choice',
     'Collection',
+    'Complex',
     'Container',
     'Date',
     'Datetime',
@@ -88,6 +94,7 @@ __all__ = [
     'FrozenSet',
     'Id',
     'Int',
+    'Integral',
     'InterfaceField',
     'Iterable',
     'List',
@@ -97,9 +104,12 @@ __all__ = [
     'MinMaxLen',
     'NativeString',
     'NativeStringLine',
+    'Number',
     'Object',
     'Orderable',
     'Password',
+    'Rational',
+    'Real',
     'Set',
     'Sequence',
     'SourceText',

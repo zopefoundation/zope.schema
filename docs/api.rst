@@ -41,6 +41,12 @@ Strings
 Numbers
 -------
 
+.. autoclass:: zope.schema.interfaces.INumber
+.. autoclass:: zope.schema.interfaces.IComplex
+.. autoclass:: zope.schema.interfaces.IReal
+.. autoclass:: zope.schema.interfaces.IRational
+.. autoclass:: zope.schema.interfaces.IIntegral
+
 .. autoclass:: zope.schema.interfaces.IInt
 .. autoclass:: zope.schema.interfaces.IFloat
 .. autoclass:: zope.schema.interfaces.IDecimal
@@ -141,15 +147,8 @@ Fields
 .. autoclass:: zope.schema.Field
 .. autoclass:: zope.schema.Collection
 .. autoclass:: zope.schema._field.AbstractCollection
-.. autoclass:: zope.schema.ASCII
-   :no-show-inheritance:
-.. autoclass:: zope.schema.ASCIILine
-   :no-show-inheritance:
+
 .. autoclass:: zope.schema.Bool
-   :no-show-inheritance:
-.. autoclass:: zope.schema.Bytes
-   :no-show-inheritance:
-.. autoclass:: zope.schema.BytesLine
    :no-show-inheritance:
 .. autoclass:: zope.schema.Choice
    :no-show-inheritance:
@@ -159,19 +158,13 @@ Fields
    :no-show-inheritance:
 .. autoclass:: zope.schema.Datetime
    :no-show-inheritance:
-.. autoclass:: zope.schema.Decimal
-   :no-show-inheritance:
 .. autoclass:: zope.schema.Dict
 .. autoclass:: zope.schema.DottedName
    :no-show-inheritance:
 
-.. autoclass:: zope.schema.Float
-   :no-show-inheritance:
 .. autoclass:: zope.schema.FrozenSet
    :no-show-inheritance:
 .. autoclass:: zope.schema.Id
-   :no-show-inheritance:
-.. autoclass:: zope.schema.Int
    :no-show-inheritance:
 .. autoclass:: zope.schema.InterfaceField
    :no-show-inheritance:
@@ -192,12 +185,6 @@ Fields
    :no-show-inheritance:
 .. autoclass:: zope.schema.Set
 .. autoclass:: zope.schema.Sequence
-.. autoclass:: zope.schema.SourceText
-   :no-show-inheritance:
-.. autoclass:: zope.schema.Text
-   :no-show-inheritance:
-.. autoclass:: zope.schema.TextLine
-   :no-show-inheritance:
 .. autoclass:: zope.schema.Time
    :no-show-inheritance:
 .. autoclass:: zope.schema.Timedelta
@@ -205,6 +192,35 @@ Fields
 .. autoclass:: zope.schema.Tuple
 .. autoclass:: zope.schema.URI
    :no-show-inheritance:
+
+Strings
+-------
+.. autoclass:: zope.schema.ASCII
+   :no-show-inheritance:
+.. autoclass:: zope.schema.ASCIILine
+   :no-show-inheritance:
+.. autoclass:: zope.schema.Bytes
+   :no-show-inheritance:
+.. autoclass:: zope.schema.BytesLine
+   :no-show-inheritance:
+.. autoclass:: zope.schema.SourceText
+   :no-show-inheritance:
+.. autoclass:: zope.schema.Text
+   :no-show-inheritance:
+.. autoclass:: zope.schema.TextLine
+   :no-show-inheritance:
+
+Numbers
+-------
+.. autoclass:: zope.schema.Number
+.. autoclass:: zope.schema.Complex
+.. autoclass:: zope.schema.Real
+.. autoclass:: zope.schema.Rational
+.. autoclass:: zope.schema.Integral
+.. autoclass:: zope.schema.Float
+.. autoclass:: zope.schema.Int
+.. autoclass:: zope.schema.Decimal
+
 
 Accessors
 =========

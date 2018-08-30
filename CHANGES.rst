@@ -87,6 +87,13 @@
   subclass, enabling a simpler constructor call. See `issue 23
   <https://github.com/zopefoundation/zope.schema/issues/23>`_.
 
+- Add fields and interfaces representing Python's numeric tower. In
+  descending order of generality these are ``Number``, ``Complex``,
+  ``Real``, ``Rational`` and ``Integral``. The ``Int`` class extends
+  ``Integral``, the ``Float`` class extends ``Real``, and the
+  ``Decimal`` class extends ``Number``. See `issue 49
+  <https://github.com/zopefoundation/zope.schema/issues/49>`_.
+
 4.5.0 (2017-07-10)
 ==================
 

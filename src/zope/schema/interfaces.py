@@ -25,6 +25,11 @@ from zope.schema._bootstrapfields import Field
 from zope.schema._bootstrapfields import Text
 from zope.schema._bootstrapfields import TextLine
 from zope.schema._bootstrapfields import Bool
+from zope.schema._bootstrapfields import Number
+from zope.schema._bootstrapfields import Complex
+from zope.schema._bootstrapfields import Rational
+from zope.schema._bootstrapfields import Real
+from zope.schema._bootstrapfields import Integral
 from zope.schema._bootstrapfields import Int
 from zope.schema._bootstrapinterfaces import StopValidation
 from zope.schema._bootstrapinterfaces import ValidationError
@@ -364,9 +369,152 @@ else:  # pragma: no cover
 class IPassword(ITextLine):
     "Field containing a unicode string without newlines that is a password."
 
+###
+# Numbers
+###
 
-class IInt(IMinMax, IField):
-    """Field containing an Integer Value."""
+##
+# Abstract numbers
+##
+
+class INumber(IMinMax, IField):
+    """
+    Field containing a generic number: :class:`numbers.Number`.
+
+    .. seealso:: :class:`zope.schema.Number`
+    .. versionadded:: 4.6.0
+    """
+    min = Number(
+        title=_("Start of the range"),
+        required=False,
+        default=None
+        )
+
+    max = Number(
+        title=_("End of the range (including the value itself)"),
+        required=False,
+        default=None
+        )
+
+    default = Number(
+        title=_("Default Value"),
+        description=_("""The field default value may be None or a legal
+                        field value""")
+        )
+
+
+class IComplex(INumber):
+    """
+    Field containing a complex number: :class:`numbers.Complex`.
+
+    .. seealso:: :class:`zope.schema.Real`
+    .. versionadded:: 4.6.0
+    """
+    min = Complex(
+        title=_("Start of the range"),
+        required=False,
+        default=None
+        )
+
+    max = Complex(
+        title=_("End of the range (including the value itself)"),
+        required=False,
+        default=None
+        )
+
+    default = Complex(
+        title=_("Default Value"),
+        description=_("""The field default value may be None or a legal
+                        field value""")
+        )
+
+
+class IReal(IComplex):
+    """
+    Field containing a real number: :class:`numbers.IReal`.
+
+    .. seealso:: :class:`zope.schema.Real`
+    .. versionadded:: 4.6.0
+    """
+    min = Real(
+        title=_("Start of the range"),
+        required=False,
+        default=None
+        )
+
+    max = Real(
+        title=_("End of the range (including the value itself)"),
+        required=False,
+        default=None
+        )
+
+    default = Real(
+        title=_("Default Value"),
+        description=_("""The field default value may be None or a legal
+                        field value""")
+        )
+
+class IRational(IReal):
+    """
+    Field containing a rational number: :class:`numbers.IRational`.
+
+    .. seealso:: :class:`zope.schema.Rational`
+    .. versionadded:: 4.6.0
+    """
+
+    min = Rational(
+        title=_("Start of the range"),
+        required=False,
+        default=None
+        )
+
+    max = Rational(
+        title=_("End of the range (including the value itself)"),
+        required=False,
+        default=None
+        )
+
+    default = Rational(
+        title=_("Default Value"),
+        description=_("""The field default value may be None or a legal
+                        field value""")
+        )
+
+class IIntegral(IRational):
+    """
+    Field containing an integral number: class:`numbers.Integral`.
+
+    .. seealso:: :class:`zope.schema.Integral`
+    .. versionadded:: 4.6.0
+    """
+    min = Integral(
+        title=_("Start of the range"),
+        required=False,
+        default=None
+        )
+
+    max = Integral(
+        title=_("End of the range (including the value itself)"),
+        required=False,
+        default=None
+        )
+
+    default = Integral(
+        title=_("Default Value"),
+        description=_("""The field default value may be None or a legal
+                        field value""")
+        )
+##
+# Concrete numbers
+##
+
+class IInt(IIntegral):
+    """
+    Field containing exactly the native class :class:`int` (or, on
+    Python 2, ``long``).
+
+    .. seealso:: :class:`zope.schema.Int`
+    """
 
     min = Int(
         title=_("Start of the range"),
@@ -387,13 +535,23 @@ class IInt(IMinMax, IField):
         )
 
 
-class IFloat(IMinMax, IField):
-    """Field containing a Float."""
+class IFloat(IReal):
+    """
+    Field containing exactly the native class :class:`float`.
+
+    :class:`IReal` is a more general interface, allowing all of
+    floats, ints, and fractions.
+
+    .. seealso:: :class:`zope.schema.Float`
+    """
 
 
-class IDecimal(IMinMax, IField):
-    """Field containing a Decimal."""
+class IDecimal(INumber):
+    """Field containing a :class:`decimal.Decimal`"""
 
+###
+# End numbers
+###
 
 class IDatetime(IMinMax, IField):
     """Field containing a datetime."""

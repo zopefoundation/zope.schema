@@ -11,8 +11,10 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
+import doctest
 import unittest
 
+# pylint:disable=protected-access
 
 class ValidatedPropertyTests(unittest.TestCase):
 
@@ -776,9 +778,29 @@ class BoolTests(EqualityTestsMixin,
         self.assertEqual(txt.fromUnicode(u'True'), True)
         self.assertEqual(txt.fromUnicode(u'true'), True)
 
+class ConformanceMixin(object):
 
-class OrderableMissingValueMixin(object):
+    def _getTargetClass(self):
+        raise NotImplementedError
 
+    def _getTargetInterface(self):
+        raise NotImplementedError
+
+    def _makeOne(self, *args, **kwargs):
+        return self._getTargetClass()(*args, **kwargs)
+
+    def test_class_conforms_to_iface(self):
+        from zope.interface.verify import verifyClass
+        verifyClass(self._getTargetInterface(), self._getTargetClass())
+        return verifyClass
+
+    def test_instance_conforms_to_iface(self):
+        from zope.interface.verify import verifyObject
+        verifyObject(self._getTargetInterface(), self._makeOne())
+        return verifyObject
+
+
+class OrderableMissingValueMixin(ConformanceMixin):
     mvm_missing_value = -1
     mvm_default = 0
 
@@ -798,18 +820,88 @@ class OrderableMissingValueMixin(object):
         self.assertEqual(self.mvm_missing_value, field.missing_value)
 
 
-class IntTests(EqualityTestsMixin,
-               OrderableMissingValueMixin,
-               unittest.TestCase):
+
+class NumberTests(EqualityTestsMixin,
+                  OrderableMissingValueMixin,
+                  unittest.TestCase):
 
     def _getTargetClass(self):
-        from zope.schema._bootstrapfields import Int
-        return Int
+        from zope.schema._bootstrapfields import Number
+        return Number
 
-    def test_ctor_defaults(self):
-        from zope.schema._compat import integer_types
-        txt = self._makeOne()
-        self.assertEqual(txt._type, integer_types)
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import INumber
+        return INumber
+
+    def test_class_conforms_to_iface(self):
+        from zope.schema._bootstrapinterfaces import IFromUnicode
+        verifyClass = super(NumberTests, self).test_class_conforms_to_iface()
+        verifyClass(IFromUnicode, self._getTargetClass())
+
+    def test_instance_conforms_to_iface(self):
+        from zope.schema._bootstrapinterfaces import IFromUnicode
+        verifyObject = super(NumberTests, self).test_instance_conforms_to_iface()
+        verifyObject(IFromUnicode, self._makeOne())
+
+
+class ComplexTests(NumberTests):
+
+    def _getTargetClass(self):
+        from zope.schema._bootstrapfields import Complex
+        return Complex
+
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import IComplex
+        return IComplex
+
+class RealTests(NumberTests):
+
+    def _getTargetClass(self):
+        from zope.schema._bootstrapfields import Real
+        return Real
+
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import IReal
+        return IReal
+
+    def test_ctor_real_min_max(self):
+        from zope.schema.interfaces import WrongType
+        from zope.schema.interfaces import TooSmall
+        from zope.schema.interfaces import TooBig
+        from fractions import Fraction
+
+        with self.assertRaises(WrongType):
+            self._makeOne(min='')
+        with self.assertRaises(WrongType):
+            self._makeOne(max='')
+
+        field = self._makeOne(min=Fraction(1, 2), max=2)
+        field.validate(1.0)
+        field.validate(2.0)
+        self.assertRaises(TooSmall, field.validate, 0)
+        self.assertRaises(TooSmall, field.validate, 0.4)
+        self.assertRaises(TooBig, field.validate, 2.1)
+
+class RationalTests(NumberTests):
+
+    def _getTargetClass(self):
+        from zope.schema._bootstrapfields import Rational
+        return Rational
+
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import IRational
+        return IRational
+
+
+class IntegralTests(RationalTests):
+
+    def _getTargetClass(self):
+        from zope.schema._bootstrapfields import Integral
+        return Integral
+
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import IIntegral
+        return IIntegral
 
     def test_validate_not_required(self):
         field = self._makeOne(required=False)
@@ -870,6 +962,22 @@ class IntTests(EqualityTestsMixin,
         self.assertEqual(txt.fromUnicode(u'-1'), -1)
 
 
+class IntTests(IntegralTests):
+
+    def _getTargetClass(self):
+        from zope.schema._bootstrapfields import Int
+        return Int
+
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import IInt
+        return IInt
+
+    def test_ctor_defaults(self):
+        from zope.schema._compat import integer_types
+        txt = self._makeOne()
+        self.assertEqual(txt._type, integer_types)
+
+
 class DummyInst(object):
     missing_value = object()
 
@@ -879,3 +987,10 @@ class DummyInst(object):
     def validate(self, value):
         if self._exc is not None:
             raise self._exc()
+
+
+def test_suite():
+    import zope.schema._bootstrapfields
+    suite = unittest.defaultTestLoader.loadTestsFromName(__name__)
+    suite.addTests(doctest.DocTestSuite(zope.schema._bootstrapfields))
+    return suite
