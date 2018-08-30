@@ -41,7 +41,7 @@ from zope.schema._schema import getFields
 
 class _NotGiven(object):
 
-    def __repr__(self):
+    def __repr__(self): # pragma: no cover
         return "<Not Given>"
 
 

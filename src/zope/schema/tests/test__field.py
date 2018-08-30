@@ -1375,172 +1375,13 @@ class InterfaceFieldTests(unittest.TestCase):
         self.assertRaises(RequiredMissing, field.validate, None)
 
 
-class AbstractCollectionTests(unittest.TestCase):
+class CollectionTests(unittest.TestCase):
+
+    _DEFAULT_UNIQUE = False
 
     def _getTargetClass(self):
-        from zope.schema._field import AbstractCollection
-        return AbstractCollection
-
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
-
-    def test_ctor_defaults(self):
-        absc = self._makeOne()
-        self.assertEqual(absc.value_type, None)
-        self.assertEqual(absc.unique, False)
-
-    def test_ctor_explicit(self):
-        from zope.schema._bootstrapfields import Text
-        text = Text()
-        absc = self._makeOne(text, True)
-        self.assertEqual(absc.value_type, text)
-        self.assertEqual(absc.unique, True)
-
-    def test_ctor_w_non_field_value_type(self):
-        class NotAField(object):
-            pass
-        self.assertRaises(ValueError, self._makeOne, NotAField)
-
-    def test_bind_wo_value_Type(self):
-        absc = self._makeOne()
-        context = object()
-        bound = absc.bind(context)
-        self.assertEqual(bound.context, context)
-        self.assertEqual(bound.value_type, None)
-        self.assertEqual(bound.unique, False)
-
-    def test_bind_w_value_Type(self):
-        from zope.schema._bootstrapfields import Text
-        text = Text()
-        absc = self._makeOne(text, True)
-        context = object()
-        bound = absc.bind(context)
-        self.assertEqual(bound.context, context)
-        self.assertEqual(isinstance(bound.value_type, Text), True)
-        self.assertEqual(bound.value_type.context, context)
-        self.assertEqual(bound.unique, True)
-
-    def test__validate_wrong_contained_type(self):
-        from zope.schema.interfaces import WrongContainedType
-        from zope.schema._bootstrapfields import Text
-        text = Text()
-        absc = self._makeOne(text)
-        with self.assertRaises(WrongContainedType) as exc:
-            absc.validate([1])
-
-        wct = exc.exception
-        self.assertIs(wct.field, absc)
-        self.assertEqual(wct.value, [1])
-
-    def test__validate_miss_uniqueness(self):
-        from zope.schema.interfaces import NotUnique
-        from zope.schema._bootstrapfields import Text
-
-        text = Text()
-        absc = self._makeOne(text, True)
-        with self.assertRaises(NotUnique) as exc:
-            absc.validate([u'a', u'a'])
-
-        not_uniq = exc.exception
-        self.assertIs(not_uniq.field, absc)
-        self.assertEqual(not_uniq.value, [u'a', u'a'])
-
-
-class TupleTests(unittest.TestCase):
-
-    def _getTargetClass(self):
-        from zope.schema._field import Tuple
-        return Tuple
-
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
-
-    def test_class_conforms_to_ITuple(self):
-        from zope.interface.verify import verifyClass
-        from zope.schema.interfaces import ITuple
-        verifyClass(ITuple, self._getTargetClass())
-
-    def test_instance_conforms_to_ITuple(self):
-        from zope.interface.verify import verifyObject
-        from zope.schema.interfaces import ITuple
-        verifyObject(ITuple, self._makeOne())
-
-    def test_validate_wrong_types(self):
-        from zope.schema.interfaces import WrongType
-
-
-        field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, u'')
-        self.assertRaises(WrongType, field.validate, b'')
-        self.assertRaises(WrongType, field.validate, 1)
-        self.assertRaises(WrongType, field.validate, 1.0)
-        self.assertRaises(WrongType, field.validate, [])
-        self.assertRaises(WrongType, field.validate, {})
-        self.assertRaises(WrongType, field.validate, set())
-        self.assertRaises(WrongType, field.validate, frozenset())
-        self.assertRaises(WrongType, field.validate, object())
-
-    def test_validate_not_required(self):
-        field = self._makeOne(required=False)
-        field.validate(())
-        field.validate((1, 2))
-        field.validate((3,))
-        field.validate(None)
-
-    def test_validate_required(self):
-        from zope.schema.interfaces import RequiredMissing
-        field = self._makeOne()
-        field.validate(())
-        field.validate((1, 2))
-        field.validate((3,))
-        with self.assertRaises(RequiredMissing) as exc:
-            field.validate(None)
-
-        req_missing = exc.exception
-        self.assertIs(req_missing.field, field)
-        self.assertEqual(req_missing.value, None)
-
-    def test_validate_min_length(self):
-        from zope.schema.interfaces import TooShort
-        field = self._makeOne(min_length=2)
-        field.validate((1, 2))
-        field.validate((1, 2, 3))
-        self.assertRaises(TooShort, field.validate, ())
-        with self.assertRaises(TooShort) as exc:
-            field.validate((1,))
-
-        too_short = exc.exception
-        self.assertIs(too_short.field, field)
-        self.assertEqual(too_short.value, (1,))
-
-    def test_validate_max_length(self):
-        from zope.schema.interfaces import TooLong
-        field = self._makeOne(max_length=2)
-        field.validate(())
-        field.validate((1, 2))
-        self.assertRaises(TooLong, field.validate, (1, 2, 3, 4))
-        with self.assertRaises(TooLong) as exc:
-            field.validate((1, 2, 3))
-
-        too_long = exc.exception
-        self.assertIs(too_long.field, field)
-        self.assertEqual(too_long.value, (1, 2, 3))
-
-    def test_validate_min_length_and_max_length(self):
-        from zope.schema.interfaces import TooLong
-        from zope.schema.interfaces import TooShort
-        field = self._makeOne(min_length=1, max_length=2)
-        field.validate((1, ))
-        field.validate((1, 2))
-        self.assertRaises(TooShort, field.validate, ())
-        self.assertRaises(TooLong, field.validate, (1, 2, 3))
-
-
-class AbstractCollectionTests(unittest.TestCase):
-
-    def _getTargetClass(self):
-        from zope.schema._field import AbstractCollection
-        return AbstractCollection
+        from zope.schema._field import Collection
+        return Collection
 
     def _getTargetInterface(self):
         from zope.schema.interfaces import ICollection
@@ -1548,6 +1389,8 @@ class AbstractCollectionTests(unittest.TestCase):
 
     def _makeOne(self, *args, **kw):
         return self._getTargetClass()(*args, **kw)
+
+    _makeCollection = list
 
     def test_class_conforms_to_iface(self):
         from zope.interface.verify import verifyClass
@@ -1575,10 +1418,10 @@ class AbstractCollectionTests(unittest.TestCase):
         self.assertIs(field.value_type, the_value_type)
 
         # Empty collection is fine
-        field.validate([])
+        field.validate(self._makeCollection([]))
 
         # Collection with a non-implemented object is bad
-        self.assertRaises(WrongContainedType, field.validate, [object()])
+        self.assertRaises(WrongContainedType, field.validate, self._makeCollection([object()]))
 
         # Actual implementation works
         @interface.implementer(IValueType)
@@ -1586,9 +1429,117 @@ class AbstractCollectionTests(unittest.TestCase):
             "The value type"
 
 
-        field.validate([ValueType()])
+        field.validate(self._makeCollection([ValueType()]))
 
-class SequenceTests(AbstractCollectionTests):
+    def test_ctor_defaults(self):
+        absc = self._makeOne()
+        self.assertEqual(absc.value_type, None)
+        self.assertEqual(absc.unique, self._DEFAULT_UNIQUE)
+
+    def test_ctor_explicit(self):
+        from zope.schema._bootstrapfields import Text
+        text = Text()
+        absc = self._makeOne(text, True)
+        self.assertEqual(absc.value_type, text)
+        self.assertEqual(absc.unique, True)
+
+    def test_ctor_w_non_field_value_type(self):
+        class NotAField(object):
+            pass
+        self.assertRaises(ValueError, self._makeOne, NotAField)
+
+    def test_bind_wo_value_Type(self):
+        absc = self._makeOne()
+        context = object()
+        bound = absc.bind(context)
+        self.assertEqual(bound.context, context)
+        self.assertEqual(bound.value_type, None)
+        self.assertEqual(bound.unique, self._DEFAULT_UNIQUE)
+
+    def test_bind_w_value_Type(self):
+        from zope.schema._bootstrapfields import Text
+        text = Text()
+        absc = self._makeOne(text, True)
+        context = object()
+        bound = absc.bind(context)
+        self.assertEqual(bound.context, context)
+        self.assertEqual(isinstance(bound.value_type, Text), True)
+        self.assertEqual(bound.value_type.context, context)
+        self.assertEqual(bound.unique, True)
+
+    def test__validate_wrong_contained_type(self):
+        from zope.schema.interfaces import WrongContainedType
+        from zope.schema._bootstrapfields import Text
+        text = Text()
+        absc = self._makeOne(text)
+        with self.assertRaises(WrongContainedType) as exc:
+            absc.validate(self._makeCollection([1]))
+
+        wct = exc.exception
+        self.assertIs(wct.field, absc)
+        self.assertEqual(wct.value, self._makeCollection([1]))
+
+    def test__validate_miss_uniqueness(self):
+        from zope.schema.interfaces import NotUnique
+        from zope.schema.interfaces import WrongType
+        from zope.schema._bootstrapfields import Text
+
+        text = Text()
+        absc = self._makeOne(text, True)
+        with self.assertRaises((NotUnique, WrongType)) as exc:
+            absc.validate([u'a', u'a'])
+
+        not_uniq = exc.exception
+        self.assertIs(not_uniq.field, absc)
+        self.assertEqual(not_uniq.value,
+                         [u'a', u'a'])
+
+    def test_validate_min_length(self):
+        from zope.schema.interfaces import TooShort
+        field = self._makeOne(min_length=2)
+        field.validate(self._makeCollection((1, 2)))
+        field.validate(self._makeCollection((1, 2, 3)))
+        self.assertRaises(TooShort, field.validate, self._makeCollection())
+        self.assertRaises(TooShort, field.validate, self._makeCollection((1,)))
+
+    def test_validate_max_length(self):
+        from zope.schema.interfaces import TooLong
+        field = self._makeOne(max_length=2)
+        field.validate(self._makeCollection())
+        field.validate(self._makeCollection((1,)))
+        field.validate(self._makeCollection((1, 2)))
+        self.assertRaises(TooLong, field.validate, self._makeCollection((1, 2, 3, 4)))
+        self.assertRaises(TooLong, field.validate, self._makeCollection((1, 2, 3)))
+
+    def test_validate_min_length_and_max_length(self):
+        from zope.schema.interfaces import TooLong
+        from zope.schema.interfaces import TooShort
+        field = self._makeOne(min_length=1, max_length=2)
+        field.validate(self._makeCollection((1,)))
+        field.validate(self._makeCollection((1, 2)))
+        self.assertRaises(TooShort, field.validate, self._makeCollection())
+        self.assertRaises(TooLong, field.validate, self._makeCollection((1, 2, 3)))
+
+    def test_validate_not_required(self):
+        field = self._makeOne(required=False)
+        field.validate(self._makeCollection())
+        field.validate(self._makeCollection((1, 2)))
+        field.validate(self._makeCollection((3,)))
+        field.validate(None)
+
+    def test_validate_required(self):
+        from zope.schema.interfaces import RequiredMissing
+        field = self._makeOne()
+        field.validate(self._makeCollection())
+        field.validate(self._makeCollection((1, 2)))
+        field.validate(self._makeCollection((3,)))
+        field.validate(self._makeCollection())
+        field.validate(self._makeCollection((1, 2)))
+        field.validate(self._makeCollection((3,)))
+        self.assertRaises(RequiredMissing, field.validate, None)
+
+
+class SequenceTests(CollectionTests):
 
     def _getTargetClass(self):
         from zope.schema._field import Sequence
@@ -1608,47 +1559,6 @@ class SequenceTests(AbstractCollectionTests):
         self.assertRaises(WrongType, field.validate, set())
         self.assertRaises(WrongType, field.validate, frozenset())
         self.assertRaises(WrongType, field.validate, object())
-
-    def test_validate_not_required(self):
-        field = self._makeOne(required=False)
-        field.validate([])
-        field.validate([1, 2])
-        field.validate([3])
-        field.validate(None)
-
-    def test_validate_required(self):
-        from zope.schema.interfaces import RequiredMissing
-        field = self._makeOne()
-        field.validate([])
-        field.validate([1, 2])
-        field.validate([3])
-        self.assertRaises(RequiredMissing, field.validate, None)
-
-    def test_validate_min_length(self):
-        from zope.schema.interfaces import TooShort
-        field = self._makeOne(min_length=2)
-        field.validate([1, 2])
-        field.validate([1, 2, 3])
-        self.assertRaises(TooShort, field.validate, [])
-        self.assertRaises(TooShort, field.validate, [1, ])
-
-    def test_validate_max_length(self):
-        from zope.schema.interfaces import TooLong
-        field = self._makeOne(max_length=2)
-        field.validate([])
-        field.validate([1])
-        field.validate([1, 2])
-        self.assertRaises(TooLong, field.validate, [1, 2, 3, 4])
-        self.assertRaises(TooLong, field.validate, [1, 2, 3])
-
-    def test_validate_min_length_and_max_length(self):
-        from zope.schema.interfaces import TooLong
-        from zope.schema.interfaces import TooShort
-        field = self._makeOne(min_length=1, max_length=2)
-        field.validate([1])
-        field.validate([1, 2])
-        self.assertRaises(TooShort, field.validate, [])
-        self.assertRaises(TooLong, field.validate, [1, 2, 3])
 
     def test_sequence(self):
         from zope.schema._field import abc
@@ -1684,6 +1594,38 @@ class SequenceTests(AbstractCollectionTests):
         field = self._makeOne()
         field.validate(sequence)
 
+
+class TupleTests(SequenceTests):
+
+    _makeCollection = tuple
+
+    def _getTargetClass(self):
+        from zope.schema._field import Tuple
+        return Tuple
+
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import ITuple
+        return ITuple
+
+    def test_mutable_sequence(self):
+        from zope.schema.interfaces import WrongType
+        with self.assertRaises(WrongType):
+            super(TupleTests, self).test_mutable_sequence()
+
+    def test_sequence(self):
+        from zope.schema.interfaces import WrongType
+        with self.assertRaises(WrongType):
+            super(TupleTests, self).test_sequence()
+
+    def test_validate_wrong_types(self):
+        from zope.schema.interfaces import WrongType
+        field = self._makeOne()
+        self.assertRaises(WrongType, field.validate, u'')
+        self.assertRaises(WrongType, field.validate, b'')
+        self.assertRaises(WrongType, field.validate, [])
+        super(TupleTests, self).test_validate_wrong_types()
+
+
 class MutableSequenceTests(SequenceTests):
 
     def _getTargetClass(self):
@@ -1700,7 +1642,6 @@ class MutableSequenceTests(SequenceTests):
         self.assertRaises(WrongType, field.validate, u'')
         self.assertRaises(WrongType, field.validate, b'')
         self.assertRaises(WrongType, field.validate, ())
-
         super(MutableSequenceTests, self).test_validate_wrong_types()
 
     def test_sequence(self):
@@ -1725,33 +1666,27 @@ class ListTests(MutableSequenceTests):
             super(ListTests, self).test_mutable_sequence()
 
 
-class SetTests(unittest.TestCase):
+class SetTests(CollectionTests):
+
+    _DEFAULT_UNIQUE = True
+    _makeCollection = set
+    _makeWrongSet = frozenset
 
     def _getTargetClass(self):
         from zope.schema._field import Set
         return Set
 
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
-
-    def test_class_conforms_to_ISet(self):
-        from zope.interface.verify import verifyClass
+    def _getTargetInterface(self):
         from zope.schema.interfaces import ISet
-        verifyClass(ISet, self._getTargetClass())
-
-    def test_instance_conforms_to_ISet(self):
-        from zope.interface.verify import verifyObject
-        from zope.schema.interfaces import ISet
-        verifyObject(ISet, self._makeOne())
+        return ISet
 
     def test_ctor_disallows_unique(self):
         self.assertRaises(TypeError, self._makeOne, unique=False)
-        self.assertRaises(TypeError, self._makeOne, unique=True)
+        self._makeOne(unique=True) # restating the obvious is allowed
         self.assertTrue(self._makeOne().unique)
 
     def test_validate_wrong_types(self):
         from zope.schema.interfaces import WrongType
-
 
         field = self._makeOne()
         self.assertRaises(WrongType, field.validate, u'')
@@ -1761,133 +1696,22 @@ class SetTests(unittest.TestCase):
         self.assertRaises(WrongType, field.validate, ())
         self.assertRaises(WrongType, field.validate, [])
         self.assertRaises(WrongType, field.validate, {})
-        self.assertRaises(WrongType, field.validate, frozenset())
+        self.assertRaises(WrongType, field.validate, self._makeWrongSet())
         self.assertRaises(WrongType, field.validate, object())
 
-    def test_validate_not_required(self):
-        field = self._makeOne(required=False)
-        field.validate(set())
-        field.validate(set((1, 2)))
-        field.validate(set((3,)))
-        field.validate(None)
 
-    def test_validate_required(self):
-        from zope.schema.interfaces import RequiredMissing
-        field = self._makeOne()
-        field.validate(set())
-        field.validate(set((1, 2)))
-        field.validate(set((3,)))
-        field.validate(set())
-        field.validate(set((1, 2)))
-        field.validate(set((3,)))
-        self.assertRaises(RequiredMissing, field.validate, None)
+class FrozenSetTests(SetTests):
 
-    def test_validate_min_length(self):
-        from zope.schema.interfaces import TooShort
-        field = self._makeOne(min_length=2)
-        field.validate(set((1, 2)))
-        field.validate(set((1, 2, 3)))
-        self.assertRaises(TooShort, field.validate, set())
-        self.assertRaises(TooShort, field.validate, set((1,)))
-
-    def test_validate_max_length(self):
-        from zope.schema.interfaces import TooLong
-        field = self._makeOne(max_length=2)
-        field.validate(set())
-        field.validate(set((1,)))
-        field.validate(set((1, 2)))
-        self.assertRaises(TooLong, field.validate, set((1, 2, 3, 4)))
-        self.assertRaises(TooLong, field.validate, set((1, 2, 3)))
-
-    def test_validate_min_length_and_max_length(self):
-        from zope.schema.interfaces import TooLong
-        from zope.schema.interfaces import TooShort
-        field = self._makeOne(min_length=1, max_length=2)
-        field.validate(set((1,)))
-        field.validate(set((1, 2)))
-        self.assertRaises(TooShort, field.validate, set())
-        self.assertRaises(TooLong, field.validate, set((1, 2, 3)))
-
-
-class FrozenSetTests(unittest.TestCase):
+    _makeCollection = frozenset
+    _makeWrongSet = set
 
     def _getTargetClass(self):
         from zope.schema._field import FrozenSet
         return FrozenSet
 
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
-
-    def test_class_conforms_to_IFrozenSet(self):
-        from zope.interface.verify import verifyClass
+    def _getTargetInterface(self):
         from zope.schema.interfaces import IFrozenSet
-        verifyClass(IFrozenSet, self._getTargetClass())
-
-    def test_instance_conforms_to_IFrozenSet(self):
-        from zope.interface.verify import verifyObject
-        from zope.schema.interfaces import IFrozenSet
-        verifyObject(IFrozenSet, self._makeOne())
-
-    def test_ctor_disallows_unique(self):
-        self.assertRaises(TypeError, self._makeOne, unique=False)
-        self.assertRaises(TypeError, self._makeOne, unique=True)
-        self.assertTrue(self._makeOne().unique)
-
-    def test_validate_wrong_types(self):
-        from zope.schema.interfaces import WrongType
-
-
-        field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, u'')
-        self.assertRaises(WrongType, field.validate, b'')
-        self.assertRaises(WrongType, field.validate, 1)
-        self.assertRaises(WrongType, field.validate, 1.0)
-        self.assertRaises(WrongType, field.validate, ())
-        self.assertRaises(WrongType, field.validate, [])
-        self.assertRaises(WrongType, field.validate, {})
-        self.assertRaises(WrongType, field.validate, set())
-        self.assertRaises(WrongType, field.validate, object())
-
-    def test_validate_not_required(self):
-        field = self._makeOne(required=False)
-        field.validate(frozenset())
-        field.validate(frozenset((1, 2)))
-        field.validate(frozenset((3,)))
-        field.validate(None)
-
-    def test_validate_required(self):
-        from zope.schema.interfaces import RequiredMissing
-        field = self._makeOne()
-        field.validate(frozenset())
-        field.validate(frozenset((1, 2)))
-        field.validate(frozenset((3,)))
-        self.assertRaises(RequiredMissing, field.validate, None)
-
-    def test_validate_min_length(self):
-        from zope.schema.interfaces import TooShort
-        field = self._makeOne(min_length=2)
-        field.validate(frozenset((1, 2)))
-        field.validate(frozenset((1, 2, 3)))
-        self.assertRaises(TooShort, field.validate, frozenset())
-        self.assertRaises(TooShort, field.validate, frozenset((1,)))
-
-    def test_validate_max_length(self):
-        from zope.schema.interfaces import TooLong
-        field = self._makeOne(max_length=2)
-        field.validate(frozenset())
-        field.validate(frozenset((1,)))
-        field.validate(frozenset((1, 2)))
-        self.assertRaises(TooLong, field.validate, frozenset((1, 2, 3, 4)))
-        self.assertRaises(TooLong, field.validate, frozenset((1, 2, 3)))
-
-    def test_validate_min_length_and_max_length(self):
-        from zope.schema.interfaces import TooLong
-        from zope.schema.interfaces import TooShort
-        field = self._makeOne(min_length=1, max_length=2)
-        field.validate(frozenset((1,)))
-        field.validate(frozenset((1, 2)))
-        self.assertRaises(TooShort, field.validate, frozenset())
-        self.assertRaises(TooLong, field.validate, frozenset((1, 2, 3)))
+        return IFrozenSet
 
 
 class ObjectTests(unittest.TestCase):
@@ -2232,13 +2056,13 @@ class ObjectTests(unittest.TestCase):
             bar = Bytes()
 
             @invariant
-            def check_foo(o):
-                if o.foo == u'bar':
+            def check_foo(self):
+                if self.foo == u'bar':
                     raise Invalid("Foo is not valid")
 
             @invariant
-            def check_bar(o):
-                if o.bar == b'foo':
+            def check_bar(self):
+                if self.bar == b'foo':
                     raise Invalid("Bar is not valid")
 
         @implementer(ISchema)
@@ -2278,7 +2102,6 @@ class ObjectTests(unittest.TestCase):
 
     def test_schema_defined_by_subclass(self):
         from zope import interface
-        from zope.schema import Object
         from zope.schema.interfaces import SchemaNotProvided
 
         class IValueType(interface.Interface):
@@ -2518,6 +2341,7 @@ def _makeDummyRegistry(v):
 
     class DummyRegistry(VocabularyRegistry):
         def __init__(self, vocabulary):
+            VocabularyRegistry.__init__(self)
             self._vocabulary = vocabulary
 
         def get(self, object, name):

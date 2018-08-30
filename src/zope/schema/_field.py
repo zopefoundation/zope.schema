@@ -633,27 +633,25 @@ class List(MutableSequence):
     _type = list
 
 
+class _AbstractSet(Collection):
+    unique = True
+
+    def __init__(self, *args, **kwargs):
+        super(_AbstractSet, self).__init__(*args, **kwargs)
+        if not self.unique: # set members are always unique
+            raise TypeError(
+                "__init__() got an unexpected keyword argument 'unique'")
+
+
 @implementer(ISet)
-class Set(Collection):
+class Set(_AbstractSet):
     """A field representing a set."""
     _type = set
 
-    def __init__(self, **kw):
-        if 'unique' in kw:  # set members are always unique
-            raise TypeError(
-                "__init__() got an unexpected keyword argument 'unique'")
-        super(Set, self).__init__(unique=True, **kw)
-
 
 @implementer(IFrozenSet)
-class FrozenSet(Collection):
+class FrozenSet(_AbstractSet):
     _type = frozenset
-
-    def __init__(self, **kw):
-        if 'unique' in kw:  # set members are always unique
-            raise TypeError(
-                "__init__() got an unexpected keyword argument 'unique'")
-        super(FrozenSet, self).__init__(unique=True, **kw)
 
 
 VALIDATED_VALUES = threading.local()
