@@ -119,7 +119,7 @@ class Field(Attribute):
     default = DefaultProperty('default')
 
     # These were declared as slots in zope.interface, we override them here to
-    # get rid of the dedcriptors so they don't break .bind()
+    # get rid of the descriptors so they don't break .bind()
     __name__ = None
     interface = None
     _Element__tagged_values = None
@@ -206,20 +206,23 @@ class Field(Attribute):
             names.update(getFields(interface))
 
         # order will be different always, don't compare it
-        if 'order' in names:
-            del names['order']
+        names.pop('order', None)
         return names
 
     def __hash__(self):
         # Equal objects should have equal hashes;
         # equal hashes does not imply equal objects.
-        value = (type(self),) + tuple(self.__get_property_names_to_compare())
+        value = (type(self), self.interface) + tuple(self.__get_property_names_to_compare())
         return hash(value)
 
     def __eq__(self, other):
-        # should be the same type
-        if type(self) != type(other):
+        # should be the same type and in the same interface (or no interface at all)
+        if self is other:
+            return True
+
+        if type(self) != type(other) or self.interface != other.interface:
             return False
+
 
         # should have the same properties
         names = self.__get_property_names_to_compare()

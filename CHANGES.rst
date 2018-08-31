@@ -30,6 +30,16 @@
   compatibility problem. See `issue 36
   <https://github.com/zopefoundation/zope.schema/issues/36>`_.
 
+- ``Field`` instances are only equal when their ``.interface`` is
+  equal. In practice, this means that two otherwise identical fields
+  of separate schemas are not equal, do not hash the same, and can
+  both be members of the same ``dict`` or ``set``. Prior to this
+  release, when hashing was identity based but only worked on Python
+  2, that was the typical behaviour. (Field objects that are *not*
+  members of a schema continue to compare and hash equal if they have
+  the same attributes and interfaces.) See `issue 40
+  <https://github.com/zopefoundation/zope.schema/issues/40>`_.
+
 - Orderable fields, including ``Int``, ``Float``, ``Decimal``,
   ``Timedelta``, ``Date`` and ``Time``, can now have a
   ``missing_value`` without needing to specify concrete ``min`` and

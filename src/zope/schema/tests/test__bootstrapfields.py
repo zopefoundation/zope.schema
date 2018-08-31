@@ -142,7 +142,88 @@ class DefaultPropertyTests(unittest.TestCase):
         self.assertEqual(_called_with, [inst.context])
 
 
-class FieldTests(unittest.TestCase):
+class EqualityTestsMixin(object):
+
+    def _getTargetClass(self):
+        raise NotImplementedError
+
+    def _makeOne(self, *args, **kw):
+        return self._getTargetClass()(*args, **kw)
+
+    def test_is_hashable(self):
+        field = self._makeOne()
+        hash(field)  # doesn't raise
+
+    def test_equal_instances_have_same_hash(self):
+        # Equal objects should have equal hashes
+        field1 = self._makeOne()
+        field2 = self._makeOne()
+        self.assertIsNot(field1, field2)
+        self.assertEqual(field1, field2)
+        self.assertEqual(hash(field1), hash(field2))
+
+    def test_instances_in_different_interfaces_not_equal(self):
+        from zope import interface
+
+        field1 = self._makeOne()
+        field2 = self._makeOne()
+        self.assertEqual(field1, field2)
+        self.assertEqual(hash(field1), hash(field2))
+
+        class IOne(interface.Interface):
+            one = field1
+
+        class ITwo(interface.Interface):
+            two = field2
+
+        self.assertEqual(field1, field1)
+        self.assertEqual(field2, field2)
+        self.assertNotEqual(field1, field2)
+        self.assertNotEqual(hash(field1), hash(field2))
+
+    def test_hash_across_unequal_instances(self):
+        # Hash equality does not imply equal objects.
+        # Our implementation only considers property names,
+        # not values. That's OK, a dict still does the right thing.
+        field1 = self._makeOne(title=u'foo')
+        field2 = self._makeOne(title=u'bar')
+        self.assertIsNot(field1, field2)
+        self.assertNotEqual(field1, field2)
+        self.assertEqual(hash(field1), hash(field2))
+
+        d = {field1: 42}
+        self.assertIn(field1, d)
+        self.assertEqual(42, d[field1])
+        self.assertNotIn(field2, d)
+        with self.assertRaises(KeyError):
+            d.__getitem__(field2)
+
+    def test___eq___different_type(self):
+        left = self._makeOne()
+
+        class Derived(self._getTargetClass()):
+            pass
+        right = Derived()
+        self.assertNotEqual(left, right)
+        self.assertTrue(left != right)
+
+    def test___eq___same_type_different_attrs(self):
+        left = self._makeOne(required=True)
+        right = self._makeOne(required=False)
+        self.assertNotEqual(left, right)
+        self.assertTrue(left != right)
+
+    def test___eq___same_type_same_attrs(self):
+        left = self._makeOne()
+        self.assertEqual(left, left)
+
+        right = self._makeOne()
+        self.assertEqual(left, right)
+        self.assertFalse(left != right)
+
+
+class FieldTests(EqualityTestsMixin,
+                 unittest.TestCase):
 
     def _getTargetClass(self):
         from zope.schema._bootstrapfields import Field
@@ -304,27 +385,6 @@ class FieldTests(unittest.TestCase):
         field._type = int
         field.validate(1)  # doesn't raise
 
-    def test___eq___different_type(self):
-        left = self._makeOne()
-
-        class Derived(self._getTargetClass()):
-            pass
-        right = Derived()
-        self.assertEqual(left == right, False)
-        self.assertEqual(left != right, True)
-
-    def test___eq___same_type_different_attrs(self):
-        left = self._makeOne(required=True)
-        right = self._makeOne(required=False)
-        self.assertEqual(left == right, False)
-        self.assertEqual(left != right, True)
-
-    def test___eq___same_type_same_attrs(self):
-        left = self._makeOne()
-        right = self._makeOne()
-        self.assertEqual(left == right, True)
-        self.assertEqual(left != right, False)
-
     def test_get_miss(self):
         field = self._makeOne(__name__='nonesuch')
         inst = DummyInst()
@@ -364,43 +424,13 @@ class FieldTests(unittest.TestCase):
         field.set(inst, 'AFTER')
         self.assertEqual(inst.extant, 'AFTER')
 
-    def test_is_hashable(self):
-        field = self._makeOne()
-        hash(field)  # doesn't raise
 
-    def test_equal_instances_have_same_hash(self):
-        # Equal objects should have equal hashes
-        field1 = self._makeOne()
-        field2 = self._makeOne()
-        self.assertIsNot(field1, field2)
-        self.assertEqual(field1, field2)
-        self.assertEqual(hash(field1), hash(field2))
-
-    def test_hash_across_unequal_instances(self):
-        # Hash equality does not imply equal objects.
-        # Our implementation only considers property names,
-        # not values. That's OK, a dict still does the right thing.
-        field1 = self._makeOne(title=u'foo')
-        field2 = self._makeOne(title=u'bar')
-        self.assertIsNot(field1, field2)
-        self.assertNotEqual(field1, field2)
-        self.assertEqual(hash(field1), hash(field2))
-
-        d = {field1: 42}
-        self.assertIn(field1, d)
-        self.assertEqual(42, d[field1])
-        self.assertNotIn(field2, d)
-        with self.assertRaises(KeyError):
-            d[field2]
-
-class ContainerTests(unittest.TestCase):
+class ContainerTests(EqualityTestsMixin,
+                     unittest.TestCase):
 
     def _getTargetClass(self):
         from zope.schema._bootstrapfields import Container
         return Container
-
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
 
     def test_validate_not_required(self):
         field = self._makeOne(required=False)
@@ -529,14 +559,12 @@ class MinMaxLenTests(unittest.TestCase):
         self.assertRaises(TooLong, mml._validate, (0, 1, 2))
 
 
-class TextTests(unittest.TestCase):
+class TextTests(EqualityTestsMixin,
+                unittest.TestCase):
 
     def _getTargetClass(self):
         from zope.schema._bootstrapfields import Text
         return Text
-
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
 
     def test_ctor_defaults(self):
         from zope.schema._compat import text_type
@@ -593,14 +621,12 @@ class TextTests(unittest.TestCase):
         self.assertEqual(txt.fromUnicode(deadbeef), deadbeef)
 
 
-class TextLineTests(unittest.TestCase):
+class TextLineTests(EqualityTestsMixin,
+                    unittest.TestCase):
 
     def _getTargetClass(self):
         from zope.schema._field import TextLine
         return TextLine
-
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
 
     def test_class_conforms_to_ITextLine(self):
         from zope.interface.verify import verifyClass
@@ -711,14 +737,12 @@ class PasswordTests(unittest.TestCase):
         self.assertEqual(field.constraint(u'abc\ndef'), False)
 
 
-class BoolTests(unittest.TestCase):
+class BoolTests(EqualityTestsMixin,
+                unittest.TestCase):
 
     def _getTargetClass(self):
         from zope.schema._bootstrapfields import Bool
         return Bool
-
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
 
     def test_ctor_defaults(self):
         txt = self._makeOne()
@@ -774,15 +798,13 @@ class OrderableMissingValueMixin(object):
         self.assertEqual(self.mvm_missing_value, field.missing_value)
 
 
-class IntTests(OrderableMissingValueMixin,
+class IntTests(EqualityTestsMixin,
+               OrderableMissingValueMixin,
                unittest.TestCase):
 
     def _getTargetClass(self):
         from zope.schema._bootstrapfields import Int
         return Int
-
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
 
     def test_ctor_defaults(self):
         from zope.schema._compat import integer_types
