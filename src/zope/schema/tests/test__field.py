@@ -2226,5 +2226,8 @@ def _makeDummyRegistry(v):
 def test_suite():
     import zope.schema._field
     suite = unittest.defaultTestLoader.loadTestsFromName(__name__)
-    suite.addTests(doctest.DocTestSuite(zope.schema._field))
+    suite.addTests(doctest.DocTestSuite(
+        zope.schema._field,
+        optionflags=doctest.ELLIPSIS
+    ))
     return suite

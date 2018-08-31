@@ -369,21 +369,19 @@ class Text(MinMaxLen, Field):
         >>> from zope.schema import Text
         >>> from zope.schema._compat import text_type
         >>> t = Text(constraint=lambda v: 'x' in v)
-        >>> try:
-        ...     t.fromUnicode(b"foo x spam")
-        ... except WrongType as e:
-        ...     e.args == (b"foo x spam", text_type, '')
-        True
+        >>> t.fromUnicode(b"foo x spam") # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        zope.schema._bootstrapinterfaces.WrongType: ('foo x spam', <type 'unicode'>, '')
         >>> result = t.fromUnicode(u"foo x spam")
         >>> isinstance(result, bytes)
         False
         >>> str(result)
         'foo x spam'
-        >>> try:
-        ...     t.fromUnicode(u"foo spam")
-        ... except ConstraintNotSatisfied as e:
-        ...     e.args == (u'foo spam', '')
-        True
+        >>> t.fromUnicode(u"foo spam") # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        zope.schema._bootstrapinterfaces.ConstraintNotSatisfied: (u'foo spam', '')
         """
         self.validate(str)
         return str

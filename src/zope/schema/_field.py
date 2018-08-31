@@ -555,13 +555,9 @@ def _validate_sequence(value_type, value, errors=None):
     To validate a sequence of various values:
 
        >>> from zope.schema._compat import text_type
-       >>> errors = _validate_sequence(field, (b'foo', u'bar', 1))
-       >>> len(errors)
-       2
-       >>> errors[0].args == (b'foo', text_type, '')
-       True
-       >>> errors[1].args == (1, text_type, '')
-       True
+       >>> errors = _validate_sequence(field, (bytearray(b'foo'), u'bar', 1))
+       >>> errors
+       [WrongType(bytearray(b'foo'), <...>, ''), WrongType(1, <...>, '')]
 
     The only valid value in the sequence is the second item. The others
     generated errors.
@@ -570,14 +566,8 @@ def _validate_sequence(value_type, value, errors=None):
     for a new sequence:
 
        >>> errors = _validate_sequence(field, (2, u'baz'), errors)
-       >>> len(errors)
-       3
-       >>> errors[0].args == (b'foo', text_type, '')
-       True
-       >>> errors[1].args == (1, text_type, '')
-       True
-       >>> errors[2].args == (2, text_type, '')
-       True
+       >>> errors
+       [WrongType(bytearray(b'foo'), <...>, ''), WrongType(1, <...>, ''), WrongType(2, <...>, '')]
 
     """
     if errors is None:

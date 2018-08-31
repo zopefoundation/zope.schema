@@ -1004,6 +1004,10 @@ class DummyInst(object):
 
 def test_suite():
     import zope.schema._bootstrapfields
+    from zope.testing.renormalizing import IGNORE_EXCEPTION_MODULE_IN_PYTHON2
     suite = unittest.defaultTestLoader.loadTestsFromName(__name__)
-    suite.addTests(doctest.DocTestSuite(zope.schema._bootstrapfields))
+    suite.addTests(doctest.DocTestSuite(
+        zope.schema._bootstrapfields,
+        optionflags=doctest.ELLIPSIS|IGNORE_EXCEPTION_MODULE_IN_PYTHON2
+    ))
     return suite
