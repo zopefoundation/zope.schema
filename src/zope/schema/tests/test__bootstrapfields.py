@@ -16,6 +16,131 @@ import unittest
 
 # pylint:disable=protected-access
 
+class ConformanceMixin(object):
+
+    def _getTargetClass(self):
+        raise NotImplementedError
+
+    def _getTargetInterface(self):
+        raise NotImplementedError
+
+    def _makeOne(self, *args, **kwargs):
+        return self._makeOneFromClass(self._getTargetClass(),
+                                      *args,
+                                      **kwargs)
+
+    def _makeOneFromClass(self, cls, *args, **kwargs):
+        return cls(*args, **kwargs)
+
+    def test_class_conforms_to_iface(self):
+        from zope.interface.verify import verifyClass
+        cls = self._getTargetClass()
+        __traceback_info__ = cls
+        verifyClass(self._getTargetInterface(), cls)
+        return verifyClass
+
+    def test_instance_conforms_to_iface(self):
+        from zope.interface.verify import verifyObject
+        instance = self._makeOne()
+        __traceback_info__ = instance
+        verifyObject(self._getTargetInterface(), instance)
+        return verifyObject
+
+
+class EqualityTestsMixin(ConformanceMixin):
+
+    def test_is_hashable(self):
+        field = self._makeOne()
+        hash(field)  # doesn't raise
+
+    def test_equal_instances_have_same_hash(self):
+        # Equal objects should have equal hashes
+        field1 = self._makeOne()
+        field2 = self._makeOne()
+        self.assertIsNot(field1, field2)
+        self.assertEqual(field1, field2)
+        self.assertEqual(hash(field1), hash(field2))
+
+    def test_instances_in_different_interfaces_not_equal(self):
+        from zope import interface
+
+        field1 = self._makeOne()
+        field2 = self._makeOne()
+        self.assertEqual(field1, field2)
+        self.assertEqual(hash(field1), hash(field2))
+
+        class IOne(interface.Interface):
+            one = field1
+
+        class ITwo(interface.Interface):
+            two = field2
+
+        self.assertEqual(field1, field1)
+        self.assertEqual(field2, field2)
+        self.assertNotEqual(field1, field2)
+        self.assertNotEqual(hash(field1), hash(field2))
+
+    def test_hash_across_unequal_instances(self):
+        # Hash equality does not imply equal objects.
+        # Our implementation only considers property names,
+        # not values. That's OK, a dict still does the right thing.
+        field1 = self._makeOne(title=u'foo')
+        field2 = self._makeOne(title=u'bar')
+        self.assertIsNot(field1, field2)
+        self.assertNotEqual(field1, field2)
+        self.assertEqual(hash(field1), hash(field2))
+
+        d = {field1: 42}
+        self.assertIn(field1, d)
+        self.assertEqual(42, d[field1])
+        self.assertNotIn(field2, d)
+        with self.assertRaises(KeyError):
+            d.__getitem__(field2)
+
+    def test___eq___different_type(self):
+        left = self._makeOne()
+
+        class Derived(self._getTargetClass()):
+            pass
+        right = self._makeOneFromClass(Derived)
+        self.assertNotEqual(left, right)
+        self.assertTrue(left != right)
+
+    def test___eq___same_type_different_attrs(self):
+        left = self._makeOne(required=True)
+        right = self._makeOne(required=False)
+        self.assertNotEqual(left, right)
+        self.assertTrue(left != right)
+
+    def test___eq___same_type_same_attrs(self):
+        left = self._makeOne()
+        self.assertEqual(left, left)
+
+        right = self._makeOne()
+        self.assertEqual(left, right)
+        self.assertFalse(left != right)
+
+
+class OrderableMissingValueMixin(EqualityTestsMixin):
+    mvm_missing_value = -1
+    mvm_default = 0
+
+    def test_missing_value_no_min_or_max(self):
+        # We should be able to provide a missing_value without
+        # also providing a min or max. But note that we must still
+        # provide a default.
+        # See https://github.com/zopefoundation/zope.schema/issues/9
+        Kind = self._getTargetClass()
+        self.assertTrue(Kind.min._allow_none)
+        self.assertTrue(Kind.max._allow_none)
+
+        field = self._makeOne(missing_value=self.mvm_missing_value,
+                              default=self.mvm_default)
+        self.assertIsNone(field.min)
+        self.assertIsNone(field.max)
+        self.assertEqual(self.mvm_missing_value, field.missing_value)
+
+
 class ValidatedPropertyTests(unittest.TestCase):
 
     def _getTargetClass(self):
@@ -144,86 +269,6 @@ class DefaultPropertyTests(unittest.TestCase):
         self.assertEqual(_called_with, [inst.context])
 
 
-class EqualityTestsMixin(object):
-
-    def _getTargetClass(self):
-        raise NotImplementedError
-
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
-
-    def test_is_hashable(self):
-        field = self._makeOne()
-        hash(field)  # doesn't raise
-
-    def test_equal_instances_have_same_hash(self):
-        # Equal objects should have equal hashes
-        field1 = self._makeOne()
-        field2 = self._makeOne()
-        self.assertIsNot(field1, field2)
-        self.assertEqual(field1, field2)
-        self.assertEqual(hash(field1), hash(field2))
-
-    def test_instances_in_different_interfaces_not_equal(self):
-        from zope import interface
-
-        field1 = self._makeOne()
-        field2 = self._makeOne()
-        self.assertEqual(field1, field2)
-        self.assertEqual(hash(field1), hash(field2))
-
-        class IOne(interface.Interface):
-            one = field1
-
-        class ITwo(interface.Interface):
-            two = field2
-
-        self.assertEqual(field1, field1)
-        self.assertEqual(field2, field2)
-        self.assertNotEqual(field1, field2)
-        self.assertNotEqual(hash(field1), hash(field2))
-
-    def test_hash_across_unequal_instances(self):
-        # Hash equality does not imply equal objects.
-        # Our implementation only considers property names,
-        # not values. That's OK, a dict still does the right thing.
-        field1 = self._makeOne(title=u'foo')
-        field2 = self._makeOne(title=u'bar')
-        self.assertIsNot(field1, field2)
-        self.assertNotEqual(field1, field2)
-        self.assertEqual(hash(field1), hash(field2))
-
-        d = {field1: 42}
-        self.assertIn(field1, d)
-        self.assertEqual(42, d[field1])
-        self.assertNotIn(field2, d)
-        with self.assertRaises(KeyError):
-            d.__getitem__(field2)
-
-    def test___eq___different_type(self):
-        left = self._makeOne()
-
-        class Derived(self._getTargetClass()):
-            pass
-        right = Derived()
-        self.assertNotEqual(left, right)
-        self.assertTrue(left != right)
-
-    def test___eq___same_type_different_attrs(self):
-        left = self._makeOne(required=True)
-        right = self._makeOne(required=False)
-        self.assertNotEqual(left, right)
-        self.assertTrue(left != right)
-
-    def test___eq___same_type_same_attrs(self):
-        left = self._makeOne()
-        self.assertEqual(left, left)
-
-        right = self._makeOne()
-        self.assertEqual(left, right)
-        self.assertFalse(left != right)
-
-
 class FieldTests(EqualityTestsMixin,
                  unittest.TestCase):
 
@@ -231,8 +276,9 @@ class FieldTests(EqualityTestsMixin,
         from zope.schema._bootstrapfields import Field
         return Field
 
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import IField
+        return IField
 
     def test_ctor_defaults(self):
 
@@ -434,6 +480,10 @@ class ContainerTests(EqualityTestsMixin,
         from zope.schema._bootstrapfields import Container
         return Container
 
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import IContainer
+        return IContainer
+
     def test_validate_not_required(self):
         field = self._makeOne(required=False)
         field.validate(None)
@@ -483,6 +533,10 @@ class IterableTests(ContainerTests):
     def _getTargetClass(self):
         from zope.schema._bootstrapfields import Iterable
         return Iterable
+
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import IIterable
+        return IIterable
 
     def test__validate_collection_but_not_iterable(self):
         from zope.schema._bootstrapinterfaces import NotAnIterator
@@ -568,6 +622,10 @@ class TextTests(EqualityTestsMixin,
         from zope.schema._bootstrapfields import Text
         return Text
 
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import IText
+        return IText
+
     def test_ctor_defaults(self):
         from zope.schema._compat import text_type
         txt = self._makeOne()
@@ -630,15 +688,9 @@ class TextLineTests(EqualityTestsMixin,
         from zope.schema._field import TextLine
         return TextLine
 
-    def test_class_conforms_to_ITextLine(self):
-        from zope.interface.verify import verifyClass
+    def _getTargetInterface(self):
         from zope.schema.interfaces import ITextLine
-        verifyClass(ITextLine, self._getTargetClass())
-
-    def test_instance_conforms_to_ITextLine(self):
-        from zope.interface.verify import verifyObject
-        from zope.schema.interfaces import ITextLine
-        verifyObject(ITextLine, self._makeOne())
+        return ITextLine
 
     def test_validate_wrong_types(self):
         from zope.schema.interfaces import WrongType
@@ -677,14 +729,16 @@ class TextLineTests(EqualityTestsMixin,
         self.assertEqual(field.constraint(u'abc\ndef'), False)
 
 
-class PasswordTests(unittest.TestCase):
+class PasswordTests(EqualityTestsMixin,
+                    unittest.TestCase):
 
     def _getTargetClass(self):
         from zope.schema._bootstrapfields import Password
         return Password
 
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import IPassword
+        return IPassword
 
     def test_set_unchanged(self):
         klass = self._getTargetClass()
@@ -746,6 +800,10 @@ class BoolTests(EqualityTestsMixin,
         from zope.schema._bootstrapfields import Bool
         return Bool
 
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import IBool
+        return IBool
+
     def test_ctor_defaults(self):
         txt = self._makeOne()
         self.assertEqual(txt._type, bool)
@@ -778,51 +836,8 @@ class BoolTests(EqualityTestsMixin,
         self.assertEqual(txt.fromUnicode(u'True'), True)
         self.assertEqual(txt.fromUnicode(u'true'), True)
 
-class ConformanceMixin(object):
 
-    def _getTargetClass(self):
-        raise NotImplementedError
-
-    def _getTargetInterface(self):
-        raise NotImplementedError
-
-    def _makeOne(self, *args, **kwargs):
-        return self._getTargetClass()(*args, **kwargs)
-
-    def test_class_conforms_to_iface(self):
-        from zope.interface.verify import verifyClass
-        verifyClass(self._getTargetInterface(), self._getTargetClass())
-        return verifyClass
-
-    def test_instance_conforms_to_iface(self):
-        from zope.interface.verify import verifyObject
-        verifyObject(self._getTargetInterface(), self._makeOne())
-        return verifyObject
-
-
-class OrderableMissingValueMixin(ConformanceMixin):
-    mvm_missing_value = -1
-    mvm_default = 0
-
-    def test_missing_value_no_min_or_max(self):
-        # We should be able to provide a missing_value without
-        # also providing a min or max. But note that we must still
-        # provide a default.
-        # See https://github.com/zopefoundation/zope.schema/issues/9
-        Kind = self._getTargetClass()
-        self.assertTrue(Kind.min._allow_none)
-        self.assertTrue(Kind.max._allow_none)
-
-        field = self._makeOne(missing_value=self.mvm_missing_value,
-                              default=self.mvm_default)
-        self.assertIsNone(field.min)
-        self.assertIsNone(field.max)
-        self.assertEqual(self.mvm_missing_value, field.missing_value)
-
-
-
-class NumberTests(EqualityTestsMixin,
-                  OrderableMissingValueMixin,
+class NumberTests(OrderableMissingValueMixin,
                   unittest.TestCase):
 
     def _getTargetClass(self):

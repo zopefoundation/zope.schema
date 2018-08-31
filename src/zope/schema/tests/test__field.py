@@ -17,7 +17,8 @@ import doctest
 import unittest
 
 from zope.schema.tests.test__bootstrapfields import OrderableMissingValueMixin
-from zope.schema.tests.test__bootstrapfields import ConformanceMixin
+from zope.schema.tests.test__bootstrapfields import EqualityTestsMixin
+
 
 # pylint:disable=protected-access
 # pylint:disable=too-many-lines
@@ -25,7 +26,7 @@ from zope.schema.tests.test__bootstrapfields import ConformanceMixin
 # pylint:disable=no-member
 # pylint:disable=blacklisted-name
 
-class BytesTests(ConformanceMixin, unittest.TestCase):
+class BytesTests(EqualityTestsMixin, unittest.TestCase):
 
     def _getTargetClass(self):
         from zope.schema._field import Bytes
@@ -82,24 +83,16 @@ class BytesTests(ConformanceMixin, unittest.TestCase):
         self.assertEqual(byt.fromUnicode(u'DEADBEEF'), b'DEADBEEF')
 
 
-class ASCIITests(unittest.TestCase):
+class ASCIITests(EqualityTestsMixin,
+                 unittest.TestCase):
 
     def _getTargetClass(self):
         from zope.schema._field import ASCII
         return ASCII
 
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
-
-    def test_class_conforms_to_IASCII(self):
-        from zope.interface.verify import verifyClass
+    def _getTargetInterface(self):
         from zope.schema.interfaces import IASCII
-        verifyClass(IASCII, self._getTargetClass())
-
-    def test_instance_conforms_to_IASCII(self):
-        from zope.interface.verify import verifyObject
-        from zope.schema.interfaces import IASCII
-        verifyObject(IASCII, self._makeOne())
+        return IASCII
 
     def test_validate_wrong_types(self):
         from zope.schema.interfaces import WrongType
@@ -135,24 +128,16 @@ class ASCIITests(unittest.TestCase):
             asc._validate(chr(i))  # doesn't raise
 
 
-class BytesLineTests(unittest.TestCase):
+class BytesLineTests(EqualityTestsMixin,
+                     unittest.TestCase):
 
     def _getTargetClass(self):
         from zope.schema._field import BytesLine
         return BytesLine
 
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
-
-    def test_class_conforms_to_IBytesLine(self):
-        from zope.interface.verify import verifyClass
+    def _getTargetInterface(self):
         from zope.schema.interfaces import IBytesLine
-        verifyClass(IBytesLine, self._getTargetClass())
-
-    def test_instance_conforms_to_IBytesLine(self):
-        from zope.interface.verify import verifyObject
-        from zope.schema.interfaces import IBytesLine
-        verifyObject(IBytesLine, self._makeOne())
+        return IBytesLine
 
     def test_validate_wrong_types(self):
         from zope.schema.interfaces import WrongType
@@ -195,24 +180,16 @@ class BytesLineTests(unittest.TestCase):
         self.assertEqual(field.constraint(b'abc\ndef'), False)
 
 
-class ASCIILineTests(unittest.TestCase):
+class ASCIILineTests(EqualityTestsMixin,
+                     unittest.TestCase):
 
     def _getTargetClass(self):
         from zope.schema._field import ASCIILine
         return ASCIILine
 
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
-
-    def test_class_conforms_to_IASCIILine(self):
-        from zope.interface.verify import verifyClass
+    def _getTargetInterface(self):
         from zope.schema.interfaces import IASCIILine
-        verifyClass(IASCIILine, self._getTargetClass())
-
-    def test_instance_conforms_to_IASCIILine(self):
-        from zope.interface.verify import verifyObject
-        from zope.schema.interfaces import IASCIILine
-        verifyObject(IASCIILine, self._makeOne())
+        return IASCIILine
 
     def test_validate_wrong_types(self):
         from zope.schema.interfaces import WrongType
@@ -713,7 +690,8 @@ class TimeTests(OrderableMissingValueMixin,
         self.assertRaises(TooBig, field.validate, t5)
 
 
-class ChoiceTests(unittest.TestCase):
+class ChoiceTests(EqualityTestsMixin,
+                  unittest.TestCase):
 
     def setUp(self):
         from zope.schema.vocabulary import _clear
@@ -727,27 +705,31 @@ class ChoiceTests(unittest.TestCase):
         from zope.schema._field import Choice
         return Choice
 
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
+    from zope.schema.vocabulary import SimpleVocabulary
+    # SimpleVocabulary uses identity semantics for equality
+    _default_vocabulary = SimpleVocabulary.fromValues([1, 2, 3])
 
-    def test_class_conforms_to_IChoice(self):
-        from zope.interface.verify import verifyClass
-        from zope.schema.interfaces import IChoice
-        verifyClass(IChoice, self._getTargetClass())
+    def _makeOneFromClass(self, cls, *args, **kwargs):
+        if (not args
+            and 'vocabulary' not in kwargs
+            and 'values' not in kwargs
+            and 'source' not in kwargs):
+            kwargs['vocabulary'] = self._default_vocabulary
+        return super(ChoiceTests, self)._makeOneFromClass(cls, *args, **kwargs)
 
-    def test_instance_conforms_to_IChoice(self):
-        from zope.interface.verify import verifyObject
+    def _getTargetInterface(self):
         from zope.schema.interfaces import IChoice
-        verifyObject(IChoice, self._makeOne(values=[1, 2, 3]))
+        return IChoice
+
 
     def test_ctor_wo_values_vocabulary_or_source(self):
-        self.assertRaises(ValueError, self._makeOne)
+        self.assertRaises(ValueError, self._getTargetClass())
 
     def test_ctor_invalid_vocabulary(self):
-        self.assertRaises(ValueError, self._makeOne, vocabulary=object())
+        self.assertRaises(ValueError, self._getTargetClass(), vocabulary=object())
 
     def test_ctor_invalid_source(self):
-        self.assertRaises(ValueError, self._makeOne, source=object())
+        self.assertRaises(ValueError, self._getTargetClass(), source=object())
 
     def test_ctor_both_vocabulary_and_source(self):
         self.assertRaises(
@@ -963,24 +945,16 @@ class ChoiceTests(unittest.TestCase):
         self.assertRaises(ConstraintNotSatisfied, clone._validate, 42)
 
 
-class URITests(unittest.TestCase):
+class URITests(EqualityTestsMixin,
+               unittest.TestCase):
 
     def _getTargetClass(self):
         from zope.schema._field import URI
         return URI
 
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
-
-    def test_class_conforms_to_IURI(self):
-        from zope.interface.verify import verifyClass
+    def _getTargetInterface(self):
         from zope.schema.interfaces import IURI
-        verifyClass(IURI, self._getTargetClass())
-
-    def test_instance_conforms_to_IURI(self):
-        from zope.interface.verify import verifyObject
-        from zope.schema.interfaces import IURI
-        verifyObject(IURI, self._makeOne())
+        return IURI
 
     def test_validate_wrong_types(self):
         from zope.schema.interfaces import WrongType
@@ -1040,24 +1014,16 @@ class URITests(unittest.TestCase):
                           field.fromUnicode, u'http://example.com/\nDAV:')
 
 
-class DottedNameTests(unittest.TestCase):
+class DottedNameTests(EqualityTestsMixin,
+                      unittest.TestCase):
 
     def _getTargetClass(self):
         from zope.schema._field import DottedName
         return DottedName
 
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
-
-    def test_class_conforms_to_IDottedName(self):
-        from zope.interface.verify import verifyClass
+    def _getTargetInterface(self):
         from zope.schema.interfaces import IDottedName
-        verifyClass(IDottedName, self._getTargetClass())
-
-    def test_instance_conforms_to_IDottedName(self):
-        from zope.interface.verify import verifyObject
-        from zope.schema.interfaces import IDottedName
-        verifyObject(IDottedName, self._makeOne())
+        return IDottedName
 
     def test_ctor_defaults(self):
         dotted = self._makeOne()
@@ -1158,24 +1124,16 @@ class DottedNameTests(unittest.TestCase):
                           field.fromUnicode, u'http://example.com/\nDAV:')
 
 
-class IdTests(unittest.TestCase):
+class IdTests(EqualityTestsMixin,
+              unittest.TestCase):
 
     def _getTargetClass(self):
         from zope.schema._field import Id
         return Id
 
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
-
-    def test_class_conforms_to_IId(self):
-        from zope.interface.verify import verifyClass
+    def _getTargetInterface(self):
         from zope.schema.interfaces import IId
-        verifyClass(IId, self._getTargetClass())
-
-    def test_instance_conforms_to_IId(self):
-        from zope.interface.verify import verifyObject
-        from zope.schema.interfaces import IId
-        verifyObject(IId, self._makeOne())
+        return IId
 
     def test_validate_wrong_types(self):
         from zope.schema.interfaces import WrongType
@@ -1249,7 +1207,7 @@ class IdTests(unittest.TestCase):
                           field.fromUnicode, u'http://example.com/\nDAV:')
 
 
-class InterfaceFieldTests(ConformanceMixin,
+class InterfaceFieldTests(EqualityTestsMixin,
                           unittest.TestCase):
 
     def _getTargetClass(self):
@@ -1306,7 +1264,8 @@ class InterfaceFieldTests(ConformanceMixin,
         self.assertRaises(RequiredMissing, field.validate, None)
 
 
-class CollectionTests(unittest.TestCase):
+class CollectionTests(EqualityTestsMixin,
+                      unittest.TestCase):
 
     _DEFAULT_UNIQUE = False
 
@@ -1318,18 +1277,7 @@ class CollectionTests(unittest.TestCase):
         from zope.schema.interfaces import ICollection
         return ICollection
 
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
-
     _makeCollection = list
-
-    def test_class_conforms_to_iface(self):
-        from zope.interface.verify import verifyClass
-        verifyClass(self._getTargetInterface(), self._getTargetClass())
-
-    def test_instance_conforms_to_iface(self):
-        from zope.interface.verify import verifyObject
-        verifyObject(self._getTargetInterface(), self._makeOne())
 
 
     def test_schema_defined_by_subclass(self):
@@ -1645,7 +1593,8 @@ class FrozenSetTests(SetTests):
         return IFrozenSet
 
 
-class ObjectTests(unittest.TestCase):
+class ObjectTests(EqualityTestsMixin,
+                  unittest.TestCase):
 
     def setUp(self):
         from zope.event import subscribers
@@ -1659,10 +1608,14 @@ class ObjectTests(unittest.TestCase):
         from zope.schema._field import Object
         return Object
 
-    def _makeOne(self, schema=None, *args, **kw):
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import IObject
+        return IObject
+
+    def _makeOneFromClass(self, cls, schema=None, *args, **kw):
         if schema is None:
             schema = self._makeSchema()
-        return self._getTargetClass()(schema, *args, **kw)
+        return super(ObjectTests, self)._makeOneFromClass(cls, schema, *args, **kw)
 
     def _makeSchema(self, **kw):
         from zope.interface import Interface
@@ -2056,7 +2009,8 @@ class ObjectTests(unittest.TestCase):
         field.validate(ValueType())
 
 
-class MappingTests(unittest.TestCase):
+class MappingTests(EqualityTestsMixin,
+                   unittest.TestCase):
 
     def _getTargetClass(self):
         from zope.schema._field import Mapping
@@ -2065,17 +2019,6 @@ class MappingTests(unittest.TestCase):
     def _getTargetInterface(self):
         from zope.schema.interfaces import IMapping
         return IMapping
-
-    def _makeOne(self, *args, **kw):
-        return self._getTargetClass()(*args, **kw)
-
-    def test_class_conforms_to_iface(self):
-        from zope.interface.verify import verifyClass
-        verifyClass(self._getTargetInterface(), self._getTargetClass())
-
-    def test_instance_conforms_to_iface(self):
-        from zope.interface.verify import verifyObject
-        verifyObject(self._getTargetInterface(), self._makeOne())
 
     def test_ctor_key_type_not_IField(self):
         self.assertRaises(ValueError, self._makeOne, key_type=object())

@@ -94,6 +94,9 @@
   ``Decimal`` class extends ``Number``. See `issue 49
   <https://github.com/zopefoundation/zope.schema/issues/49>`_.
 
+- Make ``Iterable`` and ``Container`` properly implement ``IIterable``
+  and ``IContainer``, respectively.
+
 4.5.0 (2017-07-10)
 ==================
 

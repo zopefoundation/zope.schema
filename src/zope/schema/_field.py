@@ -45,8 +45,9 @@ from zope.schema.interfaces import IBool
 from zope.schema.interfaces import IBytes
 from zope.schema.interfaces import IBytesLine
 from zope.schema.interfaces import IChoice
-from zope.schema.interfaces import IComplex
 from zope.schema.interfaces import ICollection
+from zope.schema.interfaces import IComplex
+from zope.schema.interfaces import IContainer
 from zope.schema.interfaces import IContextSourceBinder
 from zope.schema.interfaces import IDate
 from zope.schema.interfaces import IDatetime
@@ -58,6 +59,7 @@ from zope.schema.interfaces import IFloat
 from zope.schema.interfaces import IFromUnicode
 from zope.schema.interfaces import IFrozenSet
 from zope.schema.interfaces import IId
+from zope.schema.interfaces import IIterable
 from zope.schema.interfaces import IInt
 from zope.schema.interfaces import IIntegral
 from zope.schema.interfaces import IInterfaceField
@@ -123,9 +125,6 @@ from zope.schema._compat import binary_type
 from zope.schema._compat import PY3
 from zope.schema._compat import make_binary
 
-# pep 8 friendlyness
-Container
-
 # Fix up bootstrap field types
 Field.title = FieldProperty(IField['title'])
 Field.description = FieldProperty(IField['description'])
@@ -142,6 +141,8 @@ classImplements(TextLine, ITextLine)
 classImplements(Password, IPassword)
 classImplements(Bool, IBool)
 classImplements(Bool, IFromUnicode)
+classImplements(Iterable, IIterable)
+classImplements(Container, IContainer)
 
 classImplements(Number, INumber)
 classImplements(Complex, IComplex)
