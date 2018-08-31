@@ -232,7 +232,7 @@ class ASCIILineTests(EqualityTestsMixin,
         self.assertEqual(field.constraint('abc\ndef'), False)
 
 
-class FloatTests(OrderableMissingValueMixin,
+class FloatTests(OrderableMissingValueMixin, EqualityTestsMixin,
                  unittest.TestCase):
 
     mvm_missing_value = -1.0
@@ -304,7 +304,7 @@ class FloatTests(OrderableMissingValueMixin,
         self.assertEqual(flt.fromUnicode(u'1.23e6'), 1230000.0)
 
 
-class DecimalTests(OrderableMissingValueMixin,
+class DecimalTests(OrderableMissingValueMixin, EqualityTestsMixin,
                    unittest.TestCase):
 
     mvm_missing_value = decimal.Decimal("-1")
@@ -395,7 +395,7 @@ class DecimalTests(OrderableMissingValueMixin,
         self.assertEqual(flt.fromUnicode(u'12345.6'), Decimal('12345.6'))
 
 
-class DatetimeTests(OrderableMissingValueMixin,
+class DatetimeTests(OrderableMissingValueMixin, EqualityTestsMixin,
                     unittest.TestCase):
 
     mvm_missing_value = datetime.datetime.now()
@@ -472,7 +472,7 @@ class DatetimeTests(OrderableMissingValueMixin,
         self.assertRaises(TooBig, field.validate, d5)
 
 
-class DateTests(OrderableMissingValueMixin,
+class DateTests(OrderableMissingValueMixin, EqualityTestsMixin,
                 unittest.TestCase):
 
     mvm_missing_value = datetime.date.today()
@@ -559,7 +559,7 @@ class DateTests(OrderableMissingValueMixin,
         self.assertRaises(TooBig, field.validate, d5)
 
 
-class TimedeltaTests(OrderableMissingValueMixin,
+class TimedeltaTests(OrderableMissingValueMixin, EqualityTestsMixin,
                      unittest.TestCase):
 
     mvm_missing_value = datetime.timedelta(minutes=15)
@@ -624,7 +624,7 @@ class TimedeltaTests(OrderableMissingValueMixin,
         self.assertRaises(TooBig, field.validate, t5)
 
 
-class TimeTests(OrderableMissingValueMixin,
+class TimeTests(OrderableMissingValueMixin, EqualityTestsMixin,
                 unittest.TestCase):
 
     mvm_missing_value = datetime.time(12, 15, 37)

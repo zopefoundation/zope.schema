@@ -16,7 +16,7 @@ import unittest
 
 # pylint:disable=protected-access
 
-class ConformanceMixin(object):
+class EqualityTestsMixin(object):
 
     def _getTargetClass(self):
         raise NotImplementedError
@@ -45,9 +45,6 @@ class ConformanceMixin(object):
         __traceback_info__ = instance
         verifyObject(self._getTargetInterface(), instance)
         return verifyObject
-
-
-class EqualityTestsMixin(ConformanceMixin):
 
     def test_is_hashable(self):
         field = self._makeOne()
@@ -121,7 +118,7 @@ class EqualityTestsMixin(ConformanceMixin):
         self.assertFalse(left != right)
 
 
-class OrderableMissingValueMixin(EqualityTestsMixin):
+class OrderableMissingValueMixin(object):
     mvm_missing_value = -1
     mvm_default = 0
 
@@ -837,7 +834,8 @@ class BoolTests(EqualityTestsMixin,
         self.assertEqual(txt.fromUnicode(u'true'), True)
 
 
-class NumberTests(OrderableMissingValueMixin,
+class NumberTests(EqualityTestsMixin,
+                  OrderableMissingValueMixin,
                   unittest.TestCase):
 
     def _getTargetClass(self):
