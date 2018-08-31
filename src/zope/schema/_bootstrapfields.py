@@ -15,6 +15,11 @@
 """
 __docformat__ = 'restructuredtext'
 
+import decimal
+import fractions
+import numbers
+from math import isinf
+
 from zope.interface import Attribute
 from zope.interface import providedBy
 from zope.interface import implementer
@@ -359,21 +364,24 @@ class Text(MinMaxLen, Field):
 
     def fromUnicode(self, str):
         """
+        >>> from zope.schema.interfaces import WrongType
+        >>> from zope.schema.interfaces import ConstraintNotSatisfied
         >>> from zope.schema import Text
+        >>> from zope.schema._compat import text_type
         >>> t = Text(constraint=lambda v: 'x' in v)
-        >>> t.fromUnicode(b"foo x spam")
+        >>> t.fromUnicode(b"foo x spam") # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
-        WrongType: ('foo x spam', <type 'unicode'>, '')
+        zope.schema._bootstrapinterfaces.WrongType: ('foo x spam', <type 'unicode'>, '')
         >>> result = t.fromUnicode(u"foo x spam")
         >>> isinstance(result, bytes)
         False
         >>> str(result)
         'foo x spam'
-        >>> t.fromUnicode(u"foo spam")
+        >>> t.fromUnicode(u"foo spam") # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
-        ConstraintNotSatisfied: (u'foo spam', '')
+        zope.schema._bootstrapinterfaces.ConstraintNotSatisfied: (u'foo spam', '')
         """
         self.validate(str)
         return str
@@ -453,32 +461,197 @@ class Bool(Field):
         self.validate(v)
         return v
 
+class InvalidNumberLiteral(ValueError, ValidationError):
+    """Invalid number literal."""
+
+@implementer(IFromUnicode)
+class Number(Orderable, Field):
+    """
+    A field representing a :class:`numbers.Number` and implementing
+    :class:`zope.schema.interfaces.INumber`.
+
+    The :meth:`fromUnicode` method will attempt to use the smallest or
+    strictest possible type to represent incoming strings::
+
+        >>> from zope.schema._bootstrapfields import Number
+        >>> f = Number()
+        >>> f.fromUnicode("1")
+        1
+        >>> f.fromUnicode("125.6")
+        125.6
+        >>> f.fromUnicode("1+0j")
+        (1+0j)
+        >>> f.fromUnicode("1/2")
+        Fraction(1, 2)
+        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256)) # doctest: +ELLIPSIS
+        Decimal('234...936')
+        >>> f.fromUnicode("not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        InvalidNumberLiteral: Invalid literal for Decimal: 'not a number'
+
+    .. versionadded:: 4.6.0
+    """
+    _type = numbers.Number
+
+    # An ordered sequence of conversion routines. These should accept
+    # a string and produce an object that is an instance of `_type`, or raise
+    # a ValueError. The order should be most specific/strictest towards least
+    # restrictive (in other words, lowest in the numeric tower towards highest).
+    # We break this rule with fractions, though: a floating point number is
+    # more generally useful and expected than a fraction, so we attempt to parse
+    # as a float before a fraction.
+    _unicode_converters = (int, float, fractions.Fraction, complex, decimal.Decimal)
+
+    # The type of error we will raise if all conversions fail.
+    _validation_error = InvalidNumberLiteral
+
+    def fromUnicode(self, value):
+        last_exc = None
+        for converter in self._unicode_converters:
+            try:
+                val = converter(value)
+                if converter is float and isinf(val) and decimal.Decimal in self._unicode_converters:
+                    # Pass this on to decimal, if we're allowed
+                    val = decimal.Decimal(value)
+            except (ValueError, decimal.InvalidOperation) as e:
+                last_exc = e
+            else:
+                self.validate(val)
+                return val
+        try:
+            raise self._validation_error(*last_exc.args).with_field_and_value(self, value)
+        finally:
+            last_exc = None
+
+
+class Complex(Number):
+    """
+    A field representing a :class:`numbers.Complex` and implementing
+    :class:`zope.schema.interfaces.IComplex`.
+
+    The :meth:`fromUnicode` method is like that for :class:`Number`,
+    but doesn't allow Decimals::
+
+        >>> from zope.schema._bootstrapfields import Complex
+        >>> f = Complex()
+        >>> f.fromUnicode("1")
+        1
+        >>> f.fromUnicode("125.6")
+        125.6
+        >>> f.fromUnicode("1+0j")
+        (1+0j)
+        >>> f.fromUnicode("1/2")
+        Fraction(1, 2)
+        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256)) # doctest: +ELLIPSIS
+        inf
+        >>> f.fromUnicode("not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        InvalidNumberLiteral: Invalid literal for Decimal: 'not a number'
+
+    .. versionadded:: 4.6.0
+    """
+    _type = numbers.Complex
+    _unicode_converters = (int, float, complex, fractions.Fraction)
+
+
+class Real(Complex):
+    """
+    A field representing a :class:`numbers.Real` and implementing
+    :class:`zope.schema.interfaces.IReal`.
+
+    The :meth:`fromUnicode` method is like that for :class:`Complex`,
+    but doesn't allow Decimals or complex numbers::
+
+        >>> from zope.schema._bootstrapfields import Real
+        >>> f = Real()
+        >>> f.fromUnicode("1")
+        1
+        >>> f.fromUnicode("125.6")
+        125.6
+        >>> f.fromUnicode("1+0j") # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        InvalidNumberLiteral: Invalid literal for Fraction: '1+0j'
+        >>> f.fromUnicode("1/2")
+        Fraction(1, 2)
+        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256)) # doctest: +ELLIPSIS
+        inf
+        >>> f.fromUnicode("not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        InvalidNumberLiteral: Invalid literal for Decimal: 'not a number'
+
+    .. versionadded:: 4.6.0
+    """
+    _type = numbers.Real
+    _unicode_converters = (int, float, fractions.Fraction)
+
+
+class Rational(Real):
+    """
+    A field representing a :class:`numbers.Rational` and implementing
+    :class:`zope.schema.interfaces.IRational`.
+
+    The :meth:`fromUnicode` method is like that for :class:`Real`,
+    but does not allow arbitrary floating point numbers::
+
+        >>> from zope.schema._bootstrapfields import Rational
+        >>> f = Rational()
+        >>> f.fromUnicode("1")
+        1
+        >>> f.fromUnicode("1/2")
+        Fraction(1, 2)
+        >>> f.fromUnicode("125.6")
+        Fraction(628, 5)
+        >>> f.fromUnicode("1+0j") # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        InvalidNumberLiteral: Invalid literal for Fraction: '1+0j'
+        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256)) # doctest: +ELLIPSIS
+        Fraction(777..., 330...)
+        >>> f.fromUnicode("not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        InvalidNumberLiteral: Invalid literal for Decimal: 'not a number'
+
+    .. versionadded:: 4.6.0
+    """
+    _type = numbers.Rational
+    _unicode_converters = (int, fractions.Fraction)
+
+
 class InvalidIntLiteral(ValueError, ValidationError):
     """Invalid int literal."""
 
 
-@implementer(IFromUnicode)
-class Int(Orderable, Field):
-    """A field representing an Integer."""
-    _type = integer_types
+class Integral(Rational):
+    """
+    A field representing a :class:`numbers.Integral` and implementing
+    :class:`zope.schema.interfaces.IIntegral`.
 
-    def __init__(self, *args, **kw):
-        super(Int, self).__init__(*args, **kw)
+    The :meth:`fromUnicode` method only allows integral values::
 
-    def fromUnicode(self, str):
-        """
-        >>> from zope.schema._bootstrapfields import Int
-        >>> f = Int()
+        >>> from zope.schema._bootstrapfields import Integral
+        >>> f = Integral()
         >>> f.fromUnicode("125")
         125
         >>> f.fromUnicode("125.6") #doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
         InvalidIntLiteral: invalid literal for int(): 125.6
-        """
-        try:
-            v = int(str)
-        except ValueError as v:
-            raise InvalidIntLiteral(*v.args).with_field_and_value(self, str)
-        self.validate(v)
-        return v
+
+    .. versionadded:: 4.6.0
+    """
+    _type = numbers.Integral
+    _unicode_converters = (int,)
+    _validation_error = InvalidIntLiteral
+
+
+class Int(Integral):
+    """A field representing a native integer type. and implementing
+    :class:`zope.schema.interfaces.IInt`.
+    """
+    _type = integer_types
+    _unicode_converters = (int,)
