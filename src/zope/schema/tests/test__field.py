@@ -705,16 +705,13 @@ class ChoiceTests(EqualityTestsMixin,
         from zope.schema._field import Choice
         return Choice
 
-    from zope.schema.vocabulary import SimpleVocabulary
-    # SimpleVocabulary uses identity semantics for equality
-    _default_vocabulary = SimpleVocabulary.fromValues([1, 2, 3])
-
     def _makeOneFromClass(self, cls, *args, **kwargs):
         if (not args
             and 'vocabulary' not in kwargs
             and 'values' not in kwargs
             and 'source' not in kwargs):
-            kwargs['vocabulary'] = self._default_vocabulary
+            from zope.schema.vocabulary import SimpleVocabulary
+            kwargs['vocabulary'] = SimpleVocabulary.fromValues([1, 2, 3])
         return super(ChoiceTests, self)._makeOneFromClass(cls, *args, **kwargs)
 
     def _getTargetInterface(self):

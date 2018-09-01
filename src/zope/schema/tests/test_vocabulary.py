@@ -66,6 +66,41 @@ class SimpleTermTests(unittest.TestCase):
         self.assertFalse(ITitledTokenizedTerm.providedBy(term))
 
 
+    def test__eq__and__hash__(self):
+        from zope import interface
+
+        term = self._makeOne('value')
+        # Equal to itself
+        self.assertEqual(term, term)
+        # Not equal to a different class
+        self.assertNotEqual(term, object())
+        self.assertNotEqual(object(), term)
+
+        term2 = self._makeOne('value')
+        # Equal to another with the same value
+        self.assertEqual(term, term2)
+        # equal objects hash the same
+        self.assertEqual(hash(term), hash(term2))
+
+        # Providing tokens or titles that differ
+        # changes equality
+        term = self._makeOne('value', 'token')
+        self.assertNotEqual(term, term2)
+        self.assertNotEqual(hash(term), hash(term2))
+
+        term2 = self._makeOne('value', 'token')
+        self.assertEqual(term, term2)
+        self.assertEqual(hash(term), hash(term2))
+
+        term = self._makeOne('value', 'token', 'title')
+        self.assertNotEqual(term, term2)
+        self.assertNotEqual(hash(term), hash(term2))
+
+        term2 = self._makeOne('value', 'token', 'title')
+        self.assertEqual(term, term2)
+        self.assertEqual(hash(term), hash(term2))
+
+
 class SimpleVocabularyTests(unittest.TestCase):
 
     def _getTargetClass(self):
@@ -102,8 +137,8 @@ class SimpleVocabularyTests(unittest.TestCase):
             self.assertTrue(value in vocabulary)
         self.assertFalse('ABC' in vocabulary)
         for term in vocabulary:
-            self.assertTrue(vocabulary.getTerm(term.value) is term)
-            self.assertTrue(vocabulary.getTermByToken(term.token) is term)
+            self.assertIs(vocabulary.getTerm(term.value), term)
+            self.assertIs(vocabulary.getTermByToken(term.token), term)
 
     def test_fromValues(self):
         from zope.interface import Interface
@@ -119,7 +154,7 @@ class SimpleVocabularyTests(unittest.TestCase):
             self.assertTrue(ITokenizedTerm.providedBy(term))
             self.assertEqual(term.value, value)
         for value in VALUES:
-            self.assertTrue(value in vocabulary)
+            self.assertIn(value, vocabulary)
 
     def test_fromItems(self):
         from zope.interface import Interface
@@ -136,7 +171,30 @@ class SimpleVocabularyTests(unittest.TestCase):
             self.assertEqual(term.token, item[0])
             self.assertEqual(term.value, item[1])
         for item in ITEMS:
-            self.assertTrue(item[1] in vocabulary)
+            self.assertIn(item[1], vocabulary)
+
+    def test_fromItems_triples(self):
+        from zope.interface import Interface
+        from zope.schema.interfaces import ITitledTokenizedTerm
+
+        class IStupid(Interface):
+            pass
+
+        ITEMS = [
+            ('one', 1, 'title 1'),
+            ('two', 2, 'title 2'),
+            ('three', 3, 'title 3'),
+            ('fore!', 4, 'title four')
+        ]
+        vocabulary = self._getTargetClass().fromItems(ITEMS)
+        self.assertEqual(len(vocabulary), len(ITEMS))
+        for item, term in zip(ITEMS, vocabulary):
+            self.assertTrue(ITitledTokenizedTerm.providedBy(term))
+            self.assertEqual(term.token, item[0])
+            self.assertEqual(term.value, item[1])
+            self.assertEqual(term.title, item[2])
+        for item in ITEMS:
+            self.assertIn(item[1], vocabulary)
 
     def test_createTerm(self):
         from zope.schema.vocabulary import SimpleTerm
@@ -204,6 +262,38 @@ class SimpleVocabularyTests(unittest.TestCase):
         for term in vocab:
             self.assertEqual(term.value + 1, term.nextvalue)
 
+    def test__eq__and__hash__(self):
+        from zope import interface
+
+        values = [1, 4, 2, 9]
+        vocabulary = self._getTargetClass().fromValues(values)
+
+        # Equal to itself
+        self.assertEqual(vocabulary, vocabulary)
+        # Not to other classes
+        self.assertNotEqual(vocabulary, object())
+        self.assertNotEqual(object(), vocabulary)
+
+        # Equal to another object with the same values
+        vocabulary2 = self._getTargetClass().fromValues(values)
+        self.assertEqual(vocabulary, vocabulary2)
+        self.assertEqual(hash(vocabulary), hash(vocabulary2))
+
+        # Changing the values or the interfaces changes
+        # equality
+        class IFoo(interface.Interface):
+            "an interface"
+
+        vocabulary = self._getTargetClass().fromValues(values, IFoo)
+        self.assertNotEqual(vocabulary, vocabulary2)
+        # Interfaces are not taken into account in the hash; that's
+        # OK: equal hashes do not imply equal objects
+        self.assertEqual(hash(vocabulary), hash(vocabulary2))
+
+        vocabulary2 = self._getTargetClass().fromValues(values, IFoo)
+        self.assertEqual(vocabulary, vocabulary2)
+        self.assertEqual(hash(vocabulary), hash(vocabulary2))
+
 
 # Test _createTermTree via TreeVocabulary.fromDict
 
@@ -255,6 +345,18 @@ class TreeVocabularyTests(unittest.TestCase):
 
     def tree_vocab_3(self):
         return self._getTargetClass().fromDict(self.business_tree())
+
+    def test_only_titled_if_triples(self):
+        from zope.schema.interfaces import ITitledTokenizedTerm
+        no_titles = self.tree_vocab_2()
+        for term in no_titles:
+            self.assertIsNone(term.title)
+            self.assertFalse(ITitledTokenizedTerm.providedBy(term))
+
+        all_titles = self.tree_vocab_3()
+        for term in all_titles:
+            self.assertIsNotNone(term.title)
+            self.assertTrue(ITitledTokenizedTerm.providedBy(term))
 
     def test_implementation(self):
         from zope.interface.verify import verifyObject

@@ -17,6 +17,7 @@ from collections import OrderedDict
 
 from zope.interface import directlyProvides
 from zope.interface import implementer
+from zope.interface import providedBy
 
 from zope.schema._compat import text_type
 from zope.schema.interfaces import ITitledTokenizedTerm
@@ -32,14 +33,20 @@ _marker = object()
 
 @implementer(ITokenizedTerm)
 class SimpleTerm(object):
-    """Simple tokenized term used by SimpleVocabulary."""
+    """
+    Simple tokenized term used by SimpleVocabulary.
+
+    .. versionchanged:: 4.6.0
+       Implement equality and hashing based on the value, token and title.
+    """
 
     def __init__(self, value, token=None, title=None):
         """Create a term for *value* and *token*. If *token* is
         omitted, str(value) is used for the token, escaping any
         non-ASCII characters.
 
-        If *title* is provided, term implements `ITitledTokenizedTerm`.
+        If *title* is provided, term implements
+        :class:`zope.schema.interfaces.ITitledTokenizedTerm`.
         """
         self.value = value
         if token is None:
@@ -64,10 +71,35 @@ class SimpleTerm(object):
         if title is not None:
             directlyProvides(self, ITitledTokenizedTerm)
 
+    def __eq__(self, other):
+        if other is self:
+            return True
+
+        if not isinstance(other, SimpleTerm):
+            return False
+
+        return (
+            self.value == other.value
+            and self.token == other.token
+            and self.title == other.title
+        )
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash((self.value, self.token, self.title))
+
 
 @implementer(IVocabularyTokenized)
 class SimpleVocabulary(object):
-    """Vocabulary that works from a sequence of terms."""
+    """
+    Vocabulary that works from a sequence of terms.
+
+    .. versionchanged:: 4.6.0
+       Implement equality and hashing based on the terms list
+       and interfaces implemented by this object.
+    """
 
     def __init__(self, terms, *interfaces, **kwargs):
         """Initialize the vocabulary given a list of terms.
@@ -80,14 +112,14 @@ class SimpleVocabulary(object):
 
         By default, ValueErrors are thrown if duplicate values or tokens
         are passed in. If you want to swallow these exceptions, pass
-        in swallow_duplicates=True. In this case, the values will
+        in ``swallow_duplicates=True``. In this case, the values will
         override themselves.
         """
         self.by_value = {}
         self.by_token = {}
         self._terms = terms
+        swallow_dupes = kwargs.get('swallow_duplicates', False)
         for term in self._terms:
-            swallow_dupes = kwargs.get('swallow_duplicates', False)
             if not swallow_dupes:
                 if term.value in self.by_value:
                     raise ValueError(
@@ -102,16 +134,23 @@ class SimpleVocabulary(object):
 
     @classmethod
     def fromItems(cls, items, *interfaces):
-        """Construct a vocabulary from a list of (token, value) pairs.
+        """
+        Construct a vocabulary from a list of (token, value) pairs or
+        (token, value, title) triples. The list does not have to be
+        homogeneous.
 
         The order of the items is preserved as the order of the terms
-        in the vocabulary.  Terms are created by calling the class
-        method createTerm() with the pair (value, token).
+        in the vocabulary. Terms are created by calling the class
+        method :meth:`createTerm`` with the pair or triple.
 
         One or more interfaces may also be provided so that alternate
         widgets may be bound without subclassing.
+
+        .. versionchanged:: 4.6.0
+            Allow passing in triples to set item titles.
         """
-        terms = [cls.createTerm(value, token) for (token, value) in items]
+        terms = [cls.createTerm(item[1], item[0], *item[2:])
+                 for item in items]
         return cls(terms, *interfaces)
 
     @classmethod
@@ -119,10 +158,10 @@ class SimpleVocabulary(object):
         """Construct a vocabulary from a simple list.
 
         Values of the list become both the tokens and values of the
-        terms in the vocabulary.  The order of the values is preserved
-        as the order of the terms in the vocabulary.  Tokens are
-        created by calling the class method createTerm() with the
-        value as the only parameter.
+        terms in the vocabulary. The order of the values is preserved
+        as the order of the terms in the vocabulary. Tokens are
+        created by calling the class method :meth:`createTerm()` with
+        the value as the only parameter.
 
         One or more interfaces may also be provided so that alternate
         widgets may be bound without subclassing.
@@ -169,6 +208,21 @@ class SimpleVocabulary(object):
         """See zope.schema.interfaces.IIterableVocabulary"""
         return len(self.by_value)
 
+    def __eq__(self, other):
+        if other is self:
+            return True
+
+        if not isinstance(other, SimpleVocabulary):
+            return False
+
+        return self._terms == other._terms and providedBy(self) == providedBy(other)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash(tuple(self._terms))
+
 
 def _createTermTree(ttree, dict_):
     """ Helper method that creates a tree-like dict with ITokenizedTerm
@@ -177,7 +231,7 @@ def _createTermTree(ttree, dict_):
     See fromDict for more details.
     """
     for key in sorted(dict_.keys()):
-        term = SimpleTerm(key[1], key[0], key[-1])
+        term = SimpleTerm(key[1], key[0], *key[2:])
         ttree[term] = TreeVocabulary.terms_factory()
         _createTermTree(ttree[term], dict_[key])
     return ttree
@@ -272,7 +326,8 @@ class TreeVocabulary(object):
         OrderedDict), that has tuples for keys.
 
         The tuples should have either 2 or 3 values, i.e:
-        (token, value, title) or (token, value)
+        (token, value, title) or (token, value). Only tuples that have
+        three values will create a :class:`zope.schema.interfaces.ITitledTokenizedTerm`.
 
         For example, a dict with 2-valued tuples:
 
@@ -290,6 +345,10 @@ class TreeVocabulary(object):
         }
         One or more interfaces may also be provided so that alternate
         widgets may be bound without subclassing.
+
+        .. versionchanged:: 4.6.0
+           Only create ``ITitledTokenizedTerm`` when a title is actually
+           provided.
         """
         return cls(_createTermTree(cls.terms_factory(), dict_), *interfaces)
 
