@@ -27,20 +27,16 @@ from datetime import timedelta
 from datetime import time
 import decimal
 import re
-import threading
 
-from zope.event import notify
+
 from zope.interface import classImplements
 from zope.interface import implementer
-from zope.interface import Interface
-from zope.interface import Invalid
 from zope.interface.interfaces import IInterface
-from zope.interface.interfaces import IMethod
+
 
 from zope.schema.interfaces import IASCII
 from zope.schema.interfaces import IASCIILine
 from zope.schema.interfaces import IBaseVocabulary
-from zope.schema.interfaces import IBeforeObjectAssignedEvent
 from zope.schema.interfaces import IBool
 from zope.schema.interfaces import IBytes
 from zope.schema.interfaces import IBytesLine
@@ -89,9 +85,6 @@ from zope.schema.interfaces import InvalidValue
 from zope.schema.interfaces import WrongType
 from zope.schema.interfaces import WrongContainedType
 from zope.schema.interfaces import NotUnique
-from zope.schema.interfaces import SchemaNotProvided
-from zope.schema.interfaces import SchemaNotCorrectlyImplemented
-from zope.schema.interfaces import SchemaNotFullyImplemented
 from zope.schema.interfaces import InvalidURI
 from zope.schema.interfaces import InvalidId
 from zope.schema.interfaces import InvalidDottedName
@@ -113,6 +106,7 @@ from zope.schema._bootstrapfields import Rational
 from zope.schema._bootstrapfields import Real
 from zope.schema._bootstrapfields import MinMaxLen
 from zope.schema._bootstrapfields import _NotGiven
+from zope.schema._bootstrapfields import Object
 from zope.schema.fieldproperty import FieldProperty
 from zope.schema.vocabulary import getVocabularyRegistry
 from zope.schema.vocabulary import SimpleVocabulary
@@ -149,6 +143,8 @@ classImplements(Real, IReal)
 classImplements(Rational, IRational)
 classImplements(Integral, IIntegral)
 classImplements(Int, IInt)
+
+classImplements(Object, IObject)
 
 
 
@@ -646,13 +642,13 @@ class Collection(MinMaxLen, Iterable):
         if unique is not _NotGiven:
             self.unique = unique
 
-    def bind(self, object):
+    def bind(self, context):
         """See zope.schema._bootstrapinterfaces.IField."""
-        clone = super(Collection, self).bind(object)
+        clone = super(Collection, self).bind(context)
         # binding value_type is necessary for choices with named vocabularies,
         # and possibly also for other fields.
         if clone.value_type is not None:
-            clone.value_type = clone.value_type.bind(object)
+            clone.value_type = clone.value_type.bind(context)
         return clone
 
     def _validate(self, value):
@@ -726,141 +722,6 @@ class Set(_AbstractSet):
 @implementer(IFrozenSet)
 class FrozenSet(_AbstractSet):
     _type = frozenset
-
-
-VALIDATED_VALUES = threading.local()
-
-
-def _validate_fields(schema, value):
-    errors = {}
-    # Interface can be used as schema property for Object fields that plan to
-    # hold values of any type.
-    # Because Interface does not include any Attribute, it is obviously not
-    # worth looping on its methods and filter them all out.
-    if schema is Interface:
-        return errors
-    # if `value` is part of a cyclic graph, we need to break the cycle to avoid
-    # infinite recursion. Collect validated objects in a thread local dict by
-    # it's python represenation. A previous version was setting a volatile
-    # attribute which didn't work with security proxy
-    if id(value) in VALIDATED_VALUES.__dict__:
-        return errors
-    VALIDATED_VALUES.__dict__[id(value)] = True
-    # (If we have gotten here, we know that `value` provides an interface
-    # other than zope.interface.Interface;
-    # iow, we can rely on the fact that it is an instance
-    # that supports attribute assignment.)
-    try:
-        for name in schema.names(all=True):
-            attribute = schema[name]
-            if IMethod.providedBy(attribute):
-                continue # pragma: no cover
-
-            try:
-                if IChoice.providedBy(attribute):
-                    # Choice must be bound before validation otherwise
-                    # IContextSourceBinder is not iterable in validation
-                    bound = attribute.bind(value)
-                    bound.validate(getattr(value, name))
-                elif IField.providedBy(attribute):
-                    # validate attributes that are fields
-                    attribute.validate(getattr(value, name))
-            except ValidationError as error:
-                errors[name] = error
-            except AttributeError as error:
-                # property for the given name is not implemented
-                errors[name] = SchemaNotFullyImplemented(error).with_field_and_value(attribute, None)
-    finally:
-        del VALIDATED_VALUES.__dict__[id(value)]
-    return errors
-
-
-@implementer(IObject)
-class Object(Field):
-    __doc__ = IObject.__doc__
-    schema = None
-
-    def __init__(self, schema=_NotGiven, **kw):
-        """
-        Object(schema=<Not Given>, *, validate_invariants=True, **kwargs)
-
-        Create an `~.IObject` field. The keyword arguments are as for `~.Field`.
-
-        .. versionchanged:: 4.6.0
-           Add the keyword argument *validate_invariants*. When true (the default),
-           the schema's ``validateInvariants`` method will be invoked to check
-           the ``@invariant`` properties of the schema.
-        .. versionchanged:: 4.6.0
-           The *schema* argument can be ommitted in a subclass
-           that specifies a ``schema`` attribute.
-        """
-        if schema is _NotGiven:
-            schema = self.schema
-
-        if not IInterface.providedBy(schema):
-            raise WrongType
-
-        self.schema = schema
-        self.validate_invariants = kw.pop('validate_invariants', True)
-        super(Object, self).__init__(**kw)
-
-    def _validate(self, value):
-        super(Object, self)._validate(value)
-
-        # schema has to be provided by value
-        if not self.schema.providedBy(value):
-            raise SchemaNotProvided(self.schema, value).with_field_and_value(self, value)
-
-        # check the value against schema
-        schema_error_dict = _validate_fields(self.schema, value)
-        invariant_errors = []
-        if self.validate_invariants:
-            try:
-                self.schema.validateInvariants(value, invariant_errors)
-            except Invalid:
-                # validateInvariants raises a wrapper error around
-                # all the errors it got if it got errors, in addition
-                # to appending them to the errors list. We don't want
-                # that, we raise our own error.
-                pass
-
-        if schema_error_dict or invariant_errors:
-            errors = list(schema_error_dict.values()) + invariant_errors
-            exception = SchemaNotCorrectlyImplemented(
-                errors,
-                self.__name__
-            ).with_field_and_value(self, value)
-            exception.schema_errors = schema_error_dict
-            exception.invariant_errors = invariant_errors
-            try:
-                raise exception
-            finally:
-                # Break cycles
-                del exception
-                del invariant_errors
-                del schema_error_dict
-                del errors
-
-    def set(self, object, value):
-        # Announce that we're going to assign the value to the object.
-        # Motivation: Widgets typically like to take care of policy-specific
-        # actions, like establishing location.
-        event = BeforeObjectAssignedEvent(value, self.__name__, object)
-        notify(event)
-        # The event subscribers are allowed to replace the object, thus we need
-        # to replace our previous value.
-        value = event.object
-        super(Object, self).set(object, value)
-
-
-@implementer(IBeforeObjectAssignedEvent)
-class BeforeObjectAssignedEvent(object):
-    """An object is going to be assigned to an attribute on another object."""
-
-    def __init__(self, object, name, context):
-        self.object = object
-        self.name = name
-        self.context = context
 
 
 @implementer(IMapping)

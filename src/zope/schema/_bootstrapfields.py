@@ -18,30 +18,40 @@ __docformat__ = 'restructuredtext'
 import decimal
 import fractions
 import numbers
+import threading
 from math import isinf
 
 from zope.interface import Attribute
+from zope.interface import Invalid
+from zope.interface import Interface
 from zope.interface import providedBy
 from zope.interface import implementer
+from zope.interface.interfaces import IInterface
+from zope.interface.interfaces import IMethod
 
-from zope.schema._bootstrapinterfaces import ValidationError
+from zope.event import notify
+
 from zope.schema._bootstrapinterfaces import ConstraintNotSatisfied
+from zope.schema._bootstrapinterfaces import IBeforeObjectAssignedEvent
 from zope.schema._bootstrapinterfaces import IContextAwareDefaultFactory
 from zope.schema._bootstrapinterfaces import IFromUnicode
+from zope.schema._bootstrapinterfaces import IValidatable
 from zope.schema._bootstrapinterfaces import NotAContainer
 from zope.schema._bootstrapinterfaces import NotAnIterator
 from zope.schema._bootstrapinterfaces import RequiredMissing
+from zope.schema._bootstrapinterfaces import SchemaNotCorrectlyImplemented
+from zope.schema._bootstrapinterfaces import SchemaNotFullyImplemented
+from zope.schema._bootstrapinterfaces import SchemaNotProvided
 from zope.schema._bootstrapinterfaces import StopValidation
 from zope.schema._bootstrapinterfaces import TooBig
 from zope.schema._bootstrapinterfaces import TooLong
 from zope.schema._bootstrapinterfaces import TooShort
 from zope.schema._bootstrapinterfaces import TooSmall
+from zope.schema._bootstrapinterfaces import ValidationError
 from zope.schema._bootstrapinterfaces import WrongType
 
 from zope.schema._compat import text_type
 from zope.schema._compat import integer_types
-
-from zope.schema._schema import getFields
 
 
 class _NotGiven(object):
@@ -96,6 +106,17 @@ class DefaultProperty(ValidatedProperty):
         elif value != inst.missing_value:
             inst.validate(value)
         return value
+
+
+def getFields(schema):
+    """Return a dictionary containing all the Fields in a schema.
+    """
+    fields = {}
+    for name in schema:
+        attr = schema[name]
+        if IValidatable.providedBy(attr):
+            fields[name] = attr
+    return fields
 
 
 class Field(Attribute):
@@ -187,10 +208,10 @@ class Field(Attribute):
     def constraint(self, value):
         return True
 
-    def bind(self, object):
+    def bind(self, context):
         clone = self.__class__.__new__(self.__class__)
         clone.__dict__.update(self.__dict__)
-        clone.context = object
+        clone.context = context
         return clone
 
     def validate(self, value):
@@ -655,3 +676,176 @@ class Int(Integral):
     """
     _type = integer_types
     _unicode_converters = (int,)
+
+
+VALIDATED_VALUES = threading.local()
+
+def get_schema_validation_errors(schema, value):
+    """
+    Validate that *value* conforms to the schema interface *schema*.
+
+    All :class:`zope.schema.interfaces.IField` members of the *schema*
+    are validated after being bound to *value*. (Note that we do not check for
+    arbitrary :class:`zope.interface.Attribute` members being present.)
+
+    :return: A `dict` mapping field names to `ValidationError` subclasses.
+       A non-empty return value means that validation failed.
+    """
+    errors = {}
+    # Interface can be used as schema property for Object fields that plan to
+    # hold values of any type.
+    # Because Interface does not include any Attribute, it is obviously not
+    # worth looping on its methods and filter them all out.
+    if schema is Interface:
+        return errors
+    # if `value` is part of a cyclic graph, we need to break the cycle to avoid
+    # infinite recursion. Collect validated objects in a thread local dict by
+    # it's python represenation. A previous version was setting a volatile
+    # attribute which didn't work with security proxy
+    if id(value) in VALIDATED_VALUES.__dict__:
+        return errors
+    VALIDATED_VALUES.__dict__[id(value)] = True
+    # (If we have gotten here, we know that `value` provides an interface
+    # other than zope.interface.Interface;
+    # iow, we can rely on the fact that it is an instance
+    # that supports attribute assignment.)
+
+    try:
+        for name in schema.names(all=True):
+            attribute = schema[name]
+            if IMethod.providedBy(attribute):
+                continue # pragma: no cover
+
+            try:
+                if IValidatable.providedBy(attribute):
+                    # validate attributes that are fields
+                    field_value = getattr(value, name)
+                    attribute = attribute.bind(value)
+                    attribute.validate(field_value)
+            except ValidationError as error:
+                errors[name] = error
+            except AttributeError as error:
+                # property for the given name is not implemented
+                errors[name] = SchemaNotFullyImplemented(error).with_field_and_value(attribute, None)
+    finally:
+        del VALIDATED_VALUES.__dict__[id(value)]
+    return errors
+
+
+def get_validation_errors(schema, value, validate_invariants=True):
+    """
+    Validate that *value* conforms to the schema interface *schema*.
+
+    This includes checking for any schema validation errors (using
+    `get_schema_validation_errors`). If that succeeds, and
+    *validate_invariants* is true, then we proceed to check for any
+    declared invariants.
+
+    Note that this does not include a check to see if the *value*
+    actually provides the given *schema*.
+
+    :return: If there were any validation errors, either schema or
+             invariant, return a two tuple (schema_error_dict,
+             invariant_error_list). If there were no errors, returns a
+             two-tuple where both members are empty.
+    """
+    schema_error_dict = get_schema_validation_errors(schema, value)
+    invariant_errors = []
+    # Only validate invariants if there were no previous errors. Previous
+    # errors could be missing attributes which would most likely make an
+    # invariant raise an AttributeError.
+
+    if validate_invariants and not schema_error_dict:
+        try:
+            schema.validateInvariants(value, invariant_errors)
+        except Invalid:
+            # validateInvariants raises a wrapper error around
+            # all the errors it got if it got errors, in addition
+            # to appending them to the errors list. We don't want
+            # that, we raise our own error.
+            pass
+
+    return (schema_error_dict, invariant_errors)
+
+
+class Object(Field):
+    """
+    Implementation of :class:`zope.schema.interfaces.IObject`.
+    """
+    schema = None
+
+    def __init__(self, schema=_NotGiven, **kw):
+        """
+        Object(schema=<Not Given>, *, validate_invariants=True, **kwargs)
+
+        Create an `~.IObject` field. The keyword arguments are as for `~.Field`.
+
+        .. versionchanged:: 4.6.0
+           Add the keyword argument *validate_invariants*. When true (the default),
+           the schema's ``validateInvariants`` method will be invoked to check
+           the ``@invariant`` properties of the schema.
+        .. versionchanged:: 4.6.0
+           The *schema* argument can be ommitted in a subclass
+           that specifies a ``schema`` attribute.
+        """
+        if schema is _NotGiven:
+            schema = self.schema
+
+        if not IInterface.providedBy(schema):
+            raise WrongType
+
+        self.schema = schema
+        self.validate_invariants = kw.pop('validate_invariants', True)
+        super(Object, self).__init__(**kw)
+
+    def _validate(self, value):
+        super(Object, self)._validate(value)
+
+        # schema has to be provided by value
+        if not self.schema.providedBy(value):
+            raise SchemaNotProvided(self.schema, value).with_field_and_value(self, value)
+
+        # check the value against schema
+        schema_error_dict, invariant_errors = get_validation_errors(
+            self.schema,
+            value,
+            self.validate_invariants
+        )
+
+        if schema_error_dict or invariant_errors:
+            errors = list(schema_error_dict.values()) + invariant_errors
+            exception = SchemaNotCorrectlyImplemented(
+                errors,
+                self.__name__
+            ).with_field_and_value(self, value)
+            exception.schema_errors = schema_error_dict
+            exception.invariant_errors = invariant_errors
+            try:
+                raise exception
+            finally:
+                # Break cycles
+                del exception
+                del invariant_errors
+                del schema_error_dict
+                del errors
+
+    def set(self, object, value):
+        # Announce that we're going to assign the value to the object.
+        # Motivation: Widgets typically like to take care of policy-specific
+        # actions, like establishing location.
+        event = BeforeObjectAssignedEvent(value, self.__name__, object)
+        notify(event)
+        # The event subscribers are allowed to replace the object, thus we need
+        # to replace our previous value.
+        value = event.object
+        super(Object, self).set(object, value)
+
+
+@implementer(IBeforeObjectAssignedEvent)
+class BeforeObjectAssignedEvent(object):
+    """An object is going to be assigned to an attribute on another object."""
+
+    def __init__(self, object, name, context):
+        self.object = object
+        self.name = name
+        self.context = context

@@ -14,26 +14,24 @@
 """Schema convenience functions
 """
 
-import zope.interface.verify
+from zope.schema._bootstrapfields import get_validation_errors
+from zope.schema._bootstrapfields import get_schema_validation_errors
+from zope.schema._bootstrapfields import getFields
+
+__all__ = [
+    'getFieldNames',
+    'getFields',
+    'getFieldsInOrder',
+    'getFieldNamesInOrder',
+    'getValidationErrors',
+    'getSchemaValidationErrors',
+]
 
 
 def getFieldNames(schema):
     """Return a list of all the Field names in a schema.
     """
-    from zope.schema.interfaces import IField
-    return [name for name in schema if IField.providedBy(schema[name])]
-
-
-def getFields(schema):
-    """Return a dictionary containing all the Fields in a schema.
-    """
-    from zope.schema.interfaces import IField
-    fields = {}
-    for name in schema:
-        attr = schema[name]
-        if IField.providedBy(attr):
-            fields[name] = attr
-    return fields
+    return list(getFields(schema).keys())
 
 
 def getFieldsInOrder(schema, _field_key=lambda x: x[1].order):
@@ -48,44 +46,43 @@ def getFieldNamesInOrder(schema):
     return [name for name, field in getFieldsInOrder(schema)]
 
 
-def getValidationErrors(schema, object):
-    """Return a list of all validation errors.
+def getValidationErrors(schema, value):
     """
-    errors = getSchemaValidationErrors(schema, object)
-    if errors:
-        return errors
+    Validate that *value* conforms to the schema interface *schema*.
 
-    # Only validate invariants if there were no previous errors. Previous
-    # errors could be missing attributes which would most likely make an
-    # invariant raise an AttributeError.
-    invariant_errors = []
-    try:
-        schema.validateInvariants(object, invariant_errors)
-    except zope.interface.exceptions.Invalid:
-        # Just collect errors
-        pass
-    errors = [(None, e) for e in invariant_errors]
-    return errors
+    This includes checking for any schema validation errors (using
+    `getSchemaValidationErrors`). If that succeeds, then we proceed to
+    check for any declared invariants.
+
+    Note that this does not include a check to see if the *value*
+    actually provides the given *schema*.
+
+    :return: A sequence of (name, `zope.interface.Invalid`) tuples,
+       where *name* is None if the error was from an invariant.
+       If the sequence is empty, there were no errors.
+    """
+    schema_error_dict, invariant_errors = get_validation_errors(
+        schema,
+        value,
+        )
+
+    if not schema_error_dict and not invariant_errors:
+        # Valid! Yay!
+        return []
+
+    return list(schema_error_dict.items()) + [(None, e) for e in invariant_errors]
 
 
-def getSchemaValidationErrors(schema, object):
-    errors = []
-    for name in schema.names(all=True):
-        if zope.interface.interfaces.IMethod.providedBy(schema[name]):
-            continue
-        attribute = schema[name]
-        if not zope.schema.interfaces.IField.providedBy(attribute):
-            continue
-        try:
-            value = getattr(object, name)
-        except AttributeError as error:
-            # property for the given name is not implemented
-            error = zope.schema.interfaces.SchemaNotFullyImplemented(error)
-            error = error.with_field_and_value(attribute, None)
-            errors.append((name, error))
-        else:
-            try:
-                attribute.bind(object).validate(value)
-            except zope.schema.ValidationError as e:
-                errors.append((name, e))
-    return errors
+def getSchemaValidationErrors(schema, value):
+    """
+    Validate that *value* conforms to the schema interface *schema*.
+
+    All :class:`zope.schema.interfaces.IField` members of the *schema*
+    are validated after being bound to *value*. (Note that we do not check for
+    arbitrary :class:`zope.interface.Attribute` members being present.)
+
+    :return: A sequence of (name, `ValidationError`) tuples. A non-empty
+        sequence indicates validation failed.
+    """
+    items = get_schema_validation_errors(schema, value).items()
+    return items if isinstance(items, list) else list(items)

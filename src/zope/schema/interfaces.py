@@ -15,12 +15,12 @@
 """
 __docformat__ = "reStructuredText"
 
-from zope.interface import Interface, Attribute
+from zope.interface import Interface
+from zope.interface import Attribute
+from zope.interface.interfaces import IInterface
 from zope.interface.common.mapping import IEnumerableMapping
 
 
-# Import from _bootstrapinterfaces only because other packages will expect
-# to find these interfaces here.
 from zope.schema._bootstrapfields import Field
 from zope.schema._bootstrapfields import Text
 from zope.schema._bootstrapfields import TextLine
@@ -31,6 +31,10 @@ from zope.schema._bootstrapfields import Rational
 from zope.schema._bootstrapfields import Real
 from zope.schema._bootstrapfields import Integral
 from zope.schema._bootstrapfields import Int
+from zope.schema._bootstrapfields import Object
+
+# Import from _bootstrapinterfaces only because other packages will expect
+# to find these interfaces here.
 from zope.schema._bootstrapinterfaces import StopValidation
 from zope.schema._bootstrapinterfaces import ValidationError
 from zope.schema._bootstrapinterfaces import IFromUnicode
@@ -44,45 +48,116 @@ from zope.schema._bootstrapinterfaces import TooBig
 from zope.schema._bootstrapinterfaces import TooLong
 from zope.schema._bootstrapinterfaces import TooShort
 from zope.schema._bootstrapinterfaces import InvalidValue
+from zope.schema._bootstrapinterfaces import WrongContainedType
+from zope.schema._bootstrapinterfaces import SchemaNotCorrectlyImplemented
+from zope.schema._bootstrapinterfaces import SchemaNotFullyImplemented
+from zope.schema._bootstrapinterfaces import SchemaNotProvided
+from zope.schema._bootstrapinterfaces import IBeforeObjectAssignedEvent
 from zope.schema._bootstrapinterfaces import IContextAwareDefaultFactory
+from zope.schema._bootstrapinterfaces import IValidatable
 
 from zope.schema._compat import PY3
 
 from zope.schema._messageid import _
 
+__all__ = [
+    # Exceptions
+    'ConstraintNotSatisfied',
+    'InvalidDottedName',
+    'InvalidId',
+    'InvalidURI',
+    'InvalidValue',
+    'NotAContainer',
+    'NotAnIterator',
+    'NotUnique',
+    'RequiredMissing',
+    'SchemaNotCorrectlyImplemented',
+    'SchemaNotFullyImplemented',
+    'SchemaNotProvided',
+    'StopValidation',
+    'TooBig',
+    'TooLong',
+    'TooShort',
+    'TooSmall',
+    'Unbound',
+    'ValidationError',
+    'WrongContainedType',
+    'WrongType',
 
-# pep 8 friendlyness
-StopValidation, ValidationError, IFromUnicode, RequiredMissing, WrongType
-ConstraintNotSatisfied, NotAContainer, NotAnIterator
-TooSmall, TooBig, TooLong, TooShort, InvalidValue, IContextAwareDefaultFactory
-
-
-class WrongContainedType(ValidationError):
-    __doc__ = _("""Wrong contained type""")
-
-
-class SchemaNotCorrectlyImplemented(WrongContainedType):
-    __doc__ = _("""An object failed schema or invariant validation.""")
-
-    #: A dictionary mapping failed attribute names of the
-    #: *value* to the underlying exception
-    schema_errors = None
-
-    #: A list of exceptions from validating the invariants
-    #: of the schema.
-    invariant_errors = ()
+    # Interfaces
+    'IASCII',
+    'IASCIILine',
+    'IAbstractBag',
+    'IAbstractSet',
+    'IBaseVocabulary',
+    'IBeforeObjectAssignedEvent',
+    'IBool',
+    'IBytes',
+    'IBytesLine',
+    'IChoice',
+    'ICollection',
+    'IComplex',
+    'IContainer',
+    'IContextAwareDefaultFactory',
+    'IContextSourceBinder',
+    'IDate',
+    'IDatetime',
+    'IDecimal',
+    'IDict',
+    'IDottedName',
+    'IField',
+    'IFieldEvent',
+    'IFieldUpdatedEvent',
+    'IFloat',
+    'IFromUnicode',
+    'IFrozenSet',
+    'IId',
+    'IInt',
+    'IIntegral',
+    'IInterfaceField',
+    'IIterable',
+    'IIterableSource',
+    'IIterableVocabulary',
+    'ILen',
+    'IList',
+    'IMapping',
+    'IMinMax',
+    'IMinMaxLen',
+    'IMutableMapping',
+    'IMutableSequence',
+    'INativeString',
+    'INativeStringLine',
+    'INumber',
+    'IObject',
+    'IOrderable',
+    'IPassword',
+    'IRational',
+    'IReal',
+    'ISequence',
+    'ISet',
+    'ISource',
+    'ISourceQueriables',
+    'ISourceText',
+    'ITerm',
+    'IText',
+    'ITextLine',
+    'ITime',
+    'ITimedelta',
+    'ITitledTokenizedTerm',
+    'ITokenizedTerm',
+    'ITreeVocabulary',
+    'ITuple',
+    'IURI',
+    'IUnorderedCollection',
+    'IVocabulary',
+    'IVocabularyFactory',
+    'IVocabularyRegistry',
+    'IVocabularyTokenized',
+]
 
 
 class NotUnique(ValidationError):
     __doc__ = _("""One or more entries of sequence are not unique.""")
-
-
-class SchemaNotFullyImplemented(ValidationError):
-    __doc__ = _("""Schema not fully implemented""")
-
-
-class SchemaNotProvided(ValidationError):
-    __doc__ = _("""Schema not provided""")
 
 
 class InvalidURI(ValidationError):
@@ -101,7 +176,7 @@ class Unbound(Exception):
     __doc__ = _("""The field is not bound.""")
 
 
-class IField(Interface):
+class IField(IValidatable):
     """Basic Schema Field Interface.
 
     Fields are used for Interface specifications.  They at least provide
@@ -639,14 +714,14 @@ class IChoice(IField):
 
 # Abstract
 
-
 class ICollection(IMinMaxLen, IIterable, IContainer):
     """Abstract interface containing a collection value.
 
     The Value must be iterable and may have a min_length/max_length.
     """
 
-    value_type = Field(
+    value_type = Object(
+        IField,
         title=_("Value Type"),
         description=_("Field value items must conform to the given type, "
                       "expressed via a Field."))
@@ -677,14 +752,14 @@ class IUnorderedCollection(ICollection):
 class IAbstractSet(IUnorderedCollection):
     """An unordered collection of unique values."""
 
-    unique = Attribute("This ICollection interface attribute must be True")
+    unique = Bool(description="This ICollection interface attribute must be True")
 
 
 class IAbstractBag(IUnorderedCollection):
     """An unordered collection of values, with no limitations on whether
     members are unique"""
 
-    unique = Attribute("This ICollection interface attribute must be False")
+    unique = Bool(description="This ICollection interface attribute must be False")
 
 
 # Concrete
@@ -720,34 +795,19 @@ class IObject(IField):
        Add the *validate_invariants* attribute.
     """
 
-    schema = Attribute(
-        "schema",
-        _("The Interface that defines the Fields comprising the Object.")
+    schema = Object(
+        IInterface,
+        description=_("The Interface that defines the Fields comprising the Object.")
     )
 
-    validate_invariants = Attribute(
-        "validate_invariants",
-        _("A boolean that says whether ``schema.validateInvariants`` "
-          "is called from ``self.validate()``. The default is true.")
+    validate_invariants = Bool(
+        title="validate_invariants",
+        description=_("A boolean that says whether ``schema.validateInvariants`` "
+                      "is called from ``self.validate()``. The default is true."),
+        default=True,
     )
 
 
-class IBeforeObjectAssignedEvent(Interface):
-    """An object is going to be assigned to an attribute on another object.
-
-    Subscribers to this event can change the object on this event to change
-    what object is going to be assigned. This is useful, e.g. for wrapping
-    or replacing objects before they get assigned to conform to application
-    policy.
-    """
-
-    object = Attribute("The object that is going to be assigned.")
-
-    name = Attribute("The name of the attribute under which the object "
-                     "will be assigned.")
-
-    context = Attribute("The context object where the object will be "
-                        "assigned to.")
 
 class IMapping(IMinMaxLen, IIterable, IContainer):
     """
@@ -757,15 +817,15 @@ class IMapping(IMinMaxLen, IIterable, IContainer):
     of restrictions for keys and values contained in the dict.
 
     """
-    key_type = Attribute(
-        "key_type",
-        _("Field keys must conform to the given type, expressed via a Field.")
+    key_type = Object(
+        IField,
+        description=_("Field keys must conform to the given type, expressed via a Field.")
     )
 
-    value_type = Attribute(
-        "value_type",
-        _("Field values must conform to the given type, expressed "
-          "via a Field.")
+    value_type = Object(
+        IField,
+        description=_("Field values must conform to the given type, expressed "
+                      "via a Field.")
     )
 
 
@@ -973,7 +1033,9 @@ class IVocabularyFactory(Interface):
 
 class IFieldEvent(Interface):
 
-    field = Attribute("The field that has been changed")
+    field = Object(
+        IField,
+        description="The field that has been changed")
 
     object = Attribute("The object containing the field")
 
