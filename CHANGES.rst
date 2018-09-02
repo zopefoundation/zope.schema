@@ -97,6 +97,16 @@
 - Make ``Iterable`` and ``Container`` properly implement ``IIterable``
   and ``IContainer``, respectively.
 
+- Make ``SimpleVocabulary.fromItems`` accept triples to allow
+  specifying the title of terms. See `issue 18
+  <https://github.com/zopefoundation/zope.schema/issues/18>`_.
+
+- Make ``TreeVocabulary.fromDict`` only create
+  ``ITitledTokenizedTerms`` when a title is actually provided.
+
+- Make ``SimpleVocabulary`` and ``SimpleTerm`` have value-based
+  equality and hashing methods.
+
 4.5.0 (2017-07-10)
 ==================
 
