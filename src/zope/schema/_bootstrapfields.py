@@ -187,10 +187,10 @@ class Field(Attribute):
     def constraint(self, value):
         return True
 
-    def bind(self, object):
+    def bind(self, context):
         clone = self.__class__.__new__(self.__class__)
         clone.__dict__.update(self.__dict__)
-        clone.context = object
+        clone.context = context
         return clone
 
     def validate(self, value):
