@@ -107,6 +107,12 @@
 - Make ``SimpleVocabulary`` and ``SimpleTerm`` have value-based
   equality and hashing methods.
 
+- All fields of the schema of an ``Object`` field are bound to the
+  top-level value being validated before attempting validation of
+  their particular attribute. Previously only ``IChoice`` fields were
+  bound. See `issue 17
+  <https://github.com/zopefoundation/zope.schema/issues/17>`_.
+
 4.5.0 (2017-07-10)
 ==================
 

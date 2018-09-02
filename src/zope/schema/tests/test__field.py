@@ -2005,6 +2005,80 @@ class ObjectTests(EqualityTestsMixin,
 
         field.validate(ValueType())
 
+    def test_bound_field_of_collection_with_choice(self):
+        # https://github.com/zopefoundation/zope.schema/issues/17
+        from zope.interface import Interface, implementer
+        from zope.interface import Attribute
+
+        from zope.schema import Choice, Object, Set
+        from zope.schema.fieldproperty import FieldProperty
+        from zope.schema.interfaces import IContextSourceBinder
+        from zope.schema.interfaces import WrongContainedType
+        from zope.schema.interfaces import SchemaNotCorrectlyImplemented
+        from zope.schema.vocabulary import SimpleVocabulary
+
+
+        @implementer(IContextSourceBinder)
+        class EnumContext(object):
+            def __call__(self, context):
+                return SimpleVocabulary.fromValues(list(context))
+
+        class IMultipleChoice(Interface):
+            choices = Set(value_type=Choice(source=EnumContext()))
+            # Provide a regular attribute to prove that binding doesn't
+            # choke. NOTE: We don't actually verify the existence of this attribute.
+            non_field = Attribute("An attribute")
+
+        @implementer(IMultipleChoice)
+        class Choices(object):
+
+            def __init__(self, choices):
+                self.choices = choices
+
+            def __iter__(self):
+                # EnumContext calls this to make the vocabulary.
+                # Fields of the schema of the IObject are bound to the value being
+                # validated.
+                return iter(range(5))
+
+        class IFavorites(Interface):
+            fav = Object(title=u"Favorites number", schema=IMultipleChoice)
+
+
+        @implementer(IFavorites)
+        class Favorites(object):
+            fav = FieldProperty(IFavorites['fav'])
+
+        # must not raise
+        good_choices = Choices({1, 3})
+        IFavorites['fav'].validate(good_choices)
+
+        # Ranges outside the context fail
+        bad_choices = Choices({1, 8})
+        with self.assertRaises(WrongContainedType) as exc:
+            IFavorites['fav'].validate(bad_choices)
+
+        e = exc.exception
+        self.assertEqual(IFavorites['fav'], e.field)
+        self.assertEqual(bad_choices, e.value)
+
+        # Validation through field property
+        favorites = Favorites()
+        favorites.fav = good_choices
+
+        # And validation through a field that wants IFavorites
+        favorites_field = Object(IFavorites)
+        favorites_field.validate(favorites)
+
+        # Check the field property error
+        with self.assertRaises(SchemaNotCorrectlyImplemented) as exc:
+            favorites.fav = bad_choices
+
+        e = exc.exception
+        self.assertEqual(IFavorites['fav'], e.field)
+        self.assertEqual(bad_choices, e.value)
+        self.assertEqual(['choices'], list(e.schema_errors))
+
 
 class MappingTests(EqualityTestsMixin,
                    unittest.TestCase):

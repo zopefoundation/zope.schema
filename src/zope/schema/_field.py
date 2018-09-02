@@ -379,15 +379,15 @@ class Choice(Field):
 
     source = property(lambda self: self.vocabulary)
 
-    def bind(self, object):
+    def bind(self, context):
         """See zope.schema._bootstrapinterfaces.IField."""
-        clone = super(Choice, self).bind(object)
+        clone = super(Choice, self).bind(context)
         # get registered vocabulary if needed:
         if IContextSourceBinder.providedBy(self.vocabulary):
-            clone.vocabulary = self.vocabulary(object)
+            clone.vocabulary = self.vocabulary(context)
         elif clone.vocabulary is None and self.vocabularyName is not None:
             vr = getVocabularyRegistry()
-            clone.vocabulary = vr.get(object, self.vocabularyName)
+            clone.vocabulary = vr.get(context, self.vocabularyName)
 
         if not ISource.providedBy(clone.vocabulary):
             raise ValueError('Invalid clone vocabulary')
@@ -622,13 +622,13 @@ class Collection(MinMaxLen, Iterable):
         if unique is not _NotGiven:
             self.unique = unique
 
-    def bind(self, object):
+    def bind(self, context):
         """See zope.schema._bootstrapinterfaces.IField."""
-        clone = super(Collection, self).bind(object)
+        clone = super(Collection, self).bind(context)
         # binding value_type is necessary for choices with named vocabularies,
         # and possibly also for other fields.
         if clone.value_type is not None:
-            clone.value_type = clone.value_type.bind(object)
+            clone.value_type = clone.value_type.bind(context)
         return clone
 
     def _validate(self, value):
@@ -733,14 +733,11 @@ def _validate_fields(schema, value):
                 continue # pragma: no cover
 
             try:
-                if IChoice.providedBy(attribute):
-                    # Choice must be bound before validation otherwise
-                    # IContextSourceBinder is not iterable in validation
-                    bound = attribute.bind(value)
-                    bound.validate(getattr(value, name))
-                elif IField.providedBy(attribute):
+                if IField.providedBy(attribute):
                     # validate attributes that are fields
                     attribute.validate(getattr(value, name))
+                # XXX: We're not even checking the existence of non-IField
+                # Attribute objects.
             except ValidationError as error:
                 errors[name] = error
             except AttributeError as error:
@@ -749,6 +746,37 @@ def _validate_fields(schema, value):
     finally:
         del VALIDATED_VALUES.__dict__[id(value)]
     return errors
+
+
+class _BoundSchema(object):
+    """
+    This class proxies a schema to get its fields bound to a context.
+    """
+
+    __slots__ = ('schema', 'context')
+
+    def __new__(cls, schema, context):
+        # Only proxy if we really need to.
+        if schema is Interface or context is None:
+            return schema
+        return object.__new__(cls)
+
+    def __init__(self, schema, context):
+        self.schema = schema
+        self.context = context
+
+    def __getitem__(self, name):
+        # Indexing this item will bind fields,
+        # if possible
+        attr = self.schema[name]
+        try:
+            return attr.bind(self.context)
+        except AttributeError:
+            return attr
+
+    # but let all the rest slip to schema
+    def __getattr__(self, name):
+        return getattr(self.schema, name)
 
 
 @implementer(IObject)
@@ -788,7 +816,7 @@ class Object(Field):
             raise SchemaNotProvided(self.schema, value).with_field_and_value(self, value)
 
         # check the value against schema
-        schema_error_dict = _validate_fields(self.schema, value)
+        schema_error_dict = _validate_fields(_BoundSchema(self.schema, value), value)
         invariant_errors = []
         if self.validate_invariants:
             try:
