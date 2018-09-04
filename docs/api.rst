@@ -221,6 +221,10 @@ Numbers
 .. autoclass:: zope.schema.Int
 .. autoclass:: zope.schema.Decimal
 
+Vocabularies
+============
+
+.. automodule:: zope.schema.vocabulary
 
 Accessors
 =========

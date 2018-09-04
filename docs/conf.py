@@ -253,6 +253,7 @@ texinfo_documents = [
 
 intersphinx_mapping = {
     'https://docs.python.org/': None,
+    'https://zopecomponent.readthedocs.io/en/latest': None,
 }
 
 extlinks = {'issue': ('https://github.com/zopefoundation/zope.schema/issues/%s',

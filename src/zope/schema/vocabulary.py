@@ -329,9 +329,9 @@ class TreeVocabulary(object):
         (token, value, title) or (token, value). Only tuples that have
         three values will create a :class:`zope.schema.interfaces.ITitledTokenizedTerm`.
 
-        For example, a dict with 2-valued tuples:
+        For example, a dict with 2-valued tuples::
 
-        dict_ = {
+          dict_ = {
             ('exampleregions', 'Regions used in ATVocabExample'): {
                 ('aut', 'Austria'): {
                     ('tyr', 'Tyrol'): {
@@ -342,7 +342,8 @@ class TreeVocabulary(object):
                     ('bav', 'Bavaria'):{}
                 },
             }
-        }
+          }
+
         One or more interfaces may also be provided so that alternate
         widgets may be bound without subclassing.
 
@@ -421,9 +422,15 @@ class TreeVocabulary(object):
 
 # registry code
 class VocabularyRegistryError(LookupError):
+    """
+    A specialized subclass of `LookupError` raised for unknown
+    (unregistered) vocabularies.
+
+    .. seealso:: `VocabularyRegistry`
+    """
     def __init__(self, name):
         self.name = name
-        Exception.__init__(self, str(self))
+        super(VocabularyRegistryError, self).__init__(str(self))
 
     def __str__(self):
         return "unknown vocabulary: %r" % self.name
@@ -431,20 +438,37 @@ class VocabularyRegistryError(LookupError):
 
 @implementer(IVocabularyRegistry)
 class VocabularyRegistry(object):
-    __slots__ = '_map',
+    """
+    Default implementation of
+    :class:`zope.schema.interfaces.IVocabularyRegistry`.
+
+    An instance of this class is used by default by
+    :func:`getVocabularyRegistry`, which in turn is used by
+    :class:`~.Choice` fields.
+
+    Named vocabularies must be manually registered with this object
+    using :meth:`register`. This associates a vocabulary name with a
+    :class:`zope.schema.interfaces.IVocabularyFactory`.
+
+    An alternative to this is to use the :mod:`zope.component` registry via
+    `zope.vocabularyregistry
+    <https://pypi.org/project/zope.vocabularyregistry/>`_.
+    """
+    __slots__ = ('_map',)
 
     def __init__(self):
         self._map = {}
 
-    def get(self, object, name):
+    def get(self, context, name):
         """See zope.schema.interfaces.IVocabularyRegistry"""
         try:
             vtype = self._map[name]
         except KeyError:
             raise VocabularyRegistryError(name)
-        return vtype(object)
+        return vtype(context)
 
     def register(self, name, factory):
+        """Register a *factory* for the vocabulary with the given *name*."""
         self._map[name] = factory
 
 _vocabularies = None

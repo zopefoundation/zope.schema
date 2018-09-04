@@ -1,6 +1,6 @@
-======
-Fields
-======
+========
+ Fields
+========
 
 This document highlights unusual and subtle aspects of various fields and
 field classes, and is not intended to be a general introduction to schema
@@ -14,12 +14,12 @@ look at the standard zope.app approach to using these fields to find views
 ("widgets").
 
 Scalars
--------
+=======
 
 Scalar fields represent simple. immutable Python types.
 
 Bytes
-#####
+-----
 
 :class:`zope.schema.Bytes` fields contain binary data, represented
 as a sequence of bytes (``str`` in Python2, ``bytes`` in Python3).
@@ -41,7 +41,7 @@ Conversion from Unicode:
    ConstraintNotSatisfied:  foo y.z bat
 
 ASCII
-#####
+-----
 
 :class:`zope.schema.ASCII` fields are a restricted form of
 :class:`zope.schema.Bytes`:  they can contain only 7-bit bytes.
@@ -73,19 +73,19 @@ but fails with 8-bit (encoded) strings:
    InvalidValue
 
 BytesLine
-#########
+---------
 
 :class:`zope.schema.BytesLine` fields are a restricted form of
 :class:`zope.schema.Bytes`:  they cannot contain newlines.
 
 ASCIILine
-#########
+---------
 
 :class:`zope.schema.BytesLine` fields are a restricted form of
 :class:`zope.schema.ASCII`:  they cannot contain newlines.
 
 Float
-#####
+-----
 
 :class:`zope.schema.Float` fields contain binary data, represented
 as a a Python ``float``.
@@ -104,7 +104,7 @@ Conversion from Unicode:
    InvalidFloatLiteral: invalid literal for float(): 1.25.6
 
 Int
-###
+---
 
 :class:`zope.schema.Int` fields contain binary data, represented
 as a a Python ``int``.
@@ -124,7 +124,7 @@ Conversion from Unicode:
 
 
 Decimal
-#######
+-------
 
 :class:`zope.schema.Decimal` fields contain binary data, represented
 as a a Python :class:`decimal.Decimal`.
@@ -146,31 +146,31 @@ Conversion from Unicode:
    InvalidDecimalLiteral: invalid literal for Decimal(): 1.25.6
 
 Datetime
-########
+--------
 
 :class:`zope.schema.Datetime` fields contain binary data, represented
 as a a Python :class:`datetime.datetime`.
 
 Date
-####
+----
 
 :class:`zope.schema.Date` fields contain binary data, represented
 as a a Python :class:`datetime.date`.
 
 TimeDelta
-#########
+---------
 
 :class:`zope.schema.TimeDelta` fields contain binary data, represented
 as a a Python :class:`datetime.timedelta`.
 
 Time
-####
+----
 
 :class:`zope.schema.Time` fields contain binary data, represented
 as a a Python :class:`datetime.time`.
 
 Choice
-######
+------
 
 :class:`zope.schema.Choice` fields are constrained to values drawn
 from a specified set, which can be static or dynamic.
@@ -204,7 +204,7 @@ in swallow_duplicates=True when initializing the vocabulary. See
 the test cases for an example.
 
 URI
-###
+---
 
 :class:`zope.schema.URI` fields contain native Python strings
 (``str``), matching the "scheme:data" pattern.
@@ -239,7 +239,7 @@ Conversion from Unicode:
    InvalidURI: http://www.python.org/ foo/bar
 
 DottedName
-##########
+----------
 
 :class:`zope.schema.DottedName` fields contain native Python strings
 (``str``), containing zero or more "dots" separating elements of the
@@ -369,7 +369,7 @@ Conversion from Unicode:
 
 
 Collections
------------
+===========
 
 Normal fields typically describe the API of the attribute -- does it behave as a
 Python Int, or a Float, or a Bool -- and various constraints to the model, such
@@ -414,7 +414,7 @@ them these:
    True
 
 Creating a custom collection field
-----------------------------------
+==================================
 
 Ideally, custom collection fields have interfaces that inherit appropriately
 from either zope.schema.interfaces.ISequence or
@@ -424,13 +424,13 @@ behavior.  Notice the behavior of the Set field in zope.schema: this
 would also be necessary to implement a Bag.
 
 Choices and Vocabularies
-------------------------
+========================
 
 Choice fields are the schema way of spelling enumerated fields and more.  By
-providing a dynamically generated vocabulary, the choices available to a
+providing a dynamically generated list of options, the choices available to a
 choice field can be contextually calculated.
 
-Simple choices do not have to explicitly use vocabularies:
+Simple choices can directly specify the values they accept:
 
 .. doctest::
 
@@ -446,46 +446,138 @@ Simple choices do not have to explicitly use vocabularies:
    ...
    ConstraintNotSatisfied: bing
 
-More complex choices will want to use registered vocabularies.  Vocabularies
-have a simple interface, as defined in
-zope.schema.interfaces.IBaseVocabulary.  A vocabulary must minimally be able
-to determine whether it contains a value, to create a term object for a value,
-and to return a query interface (or None) to find items in itself.  Term
-objects are an abstraction that wraps a vocabulary value.
+More complex choices will want to use *vocabularies*, possibly created
+from a contextual *vocabulary factory* or *named*. Vocabularies have a
+simple interface, as defined in
+`zope.schema.interfaces.IBaseVocabulary`. A vocabulary must minimally
+be able to determine whether it contains a value, to create a term
+object for a value, and to return a query interface (or None) to find
+items in itself. Term objects are an abstraction that wraps a
+vocabulary value.
 
-The Zope application server typically needs a fuller interface that provides
-"tokens" on its terms: ASCII values that have a one-to-one relationship to the
-values when the vocabulary is asked to "getTermByToken".  If a vocabulary is
-small, it can also support the IIterableVocabulary interface.
+Many applications that deal with accepting user input and validating
+it against a choice may need a fuller vocabulary interface that
+provides "tokens" on its terms: ASCII values that have a one-to-one
+relationship to the values when the vocabulary is asked to
+"getTermByToken". If a vocabulary is small, it can also support the
+`zope.schema.interfaces.IIterableVocabulary` interface.
 
-If a vocabulary has been registered, then the choice merely needs to pass the
-vocabulary identifier to the "vocabulary" argument of the choice during
-instantiation.
+A start to a vocabulary implementation that may do all you need for
+many simple tasks may be found in
+`zope.schema.vocabulary.SimpleVocabulary`. The vocabulary interface is
+simple enough that writing a custom vocabulary is not too difficult
+itself.
 
-A start to a vocabulary implementation that may do all you need for many simple
-tasks may be found in zope.schema.vocabulary.SimpleVocabulary.  Because
-registered vocabularies are simply callables passed a context, many
-registered vocabularies can simply be functions that rely on SimpleVocabulary:
+See `zope.schema.vocabulary.TreeVocabulary` for another
+``IBaseVocabulary`` supporting vocabulary that provides a nested,
+tree-like structure.
+
+
+Vocabulary Factories
+--------------------
+
+Sometimes the values for a choice really are dynamic. For example,
+they might depend on the context object being validated. In that case,
+we can provide an object that provides
+`zope.schema.interfaces.IContextSourceBinder` as the ``source``
+parameter. When the Choice needs a vocabulary, it will call the
+``IContextSourceBinder``, passing in its context. This could be as
+simple as a function:
 
 .. doctest::
 
    >>> from zope.schema.vocabulary import SimpleVocabulary
+   >>> from zope.schema.interfaces import IContextSourceBinder
+   >>> from zope.interface import directlyProvides
    >>> def myDynamicVocabulary(context):
-   ...     v = dynamic_context_calculation_that_returns_an_iterable(context)
+   ...     v = range(context)
    ...     return SimpleVocabulary.fromValues(v)
+   >>> directlyProvides(myDynamicVocabulary, IContextSourceBinder)
+
+   >>> f = Choice(source=myDynamicVocabulary)
+
+Note that the source is only invoked for fields that have been bound
+to a context:
+
+.. doctest::
+
+   >>> f.validate(1)
+   Traceback (most recent call last):
    ...
+   InvalidVocabularyError: Invalid vocabulary <function myDynamicVocabulary at 0x1101f7730>
+   >>> f = f.bind(3)
+   >>> f.validate(1)
+   >>> f.validate(2)
+   >>> f.validate(3)
+   Traceback (most recent call last):
+   ...
+   ConstraintNotSatisfied: 3
 
-The vocabulary interface is simple enough that writing a custom vocabulary is
-not too difficult itself.
+Named (Registered) Vocabularies
+-------------------------------
 
-See zope.schema.vocabulary.TreeVocabulary for another
-IBaseVocabulary supporting vocabulary that provides a nested, tree-like
-structure.
+We can also provide a vocabulary name that will be resolved later
+against a registry of vocabulary factories (objects that implement
+:class:`zope.schema.interfaces.IVocabularyFactory`). On the surface,
+this looks very similar to providing a ``source`` argument: they are
+both callable objects that take a context and return a vocabulary. The
+advantage of a named factory is a level of indirection, allowing the
+same name to be easily used in many different fields, even from
+packages that aren't aware of each other. For example, an application
+framework may define choices that use a 'permissions' vocabulary, and
+individual applications may define their own meaning for that name.
+
+A simple version of this is provided in this package using a global
+vocabulary registry:
+
+.. doctest::
+
+   >>> from zope.schema.vocabulary import SimpleVocabulary
+   >>> from zope.schema.vocabulary import getVocabularyRegistry
+   >>> from zope.schema.interfaces import IVocabularyFactory
+   >>> from zope.interface import implementer
+   >>> @implementer(IVocabularyFactory)
+   ... class PermissionsVocabulary(object):
+   ...
+   ...     def __call__(self, context):
+   ...         if context is None: raise AttributeError
+   ...         return SimpleVocabulary.fromValues(context.possible_permissions)
+   >>> getVocabularyRegistry().register('permissions', PermissionsVocabulary())
+
+   >>> class Context(object):
+   ...     possible_permissions = ('read', 'write')
+
+Unlike ``IContextSourceBinder``, the factory is invoked even for
+unbound fields; depending on the factory, this may or may not do
+anything useful (our factory produces errors):
+
+.. doctest::
+
+   >>> f = Choice(vocabulary='permissions')
+   >>> f.validate('read')
+   Traceback (most recent call last):
+   ...
+   AttributeError
+   >>> context = Context()
+   >>> f = f.bind(context)
+   >>> f.validate("read")
+   >>> f.validate("write")
+   >>> f.validate("delete")
+   Traceback (most recent call last):
+   ...
+   ConstraintNotSatisfied: ('delete', '')
+
+A registry that keeps factories as named utilities in the `Zope
+component architecture <https://zopecomponent.readthedocs.io>`_ is
+provided by the `zope.vocabularyregistry
+<https://pypi.org/project/zope.vocabularyregistry/>`_ package. This is
+especially useful when combined with the concept of multiple component
+site managers, as that provides another layer of indirection.
 
 Choices and Collections
------------------------
+=======================
 
-Choices are a field type and can be used as a value_type for collections. Just
+Choices are a field type and can be used as a ``value_type`` for collections. Just
 as a collection of an "Int" value_type constrains members to integers, so a
 choice-based value type constrains members to choices within the Choice's
 vocabulary.  Typically in the Zope application server widgets are found not
@@ -493,7 +585,7 @@ only for the collection and the choice field but also for the vocabulary on
 which the choice is based.
 
 Using Choice and Collection Fields within a Widget Framework
-------------------------------------------------------------
+============================================================
 
 While fields support several use cases, including code documentation and data
 description and even casting, a significant use case influencing their design is
