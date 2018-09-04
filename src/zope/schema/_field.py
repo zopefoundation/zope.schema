@@ -420,8 +420,8 @@ class Choice(Field):
         clone = super(Choice, self).bind(context)
         # Eagerly get registered vocabulary if needed;
         # once that's done, just return it
-        clone.vocabulary = clone._resolve_vocabulary(None)
-        clone._resolve_vocabulary = lambda value: clone.vocabulary
+        vocabulary = clone.vocabulary = clone._resolve_vocabulary(None)
+        clone._resolve_vocabulary = lambda value: vocabulary
         return clone
 
     def fromUnicode(self, str):
