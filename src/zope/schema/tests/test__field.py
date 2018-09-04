@@ -919,6 +919,25 @@ class ChoiceTests(EqualityTestsMixin,
         setVocabularyRegistry(Reg())
         self.test__validate_w_named_vocabulary_invalid()
 
+    def test__validate_w_named_vocabulary_passes_context(self):
+        from zope.schema.vocabulary import setVocabularyRegistry
+        context = object()
+        choice = self._makeOne(vocabulary='vocab')
+
+        class Reg(object):
+            called_with = ()
+            def get(self, *args):
+                self.called_with += args
+                return _makeSampleVocabulary()
+
+        reg = Reg()
+        setVocabularyRegistry(reg)
+
+        choice = choice.bind(context)
+        choice._validate(1)
+
+        self.assertEqual(reg.called_with, (context, 'vocab'))
+
     def test__validate_w_named_vocabulary(self):
         from zope.schema.interfaces import ConstraintNotSatisfied
         from zope.schema.vocabulary import setVocabularyRegistry
