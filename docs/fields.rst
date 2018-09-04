@@ -447,13 +447,14 @@ Simple choices can directly specify the values they accept:
    ConstraintNotSatisfied: bing
 
 More complex choices will want to use *vocabularies*, possibly created
-from a contextual *vocabulary factory* or *named*. Vocabularies have a
-simple interface, as defined in
-`zope.schema.interfaces.IBaseVocabulary`. A vocabulary must minimally
-be able to determine whether it contains a value, to create a term
-object for a value, and to return a query interface (or None) to find
-items in itself. Term objects are an abstraction that wraps a
-vocabulary value.
+from a contextual *vocabulary factory*; this factory can either be
+directly provided at construction time or *named* and looked up in a
+registry at binding or validation time. Vocabularies have a simple
+interface, as defined in `zope.schema.interfaces.IBaseVocabulary`. A
+vocabulary must minimally be able to determine whether it contains a
+value, to create a term object for a value, and to return a query
+interface (or None) to find items in itself. Term objects are an
+abstraction that wraps a vocabulary value.
 
 Many applications that deal with accepting user input and validating
 it against a choice may need a fuller vocabulary interface that
@@ -462,11 +463,10 @@ relationship to the values when the vocabulary is asked to
 "getTermByToken". If a vocabulary is small, it can also support the
 `zope.schema.interfaces.IIterableVocabulary` interface.
 
-A start to a vocabulary implementation that may do all you need for
-many simple tasks may be found in
-`zope.schema.vocabulary.SimpleVocabulary`. The vocabulary interface is
-simple enough that writing a custom vocabulary is not too difficult
-itself.
+`zope.schema.vocabulary.SimpleVocabulary` is a vocabulary
+implementation that may do all you need for many simple tasks. The
+vocabulary interface is simple enough that writing a custom vocabulary
+is not too difficult itself.
 
 See `zope.schema.vocabulary.TreeVocabulary` for another
 ``IBaseVocabulary`` supporting vocabulary that provides a nested,
@@ -567,12 +567,13 @@ anything useful (our factory produces errors):
    ...
    ConstraintNotSatisfied: ('delete', '')
 
-A registry that keeps factories as named utilities in the `Zope
-component architecture <https://zopecomponent.readthedocs.io>`_ is
-provided by the `zope.vocabularyregistry
-<https://pypi.org/project/zope.vocabularyregistry/>`_ package. This is
-especially useful when combined with the concept of multiple component
-site managers, as that provides another layer of indirection.
+The `zope.vocabularyregistry
+<https://pypi.org/project/zope.vocabularyregistry/>`_ package provides
+a registry that keeps factories as named utilities in the `Zope
+component architecture <https://zopecomponent.readthedocs.io>`_. This
+is especially useful when combined with the concept of multiple
+component site managers, as that provides another layer of
+indirection.
 
 Choices and Collections
 =======================
