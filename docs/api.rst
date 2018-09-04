@@ -9,97 +9,97 @@ better guide to the intended usage.
 Interfaces
 ==========
 
-.. autoclass:: zope.schema.interfaces.IField
-.. autoclass:: zope.schema.interfaces.IFromUnicode
-.. autoclass:: zope.schema.interfaces.IChoice
-.. autoclass:: zope.schema.interfaces.IContextAwareDefaultFactory
-.. autoclass:: zope.schema.interfaces.IOrderable
-.. autoclass:: zope.schema.interfaces.ILen
-.. autoclass:: zope.schema.interfaces.IMinMax
-.. autoclass:: zope.schema.interfaces.IMinMaxLen
-.. autoclass:: zope.schema.interfaces.IInterfaceField
-.. autoclass:: zope.schema.interfaces.IBool
-.. autoclass:: zope.schema.interfaces.IObject
-.. autoclass:: zope.schema.interfaces.IDict
+.. autointerface:: zope.schema.interfaces.IField
+.. autointerface:: zope.schema.interfaces.IFromUnicode
+.. autointerface:: zope.schema.interfaces.IChoice
+.. autointerface:: zope.schema.interfaces.IContextAwareDefaultFactory
+.. autointerface:: zope.schema.interfaces.IOrderable
+.. autointerface:: zope.schema.interfaces.ILen
+.. autointerface:: zope.schema.interfaces.IMinMax
+.. autointerface:: zope.schema.interfaces.IMinMaxLen
+.. autointerface:: zope.schema.interfaces.IInterfaceField
+.. autointerface:: zope.schema.interfaces.IBool
+.. autointerface:: zope.schema.interfaces.IObject
+.. autointerface:: zope.schema.interfaces.IDict
 
 Strings
 -------
 
-.. autoclass:: zope.schema.interfaces.IBytes
-.. autoclass:: zope.schema.interfaces.IBytesLine
-.. autoclass:: zope.schema.interfaces.IText
-.. autoclass:: zope.schema.interfaces.ITextLine
-.. autoclass:: zope.schema.interfaces.IASCII
-.. autoclass:: zope.schema.interfaces.IASCIILine
+.. autointerface:: zope.schema.interfaces.IBytes
+.. autointerface:: zope.schema.interfaces.IBytesLine
+.. autointerface:: zope.schema.interfaces.IText
+.. autointerface:: zope.schema.interfaces.ITextLine
+.. autointerface:: zope.schema.interfaces.IASCII
+.. autointerface:: zope.schema.interfaces.IASCIILine
 
-.. autoclass:: zope.schema.interfaces.IPassword
-.. autoclass:: zope.schema.interfaces.IURI
-.. autoclass:: zope.schema.interfaces.IId
-.. autoclass:: zope.schema.interfaces.IDottedName
+.. autointerface:: zope.schema.interfaces.IPassword
+.. autointerface:: zope.schema.interfaces.IURI
+.. autointerface:: zope.schema.interfaces.IId
+.. autointerface:: zope.schema.interfaces.IDottedName
 
 
 Numbers
 -------
 
-.. autoclass:: zope.schema.interfaces.INumber
-.. autoclass:: zope.schema.interfaces.IComplex
-.. autoclass:: zope.schema.interfaces.IReal
-.. autoclass:: zope.schema.interfaces.IRational
-.. autoclass:: zope.schema.interfaces.IIntegral
+.. autointerface:: zope.schema.interfaces.INumber
+.. autointerface:: zope.schema.interfaces.IComplex
+.. autointerface:: zope.schema.interfaces.IReal
+.. autointerface:: zope.schema.interfaces.IRational
+.. autointerface:: zope.schema.interfaces.IIntegral
 
-.. autoclass:: zope.schema.interfaces.IInt
-.. autoclass:: zope.schema.interfaces.IFloat
-.. autoclass:: zope.schema.interfaces.IDecimal
+.. autointerface:: zope.schema.interfaces.IInt
+.. autointerface:: zope.schema.interfaces.IFloat
+.. autointerface:: zope.schema.interfaces.IDecimal
 
 Date/Time
 ---------
 
-.. autoclass:: zope.schema.interfaces.IDatetime
-.. autoclass:: zope.schema.interfaces.IDate
-.. autoclass:: zope.schema.interfaces.ITimedelta
-.. autoclass:: zope.schema.interfaces.ITime
+.. autointerface:: zope.schema.interfaces.IDatetime
+.. autointerface:: zope.schema.interfaces.IDate
+.. autointerface:: zope.schema.interfaces.ITimedelta
+.. autointerface:: zope.schema.interfaces.ITime
 
 
 Collections
 -----------
-.. autoclass:: zope.schema.interfaces.IIterable
-.. autoclass:: zope.schema.interfaces.IContainer
-.. autoclass:: zope.schema.interfaces.ICollection
-.. autoclass:: zope.schema.interfaces.ISequence
-.. autoclass:: zope.schema.interfaces.IMutableSequence
-.. autoclass:: zope.schema.interfaces.IUnorderedCollection
-.. autoclass:: zope.schema.interfaces.IAbstractSet
-.. autoclass:: zope.schema.interfaces.IAbstractBag
+.. autointerface:: zope.schema.interfaces.IIterable
+.. autointerface:: zope.schema.interfaces.IContainer
+.. autointerface:: zope.schema.interfaces.ICollection
+.. autointerface:: zope.schema.interfaces.ISequence
+.. autointerface:: zope.schema.interfaces.IMutableSequence
+.. autointerface:: zope.schema.interfaces.IUnorderedCollection
+.. autointerface:: zope.schema.interfaces.IAbstractSet
+.. autointerface:: zope.schema.interfaces.IAbstractBag
 
-.. autoclass:: zope.schema.interfaces.ITuple
-.. autoclass:: zope.schema.interfaces.IList
-.. autoclass:: zope.schema.interfaces.ISet
-.. autoclass:: zope.schema.interfaces.IFrozenSet
+.. autointerface:: zope.schema.interfaces.ITuple
+.. autointerface:: zope.schema.interfaces.IList
+.. autointerface:: zope.schema.interfaces.ISet
+.. autointerface:: zope.schema.interfaces.IFrozenSet
 
 Events
 ------
 
-.. autoclass:: zope.schema.interfaces.IBeforeObjectAssignedEvent
-.. autoclass:: zope.schema.interfaces.IFieldEvent
-.. autoclass:: zope.schema.interfaces.IFieldUpdatedEvent
+.. autointerface:: zope.schema.interfaces.IBeforeObjectAssignedEvent
+.. autointerface:: zope.schema.interfaces.IFieldEvent
+.. autointerface:: zope.schema.interfaces.IFieldUpdatedEvent
 
 Vocabularies
 ------------
 
-.. autoclass:: zope.schema.interfaces.ITerm
-.. autoclass:: zope.schema.interfaces.ITokenizedTerm
-.. autoclass:: zope.schema.interfaces.ITitledTokenizedTerm
-.. autoclass:: zope.schema.interfaces.ISource
-.. autoclass:: zope.schema.interfaces.ISourceQueriables
-.. autoclass:: zope.schema.interfaces.IContextSourceBinder
-.. autoclass:: zope.schema.interfaces.IBaseVocabulary
-.. autoclass:: zope.schema.interfaces.IIterableVocabulary
-.. autoclass:: zope.schema.interfaces.IIterableSource
-.. autoclass:: zope.schema.interfaces.IVocabulary
-.. autoclass:: zope.schema.interfaces.IVocabularyTokenized
-.. autoclass:: zope.schema.interfaces.ITreeVocabulary
-.. autoclass:: zope.schema.interfaces.IVocabularyRegistry
-.. autoclass:: zope.schema.interfaces.IVocabularyFactory
+.. autointerface:: zope.schema.interfaces.ITerm
+.. autointerface:: zope.schema.interfaces.ITokenizedTerm
+.. autointerface:: zope.schema.interfaces.ITitledTokenizedTerm
+.. autointerface:: zope.schema.interfaces.ISource
+.. autointerface:: zope.schema.interfaces.ISourceQueriables
+.. autointerface:: zope.schema.interfaces.IContextSourceBinder
+.. autointerface:: zope.schema.interfaces.IBaseVocabulary
+.. autointerface:: zope.schema.interfaces.IIterableVocabulary
+.. autointerface:: zope.schema.interfaces.IIterableSource
+.. autointerface:: zope.schema.interfaces.IVocabulary
+.. autointerface:: zope.schema.interfaces.IVocabularyTokenized
+.. autointerface:: zope.schema.interfaces.ITreeVocabulary
+.. autointerface:: zope.schema.interfaces.IVocabularyRegistry
+.. autointerface:: zope.schema.interfaces.IVocabularyFactory
 
 Exceptions
 ----------
