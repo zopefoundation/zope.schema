@@ -943,10 +943,10 @@ class IVocabularyRegistry(Interface):
     architecture.
     """
 
-    def get(object, name):
+    def get(context, name):
         """
         Return the vocabulary named *name* for the content object
-        *object*.
+        *context*.
 
         When the vocabulary cannot be found, `LookupError` is raised.
         """

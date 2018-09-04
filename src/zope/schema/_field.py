@@ -115,7 +115,6 @@ from zope.schema._bootstrapfields import MinMaxLen
 from zope.schema._bootstrapfields import _NotGiven
 from zope.schema.fieldproperty import FieldProperty
 from zope.schema.vocabulary import getVocabularyRegistry
-from zope.schema.vocabulary import VocabularyRegistryError
 from zope.schema.vocabulary import SimpleVocabulary
 
 
@@ -328,6 +327,13 @@ class Time(Orderable, Field):
     _type = time
 
 
+class MissingVocabularyError(ValidationError,
+                             ValueError,
+                             LookupError):
+    """Raised when a named vocabulary cannot be found."""
+    # Subclasses ValueError and LookupError for backwards compatibility
+
+
 @implementer(IChoice, IFromUnicode)
 class Choice(Field):
     """Choice fields can have a value found in a constant or dynamic set of
@@ -410,8 +416,10 @@ class Choice(Field):
             vr = getVocabularyRegistry()
             try:
                 vocabulary = vr.get(None, self.vocabularyName)
-            except VocabularyRegistryError:
-                raise ValueError("Can't validate value without vocabulary")
+            except LookupError:
+                raise MissingVocabularyError(
+                    "Can't validate value without vocabulary named %r" % (self.vocabularyName,)
+                ).with_field_and_value(self, value)
         if value not in vocabulary:
             raise ConstraintNotSatisfied(value, self.__name__).with_field_and_value(self, value)
 

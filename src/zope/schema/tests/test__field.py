@@ -895,8 +895,29 @@ class ChoiceTests(EqualityTestsMixin,
         self.assertRaises(ConstraintNotSatisfied, choice._validate, 0.2)
 
     def test__validate_w_named_vocabulary_invalid(self):
+        from zope.schema._field import MissingVocabularyError
         choose = self._makeOne(vocabulary='vocab')
-        self.assertRaises(ValueError, choose._validate, 42)
+        with self.assertRaises(MissingVocabularyError) as exc:
+            choose._validate(42)
+
+        ex = exc.exception
+        self.assertIsInstance(ex, ValueError)
+        self.assertIsInstance(ex, LookupError)
+        self.assertIs(ex.field, choose)
+        self.assertEqual(ex.value, 42)
+
+    def test__validate_w_named_vocabulary_raises_LookupError(self):
+        # Whether the vocab registry raises VocabularyRegistryError
+        # or the generic LookupError documented by IVocabularyLookup,
+        # we do the same thing
+        from zope.schema.vocabulary import setVocabularyRegistry
+
+        class Reg(object):
+            def get(*args):
+                raise LookupError
+
+        setVocabularyRegistry(Reg())
+        self.test__validate_w_named_vocabulary_invalid()
 
     def test__validate_w_named_vocabulary(self):
         from zope.schema.interfaces import ConstraintNotSatisfied
