@@ -678,9 +678,15 @@ class Int(Integral):
     _unicode_converters = (int,)
 
 
-VALIDATED_VALUES = threading.local()
+class _ObjectsBeingValidated(threading.local):
 
-def get_schema_validation_errors(schema, value):
+    def __init__(self):
+        super(_ObjectsBeingValidated, self).__init__()
+        self.ids_being_validated = set()
+
+
+def get_schema_validation_errors(schema, value,
+                                 _validating_objects=_ObjectsBeingValidated()):
     """
     Validate that *value* conforms to the schema interface *schema*.
 
@@ -702,9 +708,10 @@ def get_schema_validation_errors(schema, value):
     # infinite recursion. Collect validated objects in a thread local dict by
     # it's python represenation. A previous version was setting a volatile
     # attribute which didn't work with security proxy
-    if id(value) in VALIDATED_VALUES.__dict__:
+    id_value = id(value)
+    if id_value in _validating_objects.ids_being_validated:
         return errors
-    VALIDATED_VALUES.__dict__[id(value)] = True
+    _validating_objects.ids_being_validated.add(id_value)
     # (If we have gotten here, we know that `value` provides an interface
     # other than zope.interface.Interface;
     # iow, we can rely on the fact that it is an instance
@@ -728,7 +735,7 @@ def get_schema_validation_errors(schema, value):
                 # property for the given name is not implemented
                 errors[name] = SchemaNotFullyImplemented(error).with_field_and_value(attribute, None)
     finally:
-        del VALIDATED_VALUES.__dict__[id(value)]
+        _validating_objects.ids_being_validated.remove(id_value)
     return errors
 
 
