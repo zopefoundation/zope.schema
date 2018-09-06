@@ -104,6 +104,14 @@
 - Make ``TreeVocabulary.fromDict`` only create
   ``ITitledTokenizedTerms`` when a title is actually provided.
 
+- Make ``Choice`` fields reliably raise a ``ValidationError`` when a
+  named vocabulary cannot be found; for backwards compatibility this
+  is also a ``ValueError``. Previously this only worked when the
+  default ``VocabularyRegistry`` was in use, not when it was replaced
+  with `zope.vocabularyregistry
+  <https://pypi.org/project/zope.vocabularyregistry/>`_. See `issue 55
+  <https://github.com/zopefoundation/zope.schema/issues/55>`_.
+
 - Make ``SimpleVocabulary`` and ``SimpleTerm`` have value-based
   equality and hashing methods.
 

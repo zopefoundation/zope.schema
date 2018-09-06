@@ -927,22 +927,47 @@ class ITreeVocabulary(IVocabularyTokenized, IEnumerableMapping):
 
 
 class IVocabularyRegistry(Interface):
-    """Registry that provides IBaseVocabulary objects for specific fields.
+    """
+    Registry that provides `IBaseVocabulary` objects for specific
+    fields.
+
+    The fields of this package use the vocabulary registry that is
+    returned from :func:`~.getVocabularyRegistry`. This is a hook
+    function; by default it returns an instance of
+    :class:`~.VocabularyRegistry`, but the function
+    :func:`~.setVocabularyRegistry` can be used to change this.
+
+    In particular, the package `zope.vocabularyregistry
+    <https://pypi.org/project/zope.vocabularyregistry/>`_ can be used
+    to install a vocabulary registry that uses the :mod:`zope.component`
+    architecture.
     """
 
-    def get(object, name):
-        """Return the vocabulary named 'name' for the content object
-        'object'.
+    def get(context, name):
+        """
+        Return the vocabulary named *name* for the content object
+        *context*.
 
-        When the vocabulary cannot be found, LookupError is raised.
+        When the vocabulary cannot be found, `LookupError` is raised.
         """
 
 
 class IVocabularyFactory(Interface):
-    """Can create vocabularies."""
+    """
+    An object that can create `IBaseVocabulary`.
+
+    Objects that implement this interface can be registered with the
+    default :class:`~.VocabularyRegistry` provided by this package.
+
+    Alternatively, `zope.vocabularyregistry
+    <https://pypi.org/project/zope.vocabularyregistry/>`_ can be used
+    to install a `IVocabularyRegistry` that looks for named utilities
+    using :func:`zope.component.getUtility` which provide this
+    interface.
+    """
 
     def __call__(context):
-        """The context provides a location that the vocabulary can make use of.
+        """The *context* provides a location that the vocabulary can make use of.
         """
 
 

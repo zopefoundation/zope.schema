@@ -115,7 +115,6 @@ from zope.schema._bootstrapfields import MinMaxLen
 from zope.schema._bootstrapfields import _NotGiven
 from zope.schema.fieldproperty import FieldProperty
 from zope.schema.vocabulary import getVocabularyRegistry
-from zope.schema.vocabulary import VocabularyRegistryError
 from zope.schema.vocabulary import SimpleVocabulary
 
 
@@ -328,6 +327,22 @@ class Time(Orderable, Field):
     _type = time
 
 
+class MissingVocabularyError(ValidationError,
+                             ValueError,
+                             LookupError):
+    """Raised when a named vocabulary cannot be found."""
+    # Subclasses ValueError and LookupError for backwards compatibility
+
+class InvalidVocabularyError(ValidationError,
+                             ValueError,
+                             TypeError):
+    """Raised when the vocabulary is not an ISource."""
+    # Subclasses TypeError and ValueError for backwards compatibility
+
+    def __init__(self, vocabulary):
+        super(InvalidVocabularyError, self).__init__("Invalid vocabulary %r" % (vocabulary,))
+
+
 @implementer(IChoice, IFromUnicode)
 class Choice(Field):
     """Choice fields can have a value found in a constant or dynamic set of
@@ -365,7 +380,7 @@ class Choice(Field):
         else:
             if (not ISource.providedBy(vocabulary)
                     and not IContextSourceBinder.providedBy(vocabulary)):
-                raise ValueError('Invalid vocabulary')
+                raise InvalidVocabularyError(vocabulary)
             self.vocabulary = vocabulary
         # Before a default value is checked, it is validated. However, a
         # named vocabulary is usually not complete when these fields are
@@ -379,19 +394,34 @@ class Choice(Field):
 
     source = property(lambda self: self.vocabulary)
 
-    def bind(self, object):
-        """See zope.schema._bootstrapinterfaces.IField."""
-        clone = super(Choice, self).bind(object)
-        # get registered vocabulary if needed:
-        if IContextSourceBinder.providedBy(self.vocabulary):
-            clone.vocabulary = self.vocabulary(object)
-        elif clone.vocabulary is None and self.vocabularyName is not None:
+    def _resolve_vocabulary(self, value):
+        # Find the vocabulary we should use, raising
+        # an exception if this isn't possible, and returning
+        # an ISource otherwise.
+        vocabulary = self.vocabulary
+        if IContextSourceBinder.providedBy(vocabulary) and self.context is not None:
+            vocabulary = vocabulary(self.context)
+        elif vocabulary is None and self.vocabularyName is not None:
             vr = getVocabularyRegistry()
-            clone.vocabulary = vr.get(object, self.vocabularyName)
+            try:
+                vocabulary = vr.get(self.context, self.vocabularyName)
+            except LookupError:
+                raise MissingVocabularyError(
+                    "Can't validate value without vocabulary named %r" % (self.vocabularyName,)
+                ).with_field_and_value(self, value)
 
-        if not ISource.providedBy(clone.vocabulary):
-            raise ValueError('Invalid clone vocabulary')
+        if not ISource.providedBy(vocabulary):
+            raise InvalidVocabularyError(vocabulary).with_field_and_value(self, value)
 
+        return vocabulary
+
+    def bind(self, context):
+        """See zope.schema._bootstrapinterfaces.IField."""
+        clone = super(Choice, self).bind(context)
+        # Eagerly get registered vocabulary if needed;
+        # once that's done, just return it
+        vocabulary = clone.vocabulary = clone._resolve_vocabulary(None)
+        clone._resolve_vocabulary = lambda value: vocabulary
         return clone
 
     def fromUnicode(self, str):
@@ -405,13 +435,7 @@ class Choice(Field):
         if self._init_field:
             return
         super(Choice, self)._validate(value)
-        vocabulary = self.vocabulary
-        if vocabulary is None:
-            vr = getVocabularyRegistry()
-            try:
-                vocabulary = vr.get(None, self.vocabularyName)
-            except VocabularyRegistryError:
-                raise ValueError("Can't validate value without vocabulary")
+        vocabulary = self._resolve_vocabulary(value)
         if value not in vocabulary:
             raise ConstraintNotSatisfied(value, self.__name__).with_field_and_value(self, value)
 
