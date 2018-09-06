@@ -15,46 +15,46 @@
 """
 __docformat__ = "reStructuredText"
 
-from zope.interface import Interface
 from zope.interface import Attribute
-from zope.interface.interfaces import IInterface
+from zope.interface import Interface
 from zope.interface.common.mapping import IEnumerableMapping
+from zope.interface.interfaces import IInterface
 
 
-from zope.schema._bootstrapfields import Field
-from zope.schema._bootstrapfields import Text
-from zope.schema._bootstrapfields import TextLine
 from zope.schema._bootstrapfields import Bool
-from zope.schema._bootstrapfields import Number
 from zope.schema._bootstrapfields import Complex
+from zope.schema._bootstrapfields import Field
+from zope.schema._bootstrapfields import Int
+from zope.schema._bootstrapfields import Integral
+from zope.schema._bootstrapfields import Number
+from zope.schema._bootstrapfields import Object
 from zope.schema._bootstrapfields import Rational
 from zope.schema._bootstrapfields import Real
-from zope.schema._bootstrapfields import Integral
-from zope.schema._bootstrapfields import Int
-from zope.schema._bootstrapfields import Object
+from zope.schema._bootstrapfields import Text
+from zope.schema._bootstrapfields import TextLine
 
 # Import from _bootstrapinterfaces only because other packages will expect
 # to find these interfaces here.
-from zope.schema._bootstrapinterfaces import StopValidation
-from zope.schema._bootstrapinterfaces import ValidationError
-from zope.schema._bootstrapinterfaces import IFromUnicode
-from zope.schema._bootstrapinterfaces import RequiredMissing
-from zope.schema._bootstrapinterfaces import WrongType
 from zope.schema._bootstrapinterfaces import ConstraintNotSatisfied
+from zope.schema._bootstrapinterfaces import IBeforeObjectAssignedEvent
+from zope.schema._bootstrapinterfaces import IContextAwareDefaultFactory
+from zope.schema._bootstrapinterfaces import IFromUnicode
+from zope.schema._bootstrapinterfaces import IValidatable
+from zope.schema._bootstrapinterfaces import InvalidValue
 from zope.schema._bootstrapinterfaces import NotAContainer
 from zope.schema._bootstrapinterfaces import NotAnIterator
-from zope.schema._bootstrapinterfaces import TooSmall
-from zope.schema._bootstrapinterfaces import TooBig
-from zope.schema._bootstrapinterfaces import TooLong
-from zope.schema._bootstrapinterfaces import TooShort
-from zope.schema._bootstrapinterfaces import InvalidValue
-from zope.schema._bootstrapinterfaces import WrongContainedType
+from zope.schema._bootstrapinterfaces import RequiredMissing
 from zope.schema._bootstrapinterfaces import SchemaNotCorrectlyImplemented
 from zope.schema._bootstrapinterfaces import SchemaNotFullyImplemented
 from zope.schema._bootstrapinterfaces import SchemaNotProvided
-from zope.schema._bootstrapinterfaces import IBeforeObjectAssignedEvent
-from zope.schema._bootstrapinterfaces import IContextAwareDefaultFactory
-from zope.schema._bootstrapinterfaces import IValidatable
+from zope.schema._bootstrapinterfaces import StopValidation
+from zope.schema._bootstrapinterfaces import TooBig
+from zope.schema._bootstrapinterfaces import TooLong
+from zope.schema._bootstrapinterfaces import TooShort
+from zope.schema._bootstrapinterfaces import TooSmall
+from zope.schema._bootstrapinterfaces import ValidationError
+from zope.schema._bootstrapinterfaces import WrongContainedType
+from zope.schema._bootstrapinterfaces import WrongType
 
 from zope.schema._compat import PY3
 
