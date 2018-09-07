@@ -374,6 +374,17 @@ class Field(Attribute):
 
         if self._type:
             lines.append(_DocStringHelpers.make_class_field("Allowed Type", self._type))
+
+        # key_type and value_type are commonly used, but don't
+        # have a common superclass to add them, so we do it here.
+        # Using a rubric produces decent formatting
+        for name, rubric in (('key_type', 'Key Type'),
+                             ('value_type', 'Value Type')):
+            field = getattr(self, name, None)
+            if hasattr(field, 'getDoc'):
+                lines.append(".. rubric:: " + rubric)
+                lines.append(field.getDoc())
+
         return lines
 
     def getDoc(self):

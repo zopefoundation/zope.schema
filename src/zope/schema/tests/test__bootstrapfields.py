@@ -299,6 +299,14 @@ class FieldTests(EqualityTestsMixin,
         field._type = (str, object)
         doc = field.getDoc()
         self.assertIn(':Allowed Type: :class:`str`, :class:`object`', doc)
+        self.assertNotIn('..rubric', doc)
+
+        # value_type and key_type are automatically picked up
+        field.value_type = self._makeOne()
+        field.key_type = self._makeOne()
+        doc = field .getDoc()
+        self.assertIn('.. rubric:: Key Type', doc)
+        self.assertIn('.. rubric:: Value Type', doc)
 
         field = self._makeOne(title=u'A title', description=u"""Multiline description.
 
