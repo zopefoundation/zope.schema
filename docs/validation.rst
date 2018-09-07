@@ -4,13 +4,11 @@ Schema Validation
 
 There are two helper methods to verify schemas and interfaces:
 
-:func:`~.getValidationErrors`
-    first validates via the zope.schema field validators. If that succeeds the
-    invariants are checked.
-:func:`~.getSchemaValidationErrors`
-    *only* validates via the zope.schema field validators. The invariants are
-    *not* checked.
+.. autofunction:: zope.schema.getValidationErrors
+.. autofunction:: zope.schema.getSchemaValidationErrors
 
+Invariants are `documented by zope.interface
+<https://zopeinterface.readthedocs.io/en/latest/README.html#invariants>`_.
 
 Create an interface to validate against:
 

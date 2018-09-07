@@ -16,6 +16,7 @@
 from functools import total_ordering
 
 import zope.interface
+from zope.interface import Attribute
 
 from zope.schema._messageid import _
 
@@ -108,6 +109,31 @@ class NotAnIterator(ValidationError):
     __doc__ = _("""Not an iterator""")
 
 
+
+class WrongContainedType(ValidationError):
+    __doc__ = _("""Wrong contained type""")
+
+
+class SchemaNotCorrectlyImplemented(WrongContainedType):
+    __doc__ = _("""An object failed schema or invariant validation.""")
+
+    #: A dictionary mapping failed attribute names of the
+    #: *value* to the underlying exception
+    schema_errors = None
+
+    #: A list of exceptions from validating the invariants
+    #: of the schema.
+    invariant_errors = ()
+
+
+class SchemaNotFullyImplemented(ValidationError):
+    __doc__ = _("""Schema not fully implemented""")
+
+
+class SchemaNotProvided(ValidationError):
+    __doc__ = _("""Schema not provided""")
+
+
 class IFromUnicode(zope.interface.Interface):
     """Parse a unicode string to a value
 
@@ -131,6 +157,36 @@ class IContextAwareDefaultFactory(zope.interface.Interface):
     def __call__(context):
         """Returns a default value for the field."""
 
+
+class IBeforeObjectAssignedEvent(zope.interface.Interface):
+    """An object is going to be assigned to an attribute on another object.
+
+    Subscribers to this event can change the object on this event to change
+    what object is going to be assigned. This is useful, e.g. for wrapping
+    or replacing objects before they get assigned to conform to application
+    policy.
+    """
+
+    object = Attribute("The object that is going to be assigned.")
+
+    name = Attribute("The name of the attribute under which the object "
+                     "will be assigned.")
+
+    context = Attribute("The context object where the object will be "
+                        "assigned to.")
+
+
+class IValidatable(zope.interface.Interface):
+    # Internal interface, the base for IField, but used to prevent
+    # import recursion. This should *not* be implemented by anything
+    # other than IField.
+    def validate(value):
+        """Validate that the given value is a valid field value.
+
+        Returns nothing but raises an error if the value is invalid.
+        It checks everything specific to a Field and also checks
+        with the additional constraint.
+        """
 
 class NO_VALUE(object):
     def __repr__(self): # pragma: no cover
