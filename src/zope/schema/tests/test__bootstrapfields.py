@@ -277,6 +277,56 @@ class FieldTests(EqualityTestsMixin,
         from zope.schema.interfaces import IField
         return IField
 
+    def test_getDoc(self):
+        import textwrap
+        field = self._makeOne(readonly=True, required=False)
+        doc = field.getDoc()
+        self.assertIn(':Read Only: True', doc)
+        self.assertIn(':Required: False', doc)
+        self.assertIn(":Default Value:", doc)
+        self.assertNotIn(':Default Factory:', doc)
+
+        field._type = str
+        doc = field.getDoc()
+        self.assertIn(':Allowed Type: :class:`str`', doc)
+        self.assertNotIn(':Default Factory:', doc)
+
+        field.defaultFactory = 'default'
+        doc = field.getDoc()
+        self.assertNotIn(":Default Value:", doc)
+        self.assertIn(':Default Factory:', doc)
+
+        field._type = (str, object)
+        doc = field.getDoc()
+        self.assertIn(':Allowed Type: :class:`str`, :class:`object`', doc)
+
+        field = self._makeOne(title=u'A title', description=u"""Multiline description.
+
+        Some lines have leading whitespace.
+
+        It gets stripped.
+        """)
+
+        doc = field.getDoc()
+        self.assertEqual(
+            field.getDoc(),
+            textwrap.dedent("""\
+            A title
+
+            Multiline description.
+
+            Some lines have leading whitespace.
+
+            It gets stripped.
+
+            :Implementation: :class:`zope.schema.Field`
+            :Read Only: False
+            :Required: True
+            :Default Value: None
+            """)
+        )
+
+
     def test_ctor_defaults(self):
 
         field = self._makeOne()
@@ -1479,6 +1529,11 @@ class ObjectTests(EqualityTestsMixin,
         self.assertEqual(IFavorites['fav'], e.field)
         self.assertEqual(bad_choices, e.value)
         self.assertEqual(['choices'], list(e.schema_errors))
+
+    def test_getDoc(self):
+        field = self._makeOne()
+        doc = field.getDoc()
+        self.assertIn(":Must Provide: :class:", doc)
 
 
 class DummyInst(object):
