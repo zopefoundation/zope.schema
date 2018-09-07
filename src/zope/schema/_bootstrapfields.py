@@ -709,9 +709,10 @@ def get_schema_validation_errors(schema, value,
     # it's python represenation. A previous version was setting a volatile
     # attribute which didn't work with security proxy
     id_value = id(value)
-    if id_value in _validating_objects.ids_being_validated:
+    ids_being_validated = _validating_objects.ids_being_validated
+    if id_value in ids_being_validated:
         return errors
-    _validating_objects.ids_being_validated.add(id_value)
+    ids_being_validated.add(id_value)
     # (If we have gotten here, we know that `value` provides an interface
     # other than zope.interface.Interface;
     # iow, we can rely on the fact that it is an instance
@@ -735,7 +736,7 @@ def get_schema_validation_errors(schema, value,
                 # property for the given name is not implemented
                 errors[name] = SchemaNotFullyImplemented(error).with_field_and_value(attribute, None)
     finally:
-        _validating_objects.ids_being_validated.remove(id_value)
+        ids_being_validated.remove(id_value)
     return errors
 
 
