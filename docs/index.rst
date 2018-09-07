@@ -11,6 +11,7 @@ Contents:
    sources
    validation
    api
+   changelog
    hacking
 
 Indices and tables
