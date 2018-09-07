@@ -18,6 +18,7 @@ __docformat__ = 'restructuredtext'
 import decimal
 import fractions
 import numbers
+import sys
 import threading
 from math import isinf
 
@@ -26,6 +27,7 @@ from zope.interface import Invalid
 from zope.interface import Interface
 from zope.interface import providedBy
 from zope.interface import implementer
+from zope.interface.interface import InterfaceClass
 from zope.interface.interfaces import IInterface
 from zope.interface.interfaces import IMethod
 
@@ -118,6 +120,62 @@ def getFields(schema):
             fields[name] = attr
     return fields
 
+class _DocStringHelpers(object):
+    # Namespace object to hold methods related to ReST formatting
+    # docstrings
+
+    @staticmethod
+    def docstring_to_lines(docstring):
+        # Similar to what sphinx.utils.docstrings.prepare_docstring
+        # does. Strip leading equal whitespace, accounting for an initial line
+        # that might not have any. Return a list of lines, with a trailing
+        # blank line.
+        lines = docstring.expandtabs().splitlines()
+        # Find minimum indentation of any non-blank lines after ignored lines.
+
+        margin = sys.maxsize
+        for line in lines[1:]:
+            content = len(line.lstrip())
+            if content:
+                indent = len(line) - content
+                margin = min(margin, indent)
+        # Remove indentation from first ignored lines.
+        if len(lines) >= 1:
+            lines[0] = lines[0].lstrip()
+
+        if margin < sys.maxsize:
+            for i in range(1, len(lines)):
+                lines[i] = lines[i][margin:]
+        # Remove any leading blank lines.
+        while lines and not lines[0]:
+            lines.pop(0)
+        #
+        lines.append('')
+        return lines
+
+    @staticmethod
+    def make_class_directive(kind):
+        mod = kind.__module__
+        if kind.__module__ in ('__builtin__', 'builtins'):
+            mod = ''
+        if mod in ('zope.schema._bootstrapfields', 'zope.schema._field'):
+            mod = 'zope.schema'
+        mod += '.' if mod else ''
+        return ':class:`%s%s`' % (mod, kind.__name__)
+
+    @classmethod
+    def make_field(cls, name, value):
+        return ":%s: %s" % (name, value)
+
+    @classmethod
+    def make_class_field(cls, name, kind):
+        if isinstance(kind, (type, InterfaceClass)):
+            return cls.make_field(name, cls.make_class_directive(kind))
+        if isinstance(kind, tuple):
+            return cls.make_field(
+                name,
+                ', '.join([cls.make_class_directive(t) for t in kind]))
+
 
 class Field(Attribute):
 
@@ -182,6 +240,9 @@ class Field(Attribute):
         __doc__ = ''
         if title:
             if description:
+                # Fix leading whitespace that occurs when using multi-line
+                # strings.
+                description = '\n'.join(_DocStringHelpers.docstring_to_lines(description)[:-1])
                 __doc__ = "%s\n\n%s" % (title, description)
             else:
                 __doc__ = title
@@ -286,6 +347,53 @@ class Field(Attribute):
                                object.__class__.__name__))
         setattr(object, self.__name__, value)
 
+    def getExtraDocLines(self):
+        """
+        Return a list of ReST formatted lines that will be added
+        to the docstring returned by :meth:`getDoc`.
+
+        By default, this will include information about the various
+        properties of this object, such as required and readonly status,
+        required type, and so on.
+
+        This implementation uses a field list for this.
+
+        Subclasses may override or extend.
+
+        .. versionadded:: 4.6.0
+        """
+
+        lines = []
+        lines.append(_DocStringHelpers.make_class_field('Implementation', type(self)))
+        lines.append(_DocStringHelpers.make_field("Read Only", self.readonly))
+        lines.append(_DocStringHelpers.make_field("Required", self.required))
+        if self.defaultFactory:
+            lines.append(_DocStringHelpers.make_field("Default Factory", repr(self.defaultFactory)))
+        else:
+            lines.append(_DocStringHelpers.make_field("Default Value", repr(self.default)))
+
+        if self._type:
+            lines.append(_DocStringHelpers.make_class_field("Allowed Type", self._type))
+
+        # key_type and value_type are commonly used, but don't
+        # have a common superclass to add them, so we do it here.
+        # Using a rubric produces decent formatting
+        for name, rubric in (('key_type', 'Key Type'),
+                             ('value_type', 'Value Type')):
+            field = getattr(self, name, None)
+            if hasattr(field, 'getDoc'):
+                lines.append(".. rubric:: " + rubric)
+                lines.append(field.getDoc())
+
+        return lines
+
+    def getDoc(self):
+        doc = super(Field, self).getDoc()
+        lines = _DocStringHelpers.docstring_to_lines(doc)
+        lines += self.getExtraDocLines()
+        lines.append('')
+
+        return '\n'.join(lines)
 
 class Container(Field):
 
@@ -805,6 +913,11 @@ class Object(Field):
         self.schema = schema
         self.validate_invariants = kw.pop('validate_invariants', True)
         super(Object, self).__init__(**kw)
+
+    def getExtraDocLines(self):
+        lines = super(Object, self).getExtraDocLines()
+        lines.append(_DocStringHelpers.make_class_field("Must Provide", self.schema))
+        return lines
 
     def _validate(self, value):
         super(Object, self)._validate(value)

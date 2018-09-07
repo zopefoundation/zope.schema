@@ -20,7 +20,7 @@ Interfaces
 .. autointerface:: zope.schema.interfaces.IInterfaceField
 .. autointerface:: zope.schema.interfaces.IBool
 .. autointerface:: zope.schema.interfaces.IObject
-.. autointerface:: zope.schema.interfaces.IDict
+
 
 Strings
 -------
@@ -75,6 +75,13 @@ Collections
 .. autointerface:: zope.schema.interfaces.IList
 .. autointerface:: zope.schema.interfaces.ISet
 .. autointerface:: zope.schema.interfaces.IFrozenSet
+
+Mappings
+~~~~~~~~
+.. autointerface:: zope.schema.interfaces.IMapping
+.. autointerface:: zope.schema.interfaces.IMutableMapping
+.. autointerface:: zope.schema.interfaces.IDict
+
 
 Events
 ------

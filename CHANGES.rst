@@ -126,6 +126,16 @@
   <https://github.com/zopefoundation/zope.schema/issues/57>`_.
 
 
+- Make ``Field.getDoc()`` return more information about the properties
+  of the field, such as its required and readonly status. Subclasses
+  can add more information using the new method
+  ``Field.getExtraDocLines()``. This is used to generate Sphinx
+  documentation when using `repoze.sphinx.autointerface
+  <https://pypi.org/project/repoze.sphinx.autointerface/>`_. See
+  `issue 60
+  <https://github.com/zopefoundation/zope.schema/issues/60>`_.
+
+
 4.5.0 (2017-07-10)
 ==================
 
