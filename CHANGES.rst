@@ -2,7 +2,7 @@
  Changes
 =========
 
-4.6.2 (unreleased)
+4.6.2 (2018-09-10)
 ==================
 
 - Fix checking a field's constraint to set the ``field`` and ``value``
