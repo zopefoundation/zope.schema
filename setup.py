@@ -35,6 +35,7 @@ REQUIRES = [
 
 
 TESTS_REQUIRE = [
+    'zope.i18nmessageid',
     'zope.testing',
     'zope.testrunner',
 ]
@@ -52,7 +53,6 @@ setup(
     packages=find_packages('src'),
     package_dir={'': 'src'},
     namespace_packages=['zope', ],
-    #extras_require={'docs': ['z3c.recipe.sphinxdoc']},
     install_requires=REQUIRES,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
