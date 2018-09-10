@@ -527,6 +527,30 @@ class FieldTests(EqualityTestsMixin,
         field._type = int
         field.validate(1)  # doesn't raise
 
+    def test_validate_constraint_raises_custom_exception(self):
+        from zope.schema._bootstrapinterfaces import ValidationError
+
+        def _fail(value):
+            raise ValidationError
+        field = self._makeOne(constraint=_fail)
+        with self.assertRaises(ValidationError) as exc:
+            field.validate(1)
+
+        self.assertIs(exc.exception.field, field)
+        self.assertEqual(exc.exception.value, 1)
+
+    def test_validate_constraint_raises_custom_exception_no_overwrite(self):
+        from zope.schema._bootstrapinterfaces import ValidationError
+
+        def _fail(value):
+            raise ValidationError(value).with_field_and_value(self, self)
+        field = self._makeOne(constraint=_fail)
+        with self.assertRaises(ValidationError) as exc:
+            field.validate(1)
+
+        self.assertIs(exc.exception.field, self)
+        self.assertIs(exc.exception.value, self)
+
     def test_get_miss(self):
         field = self._makeOne(__name__='nonesuch')
         inst = DummyInst()

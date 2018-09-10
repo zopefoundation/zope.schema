@@ -331,7 +331,15 @@ class Field(Attribute):
         if self._type is not None and not isinstance(value, self._type):
             raise WrongType(value, self._type, self.__name__).with_field_and_value(self, value)
 
-        if not self.constraint(value):
+        try:
+            constraint = self.constraint(value)
+        except ValidationError as e:
+            if e.field is None:
+                e.field = self
+            if e.value is None:
+                e.value = value
+            raise
+        if not constraint:
             raise ConstraintNotSatisfied(value, self.__name__).with_field_and_value(self, value)
 
     def get(self, object):
