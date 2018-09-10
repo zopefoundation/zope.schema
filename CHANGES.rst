@@ -5,7 +5,10 @@
 4.6.2 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Fix checking a field's constraint to set the ``field`` and ``value``
+  properties if the constraint raises a ``ValidationError``. See
+  `issue 66
+  <https://github.com/zopefoundation/zope.schema/issues/66>`_.
 
 
 4.6.1 (2018-09-10)
