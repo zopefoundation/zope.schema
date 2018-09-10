@@ -1172,10 +1172,10 @@ class ObjectTests(EqualityTestsMixin,
         return InterfaceClass('ISchema', (Interface,), kw)
 
     def _getErrors(self, f, *args, **kw):
-        from zope.schema.interfaces import WrongContainedType
-        with self.assertRaises(WrongContainedType) as e:
+        from zope.schema.interfaces import SchemaNotCorrectlyImplemented
+        with self.assertRaises(SchemaNotCorrectlyImplemented) as e:
             f(*args, **kw)
-        return e.exception.args[0]
+        return e.exception.errors
 
     def _makeCycles(self):
         from zope.interface import Interface
@@ -1385,19 +1385,39 @@ class ObjectTests(EqualityTestsMixin,
         field.validate(unit)  # doesn't raise
 
     def test_validate_w_cycles_object_not_valid(self):
-        from zope.schema.interfaces import WrongContainedType
+        from zope.schema.interfaces import SchemaNotCorrectlyImplemented
+        from zope.schema.interfaces import SchemaNotProvided
         IUnit, Person, Unit = self._makeCycles()
         field = self._makeOne(schema=IUnit)
         person1 = Person(None)
         person2 = Person(None)
-        person3 = Person(object())
-        unit = Unit(person3, [person1, person2])
+        boss_unit = object()
+        boss = Person(boss_unit)
+        unit = Unit(boss, [person1, person2])
         person1.unit = unit
         person2.unit = unit
-        self.assertRaises(WrongContainedType, field.validate, unit)
+        with self.assertRaises(SchemaNotCorrectlyImplemented) as exc:
+            field.validate(unit)
+
+        ex = exc.exception
+        self.assertEqual(1, len(ex.schema_errors))
+        self.assertEqual(1, len(ex.errors))
+        self.assertEqual(0, len(ex.invariant_errors))
+
+        boss_error = ex.schema_errors['boss']
+        self.assertIsInstance(boss_error, SchemaNotCorrectlyImplemented)
+
+        self.assertEqual(1, len(boss_error.schema_errors))
+        self.assertEqual(1, len(boss_error.errors))
+        self.assertEqual(0, len(boss_error.invariant_errors))
+
+        unit_error = boss_error.schema_errors['unit']
+        self.assertIsInstance(unit_error, SchemaNotProvided)
+        self.assertIs(IUnit, unit_error.schema)
+        self.assertIs(boss_unit, unit_error.value)
 
     def test_validate_w_cycles_collection_not_valid(self):
-        from zope.schema.interfaces import WrongContainedType
+        from zope.schema.interfaces import SchemaNotCorrectlyImplemented
         IUnit, Person, Unit = self._makeCycles()
         field = self._makeOne(schema=IUnit)
         person1 = Person(None)
@@ -1406,7 +1426,7 @@ class ObjectTests(EqualityTestsMixin,
         unit = Unit(person1, [person2, person3])
         person1.unit = unit
         person2.unit = unit
-        self.assertRaises(WrongContainedType, field.validate, unit)
+        self.assertRaises(SchemaNotCorrectlyImplemented, field.validate, unit)
 
     def test_set_emits_IBOAE(self):
         from zope.event import subscribers
@@ -1547,7 +1567,10 @@ class ObjectTests(EqualityTestsMixin,
         self.assertIs(field.schema, IValueType)
 
         # Non implementation is bad
-        self.assertRaises(SchemaNotProvided, field.validate, object())
+        with self.assertRaises(SchemaNotProvided) as exc:
+            field.validate(object())
+
+        self.assertIs(IValueType, exc.exception.schema)
 
         # Actual implementation works
         @interface.implementer(IValueType)
@@ -1566,6 +1589,7 @@ class ObjectTests(EqualityTestsMixin,
         from zope.schema.fieldproperty import FieldProperty
         from zope.schema.interfaces import IContextSourceBinder
         from zope.schema.interfaces import WrongContainedType
+        from zope.schema.interfaces import ConstraintNotSatisfied
         from zope.schema.interfaces import SchemaNotCorrectlyImplemented
         from zope.schema.vocabulary import SimpleVocabulary
 
@@ -1607,12 +1631,28 @@ class ObjectTests(EqualityTestsMixin,
 
         # Ranges outside the context fail
         bad_choices = Choices({1, 8})
-        with self.assertRaises(WrongContainedType) as exc:
+        with self.assertRaises(SchemaNotCorrectlyImplemented) as exc:
             IFavorites['fav'].validate(bad_choices)
 
         e = exc.exception
         self.assertEqual(IFavorites['fav'], e.field)
         self.assertEqual(bad_choices, e.value)
+        self.assertEqual(1, len(e.schema_errors))
+        self.assertEqual(0, len(e.invariant_errors))
+        self.assertEqual(1, len(e.errors))
+
+        fav_error = e.schema_errors['choices']
+        self.assertIs(fav_error, e.errors[0])
+        self.assertIsInstance(fav_error, WrongContainedType)
+        self.assertNotIsInstance(fav_error, SchemaNotCorrectlyImplemented)
+        # The field is not actually equal to the one in the interface
+        # anymore because its bound.
+        self.assertEqual('choices', fav_error.field.__name__)
+        self.assertEqual(bad_choices, fav_error.field.context)
+        self.assertEqual({1, 8}, fav_error.value)
+        self.assertEqual(1, len(fav_error.errors))
+
+        self.assertIsInstance(fav_error.errors[0], ConstraintNotSatisfied)
 
         # Validation through field property
         favorites = Favorites()

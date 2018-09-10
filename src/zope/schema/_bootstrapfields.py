@@ -951,10 +951,11 @@ class Object(Field):
             errors = list(schema_error_dict.values()) + invariant_errors
             exception = SchemaNotCorrectlyImplemented(
                 errors,
-                self.__name__
+                self.__name__,
+                schema_error_dict,
+                invariant_errors
             ).with_field_and_value(self, value)
-            exception.schema_errors = schema_error_dict
-            exception.invariant_errors = invariant_errors
+
             try:
                 raise exception
             finally:

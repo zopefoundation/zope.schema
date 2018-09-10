@@ -78,10 +78,18 @@ class WrongType(ValidationError):
     __doc__ = _("""Object is of wrong type.""")
 
     #: The type or tuple of types that was expected.
+    #:
     #: .. versionadded:: 4.7.0
     expected_type = None
 
     def __init__(self, value=None, expected_type=None, name=None, *args):
+        """
+        WrongType(value, expected_type, name)
+
+        .. versionchanged:: 4.7.0
+           Added named arguments tot he constructor and the `expected_type`
+           field.
+        """
         ValidationError.__init__(self, value, expected_type, name, *args)
         self.expected_type = expected_type
         self.value = value
@@ -121,6 +129,22 @@ class NotAnIterator(ValidationError):
 class WrongContainedType(ValidationError):
     __doc__ = _("""Wrong contained type""")
 
+    #: A collection of exceptions raised when validating
+    #: the *value*.
+    #:
+    #: .. versionadded:: 4.7.0
+    errors = ()
+
+    def __init__(self, errors=None, name=None, *args):
+        """
+        WrongContainedType(errors, name)
+
+        .. versionchanged:: 4.7.0
+           Added named arguments to the constructor, and the `errors` property.
+        """
+        super(WrongContainedType, self).__init__(errors, name, *args)
+        self.errors = errors
+
 
 class SchemaNotCorrectlyImplemented(WrongContainedType):
     __doc__ = _("""An object failed schema or invariant validation.""")
@@ -133,6 +157,17 @@ class SchemaNotCorrectlyImplemented(WrongContainedType):
     #: of the schema.
     invariant_errors = ()
 
+    def __init__(self, errors=None, name=None, schema_errors=None, invariant_errors=(), *args):
+        """
+        SchemaNotCorrectlyImplemented(errors, name, schema_errors, invariant_errors)
+
+        .. versionchanged:: 4.7.0
+           Added named arguments to the constructor.
+        """
+        super(SchemaNotCorrectlyImplemented, self).__init__(errors, name, *args)
+        self.schema_errors = schema_errors
+        self.invariant_errors = invariant_errors
+
 
 class SchemaNotFullyImplemented(ValidationError):
     __doc__ = _("""Schema not fully implemented""")
@@ -141,6 +176,20 @@ class SchemaNotFullyImplemented(ValidationError):
 class SchemaNotProvided(ValidationError):
     __doc__ = _("""Schema not provided""")
 
+    #: The interface that the *value* was supposed to provide,
+    #: but does not.
+    schema = None
+
+    def __init__(self, schema=None, value=None, *args):
+        """
+        SchemaNotProvided(schema, value)
+
+        .. versionchanged:: 4.7.0
+           Added named arguments to the constructor and the `schema` property.
+        """
+        super(SchemaNotProvided, self).__init__(schema, value, *args)
+        self.schema = schema
+        self.value = value
 
 class NotAnInterface(WrongType, SchemaNotProvided):
     """

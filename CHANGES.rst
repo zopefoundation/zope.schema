@@ -11,6 +11,11 @@
   ``SchemaNotProvided`` and raised by the constructor of ``Object``
   and when validation fails for ``InterfaceField``.
 
+- Give ``SchemaNotProvided`` a ``schema`` field.
+
+- Give ``WrongContainedType`` an ``errors`` list.
+
+
 4.6.2 (2018-09-10)
 ==================
 

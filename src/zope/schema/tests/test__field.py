@@ -1331,6 +1331,7 @@ class CollectionTests(EqualityTestsMixin,
     def test_schema_defined_by_subclass(self):
         from zope import interface
         from zope.schema import Object
+        from zope.schema.interfaces import SchemaNotProvided
         from zope.schema.interfaces import WrongContainedType
 
         class IValueType(interface.Interface):
@@ -1348,7 +1349,14 @@ class CollectionTests(EqualityTestsMixin,
         field.validate(self._makeCollection([]))
 
         # Collection with a non-implemented object is bad
-        self.assertRaises(WrongContainedType, field.validate, self._makeCollection([object()]))
+        with self.assertRaises(WrongContainedType) as exc:
+            field.validate(self._makeCollection([object()]))
+
+        ex = exc.exception
+        self.assertIs(ex.__class__, WrongContainedType)
+        self.assertEqual(1, len(ex.errors))
+        self.assertIsInstance(ex.errors[0], SchemaNotProvided)
+        self.assertIs(ex.errors[0].schema, IValueType)
 
         # Actual implementation works
         @interface.implementer(IValueType)
@@ -1396,6 +1404,7 @@ class CollectionTests(EqualityTestsMixin,
 
     def test__validate_wrong_contained_type(self):
         from zope.schema.interfaces import WrongContainedType
+        from zope.schema.interfaces import WrongType
         from zope.schema._bootstrapfields import Text
         text = Text()
         absc = self._makeOne(text)
@@ -1405,6 +1414,10 @@ class CollectionTests(EqualityTestsMixin,
         wct = exc.exception
         self.assertIs(wct.field, absc)
         self.assertEqual(wct.value, self._makeCollection([1]))
+        self.assertIs(wct.__class__, WrongContainedType)
+        self.assertEqual(1, len(wct.errors))
+        self.assertIsInstance(wct.errors[0], WrongType)
+        self.assertIs(wct.errors[0].expected_type, text._type)
 
     def test__validate_miss_uniqueness(self):
         from zope.schema.interfaces import NotUnique
@@ -1703,6 +1716,7 @@ class MappingTests(EqualityTestsMixin,
 
     def test_validate_invalid_key_type(self):
         from zope.schema.interfaces import WrongContainedType
+        from zope.schema.interfaces import WrongType
         from zope.schema._bootstrapfields import Int
         field = self._makeOne(key_type=Int())
         field.validate({})
@@ -1714,9 +1728,14 @@ class MappingTests(EqualityTestsMixin,
         wct = exc.exception
         self.assertIs(wct.field, field)
         self.assertEqual(wct.value, {'a': 1})
+        self.assertIs(wct.__class__, WrongContainedType)
+        self.assertEqual(1, len(wct.errors))
+        self.assertIsInstance(wct.errors[0], WrongType)
+        self.assertIs(field.key_type._type, wct.errors[0].expected_type)
 
     def test_validate_invalid_value_type(self):
         from zope.schema.interfaces import WrongContainedType
+        from zope.schema.interfaces import WrongType
         from zope.schema._bootstrapfields import Int
         field = self._makeOne(value_type=Int())
         field.validate({})
@@ -1728,6 +1747,11 @@ class MappingTests(EqualityTestsMixin,
         wct = exc.exception
         self.assertIs(wct.field, field)
         self.assertEqual(wct.value, {1: 'a'})
+        self.assertIs(wct.__class__, WrongContainedType)
+        self.assertEqual(1, len(wct.errors))
+        self.assertIsInstance(wct.errors[0], WrongType)
+        self.assertIs(field.value_type._type, wct.errors[0].expected_type)
+
 
     def test_validate_min_length(self):
         from zope.schema.interfaces import TooShort
