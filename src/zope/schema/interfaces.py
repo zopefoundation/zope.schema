@@ -42,6 +42,7 @@ from zope.schema._bootstrapinterfaces import IFromUnicode
 from zope.schema._bootstrapinterfaces import IValidatable
 from zope.schema._bootstrapinterfaces import InvalidValue
 from zope.schema._bootstrapinterfaces import NotAContainer
+from zope.schema._bootstrapinterfaces import NotAnInterface
 from zope.schema._bootstrapinterfaces import NotAnIterator
 from zope.schema._bootstrapinterfaces import RequiredMissing
 from zope.schema._bootstrapinterfaces import SchemaNotCorrectlyImplemented
@@ -68,6 +69,7 @@ __all__ = [
     'InvalidURI',
     'InvalidValue',
     'NotAContainer',
+    'NotAnInterface',
     'NotAnIterator',
     'NotUnique',
     'RequiredMissing',

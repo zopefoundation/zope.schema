@@ -138,6 +138,36 @@ class OrderableMissingValueMixin(object):
         self.assertEqual(self.mvm_missing_value, field.missing_value)
 
 
+class WrongTypeTestsMixin(object):
+
+    def assertRaisesWrongType(self, field_or_meth, expected_type, *args, **kwargs):
+        from zope.schema.interfaces import WrongType
+        field = None
+        with self.assertRaises(WrongType) as exc:
+            if hasattr(field_or_meth, 'validate'):
+                field = field_or_meth
+                field.validate(*args, **kwargs)
+            else:
+                field_or_meth(*args, **kwargs)
+
+        ex = exc.exception
+        self.assertIs(ex.expected_type, expected_type)
+        if field is not None:
+            self.assertIs(ex.field, field)
+        if len(args) == 1 and not kwargs:
+            # Just a value
+            self.assertIs(ex.value, args[0])
+        if not args and len(kwargs) == 1:
+            # A single keyword argument
+            self.assertIs(ex.value, kwargs.popitem()[1])
+
+
+    def assertAllRaiseWrongType(self, field, expected_type, *values):
+        for value in values:
+            __traceback_info__ = value
+            self.assertRaisesWrongType(field, expected_type, value)
+
+
 class ValidatedPropertyTests(unittest.TestCase):
 
     def _getTargetClass(self):
@@ -267,6 +297,7 @@ class DefaultPropertyTests(unittest.TestCase):
 
 
 class FieldTests(EqualityTestsMixin,
+                 WrongTypeTestsMixin,
                  unittest.TestCase):
 
     def _getTargetClass(self):
@@ -505,11 +536,10 @@ class FieldTests(EqualityTestsMixin,
         self.assertRaises(RequiredMissing, field.validate, missing)
 
     def test_validate_wrong_type(self):
-        from zope.schema._bootstrapinterfaces import WrongType
 
         field = self._makeOne(required=True, constraint=lambda x: False)
         field._type = str
-        self.assertRaises(WrongType, field.validate, 1)
+        self.assertRaisesWrongType(field, str, 1)
 
     def test_validate_constraint_fails(self):
         from zope.schema._bootstrapinterfaces import ConstraintNotSatisfied
@@ -734,6 +764,7 @@ class MinMaxLenTests(unittest.TestCase):
 
 
 class TextTests(EqualityTestsMixin,
+                WrongTypeTestsMixin,
                 unittest.TestCase):
 
     def _getTargetClass(self):
@@ -750,18 +781,19 @@ class TextTests(EqualityTestsMixin,
         self.assertEqual(txt._type, text_type)
 
     def test_validate_wrong_types(self):
-        from zope.schema.interfaces import WrongType
-
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, b'')
-        self.assertRaises(WrongType, field.validate, 1)
-        self.assertRaises(WrongType, field.validate, 1.0)
-        self.assertRaises(WrongType, field.validate, ())
-        self.assertRaises(WrongType, field.validate, [])
-        self.assertRaises(WrongType, field.validate, {})
-        self.assertRaises(WrongType, field.validate, set())
-        self.assertRaises(WrongType, field.validate, frozenset())
-        self.assertRaises(WrongType, field.validate, object())
+        self.assertAllRaiseWrongType(
+            field,
+            field._type,
+            b'',
+            1,
+            1.0,
+            (),
+            [],
+            {},
+            set(),
+            frozenset(),
+            object())
 
     def test_validate_w_invalid_default(self):
 
@@ -786,11 +818,9 @@ class TextTests(EqualityTestsMixin,
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def test_fromUnicode_miss(self):
-        from zope.schema._bootstrapinterfaces import WrongType
-
         deadbeef = b'DEADBEEF'
         txt = self._makeOne()
-        self.assertRaises(WrongType, txt.fromUnicode, deadbeef)
+        self.assertRaisesWrongType(txt.fromUnicode, txt._type, deadbeef)
 
     def test_fromUnicode_hit(self):
 
@@ -800,6 +830,7 @@ class TextTests(EqualityTestsMixin,
 
 
 class TextLineTests(EqualityTestsMixin,
+                    WrongTypeTestsMixin,
                     unittest.TestCase):
 
     def _getTargetClass(self):
@@ -811,18 +842,19 @@ class TextLineTests(EqualityTestsMixin,
         return ITextLine
 
     def test_validate_wrong_types(self):
-        from zope.schema.interfaces import WrongType
-
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, b'')
-        self.assertRaises(WrongType, field.validate, 1)
-        self.assertRaises(WrongType, field.validate, 1.0)
-        self.assertRaises(WrongType, field.validate, ())
-        self.assertRaises(WrongType, field.validate, [])
-        self.assertRaises(WrongType, field.validate, {})
-        self.assertRaises(WrongType, field.validate, set())
-        self.assertRaises(WrongType, field.validate, frozenset())
-        self.assertRaises(WrongType, field.validate, object())
+        self.assertAllRaiseWrongType(
+            field,
+            field._type,
+            b'',
+            1,
+            1.0,
+            (),
+            [],
+            {},
+            set(),
+            frozenset(),
+            object())
 
     def test_validate_not_required(self):
 
@@ -848,6 +880,7 @@ class TextLineTests(EqualityTestsMixin,
 
 
 class PasswordTests(EqualityTestsMixin,
+                    WrongTypeTestsMixin,
                     unittest.TestCase):
 
     def _getTargetClass(self):
@@ -889,12 +922,10 @@ class PasswordTests(EqualityTestsMixin,
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def test_validate_unchanged_not_already_set(self):
-        from zope.schema._bootstrapinterfaces import WrongType
         klass = self._getTargetClass()
         inst = DummyInst()
         pw = self._makeOne(__name__='password').bind(inst)
-        self.assertRaises(WrongType,
-                          pw.validate, klass.UNCHANGED_PASSWORD)
+        self.assertRaisesWrongType(pw, pw._type, klass.UNCHANGED_PASSWORD)
 
     def test_validate_unchanged_already_set(self):
         klass = self._getTargetClass()
@@ -988,7 +1019,8 @@ class ComplexTests(NumberTests):
         from zope.schema.interfaces import IComplex
         return IComplex
 
-class RealTests(NumberTests):
+class RealTests(WrongTypeTestsMixin,
+                NumberTests):
 
     def _getTargetClass(self):
         from zope.schema._bootstrapfields import Real
@@ -999,15 +1031,12 @@ class RealTests(NumberTests):
         return IReal
 
     def test_ctor_real_min_max(self):
-        from zope.schema.interfaces import WrongType
         from zope.schema.interfaces import TooSmall
         from zope.schema.interfaces import TooBig
         from fractions import Fraction
 
-        with self.assertRaises(WrongType):
-            self._makeOne(min='')
-        with self.assertRaises(WrongType):
-            self._makeOne(max='')
+        self.assertRaisesWrongType(self._makeOne, self._getTargetClass()._type, min='')
+        self.assertRaisesWrongType(self._makeOne, self._getTargetClass()._type, max='')
 
         field = self._makeOne(min=Fraction(1, 2), max=2)
         field.validate(1.0)
@@ -1113,6 +1142,7 @@ class IntTests(IntegralTests):
 
 
 class ObjectTests(EqualityTestsMixin,
+                  WrongTypeTestsMixin,
                   unittest.TestCase):
 
     def setUp(self):
@@ -1205,8 +1235,8 @@ class ObjectTests(EqualityTestsMixin,
         verifyObject(IObject, self._makeOne())
 
     def test_ctor_w_bad_schema(self):
-        from zope.schema.interfaces import WrongType
-        self.assertRaises(WrongType, self._makeOne, object())
+        from zope.interface.interfaces import IInterface
+        self.assertRaisesWrongType(self._makeOne, IInterface, object())
 
     def test_validate_not_required(self):
         schema = self._makeSchema()

@@ -17,6 +17,7 @@ from functools import total_ordering
 
 import zope.interface
 from zope.interface import Attribute
+from zope.interface.interfaces import IInterface
 
 from zope.schema._messageid import _
 
@@ -76,6 +77,14 @@ class RequiredMissing(ValidationError):
 class WrongType(ValidationError):
     __doc__ = _("""Object is of wrong type.""")
 
+    #: The type or tuple of types that was expected.
+    #: .. versionadded:: 4.7.0
+    expected_type = None
+
+    def __init__(self, value=None, expected_type=None, name=None, *args):
+        ValidationError.__init__(self, value, expected_type, name, *args)
+        self.expected_type = expected_type
+        self.value = value
 
 class TooBig(ValidationError):
     __doc__ = _("""Value is too big""")
@@ -109,7 +118,6 @@ class NotAnIterator(ValidationError):
     __doc__ = _("""Not an iterator""")
 
 
-
 class WrongContainedType(ValidationError):
     __doc__ = _("""Wrong contained type""")
 
@@ -132,6 +140,26 @@ class SchemaNotFullyImplemented(ValidationError):
 
 class SchemaNotProvided(ValidationError):
     __doc__ = _("""Schema not provided""")
+
+
+class NotAnInterface(WrongType, SchemaNotProvided):
+    """
+    Object is not an interface.
+
+    This is a `WrongType` exception for backwards compatibility with
+    existing ``except`` clauses, but it is raised when
+    ``IInterface.providedBy`` is not true, so it's also a
+    `SchemaNotProvided`. The ``expected_type`` field is filled in as
+    ``IInterface``; this is not actually a `type`, and
+    ``isinstance(thing, IInterface)`` is always false.
+
+    .. versionadded:: 4.7.0
+    """
+
+    expected_type = IInterface
+
+    def __init__(self, value, name):
+        super(NotAnInterface, self).__init__(value, IInterface, name)
 
 
 class IFromUnicode(zope.interface.Interface):

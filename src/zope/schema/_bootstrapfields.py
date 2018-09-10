@@ -40,6 +40,7 @@ from zope.schema._bootstrapinterfaces import IFromUnicode
 from zope.schema._bootstrapinterfaces import IValidatable
 from zope.schema._bootstrapinterfaces import NotAContainer
 from zope.schema._bootstrapinterfaces import NotAnIterator
+from zope.schema._bootstrapinterfaces import NotAnInterface
 from zope.schema._bootstrapinterfaces import RequiredMissing
 from zope.schema._bootstrapinterfaces import SchemaNotCorrectlyImplemented
 from zope.schema._bootstrapinterfaces import SchemaNotFullyImplemented
@@ -918,7 +919,10 @@ class Object(Field):
             schema = self.schema
 
         if not IInterface.providedBy(schema):
-            raise WrongType
+            # Note that we don't provide 'self' as the 'field'
+            # by calling with_field_and_value(): We're not fully constructed,
+            # we don't want this instance to escape.
+            raise NotAnInterface(schema, self.__name__)
 
         self.schema = schema
         self.validate_invariants = kw.pop('validate_invariants', True)

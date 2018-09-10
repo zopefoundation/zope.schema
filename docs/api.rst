@@ -123,6 +123,7 @@ Exceptions
 .. autoexception:: zope.schema.interfaces.ConstraintNotSatisfied
 .. autoexception:: zope.schema.interfaces.NotAContainer
 .. autoexception:: zope.schema.interfaces.NotAnIterator
+.. autoexception:: zope.schema.interfaces.NotAnInterface
 
 .. autoexception:: zope.schema.interfaces.TooSmall
 .. autoexception:: zope.schema.interfaces.TooBig
@@ -146,7 +147,9 @@ Schema APIs
 .. autofunction:: zope.schema.getFieldNames
 .. autofunction:: zope.schema.getFieldNamesInOrder
 .. autofunction:: zope.schema.getValidationErrors
+   :noindex:
 .. autofunction:: zope.schema.getSchemaValidationErrors
+   :noindex:
 
 Fields
 ======

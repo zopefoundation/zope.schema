@@ -85,6 +85,7 @@ from zope.schema.interfaces import InvalidValue
 from zope.schema.interfaces import WrongType
 from zope.schema.interfaces import WrongContainedType
 from zope.schema.interfaces import NotUnique
+from zope.schema.interfaces import NotAnInterface
 from zope.schema.interfaces import InvalidURI
 from zope.schema.interfaces import InvalidId
 from zope.schema.interfaces import InvalidDottedName
@@ -552,8 +553,7 @@ class InterfaceField(Field):
     def _validate(self, value):
         super(InterfaceField, self)._validate(value)
         if not IInterface.providedBy(value):
-            raise WrongType(
-                "An interface is required",
+            raise NotAnInterface(
                 value,
                 self.__name__
             ).with_field_and_value(self, value)
