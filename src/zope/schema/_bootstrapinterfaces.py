@@ -94,20 +94,76 @@ class WrongType(ValidationError):
         self.expected_type = expected_type
         self.value = value
 
-class TooBig(ValidationError):
+
+class OutOfBounds(ValidationError):
+    """
+    A value was out of the allowed bounds.
+
+    This is the common superclass for `OrderableOutOfBounds` and
+    `LenOutOfBounds`, which in turn are the superclasses for `TooBig`
+    and `TooSmall`, and `TooLong` and `TooShort`, respectively.
+
+    .. versionadded:: 4.7.0
+    """
+
+    #: The value that was exceeded
+    bound = None
+
+    #: A constant for `violation_direction`.
+    TOO_LARGE = object()
+
+    #: A constant for `violation_direction`.
+    TOO_SMALL = object()
+
+    #: Whether the value was too large or
+    #: not large enough. One of the values
+    #: defined by the constants `TOO_LARGE`
+    #: or `TOO_SMALL`
+    violation_direction = None
+
+    def __init__(self, value=None, bound=None, *args):
+        """
+        OutOfBounds(value, bound)
+        """
+        super(OutOfBounds, self).__init__(value, bound, *args)
+        self.value = value
+        self.bound = bound
+
+class OrderableOutOfBounds(OutOfBounds):
+    """
+    A value was too big or too small in comparison to another value.
+
+    .. versionadded:: 4.7.0
+    """
+
+class TooBig(OrderableOutOfBounds):
     __doc__ = _("""Value is too big""")
 
+    violation_direction = OutOfBounds.TOO_LARGE
 
-class TooSmall(ValidationError):
+class TooSmall(OrderableOutOfBounds):
     __doc__ = _("""Value is too small""")
 
+    violation_direction = OutOfBounds.TOO_SMALL
 
-class TooLong(ValidationError):
+
+class LenOutOfBounds(OutOfBounds):
+    """
+    The length of the value was out of bounds.
+
+    .. versionadded:: 4.7.0
+    """
+
+
+class TooLong(LenOutOfBounds):
     __doc__ = _("""Value is too long""")
 
+    violation_direction = OutOfBounds.TOO_LARGE
 
-class TooShort(ValidationError):
+class TooShort(LenOutOfBounds):
     __doc__ = _("""Value is too short""")
+
+    violation_direction = OutOfBounds.TOO_SMALL
 
 
 class InvalidValue(ValidationError):

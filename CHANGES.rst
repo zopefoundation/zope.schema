@@ -15,6 +15,10 @@
 
 - Give ``WrongContainedType`` an ``errors`` list.
 
+- Give ``TooShort``, ``TooLong``, ``TooBig`` and ``TooSmall`` a
+  ``bound`` field and the common superclasses ``LenOutOfBounds``,
+  ``OrderableOutOfBounds``, respectively, both of which inherit from
+  ``OutOfBounds``.
 
 4.6.2 (2018-09-10)
 ==================

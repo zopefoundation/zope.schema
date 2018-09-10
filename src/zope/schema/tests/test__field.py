@@ -16,10 +16,13 @@ import decimal
 import doctest
 import unittest
 
-from zope.schema.tests.test__bootstrapfields import OrderableMissingValueMixin
 from zope.schema.tests.test__bootstrapfields import EqualityTestsMixin
+from zope.schema.tests.test__bootstrapfields import LenTestsMixin
+from zope.schema.tests.test__bootstrapfields import OrderableMissingValueMixin
+from zope.schema.tests.test__bootstrapfields import OrderableTestsMixin
 from zope.schema.tests.test__bootstrapfields import WrongTypeTestsMixin
 
+from zope.schema.tests.test__bootstrapfields import NumberTests
 
 # pylint:disable=protected-access
 # pylint:disable=too-many-lines
@@ -244,11 +247,17 @@ class ASCIILineTests(EqualityTestsMixin,
         self.assertEqual(field.constraint('abc\ndef'), False)
 
 
-class FloatTests(OrderableMissingValueMixin, EqualityTestsMixin,
-                 unittest.TestCase):
+class FloatTests(NumberTests):
 
     mvm_missing_value = -1.0
     mvm_default = 0.0
+
+    MIN = float(NumberTests.MIN)
+    MAX = float(NumberTests.MAX)
+    VALID = tuple(float(x) for x in NumberTests.VALID)
+    TOO_SMALL = tuple(float(x) for x in NumberTests.TOO_SMALL)
+    TOO_BIG = tuple(float(x) for x in NumberTests.TOO_BIG)
+
 
     def _getTargetClass(self):
         from zope.schema._field import Float
@@ -273,34 +282,6 @@ class FloatTests(OrderableMissingValueMixin, EqualityTestsMixin,
         field.validate(1000.0003)
         self.assertRaises(RequiredMissing, field.validate, None)
 
-    def test_validate_min(self):
-        from zope.schema.interfaces import TooSmall
-        field = self._makeOne(min=10.5)
-        field.validate(10.6)
-        field.validate(20.2)
-        self.assertRaises(TooSmall, field.validate, -9.0)
-        self.assertRaises(TooSmall, field.validate, 10.4)
-
-    def test_validate_max(self):
-        from zope.schema.interfaces import TooBig
-        field = self._makeOne(max=10.5)
-        field.validate(5.3)
-        field.validate(-9.1)
-        self.assertRaises(TooBig, field.validate, 10.51)
-        self.assertRaises(TooBig, field.validate, 20.7)
-
-    def test_validate_min_and_max(self):
-        from zope.schema.interfaces import TooBig
-        from zope.schema.interfaces import TooSmall
-        field = self._makeOne(min=-0.6, max=10.1)
-        field.validate(0.0)
-        field.validate(-0.03)
-        field.validate(10.0001)
-        self.assertRaises(TooSmall, field.validate, -10.0)
-        self.assertRaises(TooSmall, field.validate, -1.6)
-        self.assertRaises(TooBig, field.validate, 11.45)
-        self.assertRaises(TooBig, field.validate, 20.02)
-
     def test_fromUnicode_miss(self):
 
         flt = self._makeOne()
@@ -316,11 +297,16 @@ class FloatTests(OrderableMissingValueMixin, EqualityTestsMixin,
         self.assertEqual(flt.fromUnicode(u'1.23e6'), 1230000.0)
 
 
-class DecimalTests(OrderableMissingValueMixin, EqualityTestsMixin,
-                   unittest.TestCase):
+class DecimalTests(NumberTests):
 
     mvm_missing_value = decimal.Decimal("-1")
     mvm_default = decimal.Decimal("0")
+
+    MIN = decimal.Decimal(NumberTests.MIN)
+    MAX = decimal.Decimal(NumberTests.MAX)
+    VALID = tuple(decimal.Decimal(x) for x in NumberTests.VALID)
+    TOO_SMALL = tuple(decimal.Decimal(x) for x in NumberTests.TOO_SMALL)
+    TOO_BIG = tuple(decimal.Decimal(x) for x in NumberTests.TOO_BIG)
 
     def _getTargetClass(self):
         from zope.schema._field import Decimal
@@ -345,46 +331,6 @@ class DecimalTests(OrderableMissingValueMixin, EqualityTestsMixin,
         field.validate(decimal.Decimal("1000.0003"))
         self.assertRaises(RequiredMissing, field.validate, None)
 
-    def test_validate_min(self):
-        from zope.schema.interfaces import TooSmall
-        field = self._makeOne(min=decimal.Decimal("10.5"))
-        field.validate(decimal.Decimal("10.6"))
-        field.validate(decimal.Decimal("20.2"))
-        self.assertRaises(TooSmall, field.validate, decimal.Decimal("-9.0"))
-        self.assertRaises(TooSmall, field.validate, decimal.Decimal("10.4"))
-
-    def test_validate_max(self):
-        from zope.schema.interfaces import TooBig
-        field = self._makeOne(max=decimal.Decimal("10.5"))
-        field.validate(decimal.Decimal("5.3"))
-        field.validate(decimal.Decimal("-9.1"))
-        self.assertRaises(TooBig, field.validate, decimal.Decimal("10.51"))
-        self.assertRaises(TooBig, field.validate, decimal.Decimal("20.7"))
-
-    def test_validate_min_and_max(self):
-        from zope.schema.interfaces import TooBig
-        from zope.schema.interfaces import TooSmall
-        field = self._makeOne(min=decimal.Decimal("-0.6"),
-                              max=decimal.Decimal("10.1"))
-        field.validate(decimal.Decimal("0.0"))
-        field.validate(decimal.Decimal("-0.03"))
-        field.validate(decimal.Decimal("10.0001"))
-        self.assertRaises(TooSmall, field.validate, decimal.Decimal("-10.0"))
-        with self.assertRaises(TooSmall) as exc:
-            field.validate(decimal.Decimal("-1.6"))
-
-        too_small = exc.exception
-        self.assertIs(too_small.field, field)
-        self.assertEqual(too_small.value, decimal.Decimal("-1.6"))
-
-        self.assertRaises(TooBig, field.validate, decimal.Decimal("11.45"))
-        with self.assertRaises(TooBig) as exc:
-            field.validate(decimal.Decimal("20.02"))
-
-        too_big = exc.exception
-        self.assertIs(too_big.field, field)
-        self.assertEqual(too_big.value, decimal.Decimal("20.02"))
-
     def test_fromUnicode_miss(self):
         from zope.schema.interfaces import ValidationError
         flt = self._makeOne()
@@ -408,6 +354,7 @@ class DecimalTests(OrderableMissingValueMixin, EqualityTestsMixin,
 
 
 class DatetimeTests(OrderableMissingValueMixin,
+                    OrderableTestsMixin,
                     EqualityTestsMixin,
                     WrongTypeTestsMixin,
                     unittest.TestCase):
@@ -450,42 +397,15 @@ class DatetimeTests(OrderableMissingValueMixin,
         field = self._makeOne(required=True)
         self.assertRaises(RequiredMissing, field.validate, None)
 
-    def test_validate_w_min(self):
-        from zope.schema.interfaces import TooSmall
-        d1 = datetime.datetime(2000, 10, 1)
-        d2 = datetime.datetime(2000, 10, 2)
-        field = self._makeOne(min=d1)
-        field.validate(d1)  # doesn't raise
-        field.validate(d2)  # doesn't raise
-        self.assertRaises(TooSmall, field.validate, datetime.datetime(2000, 9, 30))
-
-    def test_validate_w_max(self):
-        from zope.schema.interfaces import TooBig
-        d1 = datetime.datetime(2000, 10, 1)
-        d2 = datetime.datetime(2000, 10, 2)
-        d3 = datetime.datetime(2000, 10, 3)
-        field = self._makeOne(max=d2)
-        field.validate(d1)  # doesn't raise
-        field.validate(d2)  # doesn't raise
-        self.assertRaises(TooBig, field.validate, d3)
-
-    def test_validate_w_min_and_max(self):
-        from zope.schema.interfaces import TooBig
-        from zope.schema.interfaces import TooSmall
-        d1 = datetime.datetime(2000, 10, 1)
-        d2 = datetime.datetime(2000, 10, 2)
-        d3 = datetime.datetime(2000, 10, 3)
-        d4 = datetime.datetime(2000, 10, 4)
-        d5 = datetime.datetime(2000, 10, 5)
-        field = self._makeOne(min=d2, max=d4)
-        field.validate(d2)  # doesn't raise
-        field.validate(d3)  # doesn't raise
-        field.validate(d4)  # doesn't raise
-        self.assertRaises(TooSmall, field.validate, d1)
-        self.assertRaises(TooBig, field.validate, d5)
+    MIN = datetime.datetime(2000, 10, 1)
+    MAX = datetime.datetime(2000, 10, 4)
+    TOO_BIG = tuple((datetime.datetime(2000, 10, x) for x in (5, 6)))
+    TOO_SMALL = tuple((datetime.datetime(2000, 9, x) for x in (5, 6)))
+    VALID = tuple((datetime.datetime(2000, 10, x) for x in (1, 2, 3, 4)))
 
 
 class DateTests(OrderableMissingValueMixin,
+                OrderableTestsMixin,
                 EqualityTestsMixin,
                 WrongTypeTestsMixin,
                 unittest.TestCase):
@@ -529,46 +449,16 @@ class DateTests(OrderableMissingValueMixin,
         field.validate(datetime.datetime.now().date())
         self.assertRaises(RequiredMissing, field.validate, None)
 
-    def test_validate_w_min(self):
-        from datetime import date
-        from zope.schema.interfaces import TooSmall
-        d1 = date(2000, 10, 1)
-        d2 = date(2000, 10, 2)
-        field = self._makeOne(min=d1)
-        field.validate(d1)
-        field.validate(d2)
-        field.validate(datetime.datetime.now().date())
-        self.assertRaises(TooSmall, field.validate, date(2000, 9, 30))
-
-    def test_validate_w_max(self):
-        from datetime import date
-        from zope.schema.interfaces import TooBig
-        d1 = date(2000, 10, 1)
-        d2 = date(2000, 10, 2)
-        d3 = date(2000, 10, 3)
-        field = self._makeOne(max=d2)
-        field.validate(d1)
-        field.validate(d2)
-        self.assertRaises(TooBig, field.validate, d3)
-
-    def test_validate_w_min_and_max(self):
-        from datetime import date
-        from zope.schema.interfaces import TooBig
-        from zope.schema.interfaces import TooSmall
-        d1 = date(2000, 10, 1)
-        d2 = date(2000, 10, 2)
-        d3 = date(2000, 10, 3)
-        d4 = date(2000, 10, 4)
-        d5 = date(2000, 10, 5)
-        field = self._makeOne(min=d2, max=d4)
-        field.validate(d2)
-        field.validate(d3)
-        field.validate(d4)
-        self.assertRaises(TooSmall, field.validate, d1)
-        self.assertRaises(TooBig, field.validate, d5)
+    MIN = datetime.date(2000, 10, 1)
+    MAX = datetime.date(2000, 10, 4)
+    TOO_BIG = tuple((datetime.date(2000, 10, x) for x in (5, 6)))
+    TOO_SMALL = tuple((datetime.date(2000, 9, x) for x in (5, 6)))
+    VALID = tuple((datetime.date(2000, 10, x) for x in (1, 2, 3, 4)))
 
 
-class TimedeltaTests(OrderableMissingValueMixin, EqualityTestsMixin,
+class TimedeltaTests(OrderableMissingValueMixin,
+                     OrderableTestsMixin,
+                     EqualityTestsMixin,
                      unittest.TestCase):
 
     mvm_missing_value = datetime.timedelta(minutes=15)
@@ -595,45 +485,16 @@ class TimedeltaTests(OrderableMissingValueMixin, EqualityTestsMixin,
         field.validate(timedelta(minutes=15))
         self.assertRaises(RequiredMissing, field.validate, None)
 
-    def test_validate_min(self):
-        from datetime import timedelta
-        from zope.schema.interfaces import TooSmall
-        t1 = timedelta(hours=2)
-        t2 = timedelta(hours=3)
-        field = self._makeOne(min=t1)
-        field.validate(t1)
-        field.validate(t2)
-        self.assertRaises(TooSmall, field.validate, timedelta(hours=1))
-
-    def test_validate_max(self):
-        from datetime import timedelta
-        from zope.schema.interfaces import TooBig
-        t1 = timedelta(minutes=1)
-        t2 = timedelta(minutes=2)
-        t3 = timedelta(minutes=3)
-        field = self._makeOne(max=t2)
-        field.validate(t1)
-        field.validate(t2)
-        self.assertRaises(TooBig, field.validate, t3)
-
-    def test_validate_min_and_max(self):
-        from datetime import timedelta
-        from zope.schema.interfaces import TooBig
-        from zope.schema.interfaces import TooSmall
-        t1 = timedelta(days=1)
-        t2 = timedelta(days=2)
-        t3 = timedelta(days=3)
-        t4 = timedelta(days=4)
-        t5 = timedelta(days=5)
-        field = self._makeOne(min=t2, max=t4)
-        field.validate(t2)
-        field.validate(t3)
-        field.validate(t4)
-        self.assertRaises(TooSmall, field.validate, t1)
-        self.assertRaises(TooBig, field.validate, t5)
+    MIN = datetime.timedelta(minutes=NumberTests.MIN)
+    MAX = datetime.timedelta(minutes=NumberTests.MAX)
+    VALID = tuple(datetime.timedelta(minutes=x) for x in NumberTests.VALID)
+    TOO_SMALL = tuple(datetime.timedelta(minutes=x) for x in NumberTests.TOO_SMALL)
+    TOO_BIG = tuple(datetime.timedelta(x) for x in NumberTests.TOO_BIG)
 
 
-class TimeTests(OrderableMissingValueMixin, EqualityTestsMixin,
+class TimeTests(OrderableMissingValueMixin,
+                OrderableTestsMixin,
+                EqualityTestsMixin,
                 unittest.TestCase):
 
     mvm_missing_value = datetime.time(12, 15, 37)
@@ -660,43 +521,11 @@ class TimeTests(OrderableMissingValueMixin, EqualityTestsMixin,
         field.validate(time(12, 15, 37))
         self.assertRaises(RequiredMissing, field.validate, None)
 
-    def test_validate_min(self):
-        from datetime import time
-        from zope.schema.interfaces import TooSmall
-        t1 = time(12, 15, 37)
-        t2 = time(12, 25, 18)
-        t3 = time(12, 42, 43)
-        field = self._makeOne(min=t2)
-        field.validate(t2)
-        field.validate(t3)
-        self.assertRaises(TooSmall, field.validate, t1)
-
-    def test_validate_max(self):
-        from datetime import time
-        from zope.schema.interfaces import TooBig
-        t1 = time(12, 15, 37)
-        t2 = time(12, 25, 18)
-        t3 = time(12, 42, 43)
-        field = self._makeOne(max=t2)
-        field.validate(t1)
-        field.validate(t2)
-        self.assertRaises(TooBig, field.validate, t3)
-
-    def test_validate_min_and_max(self):
-        from datetime import time
-        from zope.schema.interfaces import TooBig
-        from zope.schema.interfaces import TooSmall
-        t1 = time(12, 15, 37)
-        t2 = time(12, 25, 18)
-        t3 = time(12, 42, 43)
-        t4 = time(13, 7, 12)
-        t5 = time(14, 22, 9)
-        field = self._makeOne(min=t2, max=t4)
-        field.validate(t2)
-        field.validate(t3)
-        field.validate(t4)
-        self.assertRaises(TooSmall, field.validate, t1)
-        self.assertRaises(TooBig, field.validate, t5)
+    MIN = datetime.time(12, 10, 1)
+    MAX = datetime.time(12, 10, 4)
+    TOO_BIG = tuple((datetime.time(12, 10, x) for x in (5, 6)))
+    TOO_SMALL = tuple((datetime.time(12, 9, x) for x in (5, 6)))
+    VALID = tuple((datetime.time(12, 10, x) for x in (1, 2, 3, 4)))
 
 
 class ChoiceTests(EqualityTestsMixin,
@@ -1313,6 +1142,7 @@ class InterfaceFieldTests(EqualityTestsMixin,
 
 
 class CollectionTests(EqualityTestsMixin,
+                      LenTestsMixin,
                       unittest.TestCase):
 
     _DEFAULT_UNIQUE = False
@@ -1435,30 +1265,26 @@ class CollectionTests(EqualityTestsMixin,
                          [u'a', u'a'])
 
     def test_validate_min_length(self):
-        from zope.schema.interfaces import TooShort
         field = self._makeOne(min_length=2)
         field.validate(self._makeCollection((1, 2)))
         field.validate(self._makeCollection((1, 2, 3)))
-        self.assertRaises(TooShort, field.validate, self._makeCollection())
-        self.assertRaises(TooShort, field.validate, self._makeCollection((1,)))
+        self.assertRaisesTooShort(field, self._makeCollection())
+        self.assertRaisesTooShort(field, self._makeCollection((1,)))
 
     def test_validate_max_length(self):
-        from zope.schema.interfaces import TooLong
         field = self._makeOne(max_length=2)
         field.validate(self._makeCollection())
         field.validate(self._makeCollection((1,)))
         field.validate(self._makeCollection((1, 2)))
-        self.assertRaises(TooLong, field.validate, self._makeCollection((1, 2, 3, 4)))
-        self.assertRaises(TooLong, field.validate, self._makeCollection((1, 2, 3)))
+        self.assertRaisesTooLong(field, self._makeCollection((1, 2, 3, 4)))
+        self.assertRaisesTooLong(field, self._makeCollection((1, 2, 3)))
 
     def test_validate_min_length_and_max_length(self):
-        from zope.schema.interfaces import TooLong
-        from zope.schema.interfaces import TooShort
         field = self._makeOne(min_length=1, max_length=2)
         field.validate(self._makeCollection((1,)))
         field.validate(self._makeCollection((1, 2)))
-        self.assertRaises(TooShort, field.validate, self._makeCollection())
-        self.assertRaises(TooLong, field.validate, self._makeCollection((1, 2, 3)))
+        self.assertRaisesTooShort(field, self._makeCollection())
+        self.assertRaisesTooLong(field, self._makeCollection((1, 2, 3)))
 
     def test_validate_not_required(self):
         field = self._makeOne(required=False)
@@ -1666,6 +1492,7 @@ class FrozenSetTests(SetTests):
 
 class MappingTests(EqualityTestsMixin,
                    WrongTypeTestsMixin,
+                   LenTestsMixin,
                    unittest.TestCase):
 
     def _getTargetClass(self):
@@ -1754,28 +1581,24 @@ class MappingTests(EqualityTestsMixin,
 
 
     def test_validate_min_length(self):
-        from zope.schema.interfaces import TooShort
         field = self._makeOne(min_length=1)
         field.validate({1: 'a'})
         field.validate({1: 'a', 2: 'b'})
-        self.assertRaises(TooShort, field.validate, {})
+        self.assertRaisesTooShort(field, {})
 
     def test_validate_max_length(self):
-        from zope.schema.interfaces import TooLong
         field = self._makeOne(max_length=1)
         field.validate({})
         field.validate({1: 'a'})
-        self.assertRaises(TooLong, field.validate, {1: 'a', 2: 'b'})
-        self.assertRaises(TooLong, field.validate, {1: 'a', 2: 'b', 3: 'c'})
+        self.assertRaisesTooLong(field, {1: 'a', 2: 'b'})
+        self.assertRaisesTooLong(field, {1: 'a', 2: 'b', 3: 'c'})
 
     def test_validate_min_length_and_max_length(self):
-        from zope.schema.interfaces import TooLong
-        from zope.schema.interfaces import TooShort
         field = self._makeOne(min_length=1, max_length=2)
         field.validate({1: 'a'})
         field.validate({1: 'a', 2: 'b'})
-        self.assertRaises(TooShort, field.validate, {})
-        self.assertRaises(TooLong, field.validate, {1: 'a', 2: 'b', 3: 'c'})
+        self.assertRaisesTooShort(field, {})
+        self.assertRaisesTooLong(field, {1: 'a', 2: 'b', 3: 'c'})
 
     def test_bind_binds_key_and_value_types(self):
         from zope.schema import Int

@@ -138,6 +138,81 @@ class OrderableMissingValueMixin(object):
         self.assertEqual(self.mvm_missing_value, field.missing_value)
 
 
+class OrderableTestsMixin(object):
+
+    def assertRaisesTooBig(self, field, value):
+        from zope.schema.interfaces import TooBig
+        with self.assertRaises(TooBig) as exc:
+            field.validate(value)
+
+        ex = exc.exception
+        self.assertEqual(value, ex.value)
+        self.assertEqual(field.max, ex.bound)
+        self.assertEqual(TooBig.TOO_LARGE, ex.violation_direction)
+
+    def assertRaisesTooSmall(self, field, value):
+        from zope.schema.interfaces import TooSmall
+        with self.assertRaises(TooSmall) as exc:
+            field.validate(value)
+
+        ex = exc.exception
+        self.assertEqual(value, ex.value)
+        self.assertEqual(field.min, ex.bound)
+        self.assertEqual(TooSmall.TOO_SMALL, ex.violation_direction)
+
+    MIN = 10
+    MAX = 20
+    VALID = (10, 11, 19, 20)
+    TOO_SMALL = (9, -10)
+    TOO_BIG = (21, 22)
+
+    def test_validate_min(self):
+        field = self._makeOne(min=self.MIN)
+        for value in self.VALID + self.TOO_BIG:
+            field.validate(value)
+        for value in self.TOO_SMALL:
+            self.assertRaisesTooSmall(field, value)
+
+    def test_validate_max(self):
+        field = self._makeOne(max=self.MAX)
+        for value in self.VALID + self.TOO_SMALL:
+            field.validate(value)
+        for value in self.TOO_BIG:
+            self.assertRaisesTooBig(field, value)
+
+    def test_validate_min_and_max(self):
+        field = self._makeOne(min=self.MIN, max=self.MAX)
+        for value in self.TOO_SMALL:
+            self.assertRaisesTooSmall(field, value)
+        for value in self.VALID:
+            field.validate(value)
+        for value in self.TOO_BIG:
+            self.assertRaisesTooBig(field, value)
+
+
+class LenTestsMixin(object):
+
+    def assertRaisesTooLong(self, field, value):
+        from zope.schema.interfaces import TooLong
+        with self.assertRaises(TooLong) as exc:
+            field.validate(value)
+
+        ex = exc.exception
+        self.assertEqual(value, ex.value)
+        self.assertEqual(field.max_length, ex.bound)
+        self.assertEqual(TooLong.TOO_LARGE, ex.violation_direction)
+
+    def assertRaisesTooShort(self, field, value):
+        from zope.schema.interfaces import TooShort
+        with self.assertRaises(TooShort) as exc:
+            field.validate(value)
+
+        ex = exc.exception
+        self.assertEqual(value, ex.value)
+        self.assertEqual(field.min_length, ex.bound)
+        self.assertEqual(TooShort.TOO_SMALL, ex.violation_direction)
+
+
 class WrongTypeTestsMixin(object):
 
     def assertRaisesWrongType(self, field_or_meth, expected_type, *args, **kwargs):
@@ -733,7 +808,8 @@ class OrderableTests(unittest.TestCase):
         self.assertRaises(TooBig, self._makeOne, max=10, default=11)
 
 
-class MinMaxLenTests(unittest.TestCase):
+class MinMaxLenTests(LenTestsMixin,
+                     unittest.TestCase):
 
     def _getTargetClass(self):
         from zope.schema._bootstrapfields import MinMaxLen
@@ -753,14 +829,12 @@ class MinMaxLenTests(unittest.TestCase):
         self.assertEqual(mml.max_length, None)
 
     def test_validate_too_short(self):
-        from zope.schema._bootstrapinterfaces import TooShort
         mml = self._makeOne(min_length=1)
-        self.assertRaises(TooShort, mml._validate, ())
+        self.assertRaisesTooShort(mml, ())
 
     def test_validate_too_long(self):
-        from zope.schema._bootstrapinterfaces import TooLong
         mml = self._makeOne(max_length=2)
-        self.assertRaises(TooLong, mml._validate, (0, 1, 2))
+        self.assertRaisesTooLong(mml, (0, 1, 2))
 
 
 class TextTests(EqualityTestsMixin,
@@ -988,6 +1062,7 @@ class BoolTests(EqualityTestsMixin,
 
 class NumberTests(EqualityTestsMixin,
                   OrderableMissingValueMixin,
+                  OrderableTestsMixin,
                   unittest.TestCase):
 
     def _getTargetClass(self):
@@ -1031,8 +1106,6 @@ class RealTests(WrongTypeTestsMixin,
         return IReal
 
     def test_ctor_real_min_max(self):
-        from zope.schema.interfaces import TooSmall
-        from zope.schema.interfaces import TooBig
         from fractions import Fraction
 
         self.assertRaisesWrongType(self._makeOne, self._getTargetClass()._type, min='')
@@ -1041,9 +1114,10 @@ class RealTests(WrongTypeTestsMixin,
         field = self._makeOne(min=Fraction(1, 2), max=2)
         field.validate(1.0)
         field.validate(2.0)
-        self.assertRaises(TooSmall, field.validate, 0)
-        self.assertRaises(TooSmall, field.validate, 0.4)
-        self.assertRaises(TooBig, field.validate, 2.1)
+        self.assertRaisesTooSmall(field, 0)
+        self.assertRaisesTooSmall(field, 0.4)
+        self.assertRaisesTooBig(field, 2.1)
+
 
 class RationalTests(NumberTests):
 
@@ -1081,34 +1155,7 @@ class IntegralTests(RationalTests):
         field.validate(-1)
         self.assertRaises(RequiredMissing, field.validate, None)
 
-    def test_validate_min(self):
-        from zope.schema.interfaces import TooSmall
-        field = self._makeOne(min=10)
-        field.validate(10)
-        field.validate(20)
-        self.assertRaises(TooSmall, field.validate, 9)
-        self.assertRaises(TooSmall, field.validate, -10)
 
-    def test_validate_max(self):
-        from zope.schema.interfaces import TooBig
-        field = self._makeOne(max=10)
-        field.validate(5)
-        field.validate(9)
-        field.validate(10)
-        self.assertRaises(TooBig, field.validate, 11)
-        self.assertRaises(TooBig, field.validate, 20)
-
-    def test_validate_min_and_max(self):
-        from zope.schema.interfaces import TooBig
-        from zope.schema.interfaces import TooSmall
-        field = self._makeOne(min=0, max=10)
-        field.validate(0)
-        field.validate(5)
-        field.validate(10)
-        self.assertRaises(TooSmall, field.validate, -10)
-        self.assertRaises(TooSmall, field.validate, -1)
-        self.assertRaises(TooBig, field.validate, 11)
-        self.assertRaises(TooBig, field.validate, 20)
 
     def test_fromUnicode_miss(self):
 

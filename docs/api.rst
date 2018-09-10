@@ -125,10 +125,17 @@ Exceptions
 .. autoexception:: zope.schema.interfaces.NotAnIterator
 .. autoexception:: zope.schema.interfaces.NotAnInterface
 
+Bounds
+~~~~~~
+
+.. autoexception:: zope.schema.interfaces.OutOfBounds
+.. autoexception:: zope.schema.interfaces.OrderableOutOfBounds
+.. autoexception:: zope.schema.interfaces.LenOutOfBounds
 .. autoexception:: zope.schema.interfaces.TooSmall
 .. autoexception:: zope.schema.interfaces.TooBig
 .. autoexception:: zope.schema.interfaces.TooLong
 .. autoexception:: zope.schema.interfaces.TooShort
+
 .. autoexception:: zope.schema.interfaces.InvalidValue
 .. autoexception:: zope.schema.interfaces.WrongContainedType
 .. autoexception:: zope.schema.interfaces.NotUnique
