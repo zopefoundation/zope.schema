@@ -334,6 +334,45 @@ class FieldTests(EqualityTestsMixin,
             """)
         )
 
+    def test_ctor_description_preserved(self):
+        # The exact value of the description is preserved,
+        # allowing for MessageID objects.
+        import textwrap
+        from zope.i18nmessageid import MessageFactory
+
+        msg_factory = MessageFactory('zope')
+
+        description = msg_factory(u"""Multiline description.
+
+        Some lines have leading whitespace.
+
+        It gets stripped.
+        """)
+
+        title = msg_factory(u'A title')
+
+        field = self._makeOne(title=title, description=description)
+
+        self.assertIs(field.title, title)
+        self.assertIs(field.description, description)
+
+        self.assertEqual(
+            field.getDoc(),
+            textwrap.dedent("""\
+            A title
+
+            Multiline description.
+
+            Some lines have leading whitespace.
+
+            It gets stripped.
+
+            :Implementation: :class:`zope.schema.Field`
+            :Read Only: False
+            :Required: True
+            :Default Value: None
+            """)
+        )
 
     def test_ctor_defaults(self):
 

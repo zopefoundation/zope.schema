@@ -238,16 +238,18 @@ class Field(Attribute):
         ('sample\\n\\nblah blah\\nblah', 'sample', 'blah blah\\nblah')
         """
         __doc__ = ''
+        # Fix leading whitespace that occurs when using multi-line
+        # strings, but don't overwrite the original, we need to
+        # preserve it (it could be a MessageID).
+        doc_description = '\n'.join(_DocStringHelpers.docstring_to_lines(description)[:-1])
+
         if title:
-            if description:
-                # Fix leading whitespace that occurs when using multi-line
-                # strings.
-                description = '\n'.join(_DocStringHelpers.docstring_to_lines(description)[:-1])
-                __doc__ = "%s\n\n%s" % (title, description)
+            if doc_description:
+                __doc__ = "%s\n\n%s" % (title, doc_description)
             else:
                 __doc__ = title
         elif description:
-            __doc__ = description
+            __doc__ = doc_description
 
         super(Field, self).__init__(__name__, __doc__)
         self.title = title

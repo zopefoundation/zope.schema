@@ -5,7 +5,12 @@
 4.6.1 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Fix the ``Field`` constructor to again allow ``MessageID`` values
+  for the ``description``. This was a regression introduced with the
+  fix for `issue 60
+  <https://github.com/zopefoundation/zope.schema/issues/60>`_. See
+  `issue 63
+  <https://github.com/zopefoundation/zope.schema/issues/63>`_.
 
 
 4.6.0 (2018-09-07)
