@@ -2,7 +2,7 @@
  Changes
 =========
 
-4.6.1 (unreleased)
+4.6.1 (2018-09-10)
 ==================
 
 - Fix the ``Field`` constructor to again allow ``MessageID`` values
