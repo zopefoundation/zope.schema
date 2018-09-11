@@ -60,8 +60,6 @@ from zope.schema._bootstrapinterfaces import ValidationError
 from zope.schema._bootstrapinterfaces import WrongContainedType
 from zope.schema._bootstrapinterfaces import WrongType
 
-
-
 from zope.schema._compat import PY3
 
 from zope.schema._messageid import _

@@ -21,6 +21,8 @@ from zope.interface.interfaces import IInterface
 
 from zope.schema._messageid import _
 
+# pylint:disable=inherit-non-class,keyword-arg-before-vararg,
+# pylint:disable=no-self-argument
 
 class StopValidation(Exception):
     """Raised if the validation is completed early.
@@ -87,7 +89,7 @@ class WrongType(ValidationError):
         WrongType(value, expected_type, name)
 
         .. versionchanged:: 4.7.0
-           Added named arguments tot he constructor and the `expected_type`
+           Added named arguments to the constructor and the `expected_type`
            field.
         """
         ValidationError.__init__(self, value, expected_type, name, *args)
@@ -110,10 +112,10 @@ class OutOfBounds(ValidationError):
     bound = None
 
     #: A constant for `violation_direction`.
-    TOO_LARGE = object()
+    TOO_LARGE = type('TOO_LARGE', (), {'__slots__': ()})()
 
     #: A constant for `violation_direction`.
-    TOO_SMALL = object()
+    TOO_SMALL = type('TOO_SMALL', (), {'__slots__': ()})()
 
     #: Whether the value was too large or
     #: not large enough. One of the values
@@ -129,6 +131,7 @@ class OutOfBounds(ValidationError):
         self.value = value
         self.bound = bound
 
+
 class OrderableOutOfBounds(OutOfBounds):
     """
     A value was too big or too small in comparison to another value.
@@ -136,10 +139,12 @@ class OrderableOutOfBounds(OutOfBounds):
     .. versionadded:: 4.7.0
     """
 
+
 class TooBig(OrderableOutOfBounds):
     __doc__ = _("""Value is too big""")
 
     violation_direction = OutOfBounds.TOO_LARGE
+
 
 class TooSmall(OrderableOutOfBounds):
     __doc__ = _("""Value is too small""")
@@ -159,6 +164,7 @@ class TooLong(LenOutOfBounds):
     __doc__ = _("""Value is too long""")
 
     violation_direction = OutOfBounds.TOO_LARGE
+
 
 class TooShort(LenOutOfBounds):
     __doc__ = _("""Value is too short""")
@@ -247,6 +253,7 @@ class SchemaNotProvided(ValidationError):
         self.schema = schema
         self.value = value
 
+
 class NotAnInterface(WrongType, SchemaNotProvided):
     """
     Object is not an interface.
@@ -321,8 +328,10 @@ class IValidatable(zope.interface.Interface):
         with the additional constraint.
         """
 
+
 class NO_VALUE(object):
     def __repr__(self): # pragma: no cover
         return '<NO_VALUE>'
+
 
 NO_VALUE = NO_VALUE()
