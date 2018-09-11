@@ -2,7 +2,7 @@
  Changes
 =========
 
-4.7.0 (unreleased)
+4.7.0 (2018-09-11)
 ==================
 
 - Make ``WrongType`` have an ``expected_type`` field.
