@@ -11,6 +11,7 @@ global-exclude *.so
 global-exclude coverage.xml
 
 prune docs/_build
+prune docs/.doctrees
 
 # added by check_manifest.py
 include *.py
