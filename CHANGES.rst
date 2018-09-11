@@ -2,11 +2,23 @@
  Changes
 =========
 
-4.6.3 (unreleased)
+4.7.0 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Make ``WrongType`` have an ``expected_type`` field.
 
+- Add ``NotAnInterface``, an exception derived from ``WrongType`` and
+  ``SchemaNotProvided`` and raised by the constructor of ``Object``
+  and when validation fails for ``InterfaceField``.
+
+- Give ``SchemaNotProvided`` a ``schema`` field.
+
+- Give ``WrongContainedType`` an ``errors`` list.
+
+- Give ``TooShort``, ``TooLong``, ``TooBig`` and ``TooSmall`` a
+  ``bound`` field and the common superclasses ``LenOutOfBounds``,
+  ``OrderableOutOfBounds``, respectively, both of which inherit from
+  ``OutOfBounds``.
 
 4.6.2 (2018-09-10)
 ==================

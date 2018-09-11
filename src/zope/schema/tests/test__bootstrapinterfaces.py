@@ -48,11 +48,26 @@ class ValidationErrorTests(unittest.TestCase):
 
     def test___eq___no_args(self):
         ve = self._makeOne()
-        self.assertEqual(ve == object(), False)
+        self.assertNotEqual(ve, object())
+        self.assertNotEqual(object(), ve)
 
     def test___eq___w_args(self):
         left = self._makeOne('abc')
         right = self._makeOne('def')
-        self.assertEqual(left == right, False)
-        self.assertEqual(left == left, True)
-        self.assertEqual(right == right, True)
+        self.assertNotEqual(left, right)
+        self.assertNotEqual(right, left)
+        self.assertEqual(left, left)
+        self.assertEqual(right, right)
+
+
+class TestOutOfBounds(unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._bootstrapinterfaces import OutOfBounds
+        return OutOfBounds
+
+    def test_TOO_LARGE_repr(self):
+        self.assertIn('TOO_LARGE', repr(self._getTargetClass().TOO_LARGE))
+
+    def test_TOO_SMALL_repr(self):
+        self.assertIn('TOO_SMALL', repr(self._getTargetClass().TOO_SMALL))

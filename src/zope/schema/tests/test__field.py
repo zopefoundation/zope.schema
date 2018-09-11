@@ -16,9 +16,13 @@ import decimal
 import doctest
 import unittest
 
-from zope.schema.tests.test__bootstrapfields import OrderableMissingValueMixin
 from zope.schema.tests.test__bootstrapfields import EqualityTestsMixin
+from zope.schema.tests.test__bootstrapfields import LenTestsMixin
+from zope.schema.tests.test__bootstrapfields import OrderableMissingValueMixin
+from zope.schema.tests.test__bootstrapfields import OrderableTestsMixin
+from zope.schema.tests.test__bootstrapfields import WrongTypeTestsMixin
 
+from zope.schema.tests.test__bootstrapfields import NumberTests
 
 # pylint:disable=protected-access
 # pylint:disable=too-many-lines
@@ -26,7 +30,9 @@ from zope.schema.tests.test__bootstrapfields import EqualityTestsMixin
 # pylint:disable=no-member
 # pylint:disable=blacklisted-name
 
-class BytesTests(EqualityTestsMixin, unittest.TestCase):
+class BytesTests(EqualityTestsMixin,
+                 WrongTypeTestsMixin,
+                 unittest.TestCase):
 
     def _getTargetClass(self):
         from zope.schema._field import Bytes
@@ -37,18 +43,19 @@ class BytesTests(EqualityTestsMixin, unittest.TestCase):
         return IBytes
 
     def test_validate_wrong_types(self):
-        from zope.schema.interfaces import WrongType
-
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, u'')
-        self.assertRaises(WrongType, field.validate, 1)
-        self.assertRaises(WrongType, field.validate, 1.0)
-        self.assertRaises(WrongType, field.validate, ())
-        self.assertRaises(WrongType, field.validate, [])
-        self.assertRaises(WrongType, field.validate, {})
-        self.assertRaises(WrongType, field.validate, set())
-        self.assertRaises(WrongType, field.validate, frozenset())
-        self.assertRaises(WrongType, field.validate, object())
+        self.assertAllRaiseWrongType(
+            field,
+            field._type,
+            u'',
+            1,
+            1.0,
+            (),
+            [],
+            {},
+            set(),
+            frozenset(),
+            object())
 
     def test_validate_w_invalid_default(self):
 
@@ -84,6 +91,7 @@ class BytesTests(EqualityTestsMixin, unittest.TestCase):
 
 
 class ASCIITests(EqualityTestsMixin,
+                 WrongTypeTestsMixin,
                  unittest.TestCase):
 
     def _getTargetClass(self):
@@ -95,18 +103,20 @@ class ASCIITests(EqualityTestsMixin,
         return IASCII
 
     def test_validate_wrong_types(self):
-        from zope.schema.interfaces import WrongType
         from zope.schema._compat import non_native_string
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, non_native_string(''))
-        self.assertRaises(WrongType, field.validate, 1)
-        self.assertRaises(WrongType, field.validate, 1.0)
-        self.assertRaises(WrongType, field.validate, ())
-        self.assertRaises(WrongType, field.validate, [])
-        self.assertRaises(WrongType, field.validate, {})
-        self.assertRaises(WrongType, field.validate, set())
-        self.assertRaises(WrongType, field.validate, frozenset())
-        self.assertRaises(WrongType, field.validate, object())
+        self.assertAllRaiseWrongType(
+            field,
+            field._type,
+            non_native_string(''),
+            1,
+            1.0,
+            (),
+            [],
+            {},
+            set(),
+            frozenset(),
+            object())
 
     def test__validate_empty(self):
         asc = self._makeOne()
@@ -129,6 +139,7 @@ class ASCIITests(EqualityTestsMixin,
 
 
 class BytesLineTests(EqualityTestsMixin,
+                     WrongTypeTestsMixin,
                      unittest.TestCase):
 
     def _getTargetClass(self):
@@ -140,18 +151,19 @@ class BytesLineTests(EqualityTestsMixin,
         return IBytesLine
 
     def test_validate_wrong_types(self):
-        from zope.schema.interfaces import WrongType
-
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, u'')
-        self.assertRaises(WrongType, field.validate, 1)
-        self.assertRaises(WrongType, field.validate, 1.0)
-        self.assertRaises(WrongType, field.validate, ())
-        self.assertRaises(WrongType, field.validate, [])
-        self.assertRaises(WrongType, field.validate, {})
-        self.assertRaises(WrongType, field.validate, set())
-        self.assertRaises(WrongType, field.validate, frozenset())
-        self.assertRaises(WrongType, field.validate, object())
+        self.assertAllRaiseWrongType(
+            field,
+            field._type,
+            u'',
+            1,
+            1.0,
+            (),
+            [],
+            {},
+            set(),
+            frozenset(),
+            object())
 
     def test_validate_not_required(self):
 
@@ -181,6 +193,7 @@ class BytesLineTests(EqualityTestsMixin,
 
 
 class ASCIILineTests(EqualityTestsMixin,
+                     WrongTypeTestsMixin,
                      unittest.TestCase):
 
     def _getTargetClass(self):
@@ -192,18 +205,20 @@ class ASCIILineTests(EqualityTestsMixin,
         return IASCIILine
 
     def test_validate_wrong_types(self):
-        from zope.schema.interfaces import WrongType
         from zope.schema._compat import non_native_string
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, non_native_string(''))
-        self.assertRaises(WrongType, field.validate, 1)
-        self.assertRaises(WrongType, field.validate, 1.0)
-        self.assertRaises(WrongType, field.validate, ())
-        self.assertRaises(WrongType, field.validate, [])
-        self.assertRaises(WrongType, field.validate, {})
-        self.assertRaises(WrongType, field.validate, set())
-        self.assertRaises(WrongType, field.validate, frozenset())
-        self.assertRaises(WrongType, field.validate, object())
+        self.assertAllRaiseWrongType(
+            field,
+            field._type,
+            non_native_string(''),
+            1,
+            1.0,
+            (),
+            [],
+            {},
+            set(),
+            frozenset(),
+            object())
 
     def test_validate_not_required(self):
         from zope.schema.interfaces import InvalidValue
@@ -232,11 +247,17 @@ class ASCIILineTests(EqualityTestsMixin,
         self.assertEqual(field.constraint('abc\ndef'), False)
 
 
-class FloatTests(OrderableMissingValueMixin, EqualityTestsMixin,
-                 unittest.TestCase):
+class FloatTests(NumberTests):
 
     mvm_missing_value = -1.0
     mvm_default = 0.0
+
+    MIN = float(NumberTests.MIN)
+    MAX = float(NumberTests.MAX)
+    VALID = tuple(float(x) for x in NumberTests.VALID)
+    TOO_SMALL = tuple(float(x) for x in NumberTests.TOO_SMALL)
+    TOO_BIG = tuple(float(x) for x in NumberTests.TOO_BIG)
+
 
     def _getTargetClass(self):
         from zope.schema._field import Float
@@ -261,34 +282,6 @@ class FloatTests(OrderableMissingValueMixin, EqualityTestsMixin,
         field.validate(1000.0003)
         self.assertRaises(RequiredMissing, field.validate, None)
 
-    def test_validate_min(self):
-        from zope.schema.interfaces import TooSmall
-        field = self._makeOne(min=10.5)
-        field.validate(10.6)
-        field.validate(20.2)
-        self.assertRaises(TooSmall, field.validate, -9.0)
-        self.assertRaises(TooSmall, field.validate, 10.4)
-
-    def test_validate_max(self):
-        from zope.schema.interfaces import TooBig
-        field = self._makeOne(max=10.5)
-        field.validate(5.3)
-        field.validate(-9.1)
-        self.assertRaises(TooBig, field.validate, 10.51)
-        self.assertRaises(TooBig, field.validate, 20.7)
-
-    def test_validate_min_and_max(self):
-        from zope.schema.interfaces import TooBig
-        from zope.schema.interfaces import TooSmall
-        field = self._makeOne(min=-0.6, max=10.1)
-        field.validate(0.0)
-        field.validate(-0.03)
-        field.validate(10.0001)
-        self.assertRaises(TooSmall, field.validate, -10.0)
-        self.assertRaises(TooSmall, field.validate, -1.6)
-        self.assertRaises(TooBig, field.validate, 11.45)
-        self.assertRaises(TooBig, field.validate, 20.02)
-
     def test_fromUnicode_miss(self):
 
         flt = self._makeOne()
@@ -304,11 +297,16 @@ class FloatTests(OrderableMissingValueMixin, EqualityTestsMixin,
         self.assertEqual(flt.fromUnicode(u'1.23e6'), 1230000.0)
 
 
-class DecimalTests(OrderableMissingValueMixin, EqualityTestsMixin,
-                   unittest.TestCase):
+class DecimalTests(NumberTests):
 
     mvm_missing_value = decimal.Decimal("-1")
     mvm_default = decimal.Decimal("0")
+
+    MIN = decimal.Decimal(NumberTests.MIN)
+    MAX = decimal.Decimal(NumberTests.MAX)
+    VALID = tuple(decimal.Decimal(x) for x in NumberTests.VALID)
+    TOO_SMALL = tuple(decimal.Decimal(x) for x in NumberTests.TOO_SMALL)
+    TOO_BIG = tuple(decimal.Decimal(x) for x in NumberTests.TOO_BIG)
 
     def _getTargetClass(self):
         from zope.schema._field import Decimal
@@ -333,46 +331,6 @@ class DecimalTests(OrderableMissingValueMixin, EqualityTestsMixin,
         field.validate(decimal.Decimal("1000.0003"))
         self.assertRaises(RequiredMissing, field.validate, None)
 
-    def test_validate_min(self):
-        from zope.schema.interfaces import TooSmall
-        field = self._makeOne(min=decimal.Decimal("10.5"))
-        field.validate(decimal.Decimal("10.6"))
-        field.validate(decimal.Decimal("20.2"))
-        self.assertRaises(TooSmall, field.validate, decimal.Decimal("-9.0"))
-        self.assertRaises(TooSmall, field.validate, decimal.Decimal("10.4"))
-
-    def test_validate_max(self):
-        from zope.schema.interfaces import TooBig
-        field = self._makeOne(max=decimal.Decimal("10.5"))
-        field.validate(decimal.Decimal("5.3"))
-        field.validate(decimal.Decimal("-9.1"))
-        self.assertRaises(TooBig, field.validate, decimal.Decimal("10.51"))
-        self.assertRaises(TooBig, field.validate, decimal.Decimal("20.7"))
-
-    def test_validate_min_and_max(self):
-        from zope.schema.interfaces import TooBig
-        from zope.schema.interfaces import TooSmall
-        field = self._makeOne(min=decimal.Decimal("-0.6"),
-                              max=decimal.Decimal("10.1"))
-        field.validate(decimal.Decimal("0.0"))
-        field.validate(decimal.Decimal("-0.03"))
-        field.validate(decimal.Decimal("10.0001"))
-        self.assertRaises(TooSmall, field.validate, decimal.Decimal("-10.0"))
-        with self.assertRaises(TooSmall) as exc:
-            field.validate(decimal.Decimal("-1.6"))
-
-        too_small = exc.exception
-        self.assertIs(too_small.field, field)
-        self.assertEqual(too_small.value, decimal.Decimal("-1.6"))
-
-        self.assertRaises(TooBig, field.validate, decimal.Decimal("11.45"))
-        with self.assertRaises(TooBig) as exc:
-            field.validate(decimal.Decimal("20.02"))
-
-        too_big = exc.exception
-        self.assertIs(too_big.field, field)
-        self.assertEqual(too_big.value, decimal.Decimal("20.02"))
-
     def test_fromUnicode_miss(self):
         from zope.schema.interfaces import ValidationError
         flt = self._makeOne()
@@ -395,7 +353,10 @@ class DecimalTests(OrderableMissingValueMixin, EqualityTestsMixin,
         self.assertEqual(flt.fromUnicode(u'12345.6'), Decimal('12345.6'))
 
 
-class DatetimeTests(OrderableMissingValueMixin, EqualityTestsMixin,
+class DatetimeTests(OrderableMissingValueMixin,
+                    OrderableTestsMixin,
+                    EqualityTestsMixin,
+                    WrongTypeTestsMixin,
                     unittest.TestCase):
 
     mvm_missing_value = datetime.datetime.now()
@@ -411,21 +372,20 @@ class DatetimeTests(OrderableMissingValueMixin, EqualityTestsMixin,
 
     def test_validate_wrong_types(self):
         from datetime import date
-        from zope.schema.interfaces import WrongType
-
-
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, u'')
-        self.assertRaises(WrongType, field.validate, u'')
-        self.assertRaises(WrongType, field.validate, 1)
-        self.assertRaises(WrongType, field.validate, 1.0)
-        self.assertRaises(WrongType, field.validate, ())
-        self.assertRaises(WrongType, field.validate, [])
-        self.assertRaises(WrongType, field.validate, {})
-        self.assertRaises(WrongType, field.validate, set())
-        self.assertRaises(WrongType, field.validate, frozenset())
-        self.assertRaises(WrongType, field.validate, object())
-        self.assertRaises(WrongType, field.validate, date.today())
+        self.assertAllRaiseWrongType(
+            field,
+            field._type,
+            u'',
+            1,
+            1.0,
+            (),
+            [],
+            {},
+            set(),
+            frozenset(),
+            object(),
+            date.today())
 
     def test_validate_not_required(self):
         field = self._makeOne(required=False)
@@ -437,42 +397,17 @@ class DatetimeTests(OrderableMissingValueMixin, EqualityTestsMixin,
         field = self._makeOne(required=True)
         self.assertRaises(RequiredMissing, field.validate, None)
 
-    def test_validate_w_min(self):
-        from zope.schema.interfaces import TooSmall
-        d1 = datetime.datetime(2000, 10, 1)
-        d2 = datetime.datetime(2000, 10, 2)
-        field = self._makeOne(min=d1)
-        field.validate(d1)  # doesn't raise
-        field.validate(d2)  # doesn't raise
-        self.assertRaises(TooSmall, field.validate, datetime.datetime(2000, 9, 30))
-
-    def test_validate_w_max(self):
-        from zope.schema.interfaces import TooBig
-        d1 = datetime.datetime(2000, 10, 1)
-        d2 = datetime.datetime(2000, 10, 2)
-        d3 = datetime.datetime(2000, 10, 3)
-        field = self._makeOne(max=d2)
-        field.validate(d1)  # doesn't raise
-        field.validate(d2)  # doesn't raise
-        self.assertRaises(TooBig, field.validate, d3)
-
-    def test_validate_w_min_and_max(self):
-        from zope.schema.interfaces import TooBig
-        from zope.schema.interfaces import TooSmall
-        d1 = datetime.datetime(2000, 10, 1)
-        d2 = datetime.datetime(2000, 10, 2)
-        d3 = datetime.datetime(2000, 10, 3)
-        d4 = datetime.datetime(2000, 10, 4)
-        d5 = datetime.datetime(2000, 10, 5)
-        field = self._makeOne(min=d2, max=d4)
-        field.validate(d2)  # doesn't raise
-        field.validate(d3)  # doesn't raise
-        field.validate(d4)  # doesn't raise
-        self.assertRaises(TooSmall, field.validate, d1)
-        self.assertRaises(TooBig, field.validate, d5)
+    MIN = datetime.datetime(2000, 10, 1)
+    MAX = datetime.datetime(2000, 10, 4)
+    TOO_BIG = tuple((datetime.datetime(2000, 10, x) for x in (5, 6)))
+    TOO_SMALL = tuple((datetime.datetime(2000, 9, x) for x in (5, 6)))
+    VALID = tuple((datetime.datetime(2000, 10, x) for x in (1, 2, 3, 4)))
 
 
-class DateTests(OrderableMissingValueMixin, EqualityTestsMixin,
+class DateTests(OrderableMissingValueMixin,
+                OrderableTestsMixin,
+                EqualityTestsMixin,
+                WrongTypeTestsMixin,
                 unittest.TestCase):
 
     mvm_missing_value = datetime.date.today()
@@ -487,26 +422,20 @@ class DateTests(OrderableMissingValueMixin, EqualityTestsMixin,
         return IDate
 
     def test_validate_wrong_types(self):
-        from zope.schema.interfaces import WrongType
-
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, u'')
-        self.assertRaises(WrongType, field.validate, u'')
-        self.assertRaises(WrongType, field.validate, 1)
-        self.assertRaises(WrongType, field.validate, 1.0)
-        self.assertRaises(WrongType, field.validate, ())
-        self.assertRaises(WrongType, field.validate, [])
-        self.assertRaises(WrongType, field.validate, {})
-        self.assertRaises(WrongType, field.validate, set())
-        self.assertRaises(WrongType, field.validate, frozenset())
-        self.assertRaises(WrongType, field.validate, object())
-        now = datetime.datetime.now()
-        with self.assertRaises(WrongType) as exc:
-            field.validate(now)
-
-        wrong_type = exc.exception
-        self.assertIs(wrong_type.field, field)
-        self.assertIs(wrong_type.value, now)
+        self.assertAllRaiseWrongType(
+            field,
+            field._type,
+            u'',
+            1,
+            1.0,
+            (),
+            [],
+            {},
+            set(),
+            frozenset(),
+            object(),
+            datetime.datetime.now())
 
     def test_validate_not_required(self):
         from datetime import date
@@ -520,46 +449,16 @@ class DateTests(OrderableMissingValueMixin, EqualityTestsMixin,
         field.validate(datetime.datetime.now().date())
         self.assertRaises(RequiredMissing, field.validate, None)
 
-    def test_validate_w_min(self):
-        from datetime import date
-        from zope.schema.interfaces import TooSmall
-        d1 = date(2000, 10, 1)
-        d2 = date(2000, 10, 2)
-        field = self._makeOne(min=d1)
-        field.validate(d1)
-        field.validate(d2)
-        field.validate(datetime.datetime.now().date())
-        self.assertRaises(TooSmall, field.validate, date(2000, 9, 30))
-
-    def test_validate_w_max(self):
-        from datetime import date
-        from zope.schema.interfaces import TooBig
-        d1 = date(2000, 10, 1)
-        d2 = date(2000, 10, 2)
-        d3 = date(2000, 10, 3)
-        field = self._makeOne(max=d2)
-        field.validate(d1)
-        field.validate(d2)
-        self.assertRaises(TooBig, field.validate, d3)
-
-    def test_validate_w_min_and_max(self):
-        from datetime import date
-        from zope.schema.interfaces import TooBig
-        from zope.schema.interfaces import TooSmall
-        d1 = date(2000, 10, 1)
-        d2 = date(2000, 10, 2)
-        d3 = date(2000, 10, 3)
-        d4 = date(2000, 10, 4)
-        d5 = date(2000, 10, 5)
-        field = self._makeOne(min=d2, max=d4)
-        field.validate(d2)
-        field.validate(d3)
-        field.validate(d4)
-        self.assertRaises(TooSmall, field.validate, d1)
-        self.assertRaises(TooBig, field.validate, d5)
+    MIN = datetime.date(2000, 10, 1)
+    MAX = datetime.date(2000, 10, 4)
+    TOO_BIG = tuple((datetime.date(2000, 10, x) for x in (5, 6)))
+    TOO_SMALL = tuple((datetime.date(2000, 9, x) for x in (5, 6)))
+    VALID = tuple((datetime.date(2000, 10, x) for x in (1, 2, 3, 4)))
 
 
-class TimedeltaTests(OrderableMissingValueMixin, EqualityTestsMixin,
+class TimedeltaTests(OrderableMissingValueMixin,
+                     OrderableTestsMixin,
+                     EqualityTestsMixin,
                      unittest.TestCase):
 
     mvm_missing_value = datetime.timedelta(minutes=15)
@@ -586,45 +485,16 @@ class TimedeltaTests(OrderableMissingValueMixin, EqualityTestsMixin,
         field.validate(timedelta(minutes=15))
         self.assertRaises(RequiredMissing, field.validate, None)
 
-    def test_validate_min(self):
-        from datetime import timedelta
-        from zope.schema.interfaces import TooSmall
-        t1 = timedelta(hours=2)
-        t2 = timedelta(hours=3)
-        field = self._makeOne(min=t1)
-        field.validate(t1)
-        field.validate(t2)
-        self.assertRaises(TooSmall, field.validate, timedelta(hours=1))
-
-    def test_validate_max(self):
-        from datetime import timedelta
-        from zope.schema.interfaces import TooBig
-        t1 = timedelta(minutes=1)
-        t2 = timedelta(minutes=2)
-        t3 = timedelta(minutes=3)
-        field = self._makeOne(max=t2)
-        field.validate(t1)
-        field.validate(t2)
-        self.assertRaises(TooBig, field.validate, t3)
-
-    def test_validate_min_and_max(self):
-        from datetime import timedelta
-        from zope.schema.interfaces import TooBig
-        from zope.schema.interfaces import TooSmall
-        t1 = timedelta(days=1)
-        t2 = timedelta(days=2)
-        t3 = timedelta(days=3)
-        t4 = timedelta(days=4)
-        t5 = timedelta(days=5)
-        field = self._makeOne(min=t2, max=t4)
-        field.validate(t2)
-        field.validate(t3)
-        field.validate(t4)
-        self.assertRaises(TooSmall, field.validate, t1)
-        self.assertRaises(TooBig, field.validate, t5)
+    MIN = datetime.timedelta(minutes=NumberTests.MIN)
+    MAX = datetime.timedelta(minutes=NumberTests.MAX)
+    VALID = tuple(datetime.timedelta(minutes=x) for x in NumberTests.VALID)
+    TOO_SMALL = tuple(datetime.timedelta(minutes=x) for x in NumberTests.TOO_SMALL)
+    TOO_BIG = tuple(datetime.timedelta(x) for x in NumberTests.TOO_BIG)
 
 
-class TimeTests(OrderableMissingValueMixin, EqualityTestsMixin,
+class TimeTests(OrderableMissingValueMixin,
+                OrderableTestsMixin,
+                EqualityTestsMixin,
                 unittest.TestCase):
 
     mvm_missing_value = datetime.time(12, 15, 37)
@@ -651,43 +521,11 @@ class TimeTests(OrderableMissingValueMixin, EqualityTestsMixin,
         field.validate(time(12, 15, 37))
         self.assertRaises(RequiredMissing, field.validate, None)
 
-    def test_validate_min(self):
-        from datetime import time
-        from zope.schema.interfaces import TooSmall
-        t1 = time(12, 15, 37)
-        t2 = time(12, 25, 18)
-        t3 = time(12, 42, 43)
-        field = self._makeOne(min=t2)
-        field.validate(t2)
-        field.validate(t3)
-        self.assertRaises(TooSmall, field.validate, t1)
-
-    def test_validate_max(self):
-        from datetime import time
-        from zope.schema.interfaces import TooBig
-        t1 = time(12, 15, 37)
-        t2 = time(12, 25, 18)
-        t3 = time(12, 42, 43)
-        field = self._makeOne(max=t2)
-        field.validate(t1)
-        field.validate(t2)
-        self.assertRaises(TooBig, field.validate, t3)
-
-    def test_validate_min_and_max(self):
-        from datetime import time
-        from zope.schema.interfaces import TooBig
-        from zope.schema.interfaces import TooSmall
-        t1 = time(12, 15, 37)
-        t2 = time(12, 25, 18)
-        t3 = time(12, 42, 43)
-        t4 = time(13, 7, 12)
-        t5 = time(14, 22, 9)
-        field = self._makeOne(min=t2, max=t4)
-        field.validate(t2)
-        field.validate(t3)
-        field.validate(t4)
-        self.assertRaises(TooSmall, field.validate, t1)
-        self.assertRaises(TooBig, field.validate, t5)
+    MIN = datetime.time(12, 10, 1)
+    MAX = datetime.time(12, 10, 4)
+    TOO_BIG = tuple((datetime.time(12, 10, x) for x in (5, 6)))
+    TOO_SMALL = tuple((datetime.time(12, 9, x) for x in (5, 6)))
+    VALID = tuple((datetime.time(12, 10, x) for x in (1, 2, 3, 4)))
 
 
 class ChoiceTests(EqualityTestsMixin,
@@ -983,6 +821,7 @@ class ChoiceTests(EqualityTestsMixin,
 
 
 class URITests(EqualityTestsMixin,
+               WrongTypeTestsMixin,
                unittest.TestCase):
 
     def _getTargetClass(self):
@@ -997,15 +836,18 @@ class URITests(EqualityTestsMixin,
         from zope.schema.interfaces import WrongType
         from zope.schema._compat import non_native_string
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, non_native_string(''))
-        self.assertRaises(WrongType, field.validate, 1)
-        self.assertRaises(WrongType, field.validate, 1.0)
-        self.assertRaises(WrongType, field.validate, ())
-        self.assertRaises(WrongType, field.validate, [])
-        self.assertRaises(WrongType, field.validate, {})
-        self.assertRaises(WrongType, field.validate, set())
-        self.assertRaises(WrongType, field.validate, frozenset())
-        self.assertRaises(WrongType, field.validate, object())
+        self.assertAllRaiseWrongType(
+            field,
+            field._type,
+            non_native_string(''),
+            1,
+            1.0,
+            (),
+            [],
+            {},
+            set(),
+            frozenset(),
+            object())
 
     def test_validate_not_required(self):
         field = self._makeOne(required=False)
@@ -1052,6 +894,7 @@ class URITests(EqualityTestsMixin,
 
 
 class DottedNameTests(EqualityTestsMixin,
+                      WrongTypeTestsMixin,
                       unittest.TestCase):
 
     def _getTargetClass(self):
@@ -1082,18 +925,20 @@ class DottedNameTests(EqualityTestsMixin,
         self.assertEqual(dotted.max_dots, 2)
 
     def test_validate_wrong_types(self):
-        from zope.schema.interfaces import WrongType
         from zope.schema._compat import non_native_string
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, non_native_string(''))
-        self.assertRaises(WrongType, field.validate, 1)
-        self.assertRaises(WrongType, field.validate, 1.0)
-        self.assertRaises(WrongType, field.validate, ())
-        self.assertRaises(WrongType, field.validate, [])
-        self.assertRaises(WrongType, field.validate, {})
-        self.assertRaises(WrongType, field.validate, set())
-        self.assertRaises(WrongType, field.validate, frozenset())
-        self.assertRaises(WrongType, field.validate, object())
+        self.assertAllRaiseWrongType(
+            field,
+            field._type,
+            non_native_string(''),
+            1,
+            1.0,
+            (),
+            [],
+            {},
+            set(),
+            frozenset(),
+            object())
 
     def test_validate_not_required(self):
         field = self._makeOne(required=False)
@@ -1162,6 +1007,7 @@ class DottedNameTests(EqualityTestsMixin,
 
 
 class IdTests(EqualityTestsMixin,
+              WrongTypeTestsMixin,
               unittest.TestCase):
 
     def _getTargetClass(self):
@@ -1176,21 +1022,18 @@ class IdTests(EqualityTestsMixin,
         from zope.schema.interfaces import WrongType
         from zope.schema._compat import non_native_string
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, non_native_string(''))
-        self.assertRaises(WrongType, field.validate, 1)
-        self.assertRaises(WrongType, field.validate, 1.0)
-        self.assertRaises(WrongType, field.validate, ())
-        self.assertRaises(WrongType, field.validate, [])
-        self.assertRaises(WrongType, field.validate, {})
-        self.assertRaises(WrongType, field.validate, set())
-        self.assertRaises(WrongType, field.validate, frozenset())
-        bad_value = object()
-        with self.assertRaises(WrongType) as exc:
-            field.validate(bad_value)
-
-        wrong = exc.exception
-        self.assertIs(wrong.field, field)
-        self.assertEqual(wrong.value, bad_value)
+        self.assertAllRaiseWrongType(
+            field,
+            field._type,
+            non_native_string(''),
+            1,
+            1.0,
+            (),
+            [],
+            {},
+            set(),
+            frozenset(),
+            object())
 
     def test_validate_not_required(self):
         field = self._makeOne(required=False)
@@ -1245,6 +1088,7 @@ class IdTests(EqualityTestsMixin,
 
 
 class InterfaceFieldTests(EqualityTestsMixin,
+                          WrongTypeTestsMixin,
                           unittest.TestCase):
 
     def _getTargetClass(self):
@@ -1256,28 +1100,24 @@ class InterfaceFieldTests(EqualityTestsMixin,
         return IInterfaceField
 
     def test_validate_wrong_types(self):
+        from zope.interface.interfaces import IInterface
         from datetime import date
-        from zope.schema.interfaces import WrongType
-
 
         field = self._makeOne()
-        with self.assertRaises(WrongType) as exc:
-            field.validate(u'')
-
-        wrong = exc.exception
-        self.assertIs(wrong.field, field)
-        self.assertEqual(wrong.value, u'')
-
-        self.assertRaises(WrongType, field.validate, b'')
-        self.assertRaises(WrongType, field.validate, 1)
-        self.assertRaises(WrongType, field.validate, 1.0)
-        self.assertRaises(WrongType, field.validate, ())
-        self.assertRaises(WrongType, field.validate, [])
-        self.assertRaises(WrongType, field.validate, {})
-        self.assertRaises(WrongType, field.validate, set())
-        self.assertRaises(WrongType, field.validate, frozenset())
-        self.assertRaises(WrongType, field.validate, object())
-        self.assertRaises(WrongType, field.validate, date.today())
+        self.assertAllRaiseWrongType(
+            field,
+            IInterface,
+            u'',
+            b'',
+            1,
+            1.0,
+            (),
+            [],
+            {},
+            set(),
+            frozenset(),
+            object(),
+            date.today())
 
     def test_validate_not_required(self):
         from zope.interface import Interface
@@ -1302,6 +1142,7 @@ class InterfaceFieldTests(EqualityTestsMixin,
 
 
 class CollectionTests(EqualityTestsMixin,
+                      LenTestsMixin,
                       unittest.TestCase):
 
     _DEFAULT_UNIQUE = False
@@ -1320,6 +1161,7 @@ class CollectionTests(EqualityTestsMixin,
     def test_schema_defined_by_subclass(self):
         from zope import interface
         from zope.schema import Object
+        from zope.schema.interfaces import SchemaNotProvided
         from zope.schema.interfaces import WrongContainedType
 
         class IValueType(interface.Interface):
@@ -1337,7 +1179,14 @@ class CollectionTests(EqualityTestsMixin,
         field.validate(self._makeCollection([]))
 
         # Collection with a non-implemented object is bad
-        self.assertRaises(WrongContainedType, field.validate, self._makeCollection([object()]))
+        with self.assertRaises(WrongContainedType) as exc:
+            field.validate(self._makeCollection([object()]))
+
+        ex = exc.exception
+        self.assertIs(ex.__class__, WrongContainedType)
+        self.assertEqual(1, len(ex.errors))
+        self.assertIsInstance(ex.errors[0], SchemaNotProvided)
+        self.assertIs(ex.errors[0].schema, IValueType)
 
         # Actual implementation works
         @interface.implementer(IValueType)
@@ -1385,6 +1234,7 @@ class CollectionTests(EqualityTestsMixin,
 
     def test__validate_wrong_contained_type(self):
         from zope.schema.interfaces import WrongContainedType
+        from zope.schema.interfaces import WrongType
         from zope.schema._bootstrapfields import Text
         text = Text()
         absc = self._makeOne(text)
@@ -1394,6 +1244,10 @@ class CollectionTests(EqualityTestsMixin,
         wct = exc.exception
         self.assertIs(wct.field, absc)
         self.assertEqual(wct.value, self._makeCollection([1]))
+        self.assertIs(wct.__class__, WrongContainedType)
+        self.assertEqual(1, len(wct.errors))
+        self.assertIsInstance(wct.errors[0], WrongType)
+        self.assertIs(wct.errors[0].expected_type, text._type)
 
     def test__validate_miss_uniqueness(self):
         from zope.schema.interfaces import NotUnique
@@ -1411,30 +1265,26 @@ class CollectionTests(EqualityTestsMixin,
                          [u'a', u'a'])
 
     def test_validate_min_length(self):
-        from zope.schema.interfaces import TooShort
         field = self._makeOne(min_length=2)
         field.validate(self._makeCollection((1, 2)))
         field.validate(self._makeCollection((1, 2, 3)))
-        self.assertRaises(TooShort, field.validate, self._makeCollection())
-        self.assertRaises(TooShort, field.validate, self._makeCollection((1,)))
+        self.assertRaisesTooShort(field, self._makeCollection())
+        self.assertRaisesTooShort(field, self._makeCollection((1,)))
 
     def test_validate_max_length(self):
-        from zope.schema.interfaces import TooLong
         field = self._makeOne(max_length=2)
         field.validate(self._makeCollection())
         field.validate(self._makeCollection((1,)))
         field.validate(self._makeCollection((1, 2)))
-        self.assertRaises(TooLong, field.validate, self._makeCollection((1, 2, 3, 4)))
-        self.assertRaises(TooLong, field.validate, self._makeCollection((1, 2, 3)))
+        self.assertRaisesTooLong(field, self._makeCollection((1, 2, 3, 4)))
+        self.assertRaisesTooLong(field, self._makeCollection((1, 2, 3)))
 
     def test_validate_min_length_and_max_length(self):
-        from zope.schema.interfaces import TooLong
-        from zope.schema.interfaces import TooShort
         field = self._makeOne(min_length=1, max_length=2)
         field.validate(self._makeCollection((1,)))
         field.validate(self._makeCollection((1, 2)))
-        self.assertRaises(TooShort, field.validate, self._makeCollection())
-        self.assertRaises(TooLong, field.validate, self._makeCollection((1, 2, 3)))
+        self.assertRaisesTooShort(field, self._makeCollection())
+        self.assertRaisesTooLong(field, self._makeCollection((1, 2, 3)))
 
     def test_validate_not_required(self):
         field = self._makeOne(required=False)
@@ -1455,7 +1305,8 @@ class CollectionTests(EqualityTestsMixin,
         self.assertRaises(RequiredMissing, field.validate, None)
 
 
-class SequenceTests(CollectionTests):
+class SequenceTests(WrongTypeTestsMixin,
+                    CollectionTests):
 
     def _getTargetClass(self):
         from zope.schema._field import Sequence
@@ -1466,15 +1317,16 @@ class SequenceTests(CollectionTests):
         return ISequence
 
     def test_validate_wrong_types(self):
-        from zope.schema.interfaces import WrongType
-
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, 1)
-        self.assertRaises(WrongType, field.validate, 1.0)
-        self.assertRaises(WrongType, field.validate, {})
-        self.assertRaises(WrongType, field.validate, set())
-        self.assertRaises(WrongType, field.validate, frozenset())
-        self.assertRaises(WrongType, field.validate, object())
+        self.assertAllRaiseWrongType(
+            field,
+            field._type,
+            1,
+            1.0,
+            {},
+            set(),
+            frozenset(),
+            object())
 
     def test_sequence(self):
         from zope.schema._field import abc
@@ -1534,11 +1386,13 @@ class TupleTests(SequenceTests):
             super(TupleTests, self).test_sequence()
 
     def test_validate_wrong_types(self):
-        from zope.schema.interfaces import WrongType
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, u'')
-        self.assertRaises(WrongType, field.validate, b'')
-        self.assertRaises(WrongType, field.validate, [])
+        self.assertAllRaiseWrongType(
+            field,
+            field._type,
+            u'',
+            b'',
+            [])
         super(TupleTests, self).test_validate_wrong_types()
 
 
@@ -1553,11 +1407,13 @@ class MutableSequenceTests(SequenceTests):
         return IMutableSequence
 
     def test_validate_wrong_types(self):
-        from zope.schema.interfaces import WrongType
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, u'')
-        self.assertRaises(WrongType, field.validate, b'')
-        self.assertRaises(WrongType, field.validate, ())
+        self.assertAllRaiseWrongType(
+            field,
+            field._type,
+            u'',
+            b'',
+            ())
         super(MutableSequenceTests, self).test_validate_wrong_types()
 
     def test_sequence(self):
@@ -1582,7 +1438,8 @@ class ListTests(MutableSequenceTests):
             super(ListTests, self).test_mutable_sequence()
 
 
-class SetTests(CollectionTests):
+class SetTests(WrongTypeTestsMixin,
+               CollectionTests):
 
     _DEFAULT_UNIQUE = True
     _makeCollection = set
@@ -1605,15 +1462,18 @@ class SetTests(CollectionTests):
         from zope.schema.interfaces import WrongType
 
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, u'')
-        self.assertRaises(WrongType, field.validate, b'')
-        self.assertRaises(WrongType, field.validate, 1)
-        self.assertRaises(WrongType, field.validate, 1.0)
-        self.assertRaises(WrongType, field.validate, ())
-        self.assertRaises(WrongType, field.validate, [])
-        self.assertRaises(WrongType, field.validate, {})
-        self.assertRaises(WrongType, field.validate, self._makeWrongSet())
-        self.assertRaises(WrongType, field.validate, object())
+        self.assertAllRaiseWrongType(
+            field,
+            field._type,
+            u'',
+            b'',
+            1,
+            1.0,
+            (),
+            [],
+            {},
+            self._makeWrongSet(),
+            object())
 
 
 class FrozenSetTests(SetTests):
@@ -1631,6 +1491,8 @@ class FrozenSetTests(SetTests):
 
 
 class MappingTests(EqualityTestsMixin,
+                   WrongTypeTestsMixin,
+                   LenTestsMixin,
                    unittest.TestCase):
 
     def _getTargetClass(self):
@@ -1651,15 +1513,18 @@ class MappingTests(EqualityTestsMixin,
         from zope.schema.interfaces import WrongType
 
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, u'')
-        self.assertRaises(WrongType, field.validate, u'')
-        self.assertRaises(WrongType, field.validate, 1)
-        self.assertRaises(WrongType, field.validate, 1.0)
-        self.assertRaises(WrongType, field.validate, ())
-        self.assertRaises(WrongType, field.validate, [])
-        self.assertRaises(WrongType, field.validate, set())
-        self.assertRaises(WrongType, field.validate, frozenset())
-        self.assertRaises(WrongType, field.validate, object())
+        self.assertAllRaiseWrongType(
+            field,
+            field._type,
+            u'',
+            b'',
+            1,
+            1.0,
+            (),
+            [],
+            set(),
+            frozenset(),
+            object())
 
     def test_validate_not_required(self):
         field = self._makeOne(required=False)
@@ -1678,6 +1543,7 @@ class MappingTests(EqualityTestsMixin,
 
     def test_validate_invalid_key_type(self):
         from zope.schema.interfaces import WrongContainedType
+        from zope.schema.interfaces import WrongType
         from zope.schema._bootstrapfields import Int
         field = self._makeOne(key_type=Int())
         field.validate({})
@@ -1689,9 +1555,14 @@ class MappingTests(EqualityTestsMixin,
         wct = exc.exception
         self.assertIs(wct.field, field)
         self.assertEqual(wct.value, {'a': 1})
+        self.assertIs(wct.__class__, WrongContainedType)
+        self.assertEqual(1, len(wct.errors))
+        self.assertIsInstance(wct.errors[0], WrongType)
+        self.assertIs(field.key_type._type, wct.errors[0].expected_type)
 
     def test_validate_invalid_value_type(self):
         from zope.schema.interfaces import WrongContainedType
+        from zope.schema.interfaces import WrongType
         from zope.schema._bootstrapfields import Int
         field = self._makeOne(value_type=Int())
         field.validate({})
@@ -1703,30 +1574,31 @@ class MappingTests(EqualityTestsMixin,
         wct = exc.exception
         self.assertIs(wct.field, field)
         self.assertEqual(wct.value, {1: 'a'})
+        self.assertIs(wct.__class__, WrongContainedType)
+        self.assertEqual(1, len(wct.errors))
+        self.assertIsInstance(wct.errors[0], WrongType)
+        self.assertIs(field.value_type._type, wct.errors[0].expected_type)
+
 
     def test_validate_min_length(self):
-        from zope.schema.interfaces import TooShort
         field = self._makeOne(min_length=1)
         field.validate({1: 'a'})
         field.validate({1: 'a', 2: 'b'})
-        self.assertRaises(TooShort, field.validate, {})
+        self.assertRaisesTooShort(field, {})
 
     def test_validate_max_length(self):
-        from zope.schema.interfaces import TooLong
         field = self._makeOne(max_length=1)
         field.validate({})
         field.validate({1: 'a'})
-        self.assertRaises(TooLong, field.validate, {1: 'a', 2: 'b'})
-        self.assertRaises(TooLong, field.validate, {1: 'a', 2: 'b', 3: 'c'})
+        self.assertRaisesTooLong(field, {1: 'a', 2: 'b'})
+        self.assertRaisesTooLong(field, {1: 'a', 2: 'b', 3: 'c'})
 
     def test_validate_min_length_and_max_length(self):
-        from zope.schema.interfaces import TooLong
-        from zope.schema.interfaces import TooShort
         field = self._makeOne(min_length=1, max_length=2)
         field.validate({1: 'a'})
         field.validate({1: 'a', 2: 'b'})
-        self.assertRaises(TooShort, field.validate, {})
-        self.assertRaises(TooLong, field.validate, {1: 'a', 2: 'b', 3: 'c'})
+        self.assertRaisesTooShort(field, {})
+        self.assertRaisesTooLong(field, {1: 'a', 2: 'b', 3: 'c'})
 
     def test_bind_binds_key_and_value_types(self):
         from zope.schema import Int

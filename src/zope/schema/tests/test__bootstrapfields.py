@@ -138,6 +138,111 @@ class OrderableMissingValueMixin(object):
         self.assertEqual(self.mvm_missing_value, field.missing_value)
 
 
+class OrderableTestsMixin(object):
+
+    def assertRaisesTooBig(self, field, value):
+        from zope.schema.interfaces import TooBig
+        with self.assertRaises(TooBig) as exc:
+            field.validate(value)
+
+        ex = exc.exception
+        self.assertEqual(value, ex.value)
+        self.assertEqual(field.max, ex.bound)
+        self.assertEqual(TooBig.TOO_LARGE, ex.violation_direction)
+
+    def assertRaisesTooSmall(self, field, value):
+        from zope.schema.interfaces import TooSmall
+        with self.assertRaises(TooSmall) as exc:
+            field.validate(value)
+
+        ex = exc.exception
+        self.assertEqual(value, ex.value)
+        self.assertEqual(field.min, ex.bound)
+        self.assertEqual(TooSmall.TOO_SMALL, ex.violation_direction)
+
+    MIN = 10
+    MAX = 20
+    VALID = (10, 11, 19, 20)
+    TOO_SMALL = (9, -10)
+    TOO_BIG = (21, 22)
+
+    def test_validate_min(self):
+        field = self._makeOne(min=self.MIN)
+        for value in self.VALID + self.TOO_BIG:
+            field.validate(value)
+        for value in self.TOO_SMALL:
+            self.assertRaisesTooSmall(field, value)
+
+    def test_validate_max(self):
+        field = self._makeOne(max=self.MAX)
+        for value in self.VALID + self.TOO_SMALL:
+            field.validate(value)
+        for value in self.TOO_BIG:
+            self.assertRaisesTooBig(field, value)
+
+    def test_validate_min_and_max(self):
+        field = self._makeOne(min=self.MIN, max=self.MAX)
+        for value in self.TOO_SMALL:
+            self.assertRaisesTooSmall(field, value)
+        for value in self.VALID:
+            field.validate(value)
+        for value in self.TOO_BIG:
+            self.assertRaisesTooBig(field, value)
+
+
+class LenTestsMixin(object):
+
+    def assertRaisesTooLong(self, field, value):
+        from zope.schema.interfaces import TooLong
+        with self.assertRaises(TooLong) as exc:
+            field.validate(value)
+
+        ex = exc.exception
+        self.assertEqual(value, ex.value)
+        self.assertEqual(field.max_length, ex.bound)
+        self.assertEqual(TooLong.TOO_LARGE, ex.violation_direction)
+
+    def assertRaisesTooShort(self, field, value):
+        from zope.schema.interfaces import TooShort
+        with self.assertRaises(TooShort) as exc:
+            field.validate(value)
+
+        ex = exc.exception
+        self.assertEqual(value, ex.value)
+        self.assertEqual(field.min_length, ex.bound)
+        self.assertEqual(TooShort.TOO_SMALL, ex.violation_direction)
+
+
+class WrongTypeTestsMixin(object):
+
+    def assertRaisesWrongType(self, field_or_meth, expected_type, *args, **kwargs):
+        from zope.schema.interfaces import WrongType
+        field = None
+        with self.assertRaises(WrongType) as exc:
+            if hasattr(field_or_meth, 'validate'):
+                field = field_or_meth
+                field.validate(*args, **kwargs)
+            else:
+                field_or_meth(*args, **kwargs)
+
+        ex = exc.exception
+        self.assertIs(ex.expected_type, expected_type)
+        if field is not None:
+            self.assertIs(ex.field, field)
+        if len(args) == 1 and not kwargs:
+            # Just a value
+            self.assertIs(ex.value, args[0])
+        if not args and len(kwargs) == 1:
+            # A single keyword argument
+            self.assertIs(ex.value, kwargs.popitem()[1])
+
+
+    def assertAllRaiseWrongType(self, field, expected_type, *values):
+        for value in values:
+            __traceback_info__ = value
+            self.assertRaisesWrongType(field, expected_type, value)
+
+
 class ValidatedPropertyTests(unittest.TestCase):
 
     def _getTargetClass(self):
@@ -267,6 +372,7 @@ class DefaultPropertyTests(unittest.TestCase):
 
 
 class FieldTests(EqualityTestsMixin,
+                 WrongTypeTestsMixin,
                  unittest.TestCase):
 
     def _getTargetClass(self):
@@ -505,11 +611,10 @@ class FieldTests(EqualityTestsMixin,
         self.assertRaises(RequiredMissing, field.validate, missing)
 
     def test_validate_wrong_type(self):
-        from zope.schema._bootstrapinterfaces import WrongType
 
         field = self._makeOne(required=True, constraint=lambda x: False)
         field._type = str
-        self.assertRaises(WrongType, field.validate, 1)
+        self.assertRaisesWrongType(field, str, 1)
 
     def test_validate_constraint_fails(self):
         from zope.schema._bootstrapinterfaces import ConstraintNotSatisfied
@@ -703,7 +808,8 @@ class OrderableTests(unittest.TestCase):
         self.assertRaises(TooBig, self._makeOne, max=10, default=11)
 
 
-class MinMaxLenTests(unittest.TestCase):
+class MinMaxLenTests(LenTestsMixin,
+                     unittest.TestCase):
 
     def _getTargetClass(self):
         from zope.schema._bootstrapfields import MinMaxLen
@@ -723,17 +829,16 @@ class MinMaxLenTests(unittest.TestCase):
         self.assertEqual(mml.max_length, None)
 
     def test_validate_too_short(self):
-        from zope.schema._bootstrapinterfaces import TooShort
         mml = self._makeOne(min_length=1)
-        self.assertRaises(TooShort, mml._validate, ())
+        self.assertRaisesTooShort(mml, ())
 
     def test_validate_too_long(self):
-        from zope.schema._bootstrapinterfaces import TooLong
         mml = self._makeOne(max_length=2)
-        self.assertRaises(TooLong, mml._validate, (0, 1, 2))
+        self.assertRaisesTooLong(mml, (0, 1, 2))
 
 
 class TextTests(EqualityTestsMixin,
+                WrongTypeTestsMixin,
                 unittest.TestCase):
 
     def _getTargetClass(self):
@@ -750,18 +855,19 @@ class TextTests(EqualityTestsMixin,
         self.assertEqual(txt._type, text_type)
 
     def test_validate_wrong_types(self):
-        from zope.schema.interfaces import WrongType
-
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, b'')
-        self.assertRaises(WrongType, field.validate, 1)
-        self.assertRaises(WrongType, field.validate, 1.0)
-        self.assertRaises(WrongType, field.validate, ())
-        self.assertRaises(WrongType, field.validate, [])
-        self.assertRaises(WrongType, field.validate, {})
-        self.assertRaises(WrongType, field.validate, set())
-        self.assertRaises(WrongType, field.validate, frozenset())
-        self.assertRaises(WrongType, field.validate, object())
+        self.assertAllRaiseWrongType(
+            field,
+            field._type,
+            b'',
+            1,
+            1.0,
+            (),
+            [],
+            {},
+            set(),
+            frozenset(),
+            object())
 
     def test_validate_w_invalid_default(self):
 
@@ -786,11 +892,9 @@ class TextTests(EqualityTestsMixin,
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def test_fromUnicode_miss(self):
-        from zope.schema._bootstrapinterfaces import WrongType
-
         deadbeef = b'DEADBEEF'
         txt = self._makeOne()
-        self.assertRaises(WrongType, txt.fromUnicode, deadbeef)
+        self.assertRaisesWrongType(txt.fromUnicode, txt._type, deadbeef)
 
     def test_fromUnicode_hit(self):
 
@@ -800,6 +904,7 @@ class TextTests(EqualityTestsMixin,
 
 
 class TextLineTests(EqualityTestsMixin,
+                    WrongTypeTestsMixin,
                     unittest.TestCase):
 
     def _getTargetClass(self):
@@ -811,18 +916,19 @@ class TextLineTests(EqualityTestsMixin,
         return ITextLine
 
     def test_validate_wrong_types(self):
-        from zope.schema.interfaces import WrongType
-
         field = self._makeOne()
-        self.assertRaises(WrongType, field.validate, b'')
-        self.assertRaises(WrongType, field.validate, 1)
-        self.assertRaises(WrongType, field.validate, 1.0)
-        self.assertRaises(WrongType, field.validate, ())
-        self.assertRaises(WrongType, field.validate, [])
-        self.assertRaises(WrongType, field.validate, {})
-        self.assertRaises(WrongType, field.validate, set())
-        self.assertRaises(WrongType, field.validate, frozenset())
-        self.assertRaises(WrongType, field.validate, object())
+        self.assertAllRaiseWrongType(
+            field,
+            field._type,
+            b'',
+            1,
+            1.0,
+            (),
+            [],
+            {},
+            set(),
+            frozenset(),
+            object())
 
     def test_validate_not_required(self):
 
@@ -848,6 +954,7 @@ class TextLineTests(EqualityTestsMixin,
 
 
 class PasswordTests(EqualityTestsMixin,
+                    WrongTypeTestsMixin,
                     unittest.TestCase):
 
     def _getTargetClass(self):
@@ -889,12 +996,10 @@ class PasswordTests(EqualityTestsMixin,
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def test_validate_unchanged_not_already_set(self):
-        from zope.schema._bootstrapinterfaces import WrongType
         klass = self._getTargetClass()
         inst = DummyInst()
         pw = self._makeOne(__name__='password').bind(inst)
-        self.assertRaises(WrongType,
-                          pw.validate, klass.UNCHANGED_PASSWORD)
+        self.assertRaisesWrongType(pw, pw._type, klass.UNCHANGED_PASSWORD)
 
     def test_validate_unchanged_already_set(self):
         klass = self._getTargetClass()
@@ -957,6 +1062,7 @@ class BoolTests(EqualityTestsMixin,
 
 class NumberTests(EqualityTestsMixin,
                   OrderableMissingValueMixin,
+                  OrderableTestsMixin,
                   unittest.TestCase):
 
     def _getTargetClass(self):
@@ -988,7 +1094,8 @@ class ComplexTests(NumberTests):
         from zope.schema.interfaces import IComplex
         return IComplex
 
-class RealTests(NumberTests):
+class RealTests(WrongTypeTestsMixin,
+                NumberTests):
 
     def _getTargetClass(self):
         from zope.schema._bootstrapfields import Real
@@ -999,22 +1106,18 @@ class RealTests(NumberTests):
         return IReal
 
     def test_ctor_real_min_max(self):
-        from zope.schema.interfaces import WrongType
-        from zope.schema.interfaces import TooSmall
-        from zope.schema.interfaces import TooBig
         from fractions import Fraction
 
-        with self.assertRaises(WrongType):
-            self._makeOne(min='')
-        with self.assertRaises(WrongType):
-            self._makeOne(max='')
+        self.assertRaisesWrongType(self._makeOne, self._getTargetClass()._type, min='')
+        self.assertRaisesWrongType(self._makeOne, self._getTargetClass()._type, max='')
 
         field = self._makeOne(min=Fraction(1, 2), max=2)
         field.validate(1.0)
         field.validate(2.0)
-        self.assertRaises(TooSmall, field.validate, 0)
-        self.assertRaises(TooSmall, field.validate, 0.4)
-        self.assertRaises(TooBig, field.validate, 2.1)
+        self.assertRaisesTooSmall(field, 0)
+        self.assertRaisesTooSmall(field, 0.4)
+        self.assertRaisesTooBig(field, 2.1)
+
 
 class RationalTests(NumberTests):
 
@@ -1052,34 +1155,7 @@ class IntegralTests(RationalTests):
         field.validate(-1)
         self.assertRaises(RequiredMissing, field.validate, None)
 
-    def test_validate_min(self):
-        from zope.schema.interfaces import TooSmall
-        field = self._makeOne(min=10)
-        field.validate(10)
-        field.validate(20)
-        self.assertRaises(TooSmall, field.validate, 9)
-        self.assertRaises(TooSmall, field.validate, -10)
 
-    def test_validate_max(self):
-        from zope.schema.interfaces import TooBig
-        field = self._makeOne(max=10)
-        field.validate(5)
-        field.validate(9)
-        field.validate(10)
-        self.assertRaises(TooBig, field.validate, 11)
-        self.assertRaises(TooBig, field.validate, 20)
-
-    def test_validate_min_and_max(self):
-        from zope.schema.interfaces import TooBig
-        from zope.schema.interfaces import TooSmall
-        field = self._makeOne(min=0, max=10)
-        field.validate(0)
-        field.validate(5)
-        field.validate(10)
-        self.assertRaises(TooSmall, field.validate, -10)
-        self.assertRaises(TooSmall, field.validate, -1)
-        self.assertRaises(TooBig, field.validate, 11)
-        self.assertRaises(TooBig, field.validate, 20)
 
     def test_fromUnicode_miss(self):
 
@@ -1113,6 +1189,7 @@ class IntTests(IntegralTests):
 
 
 class ObjectTests(EqualityTestsMixin,
+                  WrongTypeTestsMixin,
                   unittest.TestCase):
 
     def setUp(self):
@@ -1142,10 +1219,10 @@ class ObjectTests(EqualityTestsMixin,
         return InterfaceClass('ISchema', (Interface,), kw)
 
     def _getErrors(self, f, *args, **kw):
-        from zope.schema.interfaces import WrongContainedType
-        with self.assertRaises(WrongContainedType) as e:
+        from zope.schema.interfaces import SchemaNotCorrectlyImplemented
+        with self.assertRaises(SchemaNotCorrectlyImplemented) as e:
             f(*args, **kw)
-        return e.exception.args[0]
+        return e.exception.errors
 
     def _makeCycles(self):
         from zope.interface import Interface
@@ -1205,8 +1282,8 @@ class ObjectTests(EqualityTestsMixin,
         verifyObject(IObject, self._makeOne())
 
     def test_ctor_w_bad_schema(self):
-        from zope.schema.interfaces import WrongType
-        self.assertRaises(WrongType, self._makeOne, object())
+        from zope.interface.interfaces import IInterface
+        self.assertRaisesWrongType(self._makeOne, IInterface, object())
 
     def test_validate_not_required(self):
         schema = self._makeSchema()
@@ -1355,19 +1432,39 @@ class ObjectTests(EqualityTestsMixin,
         field.validate(unit)  # doesn't raise
 
     def test_validate_w_cycles_object_not_valid(self):
-        from zope.schema.interfaces import WrongContainedType
+        from zope.schema.interfaces import SchemaNotCorrectlyImplemented
+        from zope.schema.interfaces import SchemaNotProvided
         IUnit, Person, Unit = self._makeCycles()
         field = self._makeOne(schema=IUnit)
         person1 = Person(None)
         person2 = Person(None)
-        person3 = Person(object())
-        unit = Unit(person3, [person1, person2])
+        boss_unit = object()
+        boss = Person(boss_unit)
+        unit = Unit(boss, [person1, person2])
         person1.unit = unit
         person2.unit = unit
-        self.assertRaises(WrongContainedType, field.validate, unit)
+        with self.assertRaises(SchemaNotCorrectlyImplemented) as exc:
+            field.validate(unit)
+
+        ex = exc.exception
+        self.assertEqual(1, len(ex.schema_errors))
+        self.assertEqual(1, len(ex.errors))
+        self.assertEqual(0, len(ex.invariant_errors))
+
+        boss_error = ex.schema_errors['boss']
+        self.assertIsInstance(boss_error, SchemaNotCorrectlyImplemented)
+
+        self.assertEqual(1, len(boss_error.schema_errors))
+        self.assertEqual(1, len(boss_error.errors))
+        self.assertEqual(0, len(boss_error.invariant_errors))
+
+        unit_error = boss_error.schema_errors['unit']
+        self.assertIsInstance(unit_error, SchemaNotProvided)
+        self.assertIs(IUnit, unit_error.schema)
+        self.assertIs(boss_unit, unit_error.value)
 
     def test_validate_w_cycles_collection_not_valid(self):
-        from zope.schema.interfaces import WrongContainedType
+        from zope.schema.interfaces import SchemaNotCorrectlyImplemented
         IUnit, Person, Unit = self._makeCycles()
         field = self._makeOne(schema=IUnit)
         person1 = Person(None)
@@ -1376,7 +1473,7 @@ class ObjectTests(EqualityTestsMixin,
         unit = Unit(person1, [person2, person3])
         person1.unit = unit
         person2.unit = unit
-        self.assertRaises(WrongContainedType, field.validate, unit)
+        self.assertRaises(SchemaNotCorrectlyImplemented, field.validate, unit)
 
     def test_set_emits_IBOAE(self):
         from zope.event import subscribers
@@ -1517,7 +1614,10 @@ class ObjectTests(EqualityTestsMixin,
         self.assertIs(field.schema, IValueType)
 
         # Non implementation is bad
-        self.assertRaises(SchemaNotProvided, field.validate, object())
+        with self.assertRaises(SchemaNotProvided) as exc:
+            field.validate(object())
+
+        self.assertIs(IValueType, exc.exception.schema)
 
         # Actual implementation works
         @interface.implementer(IValueType)
@@ -1536,6 +1636,7 @@ class ObjectTests(EqualityTestsMixin,
         from zope.schema.fieldproperty import FieldProperty
         from zope.schema.interfaces import IContextSourceBinder
         from zope.schema.interfaces import WrongContainedType
+        from zope.schema.interfaces import ConstraintNotSatisfied
         from zope.schema.interfaces import SchemaNotCorrectlyImplemented
         from zope.schema.vocabulary import SimpleVocabulary
 
@@ -1577,12 +1678,28 @@ class ObjectTests(EqualityTestsMixin,
 
         # Ranges outside the context fail
         bad_choices = Choices({1, 8})
-        with self.assertRaises(WrongContainedType) as exc:
+        with self.assertRaises(SchemaNotCorrectlyImplemented) as exc:
             IFavorites['fav'].validate(bad_choices)
 
         e = exc.exception
         self.assertEqual(IFavorites['fav'], e.field)
         self.assertEqual(bad_choices, e.value)
+        self.assertEqual(1, len(e.schema_errors))
+        self.assertEqual(0, len(e.invariant_errors))
+        self.assertEqual(1, len(e.errors))
+
+        fav_error = e.schema_errors['choices']
+        self.assertIs(fav_error, e.errors[0])
+        self.assertIsInstance(fav_error, WrongContainedType)
+        self.assertNotIsInstance(fav_error, SchemaNotCorrectlyImplemented)
+        # The field is not actually equal to the one in the interface
+        # anymore because its bound.
+        self.assertEqual('choices', fav_error.field.__name__)
+        self.assertEqual(bad_choices, fav_error.field.context)
+        self.assertEqual({1, 8}, fav_error.value)
+        self.assertEqual(1, len(fav_error.errors))
+
+        self.assertIsInstance(fav_error.errors[0], ConstraintNotSatisfied)
 
         # Validation through field property
         favorites = Favorites()

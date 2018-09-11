@@ -41,8 +41,12 @@ from zope.schema._bootstrapinterfaces import IContextAwareDefaultFactory
 from zope.schema._bootstrapinterfaces import IFromUnicode
 from zope.schema._bootstrapinterfaces import IValidatable
 from zope.schema._bootstrapinterfaces import InvalidValue
+from zope.schema._bootstrapinterfaces import LenOutOfBounds
 from zope.schema._bootstrapinterfaces import NotAContainer
+from zope.schema._bootstrapinterfaces import NotAnInterface
 from zope.schema._bootstrapinterfaces import NotAnIterator
+from zope.schema._bootstrapinterfaces import OrderableOutOfBounds
+from zope.schema._bootstrapinterfaces import OutOfBounds
 from zope.schema._bootstrapinterfaces import RequiredMissing
 from zope.schema._bootstrapinterfaces import SchemaNotCorrectlyImplemented
 from zope.schema._bootstrapinterfaces import SchemaNotFullyImplemented
@@ -67,9 +71,13 @@ __all__ = [
     'InvalidId',
     'InvalidURI',
     'InvalidValue',
+    'LenOutOfBounds',
     'NotAContainer',
+    'NotAnInterface',
     'NotAnIterator',
     'NotUnique',
+    'OrderableOutOfBounds',
+    'OutOfBounds',
     'RequiredMissing',
     'SchemaNotCorrectlyImplemented',
     'SchemaNotFullyImplemented',
@@ -83,6 +91,7 @@ __all__ = [
     'ValidationError',
     'WrongContainedType',
     'WrongType',
+
 
     # Interfaces
     'IASCII',

@@ -17,9 +17,12 @@ from functools import total_ordering
 
 import zope.interface
 from zope.interface import Attribute
+from zope.interface.interfaces import IInterface
 
 from zope.schema._messageid import _
 
+# pylint:disable=inherit-non-class,keyword-arg-before-vararg,
+# pylint:disable=no-self-argument
 
 class StopValidation(Exception):
     """Raised if the validation is completed early.
@@ -76,21 +79,97 @@ class RequiredMissing(ValidationError):
 class WrongType(ValidationError):
     __doc__ = _("""Object is of wrong type.""")
 
+    #: The type or tuple of types that was expected.
+    #:
+    #: .. versionadded:: 4.7.0
+    expected_type = None
 
-class TooBig(ValidationError):
+    def __init__(self, value=None, expected_type=None, name=None, *args):
+        """
+        WrongType(value, expected_type, name)
+
+        .. versionchanged:: 4.7.0
+           Added named arguments to the constructor and the `expected_type`
+           field.
+        """
+        ValidationError.__init__(self, value, expected_type, name, *args)
+        self.expected_type = expected_type
+        self.value = value
+
+
+class OutOfBounds(ValidationError):
+    """
+    A value was out of the allowed bounds.
+
+    This is the common superclass for `OrderableOutOfBounds` and
+    `LenOutOfBounds`, which in turn are the superclasses for `TooBig`
+    and `TooSmall`, and `TooLong` and `TooShort`, respectively.
+
+    .. versionadded:: 4.7.0
+    """
+
+    #: The value that was exceeded
+    bound = None
+
+    #: A constant for `violation_direction`.
+    TOO_LARGE = type('TOO_LARGE', (), {'__slots__': ()})()
+
+    #: A constant for `violation_direction`.
+    TOO_SMALL = type('TOO_SMALL', (), {'__slots__': ()})()
+
+    #: Whether the value was too large or
+    #: not large enough. One of the values
+    #: defined by the constants `TOO_LARGE`
+    #: or `TOO_SMALL`
+    violation_direction = None
+
+    def __init__(self, value=None, bound=None, *args):
+        """
+        OutOfBounds(value, bound)
+        """
+        super(OutOfBounds, self).__init__(value, bound, *args)
+        self.value = value
+        self.bound = bound
+
+
+class OrderableOutOfBounds(OutOfBounds):
+    """
+    A value was too big or too small in comparison to another value.
+
+    .. versionadded:: 4.7.0
+    """
+
+
+class TooBig(OrderableOutOfBounds):
     __doc__ = _("""Value is too big""")
 
+    violation_direction = OutOfBounds.TOO_LARGE
 
-class TooSmall(ValidationError):
+
+class TooSmall(OrderableOutOfBounds):
     __doc__ = _("""Value is too small""")
 
+    violation_direction = OutOfBounds.TOO_SMALL
 
-class TooLong(ValidationError):
+
+class LenOutOfBounds(OutOfBounds):
+    """
+    The length of the value was out of bounds.
+
+    .. versionadded:: 4.7.0
+    """
+
+
+class TooLong(LenOutOfBounds):
     __doc__ = _("""Value is too long""")
 
+    violation_direction = OutOfBounds.TOO_LARGE
 
-class TooShort(ValidationError):
+
+class TooShort(LenOutOfBounds):
     __doc__ = _("""Value is too short""")
+
+    violation_direction = OutOfBounds.TOO_SMALL
 
 
 class InvalidValue(ValidationError):
@@ -109,9 +188,24 @@ class NotAnIterator(ValidationError):
     __doc__ = _("""Not an iterator""")
 
 
-
 class WrongContainedType(ValidationError):
     __doc__ = _("""Wrong contained type""")
+
+    #: A collection of exceptions raised when validating
+    #: the *value*.
+    #:
+    #: .. versionadded:: 4.7.0
+    errors = ()
+
+    def __init__(self, errors=None, name=None, *args):
+        """
+        WrongContainedType(errors, name)
+
+        .. versionchanged:: 4.7.0
+           Added named arguments to the constructor, and the `errors` property.
+        """
+        super(WrongContainedType, self).__init__(errors, name, *args)
+        self.errors = errors
 
 
 class SchemaNotCorrectlyImplemented(WrongContainedType):
@@ -125,6 +219,17 @@ class SchemaNotCorrectlyImplemented(WrongContainedType):
     #: of the schema.
     invariant_errors = ()
 
+    def __init__(self, errors=None, name=None, schema_errors=None, invariant_errors=(), *args):
+        """
+        SchemaNotCorrectlyImplemented(errors, name, schema_errors, invariant_errors)
+
+        .. versionchanged:: 4.7.0
+           Added named arguments to the constructor.
+        """
+        super(SchemaNotCorrectlyImplemented, self).__init__(errors, name, *args)
+        self.schema_errors = schema_errors
+        self.invariant_errors = invariant_errors
+
 
 class SchemaNotFullyImplemented(ValidationError):
     __doc__ = _("""Schema not fully implemented""")
@@ -132,6 +237,41 @@ class SchemaNotFullyImplemented(ValidationError):
 
 class SchemaNotProvided(ValidationError):
     __doc__ = _("""Schema not provided""")
+
+    #: The interface that the *value* was supposed to provide,
+    #: but does not.
+    schema = None
+
+    def __init__(self, schema=None, value=None, *args):
+        """
+        SchemaNotProvided(schema, value)
+
+        .. versionchanged:: 4.7.0
+           Added named arguments to the constructor and the `schema` property.
+        """
+        super(SchemaNotProvided, self).__init__(schema, value, *args)
+        self.schema = schema
+        self.value = value
+
+
+class NotAnInterface(WrongType, SchemaNotProvided):
+    """
+    Object is not an interface.
+
+    This is a `WrongType` exception for backwards compatibility with
+    existing ``except`` clauses, but it is raised when
+    ``IInterface.providedBy`` is not true, so it's also a
+    `SchemaNotProvided`. The ``expected_type`` field is filled in as
+    ``IInterface``; this is not actually a `type`, and
+    ``isinstance(thing, IInterface)`` is always false.
+
+    .. versionadded:: 4.7.0
+    """
+
+    expected_type = IInterface
+
+    def __init__(self, value, name):
+        super(NotAnInterface, self).__init__(value, IInterface, name)
 
 
 class IFromUnicode(zope.interface.Interface):
@@ -188,8 +328,10 @@ class IValidatable(zope.interface.Interface):
         with the additional constraint.
         """
 
+
 class NO_VALUE(object):
     def __repr__(self): # pragma: no cover
         return '<NO_VALUE>'
+
 
 NO_VALUE = NO_VALUE()

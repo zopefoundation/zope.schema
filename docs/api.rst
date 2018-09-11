@@ -123,11 +123,19 @@ Exceptions
 .. autoexception:: zope.schema.interfaces.ConstraintNotSatisfied
 .. autoexception:: zope.schema.interfaces.NotAContainer
 .. autoexception:: zope.schema.interfaces.NotAnIterator
+.. autoexception:: zope.schema.interfaces.NotAnInterface
 
+Bounds
+~~~~~~
+
+.. autoexception:: zope.schema.interfaces.OutOfBounds
+.. autoexception:: zope.schema.interfaces.OrderableOutOfBounds
+.. autoexception:: zope.schema.interfaces.LenOutOfBounds
 .. autoexception:: zope.schema.interfaces.TooSmall
 .. autoexception:: zope.schema.interfaces.TooBig
 .. autoexception:: zope.schema.interfaces.TooLong
 .. autoexception:: zope.schema.interfaces.TooShort
+
 .. autoexception:: zope.schema.interfaces.InvalidValue
 .. autoexception:: zope.schema.interfaces.WrongContainedType
 .. autoexception:: zope.schema.interfaces.NotUnique
@@ -146,7 +154,9 @@ Schema APIs
 .. autofunction:: zope.schema.getFieldNames
 .. autofunction:: zope.schema.getFieldNamesInOrder
 .. autofunction:: zope.schema.getValidationErrors
+   :noindex:
 .. autofunction:: zope.schema.getSchemaValidationErrors
+   :noindex:
 
 Fields
 ======
