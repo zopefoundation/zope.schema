@@ -242,7 +242,10 @@ class Field(Attribute):
         # Fix leading whitespace that occurs when using multi-line
         # strings, but don't overwrite the original, we need to
         # preserve it (it could be a MessageID).
-        doc_description = '\n'.join(_DocStringHelpers.docstring_to_lines(description)[:-1])
+        if not description:
+            doc_description = u''
+        else:
+            doc_description = '\n'.join(_DocStringHelpers.docstring_to_lines(description)[:-1])
 
         if title:
             if doc_description:

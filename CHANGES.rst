@@ -5,7 +5,8 @@
 4.7.1 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Fix the ``Field`` constructor when description is None. See
+  `issue 69 <https://github.com/zopefoundation/zope.schema/issues/69>`_.
 
 
 4.7.0 (2018-09-11)
