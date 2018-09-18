@@ -568,7 +568,12 @@ class Password(TextLine):
 
 @implementer(IFromUnicode, IFromBytes)
 class Bool(Field):
-    """A field representing a Bool."""
+    """
+    A field representing a Bool.
+
+    .. versionchanged:: 4.8.0
+        Implement :class:`zope.schema.interfaces.IFromBytes`
+    """
 
     _type = bool
 
