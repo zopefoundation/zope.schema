@@ -24,6 +24,10 @@ class EqualityTestsMixin(object):
     def _getTargetInterface(self):
         raise NotImplementedError
 
+    def _getTargetInterfaces(self):
+        # Return the primary and any secondary interfaces
+        return [self._getTargetInterface()]
+
     def _makeOne(self, *args, **kwargs):
         return self._makeOneFromClass(self._getTargetClass(),
                                       *args,
@@ -36,14 +40,16 @@ class EqualityTestsMixin(object):
         from zope.interface.verify import verifyClass
         cls = self._getTargetClass()
         __traceback_info__ = cls
-        verifyClass(self._getTargetInterface(), cls)
+        for iface in self._getTargetInterfaces():
+            verifyClass(iface, cls)
         return verifyClass
 
     def test_instance_conforms_to_iface(self):
         from zope.interface.verify import verifyObject
         instance = self._makeOne()
         __traceback_info__ = instance
-        verifyObject(self._getTargetInterface(), instance)
+        for iface in self._getTargetInterfaces():
+            verifyObject(iface, instance)
         return verifyObject
 
     def test_is_hashable(self):
@@ -1075,13 +1081,17 @@ class NumberTests(EqualityTestsMixin,
 
     def test_class_conforms_to_iface(self):
         from zope.schema._bootstrapinterfaces import IFromUnicode
+        from zope.schema._bootstrapinterfaces import IFromBytes
         verifyClass = super(NumberTests, self).test_class_conforms_to_iface()
         verifyClass(IFromUnicode, self._getTargetClass())
+        verifyClass(IFromBytes, self._getTargetClass())
 
     def test_instance_conforms_to_iface(self):
         from zope.schema._bootstrapinterfaces import IFromUnicode
+        from zope.schema._bootstrapinterfaces import IFromBytes
         verifyObject = super(NumberTests, self).test_instance_conforms_to_iface()
         verifyObject(IFromUnicode, self._makeOne())
+        verifyObject(IFromBytes, self._makeOne())
 
 
 class ComplexTests(NumberTests):

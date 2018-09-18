@@ -42,6 +42,11 @@ class BytesTests(EqualityTestsMixin,
         from zope.schema.interfaces import IBytes
         return IBytes
 
+    def _getTargetInterfaces(self):
+        from zope.schema.interfaces import IFromUnicode
+        from zope.schema.interfaces import IFromBytes
+        return [self._getTargetInterface(), IFromUnicode, IFromBytes]
+
     def test_validate_wrong_types(self):
         field = self._makeOne()
         self.assertAllRaiseWrongType(
@@ -84,10 +89,14 @@ class BytesTests(EqualityTestsMixin,
         self.assertRaises(UnicodeEncodeError, byt.fromUnicode, u'\x81')
 
     def test_fromUnicode_hit(self):
-
         byt = self._makeOne()
         self.assertEqual(byt.fromUnicode(u''), b'')
         self.assertEqual(byt.fromUnicode(u'DEADBEEF'), b'DEADBEEF')
+
+    def test_fromBytes(self):
+        field = self._makeOne()
+        self.assertEqual(field.fromBytes(b''), b'')
+        self.assertEqual(field.fromBytes(b'DEADBEEF'), b'DEADBEEF')
 
 
 class ASCIITests(EqualityTestsMixin,
@@ -150,6 +159,11 @@ class BytesLineTests(EqualityTestsMixin,
         from zope.schema.interfaces import IBytesLine
         return IBytesLine
 
+    def _getTargetInterfaces(self):
+        from zope.schema.interfaces import IFromUnicode
+        from zope.schema.interfaces import IFromBytes
+        return [self._getTargetInterface(), IFromUnicode, IFromBytes]
+
     def test_validate_wrong_types(self):
         field = self._makeOne()
         self.assertAllRaiseWrongType(
@@ -166,7 +180,6 @@ class BytesLineTests(EqualityTestsMixin,
             object())
 
     def test_validate_not_required(self):
-
         field = self._makeOne(required=False)
         field.validate(None)
         field.validate(b'')
@@ -183,13 +196,17 @@ class BytesLineTests(EqualityTestsMixin,
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def test_constraint(self):
-
         field = self._makeOne()
         self.assertEqual(field.constraint(b''), True)
         self.assertEqual(field.constraint(b'abc'), True)
         self.assertEqual(field.constraint(b'abc'), True)
         self.assertEqual(field.constraint(b'\xab\xde'), True)
         self.assertEqual(field.constraint(b'abc\ndef'), False)
+
+    def test_fromBytes(self):
+        field = self._makeOne()
+        self.assertEqual(field.fromBytes(b''), b'')
+        self.assertEqual(field.fromBytes(b'DEADBEEF'), b'DEADBEEF')
 
 
 class ASCIILineTests(EqualityTestsMixin,
@@ -832,8 +849,12 @@ class URITests(EqualityTestsMixin,
         from zope.schema.interfaces import IURI
         return IURI
 
+    def _getTargetInterfaces(self):
+        from zope.schema.interfaces import IFromUnicode
+        from zope.schema.interfaces import IFromBytes
+        return [self._getTargetInterface(), IFromUnicode, IFromBytes]
+
     def test_validate_wrong_types(self):
-        from zope.schema.interfaces import WrongType
         from zope.schema._compat import non_native_string
         field = self._makeOne()
         self.assertAllRaiseWrongType(
@@ -904,6 +925,11 @@ class DottedNameTests(EqualityTestsMixin,
     def _getTargetInterface(self):
         from zope.schema.interfaces import IDottedName
         return IDottedName
+
+    def _getTargetInterfaces(self):
+        from zope.schema.interfaces import IFromUnicode
+        from zope.schema.interfaces import IFromBytes
+        return [self._getTargetInterface(), IFromUnicode, IFromBytes]
 
     def test_ctor_defaults(self):
         dotted = self._makeOne()
@@ -1018,8 +1044,12 @@ class IdTests(EqualityTestsMixin,
         from zope.schema.interfaces import IId
         return IId
 
+    def _getTargetInterfaces(self):
+        from zope.schema.interfaces import IFromUnicode
+        from zope.schema.interfaces import IFromBytes
+        return [self._getTargetInterface(), IFromUnicode, IFromBytes]
+
     def test_validate_wrong_types(self):
-        from zope.schema.interfaces import WrongType
         from zope.schema._compat import non_native_string
         field = self._makeOne()
         self.assertAllRaiseWrongType(
@@ -1459,8 +1489,6 @@ class SetTests(WrongTypeTestsMixin,
         self.assertTrue(self._makeOne().unique)
 
     def test_validate_wrong_types(self):
-        from zope.schema.interfaces import WrongType
-
         field = self._makeOne()
         self.assertAllRaiseWrongType(
             field,
@@ -1510,8 +1538,6 @@ class MappingTests(EqualityTestsMixin,
         self.assertRaises(ValueError, self._makeOne, value_type=object())
 
     def test_validate_wrong_types(self):
-        from zope.schema.interfaces import WrongType
-
         field = self._makeOne()
         self.assertAllRaiseWrongType(
             field,

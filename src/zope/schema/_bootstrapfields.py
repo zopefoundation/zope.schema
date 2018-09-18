@@ -36,6 +36,7 @@ from zope.event import notify
 from zope.schema._bootstrapinterfaces import ConstraintNotSatisfied
 from zope.schema._bootstrapinterfaces import IBeforeObjectAssignedEvent
 from zope.schema._bootstrapinterfaces import IContextAwareDefaultFactory
+from zope.schema._bootstrapinterfaces import IFromBytes
 from zope.schema._bootstrapinterfaces import IFromUnicode
 from zope.schema._bootstrapinterfaces import IValidatable
 from zope.schema._bootstrapinterfaces import NotAContainer
@@ -55,6 +56,7 @@ from zope.schema._bootstrapinterfaces import WrongType
 
 from zope.schema._compat import text_type
 from zope.schema._compat import integer_types
+from zope.schema._compat import PY2
 
 
 class _NotGiven(object):
@@ -564,6 +566,7 @@ class Password(TextLine):
         return super(Password, self).validate(value)
 
 
+@implementer(IFromUnicode, IFromBytes)
 class Bool(Field):
     """A field representing a Bool."""
 
@@ -581,7 +584,7 @@ class Bool(Field):
             value = bool(value)
         Field.set(self, object, value)
 
-    def fromUnicode(self, str):
+    def fromUnicode(self, value):
         """
         >>> from zope.schema._bootstrapfields import Bool
         >>> from zope.schema.interfaces import IFromUnicode
@@ -596,15 +599,42 @@ class Bool(Field):
         True
         >>> b.fromUnicode('false') or b.fromUnicode('False')
         False
+        >>> b.fromUnicode(u'\u2603')
+        False
         """
-        v = str == 'True' or str == 'true'
+        # On Python 2, we're relying on the implicit decoding
+        # that happens during string comparisons of unicode to native
+        # (byte) strings; decoding errors are silently dropped
+        v = value == 'True' or value == 'true'
         self.validate(v)
         return v
+
+    def fromBytes(self, value):
+        """
+        >>> from zope.schema._bootstrapfields import Bool
+        >>> from zope.schema.interfaces import IFromBytes
+        >>> b = Bool()
+        >>> IFromBytes.providedBy(b)
+        True
+        >>> b.fromBytes(b'True')
+        True
+        >>> b.fromBytes(b'')
+        False
+        >>> b.fromBytes(b'true')
+        True
+        >>> b.fromBytes(b'false') or b.fromBytes(b'False')
+        False
+        >>> b.fromBytes(u'\u2603'.encode('utf-8'))
+        False
+        """
+        return self.fromUnicode(value.decode("utf-8"))
+
 
 class InvalidNumberLiteral(ValueError, ValidationError):
     """Invalid number literal."""
 
-@implementer(IFromUnicode)
+
+@implementer(IFromUnicode, IFromBytes)
 class Number(Orderable, Field):
     """
     A field representing a :class:`numbers.Number` and implementing
@@ -615,27 +645,49 @@ class Number(Orderable, Field):
 
         >>> from zope.schema._bootstrapfields import Number
         >>> f = Number()
-        >>> f.fromUnicode("1")
+        >>> f.fromUnicode(u"1")
         1
-        >>> f.fromUnicode("125.6")
+        >>> f.fromUnicode(u"125.6")
         125.6
-        >>> f.fromUnicode("1+0j")
+        >>> f.fromUnicode(u"1+0j")
         (1+0j)
-        >>> f.fromUnicode("1/2")
+        >>> f.fromUnicode(u"1/2")
         Fraction(1, 2)
         >>> f.fromUnicode(str(2**31234) + '.' + str(2**256)) # doctest: +ELLIPSIS
         Decimal('234...936')
-        >>> f.fromUnicode("not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
+        >>> f.fromUnicode(u"not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        InvalidNumberLiteral: Invalid literal for Decimal: 'not a number'
+
+    Similarly, :meth:`fromBytes` will do the same for incoming byte strings::
+
+        >>> from zope.schema._bootstrapfields import Number
+        >>> f = Number()
+        >>> f.fromBytes(b"1")
+        1
+        >>> f.fromBytes(b"125.6")
+        125.6
+        >>> f.fromBytes(b"1+0j")
+        (1+0j)
+        >>> f.fromBytes(b"1/2")
+        Fraction(1, 2)
+        >>> f.fromBytes((str(2**31234) + '.' + str(2**256)).encode('ascii')) # doctest: +ELLIPSIS
+        Decimal('234...936')
+        >>> f.fromBytes(b"not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
         InvalidNumberLiteral: Invalid literal for Decimal: 'not a number'
 
     .. versionadded:: 4.6.0
+    .. versionchanged:: 4.8.0
+        Implement :class:`zope.schema.interfaces.IFromBytes`
+
     """
     _type = numbers.Number
 
     # An ordered sequence of conversion routines. These should accept
-    # a string and produce an object that is an instance of `_type`, or raise
+    # a native string and produce an object that is an instance of `_type`, or raise
     # a ValueError. The order should be most specific/strictest towards least
     # restrictive (in other words, lowest in the numeric tower towards highest).
     # We break this rule with fractions, though: a floating point number is
@@ -664,6 +716,10 @@ class Number(Orderable, Field):
         finally:
             last_exc = None
 
+    # On Python 2, native strings are byte strings, which is
+    # what the converters expect, so we don't need to do any decoding.
+    fromBytes = fromUnicode if PY2 else lambda self, value: self.fromUnicode(value.decode('utf-8'))
+
 
 class Complex(Number):
     """
@@ -675,17 +731,36 @@ class Complex(Number):
 
         >>> from zope.schema._bootstrapfields import Complex
         >>> f = Complex()
-        >>> f.fromUnicode("1")
+        >>> f.fromUnicode(u"1")
         1
-        >>> f.fromUnicode("125.6")
+        >>> f.fromUnicode(u"125.6")
         125.6
-        >>> f.fromUnicode("1+0j")
+        >>> f.fromUnicode(u"1+0j")
         (1+0j)
-        >>> f.fromUnicode("1/2")
+        >>> f.fromUnicode(u"1/2")
         Fraction(1, 2)
         >>> f.fromUnicode(str(2**31234) + '.' + str(2**256)) # doctest: +ELLIPSIS
         inf
-        >>> f.fromUnicode("not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
+        >>> f.fromUnicode(u"not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        InvalidNumberLiteral: Invalid literal for Decimal: 'not a number'
+
+    Similarly for :meth:`fromBytes`:
+
+        >>> from zope.schema._bootstrapfields import Complex
+        >>> f = Complex()
+        >>> f.fromBytes(b"1")
+        1
+        >>> f.fromBytes(b"125.6")
+        125.6
+        >>> f.fromBytes(b"1+0j")
+        (1+0j)
+        >>> f.fromBytes(b"1/2")
+        Fraction(1, 2)
+        >>> f.fromBytes((str(2**31234) + '.' + str(2**256)).encode('ascii')) # doctest: +ELLIPSIS
+        inf
+        >>> f.fromBytes(b"not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
         InvalidNumberLiteral: Invalid literal for Decimal: 'not a number'
@@ -778,6 +853,17 @@ class Integral(Rational):
         >>> f.fromUnicode("125")
         125
         >>> f.fromUnicode("125.6") #doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        InvalidIntLiteral: invalid literal for int(): 125.6
+
+    Similarly for :meth:`fromBytes`:
+
+        >>> from zope.schema._bootstrapfields import Integral
+        >>> f = Integral()
+        >>> f.fromBytes(b"125")
+        125
+        >>> f.fromBytes(b"125.6") #doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
         InvalidIntLiteral: invalid literal for int(): 125.6

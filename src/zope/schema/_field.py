@@ -52,6 +52,7 @@ from zope.schema.interfaces import IDict
 from zope.schema.interfaces import IDottedName
 from zope.schema.interfaces import IField
 from zope.schema.interfaces import IFloat
+from zope.schema.interfaces import IFromBytes
 from zope.schema.interfaces import IFromUnicode
 from zope.schema.interfaces import IFrozenSet
 from zope.schema.interfaces import IId
@@ -134,7 +135,6 @@ classImplements(Text, IText)
 classImplements(TextLine, ITextLine)
 classImplements(Password, IPassword)
 classImplements(Bool, IBool)
-classImplements(Bool, IFromUnicode)
 classImplements(Iterable, IIterable)
 classImplements(Container, IContainer)
 
@@ -155,18 +155,20 @@ class SourceText(Text):
     _type = text_type
 
 
-@implementer(IBytes, IFromUnicode)
+@implementer(IBytes, IFromUnicode, IFromBytes)
 class Bytes(MinMaxLen, Field):
     __doc__ = IBytes.__doc__
 
     _type = binary_type
 
-    def fromUnicode(self, uc):
+    def fromUnicode(self, value):
         """ See IFromUnicode.
         """
-        v = make_binary(uc)
-        self.validate(v)
-        return v
+        return self.fromBytes(make_binary(value))
+
+    def fromBytes(self, value):
+        self.validate(value)
+        return value
 
 # for things which are of the str type on both Python 2 and 3
 if PY3:  # pragma: no cover
@@ -215,7 +217,7 @@ class InvalidFloatLiteral(ValueError, ValidationError):
     """Raised by Float fields."""
 
 
-@implementer(IFloat, IFromUnicode)
+@implementer(IFloat)
 class Float(Real):
     """
     A field representing a native :class:`float` and implementing
@@ -247,6 +249,30 @@ class Float(Real):
         Traceback (most recent call last):
         ...
         InvalidFloatLiteral: could not convert string to float: not a number
+
+    Likewise for :meth:`fromBytes`::
+
+        >>> from zope.schema._field import Float
+        >>> f = Float()
+        >>> f.fromBytes(b"1")
+        1.0
+        >>> f.fromBytes(b"125.6")
+        125.6
+        >>> f.fromBytes(b"1+0j") # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        InvalidFloatLiteral: Invalid literal for float(): 1+0j
+        >>> f.fromBytes(b"1/2") # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        InvalidFloatLiteral: invalid literal for float(): 1/2
+        >>> f.fromBytes((str(2**31234) + '.' + str(2**256)).encode('ascii')) # doctest: +ELLIPSIS
+        inf
+        >>> f.fromBytes(b"not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        InvalidFloatLiteral: could not convert string to float: not a number
+
     """
     _type = float
     _unicode_converters = (float,)
@@ -257,7 +283,7 @@ class InvalidDecimalLiteral(ValueError, ValidationError):
     "Raised by decimal fields"
 
 
-@implementer(IDecimal, IFromUnicode)
+@implementer(IDecimal)
 class Decimal(Number):
     """
     A field representing a native :class:`decimal.Decimal` and implementing
@@ -286,6 +312,31 @@ class Decimal(Number):
         Traceback (most recent call last):
         ...
         InvalidDecimalLiteral: could not convert string to float: not a number
+
+    Likewise for :meth:`fromBytes`::
+
+        >>> from zope.schema._field import Decimal
+        >>> f = Decimal()
+        >>> f.fromBytes(b"1")
+        Decimal('1')
+        >>> f.fromBytes(b"125.6")
+        Decimal('125.6')
+        >>> f.fromBytes(b"1+0j") # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        InvalidDecimalLiteral: Invalid literal for Decimal(): 1+0j
+        >>> f.fromBytes(b"1/2") # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        InvalidDecimalLiteral: Invalid literal for Decimal(): 1/2
+        >>> f.fromBytes((str(2**31234) + '.' + str(2**256)).encode("ascii")) # doctest: +ELLIPSIS
+        Decimal('2349...936')
+        >>> f.fromBytes(b"not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        InvalidDecimalLiteral: could not convert string to float: not a number
+
+
     """
     _type = decimal.Decimal
     _unicode_converters = (decimal.Decimal,)
@@ -421,11 +472,11 @@ class Choice(Field):
         clone._resolve_vocabulary = lambda value: vocabulary
         return clone
 
-    def fromUnicode(self, str):
+    def fromUnicode(self, value):
         """ See IFromUnicode.
         """
-        self.validate(str)
-        return str
+        self.validate(value)
+        return value
 
     def _validate(self, value):
         # Pass all validations during initialization
@@ -437,38 +488,7 @@ class Choice(Field):
             raise ConstraintNotSatisfied(value, self.__name__).with_field_and_value(self, value)
 
 
-_isuri = r"[a-zA-z0-9+.-]+:"  # scheme
-_isuri += r"\S*$"  # non space (should be pickier)
-_isuri = re.compile(_isuri).match
-
-
-@implementer(IURI, IFromUnicode)
-class URI(NativeStringLine):
-    """URI schema field
-    """
-
-    def _validate(self, value):
-        super(URI, self)._validate(value)
-        if _isuri(value):
-            return
-
-        raise InvalidURI(value).with_field_and_value(self, value)
-
-    def fromUnicode(self, value):
-        """ See IFromUnicode.
-        """
-        v = str(value.strip())
-        self.validate(v)
-        return v
-
-
-_isdotted = re.compile(
-    r"([a-zA-Z][a-zA-Z0-9_]*)"
-    r"([.][a-zA-Z][a-zA-Z0-9_]*)*"
-    # use the whole line
-    r"$").match
-
-
+@implementer(IFromUnicode, IFromBytes)
 class _StrippedNativeStringLine(NativeStringLine):
 
     _invalid_exc_type = None
@@ -488,12 +508,68 @@ class _StrippedNativeStringLine(NativeStringLine):
         self.validate(v)
         return v
 
+    def fromBytes(self, value):
+        return self.fromUnicode(value.decode('ascii'))
+
+
+_isuri = r"[a-zA-z0-9+.-]+:"  # scheme
+_isuri += r"\S*$"  # non space (should be pickier)
+_isuri = re.compile(_isuri).match
+
+
+@implementer(IURI)
+class URI(_StrippedNativeStringLine):
+    """
+    URI schema field.
+
+    URIs can be validated from both unicode values and bytes values,
+    producing a native text string in both cases::
+
+        >>> from zope.schema import URI
+        >>> field = URI()
+        >>> field.fromUnicode(u'   https://example.com  ')
+        'https://example.com'
+        >>> field.fromBytes(b'   https://example.com ')
+        'https://example.com'
+
+    .. versionchanged:: 4.8.0
+        Implement :class:`zope.schema.interfaces.IFromBytes`
+    """
+
+    def _validate(self, value):
+        super(URI, self)._validate(value)
+        if _isuri(value):
+            return
+
+        raise InvalidURI(value).with_field_and_value(self, value)
+
+
+_isdotted = re.compile(
+    r"([a-zA-Z][a-zA-Z0-9_]*)"
+    r"([.][a-zA-Z][a-zA-Z0-9_]*)*"
+    # use the whole line
+    r"$").match
+
 
 @implementer(IDottedName)
 class DottedName(_StrippedNativeStringLine):
     """Dotted name field.
 
     Values of DottedName fields must be Python-style dotted names.
+
+    Dotted names can be validated from both unicode values and bytes values,
+    producing a native text string in both cases::
+
+        >>> from zope.schema import DottedName
+        >>> field = DottedName()
+        >>> field.fromUnicode(u'zope.schema')
+        'zope.schema'
+        >>> field.fromBytes(b'zope.schema')
+        'zope.schema'
+
+    .. versionchanged:: 4.8.0
+        Implement :class:`zope.schema.interfaces.IFromBytes`
+
     """
 
     _invalid_exc_type = InvalidDottedName
@@ -527,11 +603,14 @@ class DottedName(_StrippedNativeStringLine):
 
 
 
-@implementer(IId, IFromUnicode)
+@implementer(IId)
 class Id(_StrippedNativeStringLine):
     """Id field
 
     Values of id fields must be either uris or dotted names.
+
+    .. versionchanged:: 4.8.0
+        Implement :class:`zope.schema.interfaces.IFromBytes`
     """
 
     _invalid_exc_type = InvalidId
