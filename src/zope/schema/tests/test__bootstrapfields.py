@@ -486,6 +486,31 @@ class FieldTests(EqualityTestsMixin,
             """)
         )
 
+    def test_ctor_description_none(self):
+        # None values for description don't break the docs.
+        import textwrap
+
+        description = None
+
+        title = u'A title'
+
+        field = self._makeOne(title=title, description=description)
+
+        self.assertIs(field.title, title)
+        self.assertIs(field.description, description)
+
+        self.assertEqual(
+            field.getDoc(),
+            textwrap.dedent("""\
+            A title
+
+            :Implementation: :class:`zope.schema.Field`
+            :Read Only: False
+            :Required: True
+            :Default Value: None
+            """)
+        )
+
     def test_ctor_defaults(self):
 
         field = self._makeOne()
