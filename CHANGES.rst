@@ -9,6 +9,8 @@
   numeric and bytes fields, as well as ``URI``, ``DottedName``, and
   ``Id``.
 
+- Fix passing ``None`` as the description to a field constructor. See
+  `issue 69 <https://github.com/zopefoundation/zope.schema/issues/69>`_.
 
 4.7.0 (2018-09-11)
 ==================
