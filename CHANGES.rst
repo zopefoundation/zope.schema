@@ -2,10 +2,12 @@
  Changes
 =========
 
-4.7.1 (unreleased)
+4.8.0 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Add the interface ``IFromBytes``, which is implemented by the
+  numeric and bytes fields, as well as ``URI``, ``DottedName``, and
+  ``Id``.
 
 
 4.7.0 (2018-09-11)

@@ -282,8 +282,20 @@ class IFromUnicode(zope.interface.Interface):
     values.
     """
 
-    def fromUnicode(str):
+    def fromUnicode(value):
         """Convert a unicode string to a value.
+        """
+
+
+class IFromBytes(zope.interface.Interface):
+    """
+    Parse a byte string to a value.
+
+    If the string needs to be decoded, decoding is done using UTF-8.
+    """
+
+    def fromBytes(value):
+        """Convert a byte string to a value.
         """
 
 

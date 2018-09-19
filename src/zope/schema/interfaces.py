@@ -38,6 +38,7 @@ from zope.schema._bootstrapfields import TextLine
 from zope.schema._bootstrapinterfaces import ConstraintNotSatisfied
 from zope.schema._bootstrapinterfaces import IBeforeObjectAssignedEvent
 from zope.schema._bootstrapinterfaces import IContextAwareDefaultFactory
+from zope.schema._bootstrapinterfaces import IFromBytes
 from zope.schema._bootstrapinterfaces import IFromUnicode
 from zope.schema._bootstrapinterfaces import IValidatable
 from zope.schema._bootstrapinterfaces import InvalidValue
@@ -118,6 +119,7 @@ __all__ = [
     'IFieldEvent',
     'IFieldUpdatedEvent',
     'IFloat',
+    'IFromBytes',
     'IFromUnicode',
     'IFrozenSet',
     'IId',
