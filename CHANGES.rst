@@ -2,7 +2,7 @@
  Changes
 =========
 
-4.8.0 (unreleased)
+4.8.0 (2018-09-19)
 ==================
 
 - Add the interface ``IFromBytes``, which is implemented by the
