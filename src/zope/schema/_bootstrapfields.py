@@ -723,7 +723,11 @@ class Number(Orderable, Field):
 
     # On Python 2, native strings are byte strings, which is
     # what the converters expect, so we don't need to do any decoding.
-    fromBytes = fromUnicode if PY2 else lambda self, value: self.fromUnicode(value.decode('utf-8'))
+    if PY2: # pragma: no cover
+        fromBytes = fromUnicode
+    else:
+        def fromBytes(self, value):
+            return self.fromUnicode(value.decode('utf-8'))
 
 
 class Complex(Number):
