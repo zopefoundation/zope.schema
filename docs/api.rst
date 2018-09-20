@@ -10,7 +10,6 @@ Interfaces
 ==========
 
 .. autointerface:: zope.schema.interfaces.IField
-.. autointerface:: zope.schema.interfaces.IFromUnicode
 .. autointerface:: zope.schema.interfaces.IChoice
 .. autointerface:: zope.schema.interfaces.IContextAwareDefaultFactory
 .. autointerface:: zope.schema.interfaces.IOrderable
@@ -20,6 +19,13 @@ Interfaces
 .. autointerface:: zope.schema.interfaces.IInterfaceField
 .. autointerface:: zope.schema.interfaces.IBool
 .. autointerface:: zope.schema.interfaces.IObject
+
+
+Conversions
+-----------
+
+.. autointerface:: zope.schema.interfaces.IFromBytes
+.. autointerface:: zope.schema.interfaces.IFromUnicode
 
 
 Strings
@@ -158,8 +164,8 @@ Schema APIs
 .. autofunction:: zope.schema.getSchemaValidationErrors
    :noindex:
 
-Fields
-======
+Field Implementations
+=====================
 
 .. autoclass:: zope.schema.Field
 .. autoclass:: zope.schema.Collection

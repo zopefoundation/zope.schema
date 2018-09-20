@@ -292,6 +292,8 @@ class IFromBytes(zope.interface.Interface):
     Parse a byte string to a value.
 
     If the string needs to be decoded, decoding is done using UTF-8.
+
+    .. versionadded:: 4.8.0
     """
 
     def fromBytes(value):
