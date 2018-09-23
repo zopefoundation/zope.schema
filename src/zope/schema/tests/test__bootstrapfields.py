@@ -420,6 +420,33 @@ class FieldTests(EqualityTestsMixin,
         self.assertIn('.. rubric:: Key Type', doc)
         self.assertIn('.. rubric:: Value Type', doc)
 
+        self.assertEqual(
+            field.getDoc(),
+            textwrap.dedent("""
+            :Implementation: :class:`zope.schema.Field`
+            :Read Only: True
+            :Required: False
+            :Default Factory: 'default'
+            :Allowed Type: :class:`str`, :class:`object`
+
+            .. rubric:: Key Type
+
+            :Implementation: :class:`zope.schema.Field`
+            :Read Only: False
+            :Required: True
+            :Default Value: None
+
+
+            .. rubric:: Value Type
+
+            :Implementation: :class:`zope.schema.Field`
+            :Read Only: False
+            :Required: True
+            :Default Value: None
+
+            """)
+        )
+
         field = self._makeOne(title=u'A title', description=u"""Multiline description.
 
         Some lines have leading whitespace.

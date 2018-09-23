@@ -7,6 +7,9 @@
 
 - Nothing changed yet.
 
+- Fix ``Field.getDoc()`` when ``value_type`` or ``key_type`` is
+  present. Previously it could produce ReST that generated Sphinx
+  warnings. See `issue 76 <https://github.com/zopefoundation/zope.schema/issues/76>`_.
 
 4.8.0 (2018-09-19)
 ==================

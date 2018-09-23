@@ -397,6 +397,7 @@ class Field(Attribute):
                              ('value_type', 'Value Type')):
             field = getattr(self, name, None)
             if hasattr(field, 'getDoc'):
+                lines.append("")
                 lines.append(".. rubric:: " + rubric)
                 lines.append(field.getDoc())
 
