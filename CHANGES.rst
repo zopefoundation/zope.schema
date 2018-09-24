@@ -2,7 +2,7 @@
  Changes
 =========
 
-4.9.0 (unreleased)
+4.9.0 (2018-09-24)
 ==================
 
 - Make ``NativeString`` and ``NativeStringLine`` distinct types that
