@@ -14,6 +14,11 @@
   present. Previously it could produce ReST that generated Sphinx
   warnings. See `issue 76 <https://github.com/zopefoundation/zope.schema/issues/76>`_.
 
+- Make ``DottedName`` accept leading underscores for each segment.
+
+- Add ``PythonIdentifier``, which accepts one segment of a dotted
+  name, e.g., a python variable or class.
+
 4.8.0 (2018-09-19)
 ==================
 

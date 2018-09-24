@@ -70,6 +70,7 @@ from zope.schema.interfaces import INativeStringLine
 from zope.schema.interfaces import IObject
 from zope.schema.interfaces import INumber
 from zope.schema.interfaces import IPassword
+from zope.schema.interfaces import IPythonIdentifier
 from zope.schema.interfaces import IReal
 from zope.schema.interfaces import IRational
 from zope.schema.interfaces import ISet
@@ -579,11 +580,48 @@ class URI(_StrippedNativeStringLine):
         raise InvalidURI(value).with_field_and_value(self, value)
 
 
+# An identifier is a letter or underscore, followed by
+# any number of letters, underscores, and digits.
+_identifier_pattern = r'[a-zA-Z_]+\w*'
+
+# The whole string must match to be an identifier
+_is_identifier = re.compile('^' + _identifier_pattern + '$').match
+
 _isdotted = re.compile(
-    r"([a-zA-Z][a-zA-Z0-9_]*)"
-    r"([.][a-zA-Z][a-zA-Z0-9_]*)*"
-    # use the whole line
-    r"$").match
+    # The start of the line, followed by an identifier,
+    '^' + _identifier_pattern
+    # optionally followed by .identifier any number of times
+    + r"([.]" + _identifier_pattern + r")*"
+    # followed by the end of the line.
+    + r"$").match
+
+
+@implementer(IPythonIdentifier)
+class PythonIdentifier(_StrippedNativeStringLine):
+    """
+    This field describes a python identifier, i.e. a variable name.
+
+    Empty strings are allowed.
+
+    Identifiers can be validated from both unicode values and bytes values,
+    producing a native text string in both cases::
+
+        >>> from zope.schema import PythonIdentifier
+        >>> field = PythonIdentifier()
+        >>> field.fromUnicode(u'zope')
+        'zope'
+        >>> field.fromBytes(b'_zope')
+        '_zope'
+        >>> field.fromUnicode(u'   ')
+        ''
+
+    .. versionadded:: 4.9.0
+    """
+
+    def _validate(self, value):
+        super(PythonIdentifier, self)._validate(value)
+        if value and not _is_identifier(value):
+            raise InvalidValue(value).with_field_and_value(self, value)
 
 
 @implementer(IDottedName)
@@ -601,10 +639,13 @@ class DottedName(_StrippedNativeStringLine):
         'zope.schema'
         >>> field.fromBytes(b'zope.schema')
         'zope.schema'
+        >>> field.fromUnicode(u'zope._schema')
+        'zope._schema'
 
     .. versionchanged:: 4.8.0
         Implement :class:`zope.schema.interfaces.IFromBytes`
-
+    .. versionchanged:: 4.9.0
+        Allow leading underscores in each component.
     """
 
     _invalid_exc_type = InvalidDottedName

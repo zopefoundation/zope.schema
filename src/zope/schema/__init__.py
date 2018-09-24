@@ -47,6 +47,7 @@ from zope.schema._field import Number
 from zope.schema._field import Object
 from zope.schema._field import Orderable
 from zope.schema._field import Password
+from zope.schema._field import PythonIdentifier
 from zope.schema._field import Rational
 from zope.schema._field import Real
 from zope.schema._field import Sequence
@@ -107,6 +108,7 @@ __all__ = [
     'Number',
     'Object',
     'Orderable',
+    'PythonIdentifier',
     'Password',
     'Rational',
     'Real',
