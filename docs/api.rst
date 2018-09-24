@@ -43,6 +43,7 @@ Strings
 .. autointerface:: zope.schema.interfaces.IPassword
 .. autointerface:: zope.schema.interfaces.IURI
 .. autointerface:: zope.schema.interfaces.IId
+.. autointerface:: zope.schema.interfaces.IPythonIdentifier
 .. autointerface:: zope.schema.interfaces.IDottedName
 
 
@@ -184,8 +185,6 @@ Field Implementations
 .. autoclass:: zope.schema.Datetime
    :no-show-inheritance:
 .. autoclass:: zope.schema.Dict
-.. autoclass:: zope.schema.DottedName
-   :no-show-inheritance:
 
 .. autoclass:: zope.schema.FrozenSet
    :no-show-inheritance:
@@ -204,8 +203,6 @@ Field Implementations
 .. autoclass:: zope.schema.Object
    :no-show-inheritance:
 .. autoclass:: zope.schema.Orderable
-.. autoclass:: zope.schema.Password
-   :no-show-inheritance:
 .. autoclass:: zope.schema.Set
 .. autoclass:: zope.schema.Sequence
 .. autoclass:: zope.schema.Time
@@ -235,6 +232,12 @@ Strings
 .. autoclass:: zope.schema.NativeString
    :no-show-inheritance:
 .. autoclass:: zope.schema.NativeStringLine
+   :no-show-inheritance:
+.. autoclass:: zope.schema.Password
+   :no-show-inheritance:
+.. autoclass:: zope.schema.DottedName
+   :no-show-inheritance:
+.. autoclass:: zope.schema.PythonIdentifier
    :no-show-inheritance:
 
 Numbers

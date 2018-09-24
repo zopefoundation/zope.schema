@@ -142,6 +142,7 @@ __all__ = [
     'IObject',
     'IOrderable',
     'IPassword',
+    'IPythonIdentifier',
     'IRational',
     'IReal',
     'ISequence',
@@ -707,6 +708,14 @@ class IDottedName(INativeStringLine):
         required=False,
         default=None
         )
+
+
+class IPythonIdentifier(INativeStringLine):
+    """
+    A single Python identifier, such as a  variable name.
+
+    .. versionadded:: 4.9.0
+    """
 
 
 class IChoice(IField):

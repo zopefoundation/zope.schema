@@ -914,6 +914,51 @@ class URITests(EqualityTestsMixin,
                           field.fromUnicode, u'http://example.com/\nDAV:')
 
 
+class PythonIdentifierTests(EqualityTestsMixin,
+                            WrongTypeTestsMixin,
+                            unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._field import PythonIdentifier
+        return PythonIdentifier
+
+    def _getTargetInterfaces(self):
+        from zope.schema.interfaces import IFromUnicode
+        from zope.schema.interfaces import IFromBytes
+        return [self._getTargetInterface(), IFromUnicode, IFromBytes]
+
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import IPythonIdentifier
+        return IPythonIdentifier
+
+    def test_fromUnicode_empty(self):
+        pi = self._makeOne()
+        self.assertEqual(pi.fromUnicode(u''), '')
+
+    def test_fromUnicode_normal(self):
+        pi = self._makeOne()
+        self.assertEqual(pi.fromUnicode(u'normal'), 'normal')
+
+    def test_fromUnicode_strips_ws(self):
+        pi = self._makeOne()
+        self.assertEqual(pi.fromUnicode(u'   '), '')
+        self.assertEqual(pi.fromUnicode(u' normal  '), 'normal')
+
+    def test__validate_miss(self):
+        from zope.schema.interfaces import InvalidValue
+        pi = self._makeOne()
+        with self.assertRaises(InvalidValue) as exc:
+            pi._validate('not-an-identifier')
+
+        ex = exc.exception
+        self.assertIs(ex.field, pi)
+        self.assertEqual(ex.value, 'not-an-identifier')
+
+    def test__validate_hit(self):
+        pi = self._makeOne()
+        pi._validate('is_an_identifier')
+
+
 class DottedNameTests(EqualityTestsMixin,
                       WrongTypeTestsMixin,
                       unittest.TestCase):
@@ -1015,6 +1060,12 @@ class DottedNameTests(EqualityTestsMixin,
     def test_fromUnicode_dotted_name_ok(self):
         field = self._makeOne()
         self.assertEqual(field.fromUnicode(u'dotted.name'), 'dotted.name')
+
+        # Underscores are allowed in any component
+        self.assertEqual(field.fromUnicode(u'dotted._name'), 'dotted._name')
+        self.assertEqual(field.fromUnicode(u'_leading_underscore'), '_leading_underscore')
+        self.assertEqual(field.fromUnicode(u'_dotted.name'), '_dotted.name')
+        self.assertEqual(field.fromUnicode(u'_dotted._name'), '_dotted._name')
 
     def test_fromUnicode_invalid(self):
         from zope.schema.interfaces import ConstraintNotSatisfied
