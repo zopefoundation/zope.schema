@@ -416,10 +416,14 @@ class IText(IMinMaxLen, IIterable, IField):
 
 
 # for things which are of the str type on both Python 2 and 3
-if PY3:  # pragma: no cover
-    INativeString = IText
-else:  # pragma: no cover
-    INativeString = IBytes
+class INativeString(IText if PY3 else IBytes):
+    """
+    A field that always contains the native `str` type.
+
+    .. versionchanged:: 4.9.0
+       This is now a distinct type instead of an alias for either `IText`
+       or `IBytes`, depending on the platform.
+    """
 
 
 class IASCII(INativeString):
@@ -446,10 +450,14 @@ class ITextLine(IText):
     """Field containing a unicode string without newlines."""
 
 
-if PY3:  # pragma: no cover
-    INativeStringLine = ITextLine
-else:  # pragma: no cover
-    INativeStringLine = IBytesLine
+class INativeStringLine(ITextLine if PY3 else IBytesLine):
+    """
+    A field that always contains the native `str` type, without any newlines.
+
+    .. versionchanged:: 4.9.0
+       This is now a distinct type instead of an alias for either `ITextLine`
+       or `IBytesLine`, depending on the platform.
+    """
 
 
 class IPassword(ITextLine):

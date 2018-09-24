@@ -65,6 +65,8 @@ from zope.schema.interfaces import IMinMaxLen
 from zope.schema.interfaces import IMapping
 from zope.schema.interfaces import IMutableMapping
 from zope.schema.interfaces import IMutableSequence
+from zope.schema.interfaces import INativeString
+from zope.schema.interfaces import INativeStringLine
 from zope.schema.interfaces import IObject
 from zope.schema.interfaces import INumber
 from zope.schema.interfaces import IPassword
@@ -170,11 +172,27 @@ class Bytes(MinMaxLen, Field):
         self.validate(value)
         return value
 
-# for things which are of the str type on both Python 2 and 3
-if PY3:  # pragma: no cover
-    NativeString = Text
-else:  # pragma: no cover
-    NativeString = Bytes
+
+@implementer(INativeString, IFromUnicode, IFromBytes)
+class NativeString(Text if PY3 else Bytes):
+    """
+    A native string is always the type `str`.
+
+    In addition to :class:`~zope.schema.interfaces.INativeString`,
+    this implements :class:`~zope.schema.interfaces.IFromUnicode` and
+    :class:`~zope.schema.interfaces.IFromBytes`.
+
+    .. versionchanged:: 4.9.0
+       This is now a distinct type instead of an alias for either `Text` or `Bytes`,
+       depending on the platform.
+    """
+    _type = str
+
+    if PY3:
+        def fromBytes(self, value):
+            value = value.decode('utf-8')
+            self.validate(value)
+            return value
 
 
 @implementer(IASCII)
@@ -191,17 +209,34 @@ class ASCII(NativeString):
 
 @implementer(IBytesLine)
 class BytesLine(Bytes):
-    """A Text field with no newlines."""
+    """A `Bytes` field with no newlines."""
 
     def constraint(self, value):
         # TODO: we should probably use a more general definition of newlines
         return b'\n' not in value
 
-# for things which are of the str type on both Python 2 and 3
-if PY3:  # pragma: no cover
-    NativeStringLine = TextLine
-else:  # pragma: no cover
-    NativeStringLine = BytesLine
+
+@implementer(INativeStringLine, IFromUnicode, IFromBytes)
+class NativeStringLine(TextLine if PY3 else BytesLine):
+    """
+    A native string is always the type `str`; this field excludes
+    newlines.
+
+    In addition to :class:`~zope.schema.interfaces.INativeStringLine`,
+    this implements :class:`~zope.schema.interfaces.IFromUnicode` and
+    :class:`~zope.schema.interfaces.IFromBytes`.
+
+    .. versionchanged:: 4.9.0
+       This is now a distinct type instead of an alias for either `TextLine`
+       or `BytesLine`, depending on the platform.
+    """
+    _type = str
+
+    if PY3:
+        def fromBytes(self, value):
+            value = value.decode('utf-8')
+            self.validate(value)
+            return value
 
 
 @implementer(IASCIILine)

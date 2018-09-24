@@ -37,6 +37,8 @@ Strings
 .. autointerface:: zope.schema.interfaces.ITextLine
 .. autointerface:: zope.schema.interfaces.IASCII
 .. autointerface:: zope.schema.interfaces.IASCIILine
+.. autointerface:: zope.schema.interfaces.INativeString
+.. autointerface:: zope.schema.interfaces.INativeStringLine
 
 .. autointerface:: zope.schema.interfaces.IPassword
 .. autointerface:: zope.schema.interfaces.IURI
@@ -199,8 +201,6 @@ Field Implementations
 .. autoclass:: zope.schema.MutableMapping
 .. autoclass:: zope.schema.MutableSequence
 .. autoclass:: zope.schema.MinMaxLen
-.. autoclass:: zope.schema.NativeString
-.. autoclass:: zope.schema.NativeStringLine
 .. autoclass:: zope.schema.Object
    :no-show-inheritance:
 .. autoclass:: zope.schema.Orderable
@@ -231,6 +231,10 @@ Strings
 .. autoclass:: zope.schema.Text
    :no-show-inheritance:
 .. autoclass:: zope.schema.TextLine
+   :no-show-inheritance:
+.. autoclass:: zope.schema.NativeString
+   :no-show-inheritance:
+.. autoclass:: zope.schema.NativeStringLine
    :no-show-inheritance:
 
 Numbers

@@ -1702,6 +1702,63 @@ class DictTests(MutableMappingTests):
         with self.assertRaises(WrongType):
             super(DictTests, self).test_mutable_mapping()
 
+class NativeStringTests(EqualityTestsMixin,
+                        WrongTypeTestsMixin,
+                        unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._field import NativeString
+        return NativeString
+
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import INativeString
+        return INativeString
+
+    def _getTargetInterfaces(self):
+        from zope.schema.interfaces import IFromUnicode
+        from zope.schema.interfaces import IFromBytes
+        return [self._getTargetInterface(), IFromUnicode, IFromBytes]
+
+    def test_fromBytes(self):
+        field = self._makeOne()
+        self.assertEqual(field.fromBytes(b''), '')
+        self.assertEqual(field.fromBytes(b'DEADBEEF'), 'DEADBEEF')
+
+    def test_fromUnicode(self):
+        field = self._makeOne()
+        self.assertIsInstance(field.fromUnicode(u''), str)
+        self.assertEqual(field.fromUnicode(u''), '')
+        self.assertEqual(field.fromUnicode(u'DEADBEEF'), 'DEADBEEF')
+
+
+class NativeStringLineTests(EqualityTestsMixin,
+                            WrongTypeTestsMixin,
+                            unittest.TestCase):
+
+    def _getTargetClass(self):
+        from zope.schema._field import NativeStringLine
+        return NativeStringLine
+
+    def _getTargetInterface(self):
+        from zope.schema.interfaces import INativeStringLine
+        return INativeStringLine
+
+    def _getTargetInterfaces(self):
+        from zope.schema.interfaces import IFromUnicode
+        from zope.schema.interfaces import IFromBytes
+        return [self._getTargetInterface(), IFromUnicode, IFromBytes]
+
+    def test_fromBytes(self):
+        field = self._makeOne()
+        self.assertEqual(field.fromBytes(b''), '')
+        self.assertEqual(field.fromBytes(b'DEADBEEF'), 'DEADBEEF')
+
+    def test_fromUnicode(self):
+        field = self._makeOne()
+        self.assertIsInstance(field.fromUnicode(u''), str)
+        self.assertEqual(field.fromUnicode(u''), '')
+        self.assertEqual(field.fromUnicode(u'DEADBEEF'), 'DEADBEEF')
+
 
 def _makeSampleVocabulary():
     from zope.interface import implementer

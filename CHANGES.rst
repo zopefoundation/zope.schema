@@ -2,10 +2,13 @@
  Changes
 =========
 
-4.8.1 (unreleased)
+4.9.0 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Make ``NativeString`` and ``NativeStringLine`` distinct types that
+  implement the newly-distinct interfaces ``INativeString`` and
+  ``INativeStringLine``. Previously these were just aliases for either
+  ``Text`` (on Python 3) or ``Bytes`` (on Python 2).
 
 
 4.8.0 (2018-09-19)
