@@ -5,7 +5,7 @@
 4.9.1 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Fix SimpleTerm token for non-ASCII bytes values.
 
 
 4.9.0 (2018-09-24)
