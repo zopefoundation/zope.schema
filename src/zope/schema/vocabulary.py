@@ -55,7 +55,9 @@ class SimpleTerm(object):
         # we want here. On the other hand, we want to try to keep the token as
         # readable as possible. On both 2 and 3, self.token should be a native
         # string (ASCIILine).
-        if not isinstance(token, (str, bytes, text_type)):
+        if isinstance(token, bytes):
+            token = token.decode('raw_unicode_escape')
+        elif not isinstance(token, (str, text_type)):
             # Nothing we recognize as intended to be textual data.
             # Get its str() as promised
             token = str(token)
