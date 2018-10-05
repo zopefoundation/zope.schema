@@ -2,7 +2,7 @@
  Changes
 =========
 
-4.9.1 (unreleased)
+4.9.1 (2018-10-05)
 ==================
 
 - Fix SimpleTerm token for non-ASCII bytes values.
