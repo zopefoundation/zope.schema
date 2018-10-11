@@ -2,7 +2,7 @@
  Changes
 =========
 
-4.9.2 (unreleased)
+4.9.2 (2018-10-11)
 ==================
 
 - Make sure that the title for ``IObject.validate_invariants`` is a unicode
