@@ -829,7 +829,7 @@ class IObject(IField):
     )
 
     validate_invariants = Bool(
-        title="validate_invariants",
+        title=_("Validate Invariants"),
         description=_("A boolean that says whether ``schema.validateInvariants`` "
                       "is called from ``self.validate()``. The default is true."),
         default=True,

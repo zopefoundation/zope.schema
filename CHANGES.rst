@@ -5,13 +5,14 @@
 4.9.2 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Make sure that the title for ``IObject.validate_invariants`` is a unicode
+  string.
 
 
 4.9.1 (2018-10-05)
 ==================
 
-- Fix SimpleTerm token for non-ASCII bytes values.
+- Fix ``SimpleTerm`` token for non-ASCII bytes values.
 
 
 4.9.0 (2018-09-24)
