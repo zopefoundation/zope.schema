@@ -54,6 +54,7 @@ setup(
     package_dir={'': 'src'},
     namespace_packages=['zope', ],
     install_requires=REQUIRES,
+    keywords="zope3 schema field interface typing",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
