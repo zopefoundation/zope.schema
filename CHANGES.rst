@@ -2,7 +2,7 @@
  Changes
 =========
 
-4.9.3 (unreleased)
+4.9.3 (2018-10-12)
 ==================
 
 - Fixed a ReST error in getDoc() results when having "subfields" 
