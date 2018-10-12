@@ -399,6 +399,7 @@ class Field(Attribute):
             if hasattr(field, 'getDoc'):
                 lines.append("")
                 lines.append(".. rubric:: " + rubric)
+                lines.append("")
                 lines.append(field.getDoc())
 
         return lines
