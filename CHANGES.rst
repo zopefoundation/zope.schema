@@ -5,7 +5,8 @@
 4.9.3 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Fixed a ReST error in getDoc() results when having "subfields" 
+  with titles. 
 
 
 4.9.2 (2018-10-11)

@@ -415,13 +415,13 @@ class FieldTests(EqualityTestsMixin,
 
         # value_type and key_type are automatically picked up
         field.value_type = self._makeOne()
-        field.key_type = self._makeOne()
-        doc = field .getDoc()
+        # Make sure the formatting works also with fields that have a title
+        field.key_type = self._makeOne(title=u'Key Type')
+        doc = field.getDoc()
         self.assertIn('.. rubric:: Key Type', doc)
         self.assertIn('.. rubric:: Value Type', doc)
-
         self.assertEqual(
-            field.getDoc(),
+            doc,
             textwrap.dedent("""
             :Implementation: :class:`zope.schema.Field`
             :Read Only: True
@@ -431,6 +431,8 @@ class FieldTests(EqualityTestsMixin,
 
             .. rubric:: Key Type
 
+            Key Type
+
             :Implementation: :class:`zope.schema.Field`
             :Read Only: False
             :Required: True
@@ -438,6 +440,7 @@ class FieldTests(EqualityTestsMixin,
 
 
             .. rubric:: Value Type
+
 
             :Implementation: :class:`zope.schema.Field`
             :Read Only: False
