@@ -5,7 +5,8 @@
 4.9.4 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Make ``str`` of ``ValidationError`` and its subclasses produce more
+  human-readable descriptions.
 
 
 4.9.3 (2018-10-12)

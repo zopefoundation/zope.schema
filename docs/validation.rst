@@ -50,12 +50,18 @@ Create an instance of TwoInts but do not set attributes. We get two errors:
    'SchemaNotFullyImplemented'
    >>> r[0][1].args[0].args
    ("'TwoInts' object has no attribute 'a'",)
+   >>> print(r[0][1])
+   Schema not fully implemented
+   'TwoInts' object has no attribute 'a'
    >>> r[1][0]
    'b'
    >>> r[1][1].__class__.__name__
    'SchemaNotFullyImplemented'
    >>> r[1][1].args[0].args
    ("'TwoInts' object has no attribute 'b'",)
+   >>> print(r[1][1])
+   Schema not fully implemented
+   'TwoInts' object has no attribute 'b'
 
 The `getSchemaValidationErrors` function returns the same result:
 
@@ -71,12 +77,18 @@ The `getSchemaValidationErrors` function returns the same result:
    'SchemaNotFullyImplemented'
    >>> r[0][1].args[0].args
    ("'TwoInts' object has no attribute 'a'",)
+   >>> print(r[0][1])
+   Schema not fully implemented
+   'TwoInts' object has no attribute 'a'
    >>> r[1][0]
    'b'
    >>> r[1][1].__class__.__name__
    'SchemaNotFullyImplemented'
    >>> r[1][1].args[0].args
    ("'TwoInts' object has no attribute 'b'",)
+   >>> print(r[1][1])
+   Schema not fully implemented
+   'TwoInts' object has no attribute 'b'
 
 Note that see no error from the invariant because the invariants are not
 validated if there are other schema errors.
@@ -98,12 +110,18 @@ When we set a valid value for `a` we still get the same error for `b`:
    'TooBig'
    >>> errors[0][1].args
    (11, 10)
+   >>> print(errors[0][1])
+   Value is too big
+   11 > 10
    >>> errors[1][0]
    'b'
    >>> errors[1][1].__class__.__name__
    'SchemaNotFullyImplemented'
    >>> errors[1][1].args[0].args
    ("'TwoInts' object has no attribute 'b'",)
+   >>> print(errors[1][1])
+   Schema not fully implemented
+   'TwoInts' object has no attribute 'b'
 
 
 After setting a valid value for `a` there is only the error for the missing `b`
@@ -117,6 +135,9 @@ left:
    [('b', SchemaNotFullyImplemented(...AttributeError...))]
    >>> r[0][1].args[0].args
    ("'TwoInts' object has no attribute 'b'",)
+   >>> print(r[0][1])
+   Schema not fully implemented
+   'TwoInts' object has no attribute 'b'
 
 
 After setting valid value for `b` the schema is valid so the invariants are

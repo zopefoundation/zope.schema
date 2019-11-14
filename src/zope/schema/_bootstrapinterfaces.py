@@ -71,9 +71,38 @@ class ValidationError(zope.interface.Invalid):
             self.__class__.__name__,
             ', '.join(repr(arg) for arg in self.args))
 
+    def _describe(self):
+        # If we have a value, then it makes a reasonable default
+        # description.  Otherwise, just let Exception stringify the
+        # arguments.
+        if self.value is not None:
+            return str(self.value)
+        else:
+            return super(ValidationError, self).__str__()
+
+    def __str__(self):
+        """Produce a human-readable version of this error.
+
+        We use a combination of the first line of the docstring and a more
+        detailed description provided by the exception's `_describe` method.
+        Note that we specifically do not include the field name here, as
+        this is intended for use in contexts such as UIs where including the
+        field name may not be appropriate.
+        """
+        first_doc_line = self.doc().lstrip('\n').splitlines()[0].strip()
+        description = self._describe()
+        if description:
+            description = '%s\n%s' % (first_doc_line, description)
+        else:
+            description = first_doc_line
+        return description
+
 
 class RequiredMissing(ValidationError):
     __doc__ = _("""Required input is missing.""")
+
+    def _describe(self):
+        return None
 
 
 class WrongType(ValidationError):
@@ -95,6 +124,10 @@ class WrongType(ValidationError):
         ValidationError.__init__(self, value, expected_type, name, *args)
         self.expected_type = expected_type
         self.value = value
+
+    def _describe(self):
+        return _('%r is not an instance of %s') % (
+            self.value, self.expected_type.__name__)
 
 
 class OutOfBounds(ValidationError):
@@ -145,11 +178,17 @@ class TooBig(OrderableOutOfBounds):
 
     violation_direction = OutOfBounds.TOO_LARGE
 
+    def _describe(self):
+        return '%r > %r' % (self.value, self.bound)
+
 
 class TooSmall(OrderableOutOfBounds):
     __doc__ = _("""Value is too small""")
 
     violation_direction = OutOfBounds.TOO_SMALL
+
+    def _describe(self):
+        return '%r < %r' % (self.value, self.bound)
 
 
 class LenOutOfBounds(OutOfBounds):
@@ -165,11 +204,17 @@ class TooLong(LenOutOfBounds):
 
     violation_direction = OutOfBounds.TOO_LARGE
 
+    def _describe(self):
+        return 'len(%r) > %s' % (self.value, self.bound)
+
 
 class TooShort(LenOutOfBounds):
     __doc__ = _("""Value is too short""")
 
     violation_direction = OutOfBounds.TOO_SMALL
+
+    def _describe(self):
+        return 'len(%r) < %s' % (self.value, self.bound)
 
 
 class InvalidValue(ValidationError):
@@ -207,6 +252,9 @@ class WrongContainedType(ValidationError):
         super(WrongContainedType, self).__init__(errors, name, *args)
         self.errors = errors
 
+    def _describe(self):
+        return '\n'.join(str(error) for error in self.errors)
+
 
 class SchemaNotCorrectlyImplemented(WrongContainedType):
     __doc__ = _("""An object failed schema or invariant validation.""")
@@ -230,9 +278,22 @@ class SchemaNotCorrectlyImplemented(WrongContainedType):
         self.schema_errors = schema_errors
         self.invariant_errors = invariant_errors
 
+    def _describe(self):
+        error_strs = []
+        if self.schema_errors:
+            error_strs.extend([
+                '%s: %s' % (name, error)
+                for name, error in sorted(self.schema_errors.items())])
+        if self.invariant_errors:
+            error_strs.extend([str(error) for error in self.invariant_errors])
+        return '\n'.join(error_strs)
+
 
 class SchemaNotFullyImplemented(ValidationError):
     __doc__ = _("""Schema not fully implemented""")
+
+    def _describe(self):
+        return '\n'.join(str(error) for error in self.args)
 
 
 class SchemaNotProvided(ValidationError):
@@ -252,6 +313,9 @@ class SchemaNotProvided(ValidationError):
         super(SchemaNotProvided, self).__init__(schema, value, *args)
         self.schema = schema
         self.value = value
+
+    def _describe(self):
+        return '%r does not provide %s' % (self.value, self.schema.__name__)
 
 
 class NotAnInterface(WrongType, SchemaNotProvided):
