@@ -510,7 +510,7 @@ class Text(MinMaxLen, Field):
         self.unicode_normalization = kw.pop('unicode_normalization', 'NFC')
         super(Text, self).__init__(*args, **kw)
 
-    def fromUnicode(self, str):
+    def fromUnicode(self, value):
         """
         >>> import unicodedata
         >>> from zope.schema.interfaces import WrongType
@@ -532,11 +532,14 @@ class Text(MinMaxLen, Field):
         ...
         zope.schema._bootstrapinterfaces.ConstraintNotSatisfied: (u'foo spam', '')
         """
-        if self.unicode_normalization:
-            str = unicodedata.normalize(self.unicode_normalization, str)
-        self.validate(str)
-        return str
-
+        if not PY2:
+            unicode = str
+        if isinstance(value, unicode):
+            if self.unicode_normalization:
+                value = unicodedata.normalize(self.unicode_normalization, value)
+        self.validate(value)
+        return value
+        
 
 class TextLine(Text):
     """A text field with no newlines."""

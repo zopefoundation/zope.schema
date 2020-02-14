@@ -964,7 +964,7 @@ class TextTests(EqualityTestsMixin,
         self.assertEqual(txt.fromUnicode(deadbeef), deadbeef)
 
     def test_normalization(self):
-        deadbeef = unicodedata.normalize('NFD', str(b'\xc3\x84\xc3\x96\xc3\x9c', 'utf-8'))
+        deadbeef = unicodedata.normalize('NFD', b'\xc3\x84\xc3\x96\xc3\x9c'.decode('utf-8'))
         txt = self._makeOne()
         self.assertEqual(
             [unicodedata.name(c) for c in txt.fromUnicode(deadbeef)],
