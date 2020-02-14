@@ -966,7 +966,7 @@ class TextTests(EqualityTestsMixin,
         self.assertEqual(txt.fromUnicode(deadbeef), deadbeef)
 
     def test_normalization(self):
-        deadbeef = unicodedata.normalize('NFD', 'ÄÖÜ')
+        deadbeef = unicodedata.normalize('NFD', u'ÄÖÜ')
         txt = self._makeOne()
         self.assertEqual(
             [unicodedata.name(c) for c in txt.fromUnicode(deadbeef)],
@@ -976,7 +976,7 @@ class TextTests(EqualityTestsMixin,
                 'LATIN CAPITAL LETTER U WITH DIAERESIS',
             ]
         )
-        txt = self._makeOne(suppress_unicode_normalization=True)
+        txt = self._makeOne(unicode_normalization=None)
         self.assertEqual(
             [unicodedata.name(c) for c in txt.fromUnicode(deadbeef)],
             [

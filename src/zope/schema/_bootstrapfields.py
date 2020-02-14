@@ -508,8 +508,8 @@ class Text(MinMaxLen, Field):
     """A field containing text used for human discourse."""
     _type = text_type
 
-    def __init__(self, suppress_unicode_normalization=_NotGiven, *args, **kw):
-        self.suppress_unicode_normalization = suppress_unicode_normalization
+    def __init__(self, unicode_normalization='NFC', *args, **kw):
+        self.unicode_normalization = unicode_normalization
         super(Text, self).__init__(*args, **kw)
 
     def fromUnicode(self, str):
@@ -533,12 +533,12 @@ class Text(MinMaxLen, Field):
         Traceback (most recent call last):
         ...
         zope.schema._bootstrapinterfaces.ConstraintNotSatisfied: (u'foo spam', '')
-        >>> [ unicodedata.name(c) for c in t.fromUnicode(unicodedata.normalize('NFD', 'ÄÖÜ'))]
+        >>> [unicodedata.name(c) for c in t.fromUnicode(unicodedata.normalize('NFD', u'ÄÖÜ'))]
         ['LATIN CAPITAL LETTER A WITH DIAERESIS', 'LATIN CAPITAL LETTER O WITH DIAERESIS', 'LATIN CAPITAL LETTER U WITH DIAERESIS']
         """
         self.validate(str)
-        if self.suppress_unicode_normalization is _NotGiven:
-            str = unicodedata.normalize('NFC', str)
+        if self.unicode_normalization:
+            str = unicodedata.normalize(self.unicode_normalization, str)
         return str
 
 
