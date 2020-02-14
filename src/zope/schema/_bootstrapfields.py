@@ -508,7 +508,6 @@ class Text(MinMaxLen, Field):
 
     def __init__(self,  *args, **kw):
         self.unicode_normalization = kw.pop('unicode_normalization', 'NFC')
-        self.unicode_normalization = unicode_normalization
         super(Text, self).__init__(*args, **kw)
 
     def fromUnicode(self, str):
