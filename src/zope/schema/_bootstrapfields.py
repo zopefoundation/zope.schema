@@ -533,8 +533,6 @@ class Text(MinMaxLen, Field):
         Traceback (most recent call last):
         ...
         zope.schema._bootstrapinterfaces.ConstraintNotSatisfied: (u'foo spam', '')
-        >>> [unicodedata.name(c) for c in t.fromUnicode(unicodedata.normalize('NFD', u'ÄÖÜ'))]
-        ['LATIN CAPITAL LETTER A WITH DIAERESIS', 'LATIN CAPITAL LETTER O WITH DIAERESIS', 'LATIN CAPITAL LETTER U WITH DIAERESIS']
         """
         self.validate(str)
         if self.unicode_normalization:
