@@ -1,3 +1,5 @@
+# coding=utf-8
+
 ##############################################################################
 #
 # Copyright (c) 2012 Zope Foundation and Contributors.
