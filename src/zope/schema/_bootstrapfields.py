@@ -532,10 +532,6 @@ class Text(MinMaxLen, Field):
         ...
         zope.schema._bootstrapinterfaces.ConstraintNotSatisfied: (u'foo spam', '')
         """
-        try:
-            text_type = unicode
-        except NameError:
-            text_type = str
         if isinstance(value, text_type):
             if self.unicode_normalization:
                 value = unicodedata.normalize(self.unicode_normalization, value)
