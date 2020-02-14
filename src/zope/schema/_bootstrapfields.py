@@ -1,5 +1,3 @@
-# coding=utf-8
-
 ##############################################################################
 #
 # Copyright (c) 2002 Zope Foundation and Contributors.
@@ -534,9 +532,9 @@ class Text(MinMaxLen, Field):
         ...
         zope.schema._bootstrapinterfaces.ConstraintNotSatisfied: (u'foo spam', '')
         """
-        self.validate(str)
         if self.unicode_normalization:
             str = unicodedata.normalize(self.unicode_normalization, str)
+        self.validate(str)
         return str
 
 
