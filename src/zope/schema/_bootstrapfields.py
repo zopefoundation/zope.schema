@@ -514,6 +514,7 @@ class Text(MinMaxLen, Field):
 
     def fromUnicode(self, str):
         """
+        >>> import unicodedata
         >>> from zope.schema.interfaces import WrongType
         >>> from zope.schema.interfaces import ConstraintNotSatisfied
         >>> from zope.schema import Text
