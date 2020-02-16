@@ -13,6 +13,7 @@
 ##############################################################################
 import doctest
 import unittest
+import unicodedata
 
 # pylint:disable=protected-access,inherit-non-class,blacklisted-name
 
@@ -958,10 +959,34 @@ class TextTests(EqualityTestsMixin,
         self.assertRaisesWrongType(txt.fromUnicode, txt._type, deadbeef)
 
     def test_fromUnicode_hit(self):
-
         deadbeef = u'DEADBEEF'
         txt = self._makeOne()
         self.assertEqual(txt.fromUnicode(deadbeef), deadbeef)
+
+    def test_normalization(self):
+        deadbeef = unicodedata.normalize('NFD', b'\xc3\x84\xc3\x96\xc3\x9c'.decode('utf-8'))
+        txt = self._makeOne()
+        self.assertEqual(
+            [unicodedata.name(c) for c in txt.fromUnicode(deadbeef)],
+            [
+                'LATIN CAPITAL LETTER A WITH DIAERESIS',
+                'LATIN CAPITAL LETTER O WITH DIAERESIS',
+                'LATIN CAPITAL LETTER U WITH DIAERESIS',
+            ]
+        )
+        txt = self._makeOne(unicode_normalization=None)
+        self.assertEqual(
+            [unicodedata.name(c) for c in txt.fromUnicode(deadbeef)],
+            [
+                'LATIN CAPITAL LETTER A',
+                'COMBINING DIAERESIS',
+                'LATIN CAPITAL LETTER O',
+                'COMBINING DIAERESIS',
+                'LATIN CAPITAL LETTER U',
+                'COMBINING DIAERESIS',
+            ]
+        )
+
 
 
 class TextLineTests(EqualityTestsMixin,
