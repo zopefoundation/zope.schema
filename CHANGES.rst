@@ -5,7 +5,7 @@
 4.9.4 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Enabled unicode normalization for Text fields.
 
 
 4.9.3 (2018-10-12)
