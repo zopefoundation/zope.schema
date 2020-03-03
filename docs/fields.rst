@@ -203,6 +203,16 @@ desired behavior. If you want to swallow these exceptions, pass
 in swallow_duplicates=True when initializing the vocabulary. See
 the test cases for an example.
 
+Text
+----
+
+By default NFC unicode normalization is enabled for :class:`zope.schema.Text`.
+Valid forms are 'NFC', 'NFKC', 'NFD', and 'NFKD'.
+
+To set the normalization form, use the parameter ``unicode_normalization`` when
+creating the field. Set the parameter to a falsy value to disable unicode
+normalization.
+
 URI
 ---
 

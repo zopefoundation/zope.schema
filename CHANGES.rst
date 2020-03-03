@@ -2,18 +2,24 @@
  Changes
 =========
 
-4.9.4 (unreleased)
-==================
+5.0 (unreleased)
+================
 
 - Make ``str`` of ``ValidationError`` and its subclasses produce more
   human-readable descriptions.
+
+- Enable unicode normalization for ``Text`` fields.
+  The default is NFC normalization. Valid forms are 'NFC', 'NFKC', 'NFD', and
+  'NFKD'. To disable normalization, set ``unicode_normalization`` to ``False``
+  or ``None`` when calling ``__init__`` of the ``Text`` field.
+  See `issue 86 <https://github.com/zopefoundation/zope.schema/issues/86>`_.
 
 
 4.9.3 (2018-10-12)
 ==================
 
-- Fixed a ReST error in getDoc() results when having "subfields" 
-  with titles. 
+- Fix a ReST error in getDoc() results when having "subfields"
+  with titles.
 
 
 4.9.2 (2018-10-11)

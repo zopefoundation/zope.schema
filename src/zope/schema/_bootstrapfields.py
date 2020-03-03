@@ -20,6 +20,7 @@ import fractions
 import numbers
 import sys
 import threading
+import unicodedata
 from math import isinf
 
 from zope.interface import Attribute
@@ -505,10 +506,11 @@ class Text(MinMaxLen, Field):
     """A field containing text used for human discourse."""
     _type = text_type
 
-    def __init__(self, *args, **kw):
+    def __init__(self,  *args, **kw):
+        self.unicode_normalization = kw.pop('unicode_normalization', 'NFC')
         super(Text, self).__init__(*args, **kw)
 
-    def fromUnicode(self, str):
+    def fromUnicode(self, value):
         """
         >>> from zope.schema.interfaces import WrongType
         >>> from zope.schema.interfaces import ConstraintNotSatisfied
@@ -529,8 +531,11 @@ class Text(MinMaxLen, Field):
         ...
         zope.schema._bootstrapinterfaces.ConstraintNotSatisfied: (u'foo spam', '')
         """
-        self.validate(str)
-        return str
+        if isinstance(value, text_type):
+            if self.unicode_normalization:
+                value = unicodedata.normalize(self.unicode_normalization, value)
+        self.validate(value)
+        return value
 
 
 class TextLine(Text):
