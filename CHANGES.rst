@@ -2,7 +2,7 @@
  Changes
 =========
 
-5.0 (unreleased)
+5.0 (2020-03-06)
 ================
 
 - Set ``IDecimal`` attributes ``min``, ``max`` and ``default`` as ``Decimal``
