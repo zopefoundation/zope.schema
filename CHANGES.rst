@@ -2,7 +2,7 @@
  Changes
 =========
 
-5.0.1 (unreleased)
+5.0.1 (2020-03-06)
 ==================
 
 - Fix: add ``Text.unicode_normalization = 'NFC'`` as default, because some are
