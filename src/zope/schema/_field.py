@@ -25,7 +25,6 @@ from datetime import datetime
 from datetime import date
 from datetime import timedelta
 from datetime import time
-import decimal
 import re
 
 
@@ -106,6 +105,8 @@ from zope.schema._bootstrapfields import Bool
 from zope.schema._bootstrapfields import Int
 from zope.schema._bootstrapfields import Integral
 from zope.schema._bootstrapfields import Number
+from zope.schema._bootstrapfields import InvalidDecimalLiteral  # reimport
+from zope.schema._bootstrapfields import Decimal
 from zope.schema._bootstrapfields import Password
 from zope.schema._bootstrapfields import Rational
 from zope.schema._bootstrapfields import Real
@@ -147,6 +148,7 @@ classImplements(Real, IReal)
 classImplements(Rational, IRational)
 classImplements(Integral, IIntegral)
 classImplements(Int, IInt)
+classImplements(Decimal, IDecimal)
 
 classImplements(Object, IObject)
 
@@ -313,70 +315,6 @@ class Float(Real):
     _type = float
     _unicode_converters = (float,)
     _validation_error = InvalidFloatLiteral
-
-
-class InvalidDecimalLiteral(ValueError, ValidationError):
-    "Raised by decimal fields"
-
-
-@implementer(IDecimal)
-class Decimal(Number):
-    """
-    A field representing a native :class:`decimal.Decimal` and implementing
-    :class:`zope.schema.interfaces.IDecimal`.
-
-    The :meth:`fromUnicode` method only accepts values that can be parsed
-    by the ``Decimal`` constructor::
-
-        >>> from zope.schema._field import Decimal
-        >>> f = Decimal()
-        >>> f.fromUnicode("1")
-        Decimal('1')
-        >>> f.fromUnicode("125.6")
-        Decimal('125.6')
-        >>> f.fromUnicode("1+0j") # doctest: +IGNORE_EXCEPTION_DETAIL
-        Traceback (most recent call last):
-        ...
-        InvalidDecimalLiteral: Invalid literal for Decimal(): 1+0j
-        >>> f.fromUnicode("1/2") # doctest: +IGNORE_EXCEPTION_DETAIL
-        Traceback (most recent call last):
-        ...
-        InvalidDecimalLiteral: Invalid literal for Decimal(): 1/2
-        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256)) # doctest: +ELLIPSIS
-        Decimal('2349...936')
-        >>> f.fromUnicode("not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
-        Traceback (most recent call last):
-        ...
-        InvalidDecimalLiteral: could not convert string to float: not a number
-
-    Likewise for :meth:`fromBytes`::
-
-        >>> from zope.schema._field import Decimal
-        >>> f = Decimal()
-        >>> f.fromBytes(b"1")
-        Decimal('1')
-        >>> f.fromBytes(b"125.6")
-        Decimal('125.6')
-        >>> f.fromBytes(b"1+0j") # doctest: +IGNORE_EXCEPTION_DETAIL
-        Traceback (most recent call last):
-        ...
-        InvalidDecimalLiteral: Invalid literal for Decimal(): 1+0j
-        >>> f.fromBytes(b"1/2") # doctest: +IGNORE_EXCEPTION_DETAIL
-        Traceback (most recent call last):
-        ...
-        InvalidDecimalLiteral: Invalid literal for Decimal(): 1/2
-        >>> f.fromBytes((str(2**31234) + '.' + str(2**256)).encode("ascii")) # doctest: +ELLIPSIS
-        Decimal('2349...936')
-        >>> f.fromBytes(b"not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
-        Traceback (most recent call last):
-        ...
-        InvalidDecimalLiteral: could not convert string to float: not a number
-
-
-    """
-    _type = decimal.Decimal
-    _unicode_converters = (decimal.Decimal,)
-    _validation_error = InvalidDecimalLiteral
 
 
 @implementer(IDatetime)

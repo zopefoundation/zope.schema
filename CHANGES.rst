@@ -5,6 +5,10 @@
 5.0 (unreleased)
 ================
 
+- Set ``IDecimal`` attributes ``min``, ``max`` and ``default`` as ``Decimal``
+  type instead of ``Number``.
+  See `issue 88 <https://github.com/zopefoundation/zope.schema/issues/88>`_.
+
 - Enable unicode normalization for ``Text`` fields.
   The default is NFC normalization. Valid forms are 'NFC', 'NFKC', 'NFD', and
   'NFKD'. To disable normalization, set ``unicode_normalization`` to ``False``
