@@ -967,6 +967,7 @@ class TextTests(EqualityTestsMixin,
     def test_normalization(self):
         deadbeef = unicodedata.normalize('NFD', b'\xc3\x84\xc3\x96\xc3\x9c'.decode('utf-8'))
         txt = self._makeOne()
+        self.assertEqual(txt.unicode_normalization, 'NFC')
         self.assertEqual(
             [unicodedata.name(c) for c in txt.fromUnicode(deadbeef)],
             [
@@ -976,6 +977,7 @@ class TextTests(EqualityTestsMixin,
             ]
         )
         txt = self._makeOne(unicode_normalization=None)
+        self.assertEqual(txt.unicode_normalization, None)
         self.assertEqual(
             [unicodedata.name(c) for c in txt.fromUnicode(deadbeef)],
             [
@@ -988,6 +990,22 @@ class TextTests(EqualityTestsMixin,
             ]
         )
 
+    def test_normalization_after_pickle(self):
+        # test an edge case where `Text` is persisted
+        # see https://github.com/zopefoundation/zope.schema/issues/90
+        import pickle
+        orig_makeOne = self._makeOne
+        def makeOne(**kwargs):
+            result = orig_makeOne(**kwargs)
+            if not kwargs:
+                # We should have no state to preserve
+                result.__dict__.clear()
+
+            result = pickle.loads(pickle.dumps(result))
+            return result
+
+        self._makeOne = makeOne
+        self.test_normalization()
 
 
 class TextLineTests(EqualityTestsMixin,

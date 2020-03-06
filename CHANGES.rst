@@ -2,10 +2,12 @@
  Changes
 =========
 
-5.1 (unreleased)
-================
+5.0.1 (unreleased)
+==================
 
-- Nothing changed yet.
+- Fix: add ``Text.unicode_normalization = 'NFC'`` as default, because some are
+  persisting schema fields. Setting that attribute only in ``__init__``
+  breaks loading old objects.
 
 
 5.0 (2020-03-06)
