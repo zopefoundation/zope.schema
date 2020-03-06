@@ -12,7 +12,6 @@
 #
 ##############################################################################
 import datetime
-import decimal
 import doctest
 import unittest
 
@@ -312,62 +311,6 @@ class FloatTests(NumberTests):
         self.assertEqual(flt.fromUnicode(u'0'), 0.0)
         self.assertEqual(flt.fromUnicode(u'1.23'), 1.23)
         self.assertEqual(flt.fromUnicode(u'1.23e6'), 1230000.0)
-
-
-class DecimalTests(NumberTests):
-
-    mvm_missing_value = decimal.Decimal("-1")
-    mvm_default = decimal.Decimal("0")
-
-    MIN = decimal.Decimal(NumberTests.MIN)
-    MAX = decimal.Decimal(NumberTests.MAX)
-    VALID = tuple(decimal.Decimal(x) for x in NumberTests.VALID)
-    TOO_SMALL = tuple(decimal.Decimal(x) for x in NumberTests.TOO_SMALL)
-    TOO_BIG = tuple(decimal.Decimal(x) for x in NumberTests.TOO_BIG)
-
-    def _getTargetClass(self):
-        from zope.schema._field import Decimal
-        return Decimal
-
-    def _getTargetInterface(self):
-        from zope.schema.interfaces import IDecimal
-        return IDecimal
-
-    def test_validate_not_required(self):
-        field = self._makeOne(required=False)
-        field.validate(decimal.Decimal("10.0"))
-        field.validate(decimal.Decimal("0.93"))
-        field.validate(decimal.Decimal("1000.0003"))
-        field.validate(None)
-
-    def test_validate_required(self):
-        from zope.schema.interfaces import RequiredMissing
-        field = self._makeOne()
-        field.validate(decimal.Decimal("10.0"))
-        field.validate(decimal.Decimal("0.93"))
-        field.validate(decimal.Decimal("1000.0003"))
-        self.assertRaises(RequiredMissing, field.validate, None)
-
-    def test_fromUnicode_miss(self):
-        from zope.schema.interfaces import ValidationError
-        flt = self._makeOne()
-        self.assertRaises(ValueError, flt.fromUnicode, u'')
-        self.assertRaises(ValueError, flt.fromUnicode, u'abc')
-        with self.assertRaises(ValueError) as exc:
-            flt.fromUnicode(u'1.4G')
-
-        value_error = exc.exception
-        self.assertIs(value_error.field, flt)
-        self.assertEqual(value_error.value, u'1.4G')
-        self.assertIsInstance(value_error, ValidationError)
-
-    def test_fromUnicode_hit(self):
-        from decimal import Decimal
-
-        flt = self._makeOne()
-        self.assertEqual(flt.fromUnicode(u'0'), Decimal('0.0'))
-        self.assertEqual(flt.fromUnicode(u'1.23'), Decimal('1.23'))
-        self.assertEqual(flt.fromUnicode(u'12345.6'), Decimal('12345.6'))
 
 
 class DatetimeTests(OrderableMissingValueMixin,

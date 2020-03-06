@@ -23,6 +23,7 @@ from zope.interface.interfaces import IInterface
 
 from zope.schema._bootstrapfields import Bool
 from zope.schema._bootstrapfields import Complex
+from zope.schema._bootstrapfields import Decimal
 from zope.schema._bootstrapfields import Field
 from zope.schema._bootstrapfields import Int
 from zope.schema._bootstrapfields import Integral
@@ -643,6 +644,24 @@ class IFloat(IReal):
 
 class IDecimal(INumber):
     """Field containing a :class:`decimal.Decimal`"""
+
+    min = Decimal(
+        title=_("Start of the range"),
+        required=False,
+        default=None
+        )
+
+    max = Decimal(
+        title=_("End of the range (including the value itself)"),
+        required=False,
+        default=None
+        )
+
+    default = Decimal(
+        title=_("Default Value"),
+        description=_("""The field default value may be None or a legal
+                        field value""")
+        )
 
 ###
 # End numbers
