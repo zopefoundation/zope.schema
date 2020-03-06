@@ -505,9 +505,11 @@ class MinMaxLen(object):
 class Text(MinMaxLen, Field):
     """A field containing text used for human discourse."""
     _type = text_type
+    unicode_normalization = 'NFC'
 
     def __init__(self,  *args, **kw):
-        self.unicode_normalization = kw.pop('unicode_normalization', 'NFC')
+        self.unicode_normalization = kw.pop(
+            'unicode_normalization', self.unicode_normalization)
         super(Text, self).__init__(*args, **kw)
 
     def fromUnicode(self, value):
