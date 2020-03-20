@@ -2,11 +2,19 @@
  Changes
 =========
 
-5.0.2 (unreleased)
+6.0.0 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Require zope.interface 5.0.
 
+- Ensure the resolution orders of all fields are consistent and make
+  sense. In particular, ``Bool`` fields now correctly implement
+  ``IBool`` before ``IFromUnicode``. See `issue 80
+  <https://github.com/zopefoundation/zope.schema/issues/80>`_.
+
+- Add support for Python 3.8.
+
+- Drop support for Python 3.4.
 
 5.0.1 (2020-03-06)
 ==================

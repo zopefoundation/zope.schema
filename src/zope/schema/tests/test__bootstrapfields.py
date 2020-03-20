@@ -17,8 +17,9 @@ import unittest
 import unicodedata
 
 # pylint:disable=protected-access,inherit-non-class,blacklisted-name
+# pylint:disable=attribute-defined-outside-init
 
-class EqualityTestsMixin(object):
+class InterfaceConformanceTestsMixin(object):
 
     def _getTargetClass(self):
         raise NotImplementedError
@@ -53,6 +54,26 @@ class EqualityTestsMixin(object):
         for iface in self._getTargetInterfaces():
             verifyObject(iface, instance)
         return verifyObject
+
+    def test_iface_is_first_in_sro(self):
+        from zope.interface import implementedBy
+        implemented = implementedBy(self._getTargetClass())
+        __traceback_info__ = implemented.__sro__
+        self.assertIs(implemented, implemented.__sro__[0])
+        self.assertIs(self._getTargetInterface(), implemented.__sro__[1])
+
+    def test_implements_consistent__sro__(self):
+        from zope.interface import ro
+        from zope.interface import implementedBy
+        __traceback_info__ = implementedBy(self._getTargetClass()).__sro__
+        self.assertTrue(ro.is_consistent(implementedBy(self._getTargetClass())))
+
+    def test_iface_consistent_ro(self):
+        from zope.interface import ro
+        __traceback_info__ = self._getTargetInterface().__iro__
+        self.assertTrue(ro.is_consistent(self._getTargetInterface()))
+
+class EqualityTestsMixin(InterfaceConformanceTestsMixin):
 
     def test_is_hashable(self):
         field = self._makeOne()

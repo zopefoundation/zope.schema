@@ -15,6 +15,7 @@
 """
 import unittest
 
+# pylint:disable=inherit-non-class
 
 class FieldReadAccessorTests(unittest.TestCase):
 
@@ -59,15 +60,41 @@ class FieldReadAccessorTests(unittest.TestCase):
     def test___provides___w_field_w_provides(self):
         from zope.interface import implementedBy
         from zope.interface import providedBy
+        from zope.interface.interfaces import IAttribute
+        from zope.interface.interfaces import IMethod
         from zope.schema import Text
+
+        # When wrapping a field that provides stuff,
+        # we provide the same stuff, with the addition of
+        # IMethod at the correct spot in the IRO (just before
+        # IAttribute).
         field = Text()
         field_provides = list(providedBy(field))
         wrapped = self._makeOne(field)
         wrapped_provides = list(providedBy(wrapped))
-        self.assertEqual(wrapped_provides[:len(field_provides)],
-                         list(providedBy(field)))
+
+        index_of_attribute = field_provides.index(IAttribute)
+        expected = list(field_provides)
+        expected.insert(index_of_attribute, IMethod)
+        self.assertEqual(expected, wrapped_provides)
         for iface in list(implementedBy(self._getTargetClass())):
-            self.assertTrue(iface in wrapped_provides)
+            self.assertIn(iface, wrapped_provides)
+
+    def test___provides___w_field_w_provides_strict(self):
+        from zope.interface import ro
+        attr = 'STRICT_IRO'
+        try:
+            getattr(ro.C3, attr)
+        except AttributeError:
+            # https://github.com/zopefoundation/zope.interface/issues/194
+            # zope.interface 5.0.0 used this incorrect spelling.
+            attr = 'STRICT_RO'
+            getattr(ro.C3, attr)
+        setattr(ro.C3, attr, True)
+        try:
+            self.test___provides___w_field_w_provides()
+        finally:
+            setattr(ro.C3, attr, getattr(ro.C3, 'ORIG_' + attr))
 
     def test_getSignatureString(self):
         wrapped = self._makeOne()
@@ -180,7 +207,7 @@ class FieldReadAccessorTests(unittest.TestCase):
             pass
 
         writer = Writer()
-        writer.__name__ = 'setMe'
+        writer.__name__ = 'setMe' # pylint:disable=attribute-defined-outside-init
         getter.writer = writer
 
         class Foo(object):
