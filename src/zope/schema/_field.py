@@ -29,7 +29,9 @@ import re
 
 
 from zope.interface import classImplements
+from zope.interface import classImplementsFirst
 from zope.interface import implementer
+from zope.interface import implementedBy
 from zope.interface.interfaces import IInterface
 
 
@@ -135,23 +137,42 @@ classImplements(Field, IField)
 MinMaxLen.min_length = FieldProperty(IMinMaxLen['min_length'])
 MinMaxLen.max_length = FieldProperty(IMinMaxLen['max_length'])
 
-classImplements(Text, IText)
-classImplements(TextLine, ITextLine)
-classImplements(Password, IPassword)
-classImplements(Bool, IBool)
-classImplements(Iterable, IIterable)
-classImplements(Container, IContainer)
+classImplementsFirst(Text, IText)
+classImplementsFirst(TextLine, ITextLine)
+classImplementsFirst(Password, IPassword)
+classImplementsFirst(Bool, IBool)
+classImplementsFirst(Iterable, IIterable)
+classImplementsFirst(Container, IContainer)
 
-classImplements(Number, INumber)
-classImplements(Complex, IComplex)
-classImplements(Real, IReal)
-classImplements(Rational, IRational)
-classImplements(Integral, IIntegral)
-classImplements(Int, IInt)
-classImplements(Decimal, IDecimal)
+classImplementsFirst(Number, INumber)
+classImplementsFirst(Complex, IComplex)
+classImplementsFirst(Real, IReal)
+classImplementsFirst(Rational, IRational)
+classImplementsFirst(Integral, IIntegral)
+classImplementsFirst(Int, IInt)
+classImplementsFirst(Decimal, IDecimal)
 
-classImplements(Object, IObject)
+classImplementsFirst(Object, IObject)
 
+
+class implementer_if_needed(object):
+    # Helper to make sure we don't redundantly implement
+    # interfaces already inherited. Doing so tends to produce
+    # problems with the C3 order. This is used when we cannot
+    # statically determine if we need the interface or not, e.g,
+    # because we're picking different base classes under some circumstances.
+    def __init__(self, *ifaces):
+        self._ifaces = ifaces
+
+    def __call__(self, cls):
+        ifaces_needed = []
+        implemented = implementedBy(cls)
+        ifaces_needed = [
+            iface
+            for iface in self._ifaces
+            if not implemented.isOrExtends(iface)
+        ]
+        return implementer(*ifaces_needed)(cls)
 
 
 @implementer(ISourceText)
@@ -176,7 +197,7 @@ class Bytes(MinMaxLen, Field):
         return value
 
 
-@implementer(INativeString, IFromUnicode, IFromBytes)
+@implementer_if_needed(INativeString, IFromUnicode, IFromBytes)
 class NativeString(Text if PY3 else Bytes):
     """
     A native string is always the type `str`.
@@ -219,7 +240,7 @@ class BytesLine(Bytes):
         return b'\n' not in value
 
 
-@implementer(INativeStringLine, IFromUnicode, IFromBytes)
+@implementer_if_needed(INativeStringLine, IFromUnicode, IFromBytes)
 class NativeStringLine(TextLine if PY3 else BytesLine):
     """
     A native string is always the type `str`; this field excludes
@@ -462,7 +483,10 @@ class Choice(Field):
             raise ConstraintNotSatisfied(value, self.__name__).with_field_and_value(self, value)
 
 
-@implementer(IFromUnicode, IFromBytes)
+# Both of these are inherited from the parent; re-declaring them
+# here messes with the __sro__ of subclasses, causing them to be
+# inconsistent with C3.
+# @implementer(IFromUnicode, IFromBytes)
 class _StrippedNativeStringLine(NativeStringLine):
 
     _invalid_exc_type = None

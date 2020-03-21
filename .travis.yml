@@ -2,21 +2,17 @@ language: python
 sudo: false
 python:
   - 2.7
-  - 3.4
   - 3.5
   - 3.6
+  - 3.7
+  - 3.8
   - pypy
   - pypy3
-matrix:
-    include:
-        - python: "3.7"
-          dist: xenial
-          sudo: true
 
 script:
   - coverage run -m zope.testrunner --test-path=src
-  - sphinx-build                         -b html    -d docs/_build/doctrees docs docs/_build/html
-  - coverage run -a `which sphinx-build` -b doctest -d docs/_build/doctrees docs docs/_build/doctest
+  - sphinx-build              -b html    -d docs/_build/doctrees docs docs/_build/html
+  - coverage run -a -m sphinx -b doctest -d docs/_build/doctrees docs docs/_build/doctest
 
 after_success:
   - coveralls

@@ -36,24 +36,58 @@ specifications.  Write accessors are solely method specifications.
 
 from zope.interface import providedBy, implementedBy
 from zope.interface.interface import Method
+from zope.interface.declarations import Declaration
 
 
 class FieldReadAccessor(Method):
     """Field read accessor
     """
 
-    # A read field accessor is a method and a field.
-    # A read accessor is a decorator of a field, using the given
-    # fields properties to provide meta data.
-
-    def __provides__(self):
-        return providedBy(self.field) + implementedBy(FieldReadAccessor)
-    __provides__ = property(__provides__)
-
     def __init__(self, field):
         self.field = field
         Method.__init__(self, '')
         self.__doc__ = 'get %s' % field.__doc__
+
+    # A read field accessor is a method and a field.
+    # A read accessor is a decorator of a field, using the given
+    # field's properties to provide meta data.
+
+    @property
+    def __provides__(self):
+        provided = providedBy(self.field)
+        implemented = implementedBy(FieldReadAccessor)
+
+        # Declaration.__add__ is not very smart in zope.interface 5.0.0.
+        # It's very easy to produce C3 inconsistent orderings using
+        # it, because it uses itself plus any new interfaces from the
+        # second argument as the ``__bases__``, ignoring their
+        # relative order.
+        #
+        # Here, we can easily work around that. We know that ``field``
+        # will be some sub-class of Attribute, just as we are
+        # (FieldReadAccessor <- Method <- Attribute). So there will be
+        # overlap, and commonly only IMethod would be added to the end
+        # of the list of bases; but since IMethod extends IAttribute,
+        # having IAttribute earlier in the bases will be inconsistent.
+        # The fix here is to remove those duplicates from the first
+        # element so that we don't get into that situation.
+        provided_list = list(provided)
+        for iface in implemented:
+            if iface in provided_list:
+                provided_list.remove(iface)
+        provided = Declaration(*provided_list)
+        try:
+            return provided + implemented
+        except BaseException as e: # pragma: no cover pylint:disable=broad-except
+            # Sadly, zope.interface catches and silently ignores
+            # any exceptions raised in ``__providedBy__``,
+            # which is the class descriptor that invokes ``__provides__``.
+            # So, for example, if we're in strict C3 mode and fail to produce
+            # a resolution order, that gets ignored and we fallback to just what's
+            # implemented by the class.
+            # That's not good. Do our best to propagate the exception by returning it.
+            # There will be downstream errors later.
+            return e
 
     def getSignatureString(self):
         return '()'

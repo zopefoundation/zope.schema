@@ -711,7 +711,7 @@ class ChoiceTests(EqualityTestsMixin,
         from zope.schema.vocabulary import setVocabularyRegistry
 
         class Reg(object):
-            def get(*args):
+            def get(self, *args):
                 raise LookupError
 
         setVocabularyRegistry(Reg())
@@ -1369,7 +1369,7 @@ class SequenceTests(WrongTypeTestsMixin,
         from zope.schema._field import abc
 
         class MutableSequence(abc.MutableSequence):
-            def insert(self, item, ix):
+            def insert(self, index, value):
                 raise AssertionError("not implemented")
             def __getitem__(self, name):
                 raise AssertionError("not implemented")
@@ -1754,6 +1754,21 @@ class NativeStringLineTests(EqualityTestsMixin,
         self.assertEqual(field.fromUnicode(u'DEADBEEF'), 'DEADBEEF')
 
 
+class StrippedNativeStringLineTests(NativeStringLineTests):
+
+    def _getTargetClass(self):
+        from zope.schema._field import _StrippedNativeStringLine
+        return _StrippedNativeStringLine
+
+    def test_strips(self):
+        field = self._makeOne()
+        self.assertEqual(field.fromBytes(b' '), '')
+        self.assertEqual(field.fromUnicode(u' '), '')
+
+    def test_iface_is_first_in_sro(self):
+        self.skipTest("Not applicable; we inherit implementation but have no interface")
+
+
 def _makeSampleVocabulary():
     from zope.interface import implementer
     from zope.schema.interfaces import IVocabulary
@@ -1784,7 +1799,7 @@ def _makeDummyRegistry(v):
             VocabularyRegistry.__init__(self)
             self._vocabulary = vocabulary
 
-        def get(self, object, name):
+        def get(self, context, name):
             return self._vocabulary
     return DummyRegistry(v)
 
