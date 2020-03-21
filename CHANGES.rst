@@ -2,7 +2,7 @@
  Changes
 =========
 
-6.0.0 (unreleased)
+6.0.0 (2020-03-21)
 ==================
 
 - Require zope.interface 5.0.
