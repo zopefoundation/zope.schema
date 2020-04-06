@@ -73,6 +73,7 @@ setup(
         "Framework :: Zope :: 3",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
+    python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*',
     include_package_data=True,
     zip_safe=False,
     tests_require=TESTS_REQUIRE,
