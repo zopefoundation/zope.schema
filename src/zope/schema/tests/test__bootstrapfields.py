@@ -19,6 +19,7 @@ import unicodedata
 # pylint:disable=protected-access,inherit-non-class,blacklisted-name
 # pylint:disable=attribute-defined-outside-init
 
+
 class InterfaceConformanceTestsMixin(object):
 
     def _getTargetClass(self):
@@ -66,12 +67,14 @@ class InterfaceConformanceTestsMixin(object):
         from zope.interface import ro
         from zope.interface import implementedBy
         __traceback_info__ = implementedBy(self._getTargetClass()).__sro__
-        self.assertTrue(ro.is_consistent(implementedBy(self._getTargetClass())))
+        self.assertTrue(
+            ro.is_consistent(implementedBy(self._getTargetClass())))
 
     def test_iface_consistent_ro(self):
         from zope.interface import ro
         __traceback_info__ = self._getTargetInterface().__iro__
         self.assertTrue(ro.is_consistent(self._getTargetInterface()))
+
 
 class EqualityTestsMixin(InterfaceConformanceTestsMixin):
 
@@ -244,7 +247,8 @@ class LenTestsMixin(object):
 
 class WrongTypeTestsMixin(object):
 
-    def assertRaisesWrongType(self, field_or_meth, expected_type, *args, **kwargs):
+    def assertRaisesWrongType(self, field_or_meth, expected_type,
+                              *args, **kwargs):
         from zope.schema.interfaces import WrongType
         field = None
         with self.assertRaises(WrongType) as exc:
@@ -264,7 +268,6 @@ class WrongTypeTestsMixin(object):
         if not args and len(kwargs) == 1:
             # A single keyword argument
             self.assertIs(ex.value, kwargs.popitem()[1])
-
 
     def assertAllRaiseWrongType(self, field, expected_type, *values):
         for value in values:
@@ -986,7 +989,8 @@ class TextTests(EqualityTestsMixin,
         self.assertEqual(txt.fromUnicode(deadbeef), deadbeef)
 
     def test_normalization(self):
-        deadbeef = unicodedata.normalize('NFD', b'\xc3\x84\xc3\x96\xc3\x9c'.decode('utf-8'))
+        deadbeef = unicodedata.normalize(
+            'NFD', b'\xc3\x84\xc3\x96\xc3\x9c'.decode('utf-8'))
         txt = self._makeOne()
         self.assertEqual(txt.unicode_normalization, 'NFC')
         self.assertEqual(
@@ -1016,6 +1020,7 @@ class TextTests(EqualityTestsMixin,
         # see https://github.com/zopefoundation/zope.schema/issues/90
         import pickle
         orig_makeOne = self._makeOne
+
         def makeOne(**kwargs):
             result = orig_makeOne(**kwargs)
             if not kwargs:
@@ -1209,7 +1214,8 @@ class NumberTests(EqualityTestsMixin,
     def test_instance_conforms_to_iface(self):
         from zope.schema._bootstrapinterfaces import IFromUnicode
         from zope.schema._bootstrapinterfaces import IFromBytes
-        verifyObject = super(NumberTests, self).test_instance_conforms_to_iface()
+        verifyObject = (
+            super(NumberTests, self).test_instance_conforms_to_iface())
         verifyObject(IFromUnicode, self._makeOne())
         verifyObject(IFromBytes, self._makeOne())
 
@@ -1223,6 +1229,7 @@ class ComplexTests(NumberTests):
     def _getTargetInterface(self):
         from zope.schema.interfaces import IComplex
         return IComplex
+
 
 class RealTests(WrongTypeTestsMixin,
                 NumberTests):
@@ -1238,8 +1245,10 @@ class RealTests(WrongTypeTestsMixin,
     def test_ctor_real_min_max(self):
         from fractions import Fraction
 
-        self.assertRaisesWrongType(self._makeOne, self._getTargetClass()._type, min='')
-        self.assertRaisesWrongType(self._makeOne, self._getTargetClass()._type, max='')
+        self.assertRaisesWrongType(
+            self._makeOne, self._getTargetClass()._type, min='')
+        self.assertRaisesWrongType(
+            self._makeOne, self._getTargetClass()._type, max='')
 
         field = self._makeOne(min=Fraction(1, 2), max=2)
         field.validate(1.0)
@@ -1394,7 +1403,8 @@ class ObjectTests(EqualityTestsMixin,
     def _makeOneFromClass(self, cls, schema=None, *args, **kw):
         if schema is None:
             schema = self._makeSchema()
-        return super(ObjectTests, self)._makeOneFromClass(cls, schema, *args, **kw)
+        return super(ObjectTests, self)._makeOneFromClass(
+            cls, schema, *args, **kw)
 
     def _makeSchema(self, **kw):
         from zope.interface import Interface
@@ -1749,13 +1759,12 @@ class ObjectTests(EqualityTestsMixin,
                     raise Invalid("Bar is not valid")
 
         @implementer(ISchema)
-        class O(object):
+        class Obj(object):
             foo = u''
             bar = b''
 
-
         field = self._makeOne(ISchema)
-        inst = O()
+        inst = Obj()
 
         # Fine at first
         field.validate(inst)
@@ -1807,7 +1816,6 @@ class ObjectTests(EqualityTestsMixin,
         class ValueType(object):
             "The value type"
 
-
         field.validate(ValueType())
 
     def test_bound_field_of_collection_with_choice(self):
@@ -1823,7 +1831,6 @@ class ObjectTests(EqualityTestsMixin,
         from zope.schema.interfaces import SchemaNotCorrectlyImplemented
         from zope.schema.vocabulary import SimpleVocabulary
 
-
         @implementer(IContextSourceBinder)
         class EnumContext(object):
             def __call__(self, context):
@@ -1832,7 +1839,8 @@ class ObjectTests(EqualityTestsMixin,
         class IMultipleChoice(Interface):
             choices = Set(value_type=Choice(source=EnumContext()))
             # Provide a regular attribute to prove that binding doesn't
-            # choke. NOTE: We don't actually verify the existence of this attribute.
+            # choke. NOTE: We don't actually verify the existence of this
+            # attribute.
             non_field = Attribute("An attribute")
 
         @implementer(IMultipleChoice)
@@ -1843,13 +1851,12 @@ class ObjectTests(EqualityTestsMixin,
 
             def __iter__(self):
                 # EnumContext calls this to make the vocabulary.
-                # Fields of the schema of the IObject are bound to the value being
-                # validated.
+                # Fields of the schema of the IObject are bound to the value
+                # being validated.
                 return iter(range(5))
 
         class IFavorites(Interface):
             fav = Object(title=u"Favorites number", schema=IMultipleChoice)
-
 
         @implementer(IFavorites)
         class Favorites(object):
@@ -1924,6 +1931,6 @@ def test_suite():
     suite = unittest.defaultTestLoader.loadTestsFromName(__name__)
     suite.addTests(doctest.DocTestSuite(
         zope.schema._bootstrapfields,
-        optionflags=doctest.ELLIPSIS|IGNORE_EXCEPTION_MODULE_IN_PYTHON2
+        optionflags=doctest.ELLIPSIS | IGNORE_EXCEPTION_MODULE_IN_PYTHON2
     ))
     return suite

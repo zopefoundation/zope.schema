@@ -465,6 +465,7 @@ class INativeStringLine(ITextLine if PY3 else IBytesLine):
 class IPassword(ITextLine):
     "Field containing a unicode string without newlines that is a password."
 
+
 ###
 # Numbers
 ###
@@ -550,6 +551,7 @@ class IReal(IComplex):
                         field value""")
         )
 
+
 class IRational(IReal):
     """
     Field containing a rational number: :class:`numbers.IRational`.
@@ -576,6 +578,7 @@ class IRational(IReal):
                         field value""")
         )
 
+
 class IIntegral(IRational):
     """
     Field containing an integral number: class:`numbers.Integral`.
@@ -600,6 +603,8 @@ class IIntegral(IRational):
         description=_("""The field default value may be None or a legal
                         field value""")
         )
+
+
 ##
 # Concrete numbers
 ##
@@ -666,6 +671,7 @@ class IDecimal(INumber):
 ###
 # End numbers
 ###
+
 
 class IDatetime(IMinMax, IField):
     """Field containing a datetime."""
@@ -757,6 +763,7 @@ class IChoice(IField):
         default=None
         )
 
+
 # Collections:
 
 # Abstract
@@ -792,6 +799,7 @@ class IMutableSequence(ISequence):
     .. versionadded:: 4.6.0
     """
 
+
 class IUnorderedCollection(ICollection):
     """Abstract interface specifying that the value cannot be ordered"""
 
@@ -799,14 +807,16 @@ class IUnorderedCollection(ICollection):
 class IAbstractSet(IUnorderedCollection):
     """An unordered collection of unique values."""
 
-    unique = Bool(description="This ICollection interface attribute must be True")
+    unique = Bool(
+        description="This ICollection interface attribute must be True")
 
 
 class IAbstractBag(IUnorderedCollection):
     """An unordered collection of values, with no limitations on whether
     members are unique"""
 
-    unique = Bool(description="This ICollection interface attribute must be False")
+    unique = Bool(
+        description="This ICollection interface attribute must be False")
 
 
 # Concrete
@@ -844,16 +854,17 @@ class IObject(IField):
 
     schema = Object(
         IInterface,
-        description=_("The Interface that defines the Fields comprising the Object.")
+        description=_("The Interface that defines the Fields comprising the "
+                      "Object.")
     )
 
     validate_invariants = Bool(
         title=_("Validate Invariants"),
-        description=_("A boolean that says whether ``schema.validateInvariants`` "
-                      "is called from ``self.validate()``. The default is true."),
+        description=_("A boolean that says whether "
+                      "``schema.validateInvariants`` is called from "
+                      "``self.validate()``. The default is true."),
         default=True,
     )
-
 
 
 class IMapping(IMinMaxLen, IIterable, IContainer):
@@ -866,7 +877,8 @@ class IMapping(IMinMaxLen, IIterable, IContainer):
     """
     key_type = Object(
         IField,
-        description=_("Field keys must conform to the given type, expressed via a Field.")
+        description=_("Field keys must conform to the given type, expressed "
+                      "via a Field.")
     )
 
     value_type = Object(

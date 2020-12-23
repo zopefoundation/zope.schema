@@ -62,7 +62,7 @@ from zope.schema._compat import PY2
 
 class _NotGiven(object):
 
-    def __repr__(self): # pragma: no cover
+    def __repr__(self):  # pragma: no cover
         return "<Not Given>"
 
 
@@ -77,7 +77,10 @@ class ValidatedProperty(object):
         self._allow_none = allow_none
 
     def __set__(self, inst, value):
-        bypass_validation = (value is None and self._allow_none) or value == inst.missing_value
+        bypass_validation = (
+            (value is None and self._allow_none)
+            or value == inst.missing_value
+        )
         if not bypass_validation:
             if self._check is not None:
                 self._check(inst, value)
@@ -123,6 +126,7 @@ def getFields(schema):
         if IValidatable.providedBy(attr):
             fields[name] = attr
     return fields
+
 
 class _DocStringHelpers(object):
     # Namespace object to hold methods related to ReST formatting
@@ -286,7 +290,9 @@ class Field(Attribute):
     def validate(self, value):
         if value == self.missing_value:
             if self.required:
-                raise RequiredMissing(self.__name__).with_field_and_value(self, value)
+                raise RequiredMissing(
+                    self.__name__
+                ).with_field_and_value(self, value)
         else:
             try:
                 self._validate(value)
@@ -307,17 +313,20 @@ class Field(Attribute):
     def __hash__(self):
         # Equal objects should have equal hashes;
         # equal hashes does not imply equal objects.
-        value = (type(self), self.interface) + tuple(self.__get_property_names_to_compare())
+        value = (
+            (type(self), self.interface) +
+            tuple(self.__get_property_names_to_compare())
+        )
         return hash(value)
 
     def __eq__(self, other):
-        # should be the same type and in the same interface (or no interface at all)
+        # should be the same type and in the same interface (or no interface
+        # at all)
         if self is other:
             return True
 
         if type(self) != type(other) or self.interface != other.interface:
             return False
-
 
         # should have the same properties
         names = self.__get_property_names_to_compare()
@@ -335,7 +344,9 @@ class Field(Attribute):
 
     def _validate(self, value):
         if self._type is not None and not isinstance(value, self._type):
-            raise WrongType(value, self._type, self.__name__).with_field_and_value(self, value)
+            raise WrongType(
+                value, self._type, self.__name__
+            ).with_field_and_value(self, value)
 
         try:
             constraint = self.constraint(value)
@@ -346,7 +357,9 @@ class Field(Attribute):
                 e.value = value
             raise
         if not constraint:
-            raise ConstraintNotSatisfied(value, self.__name__).with_field_and_value(self, value)
+            raise ConstraintNotSatisfied(
+                value, self.__name__
+            ).with_field_and_value(self, value)
 
     def get(self, object):
         return getattr(object, self.__name__)
@@ -380,16 +393,20 @@ class Field(Attribute):
         """
 
         lines = []
-        lines.append(_DocStringHelpers.make_class_field('Implementation', type(self)))
+        lines.append(_DocStringHelpers.make_class_field(
+            'Implementation', type(self)))
         lines.append(_DocStringHelpers.make_field("Read Only", self.readonly))
         lines.append(_DocStringHelpers.make_field("Required", self.required))
         if self.defaultFactory:
-            lines.append(_DocStringHelpers.make_field("Default Factory", repr(self.defaultFactory)))
+            lines.append(_DocStringHelpers.make_field(
+                "Default Factory", repr(self.defaultFactory)))
         else:
-            lines.append(_DocStringHelpers.make_field("Default Value", repr(self.default)))
+            lines.append(_DocStringHelpers.make_field(
+                "Default Value", repr(self.default)))
 
         if self._type:
-            lines.append(_DocStringHelpers.make_class_field("Allowed Type", self._type))
+            lines.append(_DocStringHelpers.make_class_field(
+                "Allowed Type", self._type))
 
         # key_type and value_type are commonly used, but don't
         # have a common superclass to add them, so we do it here.
@@ -412,6 +429,7 @@ class Field(Attribute):
         lines.append('')
 
         return '\n'.join(lines)
+
 
 class Container(Field):
 
@@ -495,10 +513,12 @@ class MinMaxLen(object):
         super(MinMaxLen, self)._validate(value)
 
         if self.min_length is not None and len(value) < self.min_length:
-            raise TooShort(value, self.min_length).with_field_and_value(self, value)
+            raise TooShort(value, self.min_length).with_field_and_value(
+                self, value)
 
         if self.max_length is not None and len(value) > self.max_length:
-            raise TooLong(value, self.max_length).with_field_and_value(self, value)
+            raise TooLong(value, self.max_length).with_field_and_value(
+                self, value)
 
 
 @implementer(IFromUnicode)
@@ -514,15 +534,13 @@ class Text(MinMaxLen, Field):
 
     def fromUnicode(self, value):
         """
-        >>> from zope.schema.interfaces import WrongType
-        >>> from zope.schema.interfaces import ConstraintNotSatisfied
         >>> from zope.schema import Text
-        >>> from zope.schema._compat import text_type
         >>> t = Text(constraint=lambda v: 'x' in v)
         >>> t.fromUnicode(b"foo x spam") # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
-        zope.schema._bootstrapinterfaces.WrongType: ('foo x spam', <type 'unicode'>, '')
+        zope.schema._bootstrapinterfaces.WrongType:
+            ('foo x spam', <type 'unicode'>, '')
         >>> result = t.fromUnicode(u"foo x spam")
         >>> isinstance(result, bytes)
         False
@@ -531,11 +549,13 @@ class Text(MinMaxLen, Field):
         >>> t.fromUnicode(u"foo spam") # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
-        zope.schema._bootstrapinterfaces.ConstraintNotSatisfied: (u'foo spam', '')
+        zope.schema._bootstrapinterfaces.ConstraintNotSatisfied:
+            (u'foo spam', '')
         """
         if isinstance(value, text_type):
             if self.unicode_normalization:
-                value = unicodedata.normalize(self.unicode_normalization, value)
+                value = unicodedata.normalize(
+                    self.unicode_normalization, value)
         self.validate(value)
         return value
 
@@ -669,7 +689,8 @@ class Number(Orderable, Field):
         (1+0j)
         >>> f.fromUnicode(u"1/2")
         Fraction(1, 2)
-        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256)) # doctest: +ELLIPSIS
+        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256))
+        ... # doctest: +ELLIPSIS
         Decimal('234...936')
         >>> f.fromUnicode(u"not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
@@ -688,7 +709,8 @@ class Number(Orderable, Field):
         (1+0j)
         >>> f.fromBytes(b"1/2")
         Fraction(1, 2)
-        >>> f.fromBytes((str(2**31234) + '.' + str(2**256)).encode('ascii')) # doctest: +ELLIPSIS
+        >>> f.fromBytes((str(2**31234) + '.' + str(2**256)).encode('ascii'))
+        ... # doctest: +ELLIPSIS
         Decimal('234...936')
         >>> f.fromBytes(b"not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
@@ -702,14 +724,16 @@ class Number(Orderable, Field):
     """
     _type = numbers.Number
 
-    # An ordered sequence of conversion routines. These should accept
-    # a native string and produce an object that is an instance of `_type`, or raise
-    # a ValueError. The order should be most specific/strictest towards least
-    # restrictive (in other words, lowest in the numeric tower towards highest).
-    # We break this rule with fractions, though: a floating point number is
-    # more generally useful and expected than a fraction, so we attempt to parse
-    # as a float before a fraction.
-    _unicode_converters = (int, float, fractions.Fraction, complex, decimal.Decimal)
+    # An ordered sequence of conversion routines. These should accept a
+    # native string and produce an object that is an instance of `_type`, or
+    # raise a ValueError. The order should be most specific/strictest
+    # towards least restrictive (in other words, lowest in the numeric tower
+    # towards highest). We break this rule with fractions, though: a
+    # floating point number is more generally useful and expected than a
+    # fraction, so we attempt to parse as a float before a fraction.
+    _unicode_converters = (
+        int, float, fractions.Fraction, complex, decimal.Decimal,
+    )
 
     # The type of error we will raise if all conversions fail.
     _validation_error = InvalidNumberLiteral
@@ -719,7 +743,9 @@ class Number(Orderable, Field):
         for converter in self._unicode_converters:
             try:
                 val = converter(value)
-                if converter is float and isinf(val) and decimal.Decimal in self._unicode_converters:
+                if (converter is float
+                        and isinf(val)
+                        and decimal.Decimal in self._unicode_converters):
                     # Pass this on to decimal, if we're allowed
                     val = decimal.Decimal(value)
             except (ValueError, decimal.InvalidOperation) as e:
@@ -728,13 +754,14 @@ class Number(Orderable, Field):
                 self.validate(val)
                 return val
         try:
-            raise self._validation_error(*last_exc.args).with_field_and_value(self, value)
+            raise self._validation_error(*last_exc.args).with_field_and_value(
+                self, value)
         finally:
             last_exc = None
 
     # On Python 2, native strings are byte strings, which is
     # what the converters expect, so we don't need to do any decoding.
-    if PY2: # pragma: no cover
+    if PY2:  # pragma: no cover
         fromBytes = fromUnicode
     else:
         def fromBytes(self, value):
@@ -759,7 +786,8 @@ class Complex(Number):
         (1+0j)
         >>> f.fromUnicode(u"1/2")
         Fraction(1, 2)
-        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256)) # doctest: +ELLIPSIS
+        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256))
+        ... # doctest: +ELLIPSIS
         inf
         >>> f.fromUnicode(u"not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
@@ -778,7 +806,8 @@ class Complex(Number):
         (1+0j)
         >>> f.fromBytes(b"1/2")
         Fraction(1, 2)
-        >>> f.fromBytes((str(2**31234) + '.' + str(2**256)).encode('ascii')) # doctest: +ELLIPSIS
+        >>> f.fromBytes((str(2**31234) + '.' + str(2**256)).encode('ascii'))
+        ... # doctest: +ELLIPSIS
         inf
         >>> f.fromBytes(b"not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
@@ -811,7 +840,8 @@ class Real(Complex):
         InvalidNumberLiteral: Invalid literal for Fraction: '1+0j'
         >>> f.fromUnicode("1/2")
         Fraction(1, 2)
-        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256)) # doctest: +ELLIPSIS
+        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256))
+        ... # doctest: +ELLIPSIS
         inf
         >>> f.fromUnicode("not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
@@ -844,7 +874,8 @@ class Rational(Real):
         Traceback (most recent call last):
         ...
         InvalidNumberLiteral: Invalid literal for Fraction: '1+0j'
-        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256)) # doctest: +ELLIPSIS
+        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256))
+        ... # doctest: +ELLIPSIS
         Fraction(777..., 330...)
         >>> f.fromUnicode("not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
@@ -929,7 +960,8 @@ class Decimal(Number):
         Traceback (most recent call last):
         ...
         InvalidDecimalLiteral: Invalid literal for Decimal(): 1/2
-        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256)) # doctest: +ELLIPSIS
+        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256))
+        ... # doctest: +ELLIPSIS
         Decimal('2349...936')
         >>> f.fromUnicode("not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
@@ -952,7 +984,8 @@ class Decimal(Number):
         Traceback (most recent call last):
         ...
         InvalidDecimalLiteral: Invalid literal for Decimal(): 1/2
-        >>> f.fromBytes((str(2**31234) + '.' + str(2**256)).encode("ascii")) # doctest: +ELLIPSIS
+        >>> f.fromBytes((str(2**31234) + '.' + str(2**256)).encode("ascii"))
+        ... # doctest: +ELLIPSIS
         Decimal('2349...936')
         >>> f.fromBytes(b"not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
@@ -1010,7 +1043,7 @@ def get_schema_validation_errors(schema, value,
         for name in schema.names(all=True):
             attribute = schema[name]
             if IMethod.providedBy(attribute):
-                continue # pragma: no cover
+                continue  # pragma: no cover
 
             try:
                 if IValidatable.providedBy(attribute):
@@ -1022,7 +1055,9 @@ def get_schema_validation_errors(schema, value,
                 errors[name] = error
             except AttributeError as error:
                 # property for the given name is not implemented
-                errors[name] = SchemaNotFullyImplemented(error).with_field_and_value(attribute, None)
+                errors[name] = SchemaNotFullyImplemented(
+                    error
+                ).with_field_and_value(attribute, None)
     finally:
         ids_being_validated.remove(id_value)
     return errors
@@ -1074,12 +1109,13 @@ class Object(Field):
         """
         Object(schema=<Not Given>, *, validate_invariants=True, **kwargs)
 
-        Create an `~.IObject` field. The keyword arguments are as for `~.Field`.
+        Create an `~.IObject` field. The keyword arguments are as for
+        `~.Field`.
 
         .. versionchanged:: 4.6.0
-           Add the keyword argument *validate_invariants*. When true (the default),
-           the schema's ``validateInvariants`` method will be invoked to check
-           the ``@invariant`` properties of the schema.
+           Add the keyword argument *validate_invariants*. When true (the
+           default), the schema's ``validateInvariants`` method will be
+           invoked to check the ``@invariant`` properties of the schema.
         .. versionchanged:: 4.6.0
            The *schema* argument can be ommitted in a subclass
            that specifies a ``schema`` attribute.
@@ -1099,7 +1135,8 @@ class Object(Field):
 
     def getExtraDocLines(self):
         lines = super(Object, self).getExtraDocLines()
-        lines.append(_DocStringHelpers.make_class_field("Must Provide", self.schema))
+        lines.append(_DocStringHelpers.make_class_field(
+            "Must Provide", self.schema))
         return lines
 
     def _validate(self, value):
@@ -1107,7 +1144,8 @@ class Object(Field):
 
         # schema has to be provided by value
         if not self.schema.providedBy(value):
-            raise SchemaNotProvided(self.schema, value).with_field_and_value(self, value)
+            raise SchemaNotProvided(self.schema, value).with_field_and_value(
+                self, value)
 
         # check the value against schema
         schema_error_dict, invariant_errors = get_validation_errors(

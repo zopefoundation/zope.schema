@@ -76,17 +76,18 @@ class FieldReadAccessor(Method):
             if iface in provided_list:
                 provided_list.remove(iface)
         provided = Declaration(*provided_list)
+        # pylint:disable=broad-except
         try:
             return provided + implemented
-        except BaseException as e: # pragma: no cover pylint:disable=broad-except
+        except BaseException as e:  # pragma: no cover
             # Sadly, zope.interface catches and silently ignores
             # any exceptions raised in ``__providedBy__``,
             # which is the class descriptor that invokes ``__provides__``.
             # So, for example, if we're in strict C3 mode and fail to produce
-            # a resolution order, that gets ignored and we fallback to just what's
-            # implemented by the class.
-            # That's not good. Do our best to propagate the exception by returning it.
-            # There will be downstream errors later.
+            # a resolution order, that gets ignored and we fallback to just
+            # what's implemented by the class.
+            # That's not good. Do our best to propagate the exception by
+            # returning it. There will be downstream errors later.
             return e
 
     def getSignatureString(self):

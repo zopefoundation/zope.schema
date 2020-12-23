@@ -70,7 +70,10 @@ def getValidationErrors(schema, value):
         # Valid! Yay!
         return []
 
-    return list(schema_error_dict.items()) + [(None, e) for e in invariant_errors]
+    return (
+        list(schema_error_dict.items()) +
+        [(None, e) for e in invariant_errors]
+    )
 
 
 def getSchemaValidationErrors(schema, value):

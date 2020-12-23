@@ -24,6 +24,7 @@ from zope.schema._messageid import _
 # pylint:disable=inherit-non-class,keyword-arg-before-vararg,
 # pylint:disable=no-self-argument
 
+
 class StopValidation(Exception):
     """Raised if the validation is completed early.
 
@@ -219,14 +220,17 @@ class SchemaNotCorrectlyImplemented(WrongContainedType):
     #: of the schema.
     invariant_errors = ()
 
-    def __init__(self, errors=None, name=None, schema_errors=None, invariant_errors=(), *args):
+    def __init__(self, errors=None, name=None, schema_errors=None,
+                 invariant_errors=(), *args):
         """
-        SchemaNotCorrectlyImplemented(errors, name, schema_errors, invariant_errors)
+        SchemaNotCorrectlyImplemented(errors, name, schema_errors,
+                                      invariant_errors)
 
         .. versionchanged:: 4.7.0
            Added named arguments to the constructor.
         """
-        super(SchemaNotCorrectlyImplemented, self).__init__(errors, name, *args)
+        super(SchemaNotCorrectlyImplemented, self).__init__(
+            errors, name, *args)
         self.schema_errors = schema_errors
         self.invariant_errors = invariant_errors
 
@@ -344,7 +348,7 @@ class IValidatable(zope.interface.Interface):
 
 
 class NO_VALUE(object):
-    def __repr__(self): # pragma: no cover
+    def __repr__(self):  # pragma: no cover
         return '<NO_VALUE>'
 
 
