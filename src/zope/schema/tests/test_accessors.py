@@ -85,7 +85,7 @@ class FieldReadAccessorTests(unittest.TestCase):
         attr = 'STRICT_IRO'
         try:
             getattr(ro.C3, attr)
-        except AttributeError:
+        except AttributeError:  # pragma: no cover
             # https://github.com/zopefoundation/zope.interface/issues/194
             # zope.interface 5.0.0 used this incorrect spelling.
             attr = 'STRICT_RO'
