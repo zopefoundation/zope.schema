@@ -22,7 +22,7 @@ if PY3:  # pragma: no cover
 
 else:  # pragma: no cover
 
-    string_types = basestring,      # noqa: F821
+    string_types = (basestring, )   # noqa: F821
     text_type = unicode             # noqa: F821
     binary_type = str               # noqa: F821
     integer_types = (int, long)     # noqa: F821
