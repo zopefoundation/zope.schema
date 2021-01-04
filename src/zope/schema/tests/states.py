@@ -16,7 +16,6 @@
 
 from zope.interface import implementer
 from zope.schema import interfaces
-from zope.schema import Choice
 
 # This table is based on information from the United States Postal Service:
 # http://www.usps.com/ncsc/lookups/abbreviations.html#states
@@ -90,6 +89,7 @@ class State(object):
     def __init__(self, value, title):
         self.value = value
         self.title = title
+
 
 for v, p in _states.items():
     _states[v] = State(v, p)

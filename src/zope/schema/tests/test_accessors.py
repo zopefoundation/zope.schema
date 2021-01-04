@@ -17,6 +17,7 @@ import unittest
 
 # pylint:disable=inherit-non-class
 
+
 class FieldReadAccessorTests(unittest.TestCase):
 
     def _getTargetClass(self):
@@ -207,7 +208,9 @@ class FieldReadAccessorTests(unittest.TestCase):
             pass
 
         writer = Writer()
-        writer.__name__ = 'setMe' # pylint:disable=attribute-defined-outside-init
+        # pylint:disable=attribute-defined-outside-init
+        writer.__name__ = 'setMe'
+        # pylint:enable=attribute-defined-outside-init
         getter.writer = writer
 
         class Foo(object):

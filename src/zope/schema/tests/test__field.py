@@ -29,6 +29,7 @@ from zope.schema.tests.test__bootstrapfields import NumberTests
 # pylint:disable=no-member
 # pylint:disable=blacklisted-name
 
+
 class BytesTests(EqualityTestsMixin,
                  WrongTypeTestsMixin,
                  unittest.TestCase):
@@ -274,7 +275,6 @@ class FloatTests(NumberTests):
     TOO_SMALL = tuple(float(x) for x in NumberTests.TOO_SMALL)
     TOO_BIG = tuple(float(x) for x in NumberTests.TOO_BIG)
 
-
     def _getTargetClass(self):
         from zope.schema._field import Float
         return Float
@@ -448,7 +448,8 @@ class TimedeltaTests(OrderableMissingValueMixin,
     MIN = datetime.timedelta(minutes=NumberTests.MIN)
     MAX = datetime.timedelta(minutes=NumberTests.MAX)
     VALID = tuple(datetime.timedelta(minutes=x) for x in NumberTests.VALID)
-    TOO_SMALL = tuple(datetime.timedelta(minutes=x) for x in NumberTests.TOO_SMALL)
+    TOO_SMALL = tuple(
+        datetime.timedelta(minutes=x) for x in NumberTests.TOO_SMALL)
     TOO_BIG = tuple(datetime.timedelta(x) for x in NumberTests.TOO_BIG)
 
 
@@ -505,9 +506,9 @@ class ChoiceTests(EqualityTestsMixin,
 
     def _makeOneFromClass(self, cls, *args, **kwargs):
         if (not args
-            and 'vocabulary' not in kwargs
-            and 'values' not in kwargs
-            and 'source' not in kwargs):
+                and 'vocabulary' not in kwargs
+                and 'values' not in kwargs
+                and 'source' not in kwargs):
             from zope.schema.vocabulary import SimpleVocabulary
             kwargs['vocabulary'] = SimpleVocabulary.fromValues([1, 2, 3])
         return super(ChoiceTests, self)._makeOneFromClass(cls, *args, **kwargs)
@@ -516,12 +517,12 @@ class ChoiceTests(EqualityTestsMixin,
         from zope.schema.interfaces import IChoice
         return IChoice
 
-
     def test_ctor_wo_values_vocabulary_or_source(self):
         self.assertRaises(ValueError, self._getTargetClass())
 
     def test_ctor_invalid_vocabulary(self):
-        self.assertRaises(ValueError, self._getTargetClass(), vocabulary=object())
+        self.assertRaises(ValueError,
+                          self._getTargetClass(), vocabulary=object())
 
     def test_ctor_invalid_source(self):
         self.assertRaises(ValueError, self._getTargetClass(), source=object())
@@ -552,8 +553,8 @@ class ChoiceTests(EqualityTestsMixin,
                          sorted(values))
         self.assertEqual(
             sorted(choose.vocabulary.by_token.keys()),
-            sorted([x.encode('ascii', 'backslashreplace').decode('ascii') for x in values]))
-
+            sorted([x.encode('ascii', 'backslashreplace').decode('ascii')
+                    for x in values]))
 
     def test_ctor_w_named_vocabulary(self):
         choose = self._makeOne(vocabulary="vocab")
@@ -724,6 +725,7 @@ class ChoiceTests(EqualityTestsMixin,
 
         class Reg(object):
             called_with = ()
+
             def get(self, *args):
                 self.called_with += args
                 return _makeSampleVocabulary()
@@ -1006,7 +1008,8 @@ class DottedNameTests(EqualityTestsMixin,
 
         # Underscores are allowed in any component
         self.assertEqual(field.fromUnicode(u'dotted._name'), 'dotted._name')
-        self.assertEqual(field.fromUnicode(u'_leading_underscore'), '_leading_underscore')
+        self.assertEqual(field.fromUnicode(u'_leading_underscore'),
+                         '_leading_underscore')
         self.assertEqual(field.fromUnicode(u'_dotted.name'), '_dotted.name')
         self.assertEqual(field.fromUnicode(u'_dotted._name'), '_dotted._name')
 
@@ -1181,7 +1184,6 @@ class CollectionTests(EqualityTestsMixin,
 
     _makeCollection = list
 
-
     def test_schema_defined_by_subclass(self):
         from zope import interface
         from zope.schema import Object
@@ -1216,7 +1218,6 @@ class CollectionTests(EqualityTestsMixin,
         @interface.implementer(IValueType)
         class ValueType(object):
             "The value type"
-
 
         field.validate(self._makeCollection([ValueType()]))
 
@@ -1358,6 +1359,7 @@ class SequenceTests(WrongTypeTestsMixin,
         class Sequence(abc.Sequence):
             def __getitem__(self, i):
                 raise AssertionError("Not implemented")
+
             def __len__(self):
                 return 0
 
@@ -1371,16 +1373,20 @@ class SequenceTests(WrongTypeTestsMixin,
         class MutableSequence(abc.MutableSequence):
             def insert(self, index, value):
                 raise AssertionError("not implemented")
+
             def __getitem__(self, name):
                 raise AssertionError("not implemented")
+
             def __iter__(self):
                 return iter(())
+
             def __setitem__(self, name, value):
                 raise AssertionError("Not implemented")
+
             def __len__(self):
                 return 0
-            __delitem__ = __getitem__
 
+            __delitem__ = __getitem__
 
         sequence = MutableSequence()
         field = self._makeOne()
@@ -1479,7 +1485,7 @@ class SetTests(WrongTypeTestsMixin,
 
     def test_ctor_disallows_unique(self):
         self.assertRaises(TypeError, self._makeOne, unique=False)
-        self._makeOne(unique=True) # restating the obvious is allowed
+        self._makeOne(unique=True)  # restating the obvious is allowed
         self.assertTrue(self._makeOne().unique)
 
     def test_validate_wrong_types(self):
@@ -1599,7 +1605,6 @@ class MappingTests(EqualityTestsMixin,
         self.assertIsInstance(wct.errors[0], WrongType)
         self.assertIs(field.value_type._type, wct.errors[0].expected_type)
 
-
     def test_validate_min_length(self):
         field = self._makeOne(min_length=1)
         field.validate({1: 'a'})
@@ -1635,11 +1640,12 @@ class MappingTests(EqualityTestsMixin,
 
             def __getitem__(self, name):
                 raise AssertionError("not implemented")
+
             def __iter__(self):
                 return iter(())
+
             def __len__(self):
                 return 0
-
 
         mm = Mapping()
         field = self._makeOne()
@@ -1652,12 +1658,16 @@ class MappingTests(EqualityTestsMixin,
 
             def __getitem__(self, name):
                 raise AssertionError("not implemented")
+
             def __iter__(self):
                 return iter(())
+
             def __setitem__(self, name, value):
                 raise AssertionError("Not implemented")
+
             def __len__(self):
                 return 0
+
             __delitem__ = __getitem__
 
         mm = MutableMapping()
@@ -1695,6 +1705,7 @@ class DictTests(MutableMappingTests):
         from zope.schema.interfaces import WrongType
         with self.assertRaises(WrongType):
             super(DictTests, self).test_mutable_mapping()
+
 
 class NativeStringTests(EqualityTestsMixin,
                         WrongTypeTestsMixin,
@@ -1766,7 +1777,8 @@ class StrippedNativeStringLineTests(NativeStringLineTests):
         self.assertEqual(field.fromUnicode(u' '), '')
 
     def test_iface_is_first_in_sro(self):
-        self.skipTest("Not applicable; we inherit implementation but have no interface")
+        self.skipTest("Not applicable; we inherit implementation but have no "
+                      "interface")
 
 
 def _makeSampleVocabulary():
@@ -1782,7 +1794,7 @@ def _makeSampleVocabulary():
         def __contains__(self, value):
             return 0 <= value < 10
 
-        def __len__(self): # pragma: no cover
+        def __len__(self):  # pragma: no cover
             return 10
 
         def getTerm(self, value):

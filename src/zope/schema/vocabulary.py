@@ -217,7 +217,10 @@ class SimpleVocabulary(object):
         if not isinstance(other, SimpleVocabulary):
             return False
 
-        return self._terms == other._terms and providedBy(self) == providedBy(other)
+        return (
+            self._terms == other._terms
+            and providedBy(self) == providedBy(other)
+        )
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -329,7 +332,8 @@ class TreeVocabulary(object):
 
         The tuples should have either 2 or 3 values, i.e:
         (token, value, title) or (token, value). Only tuples that have
-        three values will create a :class:`zope.schema.interfaces.ITitledTokenizedTerm`.
+        three values will create a
+        :class:`zope.schema.interfaces.ITitledTokenizedTerm`.
 
         For example, a dict with 2-valued tuples::
 
@@ -472,6 +476,7 @@ class VocabularyRegistry(object):
     def register(self, name, factory):
         """Register a *factory* for the vocabulary with the given *name*."""
         self._map[name] = factory
+
 
 _vocabularies = None
 

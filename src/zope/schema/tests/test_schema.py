@@ -42,8 +42,8 @@ def _makeSchema():
 
 def _makeDerivedSchema(base=None):
 
-
     from zope.schema import Bytes
+
     if base is None:
         base = _makeSchema()
 
@@ -224,7 +224,6 @@ class Test_getSchemaValidationErrors(unittest.TestCase):
     def test_schema_with_fields_ok(self):
         from zope.interface import Interface
         from zope.schema import Text
-
 
         class IWithFields(Interface):
             foo = Text()

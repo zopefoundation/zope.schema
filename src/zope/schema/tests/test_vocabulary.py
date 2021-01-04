@@ -72,10 +72,7 @@ class SimpleTermTests(unittest.TestCase):
         self.assertEqual(term.token, 'Snowman \\u2603')
         self.assertFalse(ITitledTokenizedTerm.providedBy(term))
 
-
     def test__eq__and__hash__(self):
-        from zope import interface
-
         term = self._makeOne('value')
         # Equal to itself
         self.assertEqual(term, term)
@@ -387,10 +384,10 @@ class TreeVocabularyTests(unittest.TestCase):
         self.assertTrue(IStupid.providedBy(v))
 
     def test_ordering(self):
-        #The TreeVocabulary makes use of an OrderedDict to store it's
-        #internal tree representation.
+        # The TreeVocabulary makes use of an OrderedDict to store its
+        # internal tree representation.
         #
-        #Check that they keys are indeed oredered.
+        # Check that the keys are indeed ordered.
         from collections import OrderedDict
 
         d = {
@@ -648,7 +645,7 @@ class TreeVocabularyTests(unittest.TestCase):
             self.assertEqual(str(e), "Term tokens must be unique: 'one'")
 
     def test_recursive_methods(self):
-        #Test the _createTermTree and _getPathToTreeNode methods
+        # Test the _createTermTree and _getPathToTreeNode methods
         from zope.schema.vocabulary import _createTermTree
         tree = _createTermTree({}, self.business_tree())
         vocab = self._getTargetClass().fromDict(self.business_tree())
@@ -681,7 +678,7 @@ class TreeVocabularyTests(unittest.TestCase):
 
 
 class RegistryTests(unittest.TestCase):
-    #Tests of the simple vocabulary and presentation registries.
+    # Tests of the simple vocabulary and presentation registries.
 
     def setUp(self):
         from zope.schema.vocabulary import _clear
@@ -723,7 +720,7 @@ def _makeSampleVocabulary():
         def __contains__(self, value):
             return 0 <= value < 10
 
-        def __len__(self): # pragma: no cover
+        def __len__(self):  # pragma: no cover
             return 10
 
         def getTerm(self, value):

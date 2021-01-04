@@ -288,7 +288,8 @@ class FieldPropertyTests(_Base, _Integration):
         self.assertEqual(event.new_value, 0)
         self.assertEqual(
             [ev.field.__name__ for ev in log],
-            ['min_length', 'max_length', 'title', 'description', 'required', 'readonly'])
+            ['min_length', 'max_length', 'title', 'description', 'required',
+             'readonly'])
 
     def test_field_event_update(self):
         from zope.schema import Text
@@ -517,7 +518,7 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
                 return default
 
             def set(self, inst, value):
-                if self.readonly: # pragma: no cover
+                if self.readonly:  # pragma: no cover
                     raise ValueError
                 setattr(inst, 'faux', value)
 
@@ -608,7 +609,8 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
         # these are fieldproperties in the field
         self.assertEqual(
             [ev.field.__name__ for ev in log],
-            ['min_length', 'max_length', 'title', 'description', 'required', 'readonly'])
+            ['min_length', 'max_length', 'title', 'description', 'required',
+             'readonly'])
         event = log[0]
         self.assertTrue(isinstance(event, FieldUpdatedEvent))
         self.assertEqual(event.inst, field)
@@ -621,8 +623,6 @@ def _getSchema():
     from zope.schema import Bytes
     from zope.schema import Float
     from zope.schema import Text
-
-
 
     class Schema(Interface):
         title = Text(description=u"Short summary",

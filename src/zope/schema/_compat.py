@@ -22,15 +22,15 @@ if PY3:  # pragma: no cover
 
 else:  # pragma: no cover
 
-    string_types = basestring,
-    text_type = unicode
-    binary_type = str
-    integer_types = (int, long)
+    string_types = (basestring, )   # noqa: F821
+    text_type = unicode             # noqa: F821
+    binary_type = str               # noqa: F821
+    integer_types = (int, long)     # noqa: F821
 
     def non_native_string(x):
-        if isinstance(x, unicode):
+        if isinstance(x, unicode):  # noqa: F821
             return x
-        return unicode(x, 'unicode_escape')
+        return unicode(x, 'unicode_escape')  # noqa: F821
 
     def make_binary(x):
         if isinstance(x, str):

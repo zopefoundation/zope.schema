@@ -19,6 +19,7 @@ except NameError:
     def compare(a, b):
         return -1 if a < b else (0 if a == b else 1)
 
+
 class ValidationErrorTests(unittest.TestCase):
 
     def _getTargetClass(self):

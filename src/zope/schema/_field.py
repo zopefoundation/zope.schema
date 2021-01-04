@@ -17,7 +17,7 @@ __docformat__ = 'restructuredtext'
 
 try:
     from collections import abc
-except ImportError: # pragma: no cover
+except ImportError:  # pragma: PY2
     # Python 2
     import collections as abc
 
@@ -107,7 +107,7 @@ from zope.schema._bootstrapfields import Bool
 from zope.schema._bootstrapfields import Int
 from zope.schema._bootstrapfields import Integral
 from zope.schema._bootstrapfields import Number
-from zope.schema._bootstrapfields import InvalidDecimalLiteral  # reimport
+from zope.schema._bootstrapfields import InvalidDecimalLiteral  # noqa: reexport
 from zope.schema._bootstrapfields import Decimal
 from zope.schema._bootstrapfields import Password
 from zope.schema._bootstrapfields import Rational
@@ -207,8 +207,8 @@ class NativeString(Text if PY3 else Bytes):
     :class:`~zope.schema.interfaces.IFromBytes`.
 
     .. versionchanged:: 4.9.0
-       This is now a distinct type instead of an alias for either `Text` or `Bytes`,
-       depending on the platform.
+       This is now a distinct type instead of an alias for either `Text` or
+       `Bytes`, depending on the platform.
     """
     _type = str
 
@@ -302,7 +302,8 @@ class Float(Real):
         Traceback (most recent call last):
         ...
         InvalidFloatLiteral: invalid literal for float(): 1/2
-        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256)) # doctest: +ELLIPSIS
+        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256))
+        ... # doctest: +ELLIPSIS
         inf
         >>> f.fromUnicode("not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
@@ -325,7 +326,8 @@ class Float(Real):
         Traceback (most recent call last):
         ...
         InvalidFloatLiteral: invalid literal for float(): 1/2
-        >>> f.fromBytes((str(2**31234) + '.' + str(2**256)).encode('ascii')) # doctest: +ELLIPSIS
+        >>> f.fromBytes((str(2**31234) + '.' + str(2**256)).encode('ascii'))
+        ... # doctest: +ELLIPSIS
         inf
         >>> f.fromBytes(b"not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
@@ -355,7 +357,9 @@ class Date(Orderable, Field):
     def _validate(self, value):
         super(Date, self)._validate(value)
         if isinstance(value, datetime):
-            raise WrongType(value, self._type, self.__name__).with_field_and_value(self, value)
+            raise WrongType(
+                value, self._type, self.__name__
+            ).with_field_and_value(self, value)
 
 
 @implementer(ITimedelta)
@@ -376,6 +380,7 @@ class MissingVocabularyError(ValidationError,
     """Raised when a named vocabulary cannot be found."""
     # Subclasses ValueError and LookupError for backwards compatibility
 
+
 class InvalidVocabularyError(ValidationError,
                              ValueError,
                              TypeError):
@@ -383,7 +388,8 @@ class InvalidVocabularyError(ValidationError,
     # Subclasses TypeError and ValueError for backwards compatibility
 
     def __init__(self, vocabulary):
-        super(InvalidVocabularyError, self).__init__("Invalid vocabulary %r" % (vocabulary,))
+        super(InvalidVocabularyError, self).__init__(
+            "Invalid vocabulary %r" % (vocabulary,))
 
 
 @implementer(IChoice, IFromUnicode)
@@ -442,7 +448,8 @@ class Choice(Field):
         # an exception if this isn't possible, and returning
         # an ISource otherwise.
         vocabulary = self.vocabulary
-        if IContextSourceBinder.providedBy(vocabulary) and self.context is not None:
+        if (IContextSourceBinder.providedBy(vocabulary)
+                and self.context is not None):
             vocabulary = vocabulary(self.context)
         elif vocabulary is None and self.vocabularyName is not None:
             vr = getVocabularyRegistry()
@@ -450,11 +457,13 @@ class Choice(Field):
                 vocabulary = vr.get(self.context, self.vocabularyName)
             except LookupError:
                 raise MissingVocabularyError(
-                    "Can't validate value without vocabulary named %r" % (self.vocabularyName,)
+                    "Can't validate value without vocabulary named %r" % (
+                        self.vocabularyName,)
                 ).with_field_and_value(self, value)
 
         if not ISource.providedBy(vocabulary):
-            raise InvalidVocabularyError(vocabulary).with_field_and_value(self, value)
+            raise InvalidVocabularyError(vocabulary).with_field_and_value(
+                self, value)
 
         return vocabulary
 
@@ -480,7 +489,9 @@ class Choice(Field):
         super(Choice, self)._validate(value)
         vocabulary = self._resolve_vocabulary(value)
         if value not in vocabulary:
-            raise ConstraintNotSatisfied(value, self.__name__).with_field_and_value(self, value)
+            raise ConstraintNotSatisfied(
+                value, self.__name__
+            ).with_field_and_value(self, value)
 
 
 # Both of these are inherited from the parent; re-declaring them
@@ -498,9 +509,10 @@ class _StrippedNativeStringLine(NativeStringLine):
         # unicode, but we don't want to allow non-ASCII values, to match
         # Python 2 (our regexs would reject that anyway.)
         try:
-            v = v.encode('ascii') # bytes
+            v = v.encode('ascii')  # bytes
         except UnicodeEncodeError:
-            raise self._invalid_exc_type(value).with_field_and_value(self, value)
+            raise self._invalid_exc_type(value).with_field_and_value(
+                self, value)
         if not isinstance(v, self._type):
             v = v.decode('ascii')
         self.validate(v)
@@ -636,9 +648,9 @@ class DottedName(_StrippedNativeStringLine):
                 "too few dots; %d required" % self.min_dots, value
             ).with_field_and_value(self, value)
         if self.max_dots is not None and dots > self.max_dots:
-            raise InvalidDottedName("too many dots; no more than %d allowed" %
-                                    self.max_dots, value).with_field_and_value(self, value)
-
+            raise InvalidDottedName(
+                "too many dots; no more than %d allowed" % self.max_dots, value
+            ).with_field_and_value(self, value)
 
 
 @implementer(IId)
@@ -691,7 +703,6 @@ def _validate_sequence(value_type, value, errors=None):
 
     To validate a sequence of various values:
 
-       >>> from zope.schema._compat import text_type
        >>> errors = _validate_sequence(field, (bytearray(b'foo'), u'bar', 1))
        >>> errors
        [WrongType(bytearray(b'foo'), <...>, ''), WrongType(1, <...>, '')]
@@ -703,8 +714,10 @@ def _validate_sequence(value_type, value, errors=None):
     for a new sequence:
 
        >>> errors = _validate_sequence(field, (2, u'baz'), errors)
-       >>> errors
-       [WrongType(bytearray(b'foo'), <...>, ''), WrongType(1, <...>, ''), WrongType(2, <...>, '')]
+       >>> errors # doctest: +NORMALIZE_WHITESPACE
+       [WrongType(bytearray(b'foo'), <...>, ''),
+        WrongType(1, <...>, ''),
+        WrongType(2, <...>, '')]
 
     """
     if errors is None:
@@ -731,7 +744,8 @@ def _validate_uniqueness(self, value):
 @implementer(ICollection)
 class Collection(MinMaxLen, Iterable):
     """
-    A generic collection implementing :class:`zope.schema.interfaces.ICollection`.
+    A generic collection implementing
+    :class:`zope.schema.interfaces.ICollection`.
 
     Subclasses can define the attribute ``value_type`` to be a field
     such as an :class:`Object` that will be checked for each member of
@@ -754,7 +768,8 @@ class Collection(MinMaxLen, Iterable):
         if value_type is not _NotGiven:
             self.value_type = value_type
 
-        if self.value_type is not None and not IField.providedBy(self.value_type):
+        if (self.value_type is not None
+                and not IField.providedBy(self.value_type)):
             raise ValueError("'value_type' must be field instance.")
         if unique is not _NotGiven:
             self.unique = unique
@@ -773,7 +788,9 @@ class Collection(MinMaxLen, Iterable):
         errors = _validate_sequence(self.value_type, value)
         if errors:
             try:
-                raise WrongContainedType(errors, self.__name__).with_field_and_value(self, value)
+                raise WrongContainedType(
+                    errors, self.__name__
+                ).with_field_and_value(self, value)
             finally:
                 # Break cycles
                 del errors
@@ -825,7 +842,7 @@ class _AbstractSet(Collection):
 
     def __init__(self, *args, **kwargs):
         super(_AbstractSet, self).__init__(*args, **kwargs)
-        if not self.unique: # set members are always unique
+        if not self.unique:  # set members are always unique
             raise TypeError(
                 "__init__() got an unexpected keyword argument 'unique'")
 
@@ -872,7 +889,9 @@ class Mapping(MinMaxLen, Iterable):
 
         if errors:
             try:
-                raise WrongContainedType(errors, self.__name__).with_field_and_value(self, value)
+                raise WrongContainedType(
+                    errors, self.__name__
+                ).with_field_and_value(self, value)
             finally:
                 # Break cycles
                 del errors
