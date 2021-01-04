@@ -17,7 +17,7 @@ __docformat__ = 'restructuredtext'
 
 try:
     from collections import abc
-except ImportError:  # pragma: no cover
+except ImportError:  # pragma: PY2
     # Python 2
     import collections as abc
 

@@ -761,9 +761,9 @@ class Number(Orderable, Field):
 
     # On Python 2, native strings are byte strings, which is
     # what the converters expect, so we don't need to do any decoding.
-    if PY2:  # pragma: no cover
+    if PY2:  # pragma: PY2
         fromBytes = fromUnicode
-    else:
+    else:    # pragma: PY3
         def fromBytes(self, value):
             return self.fromUnicode(value.decode('utf-8'))
 

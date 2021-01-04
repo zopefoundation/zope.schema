@@ -11,7 +11,7 @@ def _make_transforms(patterns):
     return [(re.compile(pattern), repl) for pattern, repl in patterns]
 
 
-if PY3:
+if PY3:  # pragma: PY3
     py3_checker = renormalizing.RENormalizing(_make_transforms([
         (r"u'([^']*)'",
          r"'\1'"),
@@ -44,7 +44,7 @@ if PY3:
         (r"zope.schema._bootstrapinterfaces.WrongType:",
          r"WrongType:"),
     ]))
-else:  # pragma: no cover
+else:  # pragma: PY2
     py3_checker = renormalizing.RENormalizing(_make_transforms([
         (r"([^'])b'([^']*)'",
          r"\1'\2'"),
