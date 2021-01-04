@@ -40,12 +40,11 @@ def _makeSchema():
     return ISchemaTest
 
 
-def _makeDerivedSchema(base=None):
+def _makeDerivedSchema():
 
     from zope.schema import Bytes
 
-    if base is None:
-        base = _makeSchema()
+    base = _makeSchema()
 
     class ISchemaTestSubclass(base):
         foo = Bytes(

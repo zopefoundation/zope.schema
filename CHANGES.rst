@@ -5,7 +5,7 @@
 6.0.1 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Bring branch coverage to 100%.
 
 
 6.0.0 (2020-03-21)

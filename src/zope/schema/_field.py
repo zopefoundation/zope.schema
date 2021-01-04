@@ -212,7 +212,7 @@ class NativeString(Text if PY3 else Bytes):
     """
     _type = str
 
-    if PY3:
+    if PY3:  # pragma: no branch
         def fromBytes(self, value):
             value = value.decode('utf-8')
             self.validate(value)
@@ -256,7 +256,7 @@ class NativeStringLine(TextLine if PY3 else BytesLine):
     """
     _type = str
 
-    if PY3:
+    if PY3:  # pragma: no branch
         def fromBytes(self, value):
             value = value.decode('utf-8')
             self.validate(value)
@@ -513,7 +513,7 @@ class _StrippedNativeStringLine(NativeStringLine):
         except UnicodeEncodeError:
             raise self._invalid_exc_type(value).with_field_and_value(
                 self, value)
-        if not isinstance(v, self._type):
+        if not isinstance(v, self._type):  # pragma: no branch
             v = v.decode('ascii')
         self.validate(v)
         return v

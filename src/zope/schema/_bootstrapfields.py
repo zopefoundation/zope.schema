@@ -179,10 +179,12 @@ class _DocStringHelpers(object):
     def make_class_field(cls, name, kind):
         if isinstance(kind, (type, InterfaceClass)):
             return cls.make_field(name, cls.make_class_directive(kind))
-        if isinstance(kind, tuple):
-            return cls.make_field(
-                name,
-                ', '.join([cls.make_class_directive(t) for t in kind]))
+        if not isinstance(kind, tuple):  # pragma: no cover
+            raise TypeError(
+                "make_class_field() can't handle kind %r" % (kind,))
+        return cls.make_field(
+            name,
+            ', '.join([cls.make_class_directive(t) for t in kind]))
 
 
 class Field(Attribute):
@@ -611,12 +613,12 @@ class Bool(Field):
     def _validate(self, value):
         # Convert integers to bools to they don't get mis-flagged
         # by the type check later.
-        if isinstance(value, int):
+        if isinstance(value, int) and not isinstance(value, bool):
             value = bool(value)
         Field._validate(self, value)
 
     def set(self, object, value):
-        if isinstance(value, int):
+        if isinstance(value, int) and not isinstance(value, bool):
             value = bool(value)
         Field.set(self, object, value)
 
