@@ -463,7 +463,7 @@ class INativeStringLine(ITextLine if PY3 else IBytesLine):
 
 
 class IPassword(ITextLine):
-    "Field containing a unicode string without newlines that is a password."
+    """Field containing a unicode password string without newlines."""
 
 
 ###
