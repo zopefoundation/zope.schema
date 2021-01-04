@@ -107,6 +107,7 @@ from zope.schema._bootstrapfields import Bool
 from zope.schema._bootstrapfields import Int
 from zope.schema._bootstrapfields import Integral
 from zope.schema._bootstrapfields import Number
+from zope.schema._bootstrapfields import InvalidDecimalLiteral  # noqa: reexport
 from zope.schema._bootstrapfields import Decimal
 from zope.schema._bootstrapfields import Password
 from zope.schema._bootstrapfields import Rational
