@@ -1625,6 +1625,13 @@ class MappingTests(EqualityTestsMixin,
         self.assertRaisesTooShort(field, {})
         self.assertRaisesTooLong(field, {1: 'a', 2: 'b', 3: 'c'})
 
+    def test_bind_without_key_and_value_types(self):
+        field = self._makeOne()
+        context = object()
+        field2 = field.bind(context)
+        self.assertIsNone(field2.key_type)
+        self.assertIsNone(field2.value_type)
+
     def test_bind_binds_key_and_value_types(self):
         from zope.schema import Int
         field = self._makeOne(key_type=Int(), value_type=Int())

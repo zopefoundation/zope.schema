@@ -683,7 +683,7 @@ class FieldTests(EqualityTestsMixin,
     def test_validate_missing_not_required(self):
         missing = object()
 
-        field = self._makeOne(
+        field = self._makeOne(  # pragma: no branch
             required=False, missing_value=missing, constraint=lambda x: False,
         )
         self.assertEqual(field.validate(missing), None)  # doesn't raise
@@ -692,14 +692,16 @@ class FieldTests(EqualityTestsMixin,
         from zope.schema._bootstrapinterfaces import RequiredMissing
         missing = object()
 
-        field = self._makeOne(
+        field = self._makeOne(  # pragma: no branch
             required=True, missing_value=missing, constraint=lambda x: False,
         )
         self.assertRaises(RequiredMissing, field.validate, missing)
 
     def test_validate_wrong_type(self):
 
-        field = self._makeOne(required=True, constraint=lambda x: False)
+        field = self._makeOne(  # pragma: no branch
+            required=True, constraint=lambda x: False,
+        )
         field._type = str
         self.assertRaisesWrongType(field, str, 1)
 
@@ -1148,6 +1150,7 @@ class PasswordTests(EqualityTestsMixin,
 
 
 class BoolTests(EqualityTestsMixin,
+                WrongTypeTestsMixin,
                 unittest.TestCase):
 
     def _getTargetClass(self):
@@ -1162,10 +1165,19 @@ class BoolTests(EqualityTestsMixin,
         txt = self._makeOne()
         self.assertEqual(txt._type, bool)
 
+    def test_validate_wrong_type(self):
+        boo = self._makeOne()
+        self.assertRaisesWrongType(boo, boo._type, '')
+
     def test__validate_w_int(self):
         boo = self._makeOne()
         boo._validate(0)  # doesn't raise
         boo._validate(1)  # doesn't raise
+
+    def test__validate_w_bool(self):
+        boo = self._makeOne()
+        boo._validate(False)  # doesn't raise
+        boo._validate(True)   # doesn't raise
 
     def test_set_w_int(self):
         boo = self._makeOne(__name__='boo')
@@ -1173,6 +1185,14 @@ class BoolTests(EqualityTestsMixin,
         boo.set(inst, 0)
         self.assertEqual(inst.boo, False)
         boo.set(inst, 1)
+        self.assertEqual(inst.boo, True)
+
+    def test_set_w_bool(self):
+        boo = self._makeOne(__name__='boo')
+        inst = DummyInst()
+        boo.set(inst, False)
+        self.assertEqual(inst.boo, False)
+        boo.set(inst, True)
         self.assertEqual(inst.boo, True)
 
     def test_fromUnicode_miss(self):
@@ -1921,7 +1941,7 @@ class DummyInst(object):
         self._exc = exc
 
     def validate(self, value):
-        if self._exc is not None:
+        if self._exc is not None:  # pragma: no branch
             raise self._exc()
 
 

@@ -1,4 +1,5 @@
 [run]
+branch = true
 plugins = coverage_python_version
 source = zope.schema
 

@@ -62,11 +62,11 @@ class SimpleTerm(object):
             # Get its str() as promised
             token = str(token)
 
-        if isinstance(token, text_type):
+        if isinstance(token, text_type):  # pragma: PY2
             token = token.encode('ascii', 'backslashreplace')
         # Token should be bytes at this point. Now back to native string,
         # if needed.
-        if not isinstance(token, str):
+        if not isinstance(token, str):    # pragma: PY2
             token = token.decode('ascii')
         self.token = token
         self.title = title
@@ -382,7 +382,7 @@ class TreeVocabulary(object):
             self.term_by_value[value] = term
             self.term_by_token[token] = term
 
-            if value not in self.path_by_value:
+            if value not in self.path_by_value:  # pragma: no branch
                 self.path_by_value[value] = self._getPathToTreeNode(self,
                                                                     value)
             self._populateIndexes(tree[term])
