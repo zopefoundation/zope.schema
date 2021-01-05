@@ -7,6 +7,8 @@
 
 - Bring branch coverage to 100%.
 
+- Add support for Python 3.9.
+
 
 6.0.0 (2020-03-21)
 ==================
