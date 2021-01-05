@@ -1,0 +1,20 @@
+# Generated from:
+# https://github.com/zopefoundation/meta/tree/master/config/pure-python
+[meta]
+template = "pure-python"
+commit-id = "7b24599f594f681212874ad0fa1993b6d3bc34e9"
+
+[python]
+with-appveyor = false
+with-pypy = true
+with-legacy-python = true
+with-docs = true
+with-sphinx-doctests = true
+
+[coverage]
+fail-under = 100
+
+[coverage-run]
+additional-config = [
+    "omit = src/zope/__init__.py",
+    ]
