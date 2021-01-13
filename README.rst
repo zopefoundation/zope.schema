@@ -10,9 +10,9 @@
    :target: https://pypi.org/project/zope.schema/
    :alt: Supported Python versions
 
-.. image:: https://travis-ci.com/zopefoundation/zope.schema.svg?branch=master
-   :target: https://travis-ci.com/zopefoundation/zope.schema
-   :alt: Build Status
+.. image:: https://github.com/zopefoundation/zope.schema/workflows/tests/badge.svg
+   :target: https://github.com/zopefoundation/zope.schema/actions?query=workflow%3Atests
+   :alt: Tests Status
 
 .. image:: https://readthedocs.org/projects/zopeschema/badge/?version=latest
    :target: https://zopeschema.readthedocs.org/en/latest/
