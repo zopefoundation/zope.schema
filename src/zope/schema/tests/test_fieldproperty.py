@@ -267,8 +267,9 @@ class FieldPropertyTests(_Base, _Integration):
 
     def test_field_event(self):
         from zope.schema import Text
-
+        from zope.interface.verify import verifyObject
         from zope.event import subscribers
+        from zope.schema.interfaces import IFieldUpdatedEvent
         from zope.schema.fieldproperty import FieldUpdatedEvent
         log = []
         subscribers.append(log.append)
@@ -283,7 +284,9 @@ class FieldPropertyTests(_Base, _Integration):
         self.assertEqual(len(log), 6)
         event = log[0]
         self.assertTrue(isinstance(event, FieldUpdatedEvent))
+        self.assertTrue(verifyObject(IFieldUpdatedEvent, event))
         self.assertEqual(event.object, field)
+        self.assertEqual(event.inst, field)   # BBB, but test it works.
         self.assertEqual(event.old_value, 0)
         self.assertEqual(event.new_value, 0)
         self.assertEqual(
@@ -293,8 +296,9 @@ class FieldPropertyTests(_Base, _Integration):
 
     def test_field_event_update(self):
         from zope.schema import Text
-
+        from zope.interface.verify import verifyObject
         from zope.event import subscribers
+        from zope.schema.interfaces import IFieldUpdatedEvent
         from zope.schema.fieldproperty import FieldUpdatedEvent
         field = Text(
             __name__='testing',
@@ -315,7 +319,9 @@ class FieldPropertyTests(_Base, _Integration):
         self.assertEqual(len(log), 2)
         event = log[1]
         self.assertTrue(isinstance(event, FieldUpdatedEvent))
+        self.assertTrue(verifyObject(IFieldUpdatedEvent, event))
         self.assertEqual(event.object, foo)
+        self.assertEqual(event.inst, foo)   # BBB, but test it works.
         self.assertEqual(event.field, field)
         self.assertEqual(event.old_value, u'Bar')
         self.assertEqual(event.new_value, u'Foo')
