@@ -283,7 +283,7 @@ class FieldPropertyTests(_Base, _Integration):
         self.assertEqual(len(log), 6)
         event = log[0]
         self.assertTrue(isinstance(event, FieldUpdatedEvent))
-        self.assertEqual(event.inst, field)
+        self.assertEqual(event.object, field)
         self.assertEqual(event.old_value, 0)
         self.assertEqual(event.new_value, 0)
         self.assertEqual(
@@ -315,7 +315,7 @@ class FieldPropertyTests(_Base, _Integration):
         self.assertEqual(len(log), 2)
         event = log[1]
         self.assertTrue(isinstance(event, FieldUpdatedEvent))
-        self.assertEqual(event.inst, foo)
+        self.assertEqual(event.object, foo)
         self.assertEqual(event.field, field)
         self.assertEqual(event.old_value, u'Bar')
         self.assertEqual(event.new_value, u'Foo')
@@ -583,7 +583,7 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
         self.assertEqual(len(log), 2)
         event = log[1]
         self.assertTrue(isinstance(event, FieldUpdatedEvent))
-        self.assertEqual(event.inst, foo)
+        self.assertEqual(event.object, foo)
         self.assertEqual(event.field, field)
         self.assertEqual(event.old_value, u'Bar')
         self.assertEqual(event.new_value, u'Foo')
@@ -613,7 +613,7 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
              'readonly'])
         event = log[0]
         self.assertTrue(isinstance(event, FieldUpdatedEvent))
-        self.assertEqual(event.inst, field)
+        self.assertEqual(event.object, field)
         self.assertEqual(event.old_value, 0)
         self.assertEqual(event.new_value, 0)
 
