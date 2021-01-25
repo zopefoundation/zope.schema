@@ -2,7 +2,7 @@
  Changes
 =========
 
-6.0.1 (unreleased)
+6.0.1 (2021-01-25)
 ==================
 
 - Bring branch coverage to 100%.
