@@ -286,13 +286,18 @@ class FieldPropertyTests(_Base, _Integration):
         self.assertTrue(isinstance(event, FieldUpdatedEvent))
         self.assertTrue(verifyObject(IFieldUpdatedEvent, event))
         self.assertEqual(event.object, field)
-        self.assertEqual(event.inst, field)   # BBB, but test it works.
         self.assertEqual(event.old_value, 0)
         self.assertEqual(event.new_value, 0)
         self.assertEqual(
             [ev.field.__name__ for ev in log],
             ['min_length', 'max_length', 'title', 'description', 'required',
              'readonly'])
+        # BBB, but test this works.
+        self.assertEqual(event.inst, field)
+        marker = object()
+        event.inst = marker
+        self.assertEqual(event.inst, marker)
+        self.assertEqual(event.object, marker)
 
     def test_field_event_update(self):
         from zope.schema import Text
@@ -321,10 +326,15 @@ class FieldPropertyTests(_Base, _Integration):
         self.assertTrue(isinstance(event, FieldUpdatedEvent))
         self.assertTrue(verifyObject(IFieldUpdatedEvent, event))
         self.assertEqual(event.object, foo)
-        self.assertEqual(event.inst, foo)   # BBB, but test it works.
         self.assertEqual(event.field, field)
         self.assertEqual(event.old_value, u'Bar')
         self.assertEqual(event.new_value, u'Foo')
+        # BBB, but test this works.
+        self.assertEqual(event.inst, foo)
+        marker = object()
+        event.inst = marker
+        self.assertEqual(event.inst, marker)
+        self.assertEqual(event.object, marker)
 
 
 class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
