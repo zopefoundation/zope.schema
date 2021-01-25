@@ -28,11 +28,18 @@ _marker = object()
 @interface.implementer(interfaces.IFieldUpdatedEvent)
 class FieldUpdatedEvent(object):
 
-    def __init__(self, inst, field, old_value, new_value):
-        self.inst = inst
+    def __init__(self, obj, field, old_value, new_value):
+        self.object = obj
         self.field = field
         self.old_value = old_value
         self.new_value = new_value
+
+    # The implementation used to differ from the interfaces in that it
+    # declared `self.inst` instead of `self.object`. Leave `self.inst`
+    # in place for backwards compat.
+    inst = property(
+        lambda self: self.object,
+        lambda self, new_value: setattr(self, 'object', new_value))
 
 
 class FieldProperty(object):

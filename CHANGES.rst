@@ -9,6 +9,8 @@
 
 - Add support for Python 3.9.
 
+- Fix FieldUpdateEvent implementation by having an ``object`` attribute as the
+  ``IFieldUpdatedEvent`` interfaces claims there should be.
 
 6.0.0 (2020-03-21)
 ==================
