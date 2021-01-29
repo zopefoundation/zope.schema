@@ -5,7 +5,7 @@
 6.0.2 (unreleased)
 ==================
 
-- Fix IField Bool to not be required by default. 
+- Fix ``IField.required`` to not be required by default. 
   See `issue 104 <https://github.com/zopefoundation/zope.schema/issues/104>`_.
 
 6.0.1 (2021-01-25)
