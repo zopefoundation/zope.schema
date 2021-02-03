@@ -244,7 +244,6 @@ class IField(IValidatable):
     required = Bool(
         title=_("Required"),
         description=(_("Tells whether a field requires its value to exist.")),
-        required=False,
         default=True)
 
     readonly = Bool(
