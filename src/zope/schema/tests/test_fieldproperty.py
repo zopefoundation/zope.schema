@@ -336,6 +336,11 @@ class FieldPropertyTests(_Base, _Integration):
         self.assertEqual(event.inst, marker)
         self.assertEqual(event.object, marker)
 
+    def test_ctor_bool_not_required(self):
+        from zope.schema import Bool
+        field = Bool(__name__='testing')
+        self.assertFalse(field.required)
+
 
 class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
 
