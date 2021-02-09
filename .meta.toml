@@ -2,7 +2,7 @@
 # https://github.com/zopefoundation/meta/tree/master/config/pure-python
 [meta]
 template = "pure-python"
-commit-id = "5b7a5e11f3a182cb3704ef1e071f9d592a741787"
+commit-id = "20e717f131ccaa1bc2dd878ba90c4be22d4c7488"
 
 [python]
 with-appveyor = false
@@ -17,4 +17,9 @@ fail-under = 100
 [coverage-run]
 additional-config = [
     "omit = src/zope/__init__.py",
+    ]
+
+[check-manifest]
+additional-ignores = [
+    "docs/_static",
     ]
