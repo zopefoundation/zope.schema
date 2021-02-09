@@ -2,7 +2,7 @@
  Changes
 =========
 
-6.0.2 (unreleased)
+6.1.0 (2021-02-09)
 ==================
 
 - Fix ``IField.required`` to not be required by default. 
