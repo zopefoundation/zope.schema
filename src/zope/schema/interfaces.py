@@ -404,6 +404,11 @@ class IBool(IField):
         description=_("""The field default value may be None or a legal
                         field value""")
         )
+    required = Bool(
+        title=_("Required"),
+        description=(_("Tells whether a field requires its value to exist.")),
+        required=False,
+        default=False)
 
 
 class IBytes(IMinMaxLen, IIterable, IField):

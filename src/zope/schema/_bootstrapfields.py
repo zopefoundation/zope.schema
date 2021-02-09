@@ -610,6 +610,11 @@ class Bool(Field):
 
     _type = bool
 
+    def __init__(self, *args, **kw):
+        if 'required' not in kw:
+            kw['required'] = False
+        super(Bool, self).__init__(*args, **kw)
+
     def _validate(self, value):
         # Convert integers to bools to they don't get mis-flagged
         # by the type check later.
