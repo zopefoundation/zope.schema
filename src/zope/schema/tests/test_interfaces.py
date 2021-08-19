@@ -88,3 +88,19 @@ class Test__fields(unittest.TestCase):
             self._callFUT([Text(), Bytes(), Int(), Float(), Decimal(), 0]),
             False
         )
+
+    def test_bool_not_required(self):
+        """If class Bool is used as a schema itself, it must not be required.
+        """
+        from zope.schema.interfaces import IBool
+        # treat IBool as schema with fields
+        field = IBool.get("required")
+        self.assertFalse(field.required)
+
+    def test_bool_defaults_to_false(self):
+        """If class Bool is used as a schema itself, it must default to False
+        """
+        from zope.schema.interfaces import IBool
+        # treat IBool as schema with fields
+        field = IBool.get("default")
+        self.assertFalse(field.default)
