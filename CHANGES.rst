@@ -5,8 +5,12 @@
 6.1.1 (unreleased)
 ==================
 
-- Nothing changed yet.
-
+- Fix incompatibility introduced in 6.1.0:
+  The `Bool` field constructor implicitly set required to False if not given. 
+  While this is the desired behavior in most common cases, 
+  it broke special cases.
+  See `issue 104 <https://github.com/zopefoundation/zope.schema/issues/104>`_ 
+  (scroll down, it is around the *reopen*).
 
 6.1.0 (2021-02-09)
 ==================
