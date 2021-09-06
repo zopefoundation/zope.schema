@@ -2,14 +2,15 @@
 # https://github.com/zopefoundation/meta/tree/master/config/pure-python
 [meta]
 template = "pure-python"
-commit-id = "20e717f131ccaa1bc2dd878ba90c4be22d4c7488"
+commit-id = "d3627ba9bcb25d0c7cb09b96d695040a20e0ab2b"
 
 [python]
-with-appveyor = false
 with-pypy = true
 with-legacy-python = true
 with-docs = true
 with-sphinx-doctests = true
+with-windows = false
+with-future-python = false
 
 [coverage]
 fail-under = 100
@@ -23,3 +24,11 @@ additional-config = [
 additional-ignores = [
     "docs/_static",
     ]
+
+[manifest]
+additional-rules = [
+    "recursive-include docs *.bat",
+    ]
+
+[tox]
+use-flake8 = true
