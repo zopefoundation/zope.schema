@@ -18,7 +18,7 @@
   See `issue 104 <https://github.com/zopefoundation/zope.schema/issues/104>`_
   (scroll down, it is around the *reopen*).
 
-- Add support for Python 3.10 (as of rc.2).
+- Add support for Python 3.10.
 
 
 6.1.0 (2021-02-09)
