@@ -2,7 +2,7 @@
  Changes
 =========
 
-6.1.1 (unreleased)
+6.1.1 (2021-10-13)
 ==================
 
 - Fix incompatibility introduced in 6.1.0:
