@@ -2,11 +2,10 @@
  Changes
 =========
 
-6.1.2 (unreleased)
+6.2.0 (unreleased)
 ==================
 
-- Nothing changed yet.
-
+- Add support for Python 3.10.
 
 6.1.1 (2021-10-13)
 ==================
@@ -17,8 +16,6 @@
   it broke special cases.
   See `issue 104 <https://github.com/zopefoundation/zope.schema/issues/104>`_
   (scroll down, it is around the *reopen*).
-
-- Add support for Python 3.10.
 
 
 6.1.0 (2021-02-09)
