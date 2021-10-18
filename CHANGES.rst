@@ -2,26 +2,26 @@
  Changes
 =========
 
-6.1.2 (unreleased)
+6.2.0 (unreleased)
 ==================
 
-- Nothing changed yet.
-
+- Add support for Python 3.10.
 
 6.1.1 (2021-10-13)
 ==================
 
 - Fix incompatibility introduced in 6.1.0:
-  The `Bool` field constructor implicitly set required to False if not given. 
-  While this is the desired behavior in most common cases, 
+  The `Bool` field constructor implicitly set required to False if not given.
+  While this is the desired behavior in most common cases,
   it broke special cases.
-  See `issue 104 <https://github.com/zopefoundation/zope.schema/issues/104>`_ 
+  See `issue 104 <https://github.com/zopefoundation/zope.schema/issues/104>`_
   (scroll down, it is around the *reopen*).
+
 
 6.1.0 (2021-02-09)
 ==================
 
-- Fix ``IField.required`` to not be required by default. 
+- Fix ``IField.required`` to not be required by default.
   See `issue 104 <https://github.com/zopefoundation/zope.schema/issues/104>`_.
 
 6.0.1 (2021-01-25)
