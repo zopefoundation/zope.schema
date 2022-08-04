@@ -34,9 +34,10 @@ Read accessors function as access method specifications and as field
 specifications.  Write accessors are solely method specifications.
 """
 
-from zope.interface import providedBy, implementedBy
-from zope.interface.interface import Method
+from zope.interface import implementedBy
+from zope.interface import providedBy
 from zope.interface.declarations import Declaration
+from zope.interface.interface import Method
 
 
 class FieldReadAccessor(Method):

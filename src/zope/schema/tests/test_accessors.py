@@ -15,6 +15,7 @@
 """
 import unittest
 
+
 # pylint:disable=inherit-non-class
 
 
@@ -41,6 +42,7 @@ class FieldReadAccessorTests(unittest.TestCase):
 
     def test_ctor_created_inside_interface(self):
         from zope.interface import Interface
+
         from zope.schema import Text
 
         field = Text(title=u'Hmm')
@@ -63,6 +65,7 @@ class FieldReadAccessorTests(unittest.TestCase):
         from zope.interface import providedBy
         from zope.interface.interfaces import IAttribute
         from zope.interface.interfaces import IMethod
+
         from zope.schema import Text
 
         # When wrapping a field that provides stuff,
@@ -170,6 +173,7 @@ class FieldReadAccessorTests(unittest.TestCase):
 
     def test_set_readonly(self):
         from zope.interface import Interface
+
         from zope.schema import Text
         field = Text(readonly=True)
 
@@ -257,6 +261,7 @@ class FieldWriteAccessorTests(unittest.TestCase):
 
     def test_ctor_created_inside_interface(self):
         from zope.interface import Interface
+
         from zope.schema import Text
 
         field = Text(title=u'Hmm')
@@ -290,6 +295,7 @@ class Test_accessors(unittest.TestCase):
 
     def test_w_only_read_accessor(self):
         from zope.interface import Interface
+
         from zope.schema import Text
 
         field = Text(title=u'Hmm', readonly=True)
@@ -310,6 +316,7 @@ class Test_accessors(unittest.TestCase):
 
     def test_w_read_and_write_accessors(self):
         from zope.interface import Interface
+
         from zope.schema import Text
 
         field = Text(title=u'Hmm')

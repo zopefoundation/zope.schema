@@ -14,13 +14,15 @@
 """Computed attributes based on schema fields
 """
 
-from copy import copy
 import sys
+from copy import copy
+
 import zope.schema
-from zope import interface
 from zope import event
+from zope import interface
 from zope.schema import interfaces
 from zope.schema._bootstrapinterfaces import NO_VALUE
+
 
 _marker = object()
 

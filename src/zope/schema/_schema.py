@@ -14,9 +14,10 @@
 """Schema convenience functions
 """
 
-from zope.schema._bootstrapfields import get_validation_errors
 from zope.schema._bootstrapfields import get_schema_validation_errors
+from zope.schema._bootstrapfields import get_validation_errors
 from zope.schema._bootstrapfields import getFields
+
 
 __all__ = [
     'getFieldNames',

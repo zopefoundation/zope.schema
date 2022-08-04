@@ -20,7 +20,6 @@ from zope.interface import Interface
 from zope.interface.common.mapping import IEnumerableMapping
 from zope.interface.interfaces import IInterface
 
-
 from zope.schema._bootstrapfields import Bool
 from zope.schema._bootstrapfields import Complex
 from zope.schema._bootstrapfields import Decimal
@@ -33,7 +32,6 @@ from zope.schema._bootstrapfields import Rational
 from zope.schema._bootstrapfields import Real
 from zope.schema._bootstrapfields import Text
 from zope.schema._bootstrapfields import TextLine
-
 # Import from _bootstrapinterfaces only because other packages will expect
 # to find these interfaces here.
 from zope.schema._bootstrapinterfaces import ConstraintNotSatisfied
@@ -41,8 +39,8 @@ from zope.schema._bootstrapinterfaces import IBeforeObjectAssignedEvent
 from zope.schema._bootstrapinterfaces import IContextAwareDefaultFactory
 from zope.schema._bootstrapinterfaces import IFromBytes
 from zope.schema._bootstrapinterfaces import IFromUnicode
-from zope.schema._bootstrapinterfaces import IValidatable
 from zope.schema._bootstrapinterfaces import InvalidValue
+from zope.schema._bootstrapinterfaces import IValidatable
 from zope.schema._bootstrapinterfaces import LenOutOfBounds
 from zope.schema._bootstrapinterfaces import NotAContainer
 from zope.schema._bootstrapinterfaces import NotAnInterface
@@ -61,10 +59,9 @@ from zope.schema._bootstrapinterfaces import TooSmall
 from zope.schema._bootstrapinterfaces import ValidationError
 from zope.schema._bootstrapinterfaces import WrongContainedType
 from zope.schema._bootstrapinterfaces import WrongType
-
 from zope.schema._compat import PY3
-
 from zope.schema._messageid import _
+
 
 __all__ = [
     # Exceptions
@@ -1091,7 +1088,7 @@ class IVocabularyFactory(Interface):
     """
 
     def __call__(context):
-        """The *context* provides a location that the vocabulary can make use of.
+        """The *context* provides a location that vocabulary can make use of.
         """
 
 

@@ -21,21 +21,47 @@ except ImportError:  # pragma: PY2
     # Python 2
     import collections as abc
 
-from datetime import datetime
-from datetime import date
-from datetime import timedelta
-from datetime import time
 import re
-
+from datetime import date
+from datetime import datetime
+from datetime import time
+from datetime import timedelta
 
 from zope.interface import classImplements
 from zope.interface import classImplementsFirst
-from zope.interface import implementer
 from zope.interface import implementedBy
+from zope.interface import implementer
 from zope.interface.interfaces import IInterface
 
-
+from zope.schema._bootstrapfields import Bool
+from zope.schema._bootstrapfields import Complex
+from zope.schema._bootstrapfields import Container  # API import for __init__
+from zope.schema._bootstrapfields import Decimal
+from zope.schema._bootstrapfields import Field
+from zope.schema._bootstrapfields import Int
+from zope.schema._bootstrapfields import Integral
+from zope.schema._bootstrapfields import \
+    InvalidDecimalLiteral  # noqa: reexport
+from zope.schema._bootstrapfields import Iterable
+from zope.schema._bootstrapfields import MinMaxLen
+from zope.schema._bootstrapfields import Number
+from zope.schema._bootstrapfields import Object
+from zope.schema._bootstrapfields import Orderable
+from zope.schema._bootstrapfields import Password
+from zope.schema._bootstrapfields import Rational
+from zope.schema._bootstrapfields import Real
+from zope.schema._bootstrapfields import Text
+from zope.schema._bootstrapfields import TextLine
+from zope.schema._bootstrapfields import _NotGiven
+from zope.schema._compat import PY3
+from zope.schema._compat import binary_type
+from zope.schema._compat import make_binary
+from zope.schema._compat import string_types
+from zope.schema._compat import text_type
+from zope.schema.fieldproperty import FieldProperty
 from zope.schema.interfaces import IASCII
+from zope.schema.interfaces import IURI
+from zope.schema.interfaces import ConstraintNotSatisfied
 from zope.schema.interfaces import IASCIILine
 from zope.schema.interfaces import IBaseVocabulary
 from zope.schema.interfaces import IBool
@@ -57,25 +83,29 @@ from zope.schema.interfaces import IFromBytes
 from zope.schema.interfaces import IFromUnicode
 from zope.schema.interfaces import IFrozenSet
 from zope.schema.interfaces import IId
-from zope.schema.interfaces import IIterable
 from zope.schema.interfaces import IInt
 from zope.schema.interfaces import IIntegral
 from zope.schema.interfaces import IInterfaceField
+from zope.schema.interfaces import IIterable
 from zope.schema.interfaces import IList
-from zope.schema.interfaces import IMinMaxLen
 from zope.schema.interfaces import IMapping
+from zope.schema.interfaces import IMinMaxLen
 from zope.schema.interfaces import IMutableMapping
 from zope.schema.interfaces import IMutableSequence
 from zope.schema.interfaces import INativeString
 from zope.schema.interfaces import INativeStringLine
-from zope.schema.interfaces import IObject
 from zope.schema.interfaces import INumber
+from zope.schema.interfaces import InvalidDottedName
+from zope.schema.interfaces import InvalidId
+from zope.schema.interfaces import InvalidURI
+from zope.schema.interfaces import InvalidValue
+from zope.schema.interfaces import IObject
 from zope.schema.interfaces import IPassword
 from zope.schema.interfaces import IPythonIdentifier
-from zope.schema.interfaces import IReal
 from zope.schema.interfaces import IRational
-from zope.schema.interfaces import ISet
+from zope.schema.interfaces import IReal
 from zope.schema.interfaces import ISequence
+from zope.schema.interfaces import ISet
 from zope.schema.interfaces import ISource
 from zope.schema.interfaces import ISourceText
 from zope.schema.interfaces import IText
@@ -83,48 +113,14 @@ from zope.schema.interfaces import ITextLine
 from zope.schema.interfaces import ITime
 from zope.schema.interfaces import ITimedelta
 from zope.schema.interfaces import ITuple
-from zope.schema.interfaces import IURI
-
-from zope.schema.interfaces import ValidationError
-from zope.schema.interfaces import InvalidValue
-from zope.schema.interfaces import WrongType
-from zope.schema.interfaces import WrongContainedType
-from zope.schema.interfaces import NotUnique
 from zope.schema.interfaces import NotAnInterface
-from zope.schema.interfaces import InvalidURI
-from zope.schema.interfaces import InvalidId
-from zope.schema.interfaces import InvalidDottedName
-from zope.schema.interfaces import ConstraintNotSatisfied
-
-from zope.schema._bootstrapfields import Field
-from zope.schema._bootstrapfields import Complex
-from zope.schema._bootstrapfields import Container  # API import for __init__
-from zope.schema._bootstrapfields import Iterable
-from zope.schema._bootstrapfields import Orderable
-from zope.schema._bootstrapfields import Text
-from zope.schema._bootstrapfields import TextLine
-from zope.schema._bootstrapfields import Bool
-from zope.schema._bootstrapfields import Int
-from zope.schema._bootstrapfields import Integral
-from zope.schema._bootstrapfields import Number
-from zope.schema._bootstrapfields import InvalidDecimalLiteral  # noqa: reexport
-from zope.schema._bootstrapfields import Decimal
-from zope.schema._bootstrapfields import Password
-from zope.schema._bootstrapfields import Rational
-from zope.schema._bootstrapfields import Real
-from zope.schema._bootstrapfields import MinMaxLen
-from zope.schema._bootstrapfields import _NotGiven
-from zope.schema._bootstrapfields import Object
-from zope.schema.fieldproperty import FieldProperty
-from zope.schema.vocabulary import getVocabularyRegistry
+from zope.schema.interfaces import NotUnique
+from zope.schema.interfaces import ValidationError
+from zope.schema.interfaces import WrongContainedType
+from zope.schema.interfaces import WrongType
 from zope.schema.vocabulary import SimpleVocabulary
+from zope.schema.vocabulary import getVocabularyRegistry
 
-
-from zope.schema._compat import text_type
-from zope.schema._compat import string_types
-from zope.schema._compat import binary_type
-from zope.schema._compat import PY3
-from zope.schema._compat import make_binary
 
 # Fix up bootstrap field types
 Field.title = FieldProperty(IField['title'])

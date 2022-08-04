@@ -13,8 +13,10 @@
 ##############################################################################
 """Schema package constructor
 """
+from zope.schema._bootstrapinterfaces import NO_VALUE
 # Field APIs
 from zope.schema._field import ASCII
+from zope.schema._field import URI
 from zope.schema._field import ASCIILine
 from zope.schema._field import Bool
 from zope.schema._field import Bytes
@@ -58,22 +60,18 @@ from zope.schema._field import TextLine
 from zope.schema._field import Time
 from zope.schema._field import Timedelta
 from zope.schema._field import Tuple
-from zope.schema._field import URI
-
 # Schema APIs
-from zope.schema._schema import getFields
-from zope.schema._schema import getFieldsInOrder
 from zope.schema._schema import getFieldNames
 from zope.schema._schema import getFieldNamesInOrder
-from zope.schema._schema import getValidationErrors
+from zope.schema._schema import getFields
+from zope.schema._schema import getFieldsInOrder
 from zope.schema._schema import getSchemaValidationErrors
-
+from zope.schema._schema import getValidationErrors
 # Acessor API
 from zope.schema.accessors import accessors
-
 # Error API
 from zope.schema.interfaces import ValidationError
-from zope.schema._bootstrapinterfaces import NO_VALUE
+
 
 __all__ = [
     'ASCII',

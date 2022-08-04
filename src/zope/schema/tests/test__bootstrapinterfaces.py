@@ -13,6 +13,7 @@
 ##############################################################################
 import unittest
 
+
 try:
     compare = cmp
 except NameError:

@@ -13,8 +13,9 @@
 ##############################################################################
 import decimal
 import doctest
-import unittest
 import unicodedata
+import unittest
+
 
 # pylint:disable=protected-access,inherit-non-class,blacklisted-name
 # pylint:disable=attribute-defined-outside-init
@@ -64,8 +65,8 @@ class InterfaceConformanceTestsMixin(object):
         self.assertIs(self._getTargetInterface(), implemented.__sro__[1])
 
     def test_implements_consistent__sro__(self):
-        from zope.interface import ro
         from zope.interface import implementedBy
+        from zope.interface import ro
         __traceback_info__ = implementedBy(self._getTargetClass()).__sro__
         self.assertTrue(
             ro.is_consistent(implementedBy(self._getTargetClass())))
@@ -379,8 +380,9 @@ class DefaultPropertyTests(unittest.TestCase):
 
     def test___get___w_defaultFactory_w_ICAF_w_check(self):
         from zope.interface import directlyProvides
-        from zope.schema._bootstrapinterfaces \
-            import IContextAwareDefaultFactory
+
+        from zope.schema._bootstrapinterfaces import \
+            IContextAwareDefaultFactory
         _checked = []
 
         def _check(inst, value):
@@ -476,7 +478,9 @@ class FieldTests(EqualityTestsMixin,
             """)
         )
 
-        field = self._makeOne(title=u'A title', description=u"""Multiline description.
+        field = self._makeOne(
+            title=u'A title',
+            description=u"""Multiline description.
 
         Some lines have leading whitespace.
 
@@ -506,6 +510,7 @@ class FieldTests(EqualityTestsMixin,
         # The exact value of the description is preserved,
         # allowing for MessageID objects.
         import textwrap
+
         from zope.i18nmessageid import MessageFactory
 
         msg_factory = MessageFactory('zope')
@@ -1225,15 +1230,15 @@ class NumberTests(EqualityTestsMixin,
         return INumber
 
     def test_class_conforms_to_iface(self):
-        from zope.schema._bootstrapinterfaces import IFromUnicode
         from zope.schema._bootstrapinterfaces import IFromBytes
+        from zope.schema._bootstrapinterfaces import IFromUnicode
         verifyClass = super(NumberTests, self).test_class_conforms_to_iface()
         verifyClass(IFromUnicode, self._getTargetClass())
         verifyClass(IFromBytes, self._getTargetClass())
 
     def test_instance_conforms_to_iface(self):
-        from zope.schema._bootstrapinterfaces import IFromUnicode
         from zope.schema._bootstrapinterfaces import IFromBytes
+        from zope.schema._bootstrapinterfaces import IFromUnicode
         verifyObject = (
             super(NumberTests, self).test_instance_conforms_to_iface())
         verifyObject(IFromUnicode, self._makeOne())
@@ -1440,8 +1445,9 @@ class ObjectTests(EqualityTestsMixin,
     def _makeCycles(self):
         from zope.interface import Interface
         from zope.interface import implementer
-        from zope.schema import Object
+
         from zope.schema import List
+        from zope.schema import Object
         from zope.schema._messageid import _
 
         class IUnit(Interface):
@@ -1486,11 +1492,13 @@ class ObjectTests(EqualityTestsMixin,
 
     def test_class_conforms_to_IObject(self):
         from zope.interface.verify import verifyClass
+
         from zope.schema.interfaces import IObject
         verifyClass(IObject, self._getTargetClass())
 
     def test_instance_conforms_to_IObject(self):
         from zope.interface.verify import verifyObject
+
         from zope.schema.interfaces import IObject
         verifyObject(IObject, self._makeOne())
 
@@ -1514,8 +1522,8 @@ class ObjectTests(EqualityTestsMixin,
         objf.validate(object())  # doesn't raise
 
     def test__validate_w_value_not_providing_schema(self):
-        from zope.schema.interfaces import SchemaNotProvided
         from zope.schema._bootstrapfields import Text
+        from zope.schema.interfaces import SchemaNotProvided
         schema = self._makeSchema(foo=Text(), bar=Text())
         objf = self._makeOne(schema)
         bad_value = object()
@@ -1529,9 +1537,10 @@ class ObjectTests(EqualityTestsMixin,
 
     def test__validate_w_value_providing_schema_but_missing_fields(self):
         from zope.interface import implementer
-        from zope.schema.interfaces import SchemaNotFullyImplemented
-        from zope.schema.interfaces import SchemaNotCorrectlyImplemented
+
         from zope.schema._bootstrapfields import Text
+        from zope.schema.interfaces import SchemaNotCorrectlyImplemented
+        from zope.schema.interfaces import SchemaNotFullyImplemented
         schema = self._makeSchema(foo=Text(), bar=Text())
 
         @implementer(schema)
@@ -1576,11 +1585,12 @@ class ObjectTests(EqualityTestsMixin,
 
     def test__validate_w_value_providing_schema_but_invalid_fields(self):
         from zope.interface import implementer
-        from zope.schema.interfaces import SchemaNotCorrectlyImplemented
-        from zope.schema.interfaces import RequiredMissing
-        from zope.schema.interfaces import WrongType
+
         from zope.schema._bootstrapfields import Text
         from zope.schema._compat import text_type
+        from zope.schema.interfaces import RequiredMissing
+        from zope.schema.interfaces import SchemaNotCorrectlyImplemented
+        from zope.schema.interfaces import WrongType
         schema = self._makeSchema(foo=Text(), bar=Text())
 
         @implementer(schema)
@@ -1617,6 +1627,7 @@ class ObjectTests(EqualityTestsMixin,
 
     def test__validate_w_value_providing_schema(self):
         from zope.interface import implementer
+
         from zope.schema._bootstrapfields import Text
         from zope.schema._field import Choice
 
@@ -1691,9 +1702,10 @@ class ObjectTests(EqualityTestsMixin,
     def test_set_emits_IBOAE(self):
         from zope.event import subscribers
         from zope.interface import implementer
-        from zope.schema.interfaces import IBeforeObjectAssignedEvent
+
         from zope.schema._bootstrapfields import Text
         from zope.schema._field import Choice
+        from zope.schema.interfaces import IBeforeObjectAssignedEvent
 
         schema = self._makeSchema(
             foo=Text(),
@@ -1722,6 +1734,7 @@ class ObjectTests(EqualityTestsMixin,
     def test_set_allows_IBOAE_subscr_to_replace_value(self):
         from zope.event import subscribers
         from zope.interface import implementer
+
         from zope.schema._bootstrapfields import Text
         from zope.schema._field import Choice
 
@@ -1756,12 +1769,13 @@ class ObjectTests(EqualityTestsMixin,
         self.assertEqual(log[-1].context, inst)
 
     def test_validates_invariants_by_default(self):
-        from zope.interface import invariant
         from zope.interface import Interface
-        from zope.interface import implementer
         from zope.interface import Invalid
-        from zope.schema import Text
+        from zope.interface import implementer
+        from zope.interface import invariant
+
         from zope.schema import Bytes
+        from zope.schema import Text
 
         class ISchema(Interface):
 
@@ -1840,15 +1854,18 @@ class ObjectTests(EqualityTestsMixin,
 
     def test_bound_field_of_collection_with_choice(self):
         # https://github.com/zopefoundation/zope.schema/issues/17
-        from zope.interface import Interface, implementer
         from zope.interface import Attribute
+        from zope.interface import Interface
+        from zope.interface import implementer
 
-        from zope.schema import Choice, Object, Set
+        from zope.schema import Choice
+        from zope.schema import Object
+        from zope.schema import Set
         from zope.schema.fieldproperty import FieldProperty
-        from zope.schema.interfaces import IContextSourceBinder
-        from zope.schema.interfaces import WrongContainedType
         from zope.schema.interfaces import ConstraintNotSatisfied
+        from zope.schema.interfaces import IContextSourceBinder
         from zope.schema.interfaces import SchemaNotCorrectlyImplemented
+        from zope.schema.interfaces import WrongContainedType
         from zope.schema.vocabulary import SimpleVocabulary
 
         @implementer(IContextSourceBinder)
@@ -1946,8 +1963,9 @@ class DummyInst(object):
 
 
 def test_suite():
-    import zope.schema._bootstrapfields
     from zope.testing.renormalizing import IGNORE_EXCEPTION_MODULE_IN_PYTHON2
+
+    import zope.schema._bootstrapfields
     suite = unittest.defaultTestLoader.loadTestsFromName(__name__)
     suite.addTests(doctest.DocTestSuite(
         zope.schema._bootstrapfields,

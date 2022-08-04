@@ -22,11 +22,11 @@ class Test__is_field(unittest.TestCase):
         self.assertEqual(self._callFUT(object()), False)
 
     def test_w_normal_fields(self):
-        from zope.schema import Text
         from zope.schema import Bytes
-        from zope.schema import Int
-        from zope.schema import Float
         from zope.schema import Decimal
+        from zope.schema import Float
+        from zope.schema import Int
+        from zope.schema import Text
         self.assertEqual(self._callFUT(Text()), True)
         self.assertEqual(self._callFUT(Bytes()), True)
         self.assertEqual(self._callFUT(Int()), True)
@@ -35,6 +35,7 @@ class Test__is_field(unittest.TestCase):
 
     def test_w_explicitly_provided(self):
         from zope.interface import directlyProvides
+
         from zope.schema.interfaces import IField
 
         class Foo(object):
@@ -62,11 +63,11 @@ class Test__fields(unittest.TestCase):
         self.assertEqual(self._callFUT([object()]), False)
 
     def test_w_fields(self):
-        from zope.schema import Text
         from zope.schema import Bytes
-        from zope.schema import Int
-        from zope.schema import Float
         from zope.schema import Decimal
+        from zope.schema import Float
+        from zope.schema import Int
+        from zope.schema import Text
         self.assertEqual(self._callFUT([Text()]), True)
         self.assertEqual(self._callFUT([Bytes()]), True)
         self.assertEqual(self._callFUT([Int()]), True)
@@ -78,11 +79,11 @@ class Test__fields(unittest.TestCase):
         )
 
     def test_w_mixed(self):
-        from zope.schema import Text
         from zope.schema import Bytes
-        from zope.schema import Int
-        from zope.schema import Float
         from zope.schema import Decimal
+        from zope.schema import Float
+        from zope.schema import Int
+        from zope.schema import Text
         self.assertEqual(self._callFUT([Text(), 0]), False)
         self.assertEqual(
             self._callFUT([Text(), Bytes(), Int(), Float(), Decimal(), 0]),
@@ -93,6 +94,7 @@ class Test__fields(unittest.TestCase):
         """If class Bool is used as a schema itself, it must not be required.
         """
         from zope.schema.interfaces import IBool
+
         # treat IBool as schema with fields
         field = IBool.get("required")
         self.assertFalse(field.required)
@@ -101,6 +103,7 @@ class Test__fields(unittest.TestCase):
         """If class Bool is used as a schema itself, it must default to False
         """
         from zope.schema.interfaces import IBool
+
         # treat IBool as schema with fields
         field = IBool.get("default")
         self.assertFalse(field.default)
