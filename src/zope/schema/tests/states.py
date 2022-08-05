@@ -15,7 +15,9 @@
 """
 
 from zope.interface import implementer
+
 from zope.schema import interfaces
+
 
 # This table is based on information from the United States Postal Service:
 # http://www.usps.com/ncsc/lookups/abbreviations.html#states

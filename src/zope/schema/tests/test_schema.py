@@ -19,6 +19,7 @@ import unittest
 def _makeSchema():
 
     from zope.interface import Interface
+
     from zope.schema import Bytes
 
     class ISchemaTest(Interface):
@@ -160,6 +161,7 @@ class Test_getValidationErrors(unittest.TestCase):
 
     def test_schema_with_field_errors(self):
         from zope.interface import Interface
+
         from zope.schema import Text
         from zope.schema.interfaces import SchemaNotFullyImplemented
 
@@ -209,8 +211,8 @@ class Test_getSchemaValidationErrors(unittest.TestCase):
         return getSchemaValidationErrors(schema, object)
 
     def test_schema_wo_fields(self):
-        from zope.interface import Interface
         from zope.interface import Attribute
+        from zope.interface import Interface
 
         class INoFields(Interface):
             def method():
@@ -222,6 +224,7 @@ class Test_getSchemaValidationErrors(unittest.TestCase):
 
     def test_schema_with_fields_ok(self):
         from zope.interface import Interface
+
         from zope.schema import Text
 
         class IWithFields(Interface):
@@ -237,6 +240,7 @@ class Test_getSchemaValidationErrors(unittest.TestCase):
 
     def test_schema_with_missing_field(self):
         from zope.interface import Interface
+
         from zope.schema import Text
         from zope.schema.interfaces import SchemaNotFullyImplemented
 
@@ -253,6 +257,7 @@ class Test_getSchemaValidationErrors(unittest.TestCase):
 
     def test_schema_with_invalid_field(self):
         from zope.interface import Interface
+
         from zope.schema import Int
         from zope.schema.interfaces import TooSmall
 

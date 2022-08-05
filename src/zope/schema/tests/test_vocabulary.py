@@ -27,11 +27,13 @@ class SimpleTermTests(unittest.TestCase):
 
     def test_class_conforms_to_ITokenizedTerm(self):
         from zope.interface.verify import verifyClass
+
         from zope.schema.interfaces import ITokenizedTerm
         verifyClass(ITokenizedTerm, self._getTargetClass())
 
     def test_instance_conforms_to_ITokenizedTerm(self):
         from zope.interface.verify import verifyObject
+
         from zope.schema.interfaces import ITokenizedTerm
         verifyObject(ITokenizedTerm, self._makeOne('VALUE'))
 
@@ -116,16 +118,19 @@ class SimpleVocabularyTests(unittest.TestCase):
 
     def test_class_conforms_to_IVocabularyTokenized(self):
         from zope.interface.verify import verifyClass
+
         from zope.schema.interfaces import IVocabularyTokenized
         verifyClass(IVocabularyTokenized, self._getTargetClass())
 
     def test_instance_conforms_to_IVocabularyTokenized(self):
         from zope.interface.verify import verifyObject
+
         from zope.schema.interfaces import IVocabularyTokenized
         verifyObject(IVocabularyTokenized, self._makeOne(()))
 
     def test_ctor_additional_interfaces(self):
         from zope.interface import Interface
+
         from zope.schema.vocabulary import SimpleTerm
 
         class IStupid(Interface):
@@ -146,6 +151,7 @@ class SimpleVocabularyTests(unittest.TestCase):
 
     def test_fromValues(self):
         from zope.interface import Interface
+
         from zope.schema.interfaces import ITokenizedTerm
 
         class IStupid(Interface):
@@ -162,6 +168,7 @@ class SimpleVocabularyTests(unittest.TestCase):
 
     def test_fromItems(self):
         from zope.interface import Interface
+
         from zope.schema.interfaces import ITokenizedTerm
 
         class IStupid(Interface):
@@ -179,6 +186,7 @@ class SimpleVocabularyTests(unittest.TestCase):
 
     def test_fromItems_triples(self):
         from zope.interface import Interface
+
         from zope.schema.interfaces import ITitledTokenizedTerm
 
         class IStupid(Interface):
@@ -363,8 +371,9 @@ class TreeVocabularyTests(unittest.TestCase):
             self.assertTrue(ITitledTokenizedTerm.providedBy(term))
 
     def test_implementation(self):
-        from zope.interface.verify import verifyObject
         from zope.interface.common.mapping import IEnumerableMapping
+        from zope.interface.verify import verifyObject
+
         from zope.schema.interfaces import ITreeVocabulary
         from zope.schema.interfaces import IVocabulary
         from zope.schema.interfaces import IVocabularyTokenized
@@ -689,8 +698,8 @@ class RegistryTests(unittest.TestCase):
         _clear()
 
     def test_setVocabularyRegistry(self):
-        from zope.schema.vocabulary import setVocabularyRegistry
         from zope.schema.vocabulary import getVocabularyRegistry
+        from zope.schema.vocabulary import setVocabularyRegistry
         r = _makeDummyRegistry()
         setVocabularyRegistry(r)
         self.assertTrue(getVocabularyRegistry() is r)
@@ -706,6 +715,7 @@ class RegistryTests(unittest.TestCase):
 
 def _makeSampleVocabulary():
     from zope.interface import implementer
+
     from zope.schema.interfaces import IVocabulary
 
     class SampleTerm(object):

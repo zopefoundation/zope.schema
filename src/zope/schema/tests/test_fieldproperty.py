@@ -266,11 +266,12 @@ class FieldPropertyTests(_Base, _Integration):
         self.assertEqual(_validated, ['123'])
 
     def test_field_event(self):
-        from zope.schema import Text
-        from zope.interface.verify import verifyObject
         from zope.event import subscribers
-        from zope.schema.interfaces import IFieldUpdatedEvent
+        from zope.interface.verify import verifyObject
+
+        from zope.schema import Text
         from zope.schema.fieldproperty import FieldUpdatedEvent
+        from zope.schema.interfaces import IFieldUpdatedEvent
         log = []
         subscribers.append(log.append)
         self.assertEqual(log, [])
@@ -300,11 +301,12 @@ class FieldPropertyTests(_Base, _Integration):
         self.assertEqual(event.object, marker)
 
     def test_field_event_update(self):
-        from zope.schema import Text
-        from zope.interface.verify import verifyObject
         from zope.event import subscribers
-        from zope.schema.interfaces import IFieldUpdatedEvent
+        from zope.interface.verify import verifyObject
+
+        from zope.schema import Text
         from zope.schema.fieldproperty import FieldUpdatedEvent
+        from zope.schema.interfaces import IFieldUpdatedEvent
         field = Text(
             __name__='testing',
             description=u'DESCRIPTION',
@@ -588,9 +590,9 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
         self.assertRaises(ValueError, setattr, foo, 'testing', '123')
 
     def test_field_event_update(self):
-        from zope.schema import Text
-
         from zope.event import subscribers
+
+        from zope.schema import Text
         from zope.schema.fieldproperty import FieldUpdatedEvent
         field = Text(
             __name__='testing',
@@ -619,9 +621,9 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
     def test_field_event(self):
         # fieldproperties are everywhere including in field themselfs
         # so event are triggered
-        from zope.schema import Text
-
         from zope.event import subscribers
+
+        from zope.schema import Text
         from zope.schema.fieldproperty import FieldUpdatedEvent
         log = []
         subscribers.append(log.append)
@@ -648,6 +650,7 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
 
 def _getSchema():
     from zope.interface import Interface
+
     from zope.schema import Bytes
     from zope.schema import Float
     from zope.schema import Text
@@ -666,8 +669,8 @@ class CreateFieldPropertiesTests(unittest.TestCase):
     """Testing ..fieldproperty.createFieldProperties."""
 
     def test_creates_fieldproperties_on_class(self):
-        from zope.schema.fieldproperty import createFieldProperties
         from zope.schema.fieldproperty import FieldProperty
+        from zope.schema.fieldproperty import createFieldProperties
         schema = _getSchema()
 
         class Dummy(object):

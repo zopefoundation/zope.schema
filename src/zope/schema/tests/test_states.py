@@ -19,9 +19,9 @@ import unittest
 class StateSelectionTest(unittest.TestCase):
 
     def setUp(self):
+        from zope.schema.tests.states import StateVocabulary
         from zope.schema.vocabulary import _clear
         from zope.schema.vocabulary import getVocabularyRegistry
-        from zope.schema.tests.states import StateVocabulary
         _clear()
         vr = getVocabularyRegistry()
         vr.register("states", StateVocabulary)
@@ -33,6 +33,7 @@ class StateSelectionTest(unittest.TestCase):
     def _makeSchema(self):
 
         from zope.interface import Interface
+
         from zope.schema import Choice
         from zope.schema.tests.states import StateVocabulary
 
@@ -63,6 +64,7 @@ class StateSelectionTest(unittest.TestCase):
 
     def test_default_presentation(self):
         from zope.interface.verify import verifyObject
+
         from zope.schema.interfaces import IVocabulary
         schema = self._makeSchema()
         field = schema.getDescriptionFor("state1")
@@ -72,6 +74,7 @@ class StateSelectionTest(unittest.TestCase):
 
     def test_contains(self):
         from zope.interface.verify import verifyObject
+
         from zope.schema.interfaces import IVocabulary
         from zope.schema.tests.states import StateVocabulary
         vocab = StateVocabulary()
@@ -91,6 +94,7 @@ class StateSelectionTest(unittest.TestCase):
 
     def test_prebound_vocabulary(self):
         from zope.interface.verify import verifyObject
+
         from zope.schema.interfaces import IVocabulary
         schema = self._makeSchema()
         field = schema.getDescriptionFor("state3")

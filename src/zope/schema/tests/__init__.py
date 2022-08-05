@@ -3,8 +3,9 @@
 
 import re
 
-from zope.schema._compat import PY3
 from zope.testing import renormalizing
+
+from zope.schema._compat import PY3
 
 
 def _make_transforms(patterns):

@@ -23,16 +23,15 @@ import threading
 import unicodedata
 from math import isinf
 
+from zope.event import notify
 from zope.interface import Attribute
-from zope.interface import Invalid
 from zope.interface import Interface
-from zope.interface import providedBy
+from zope.interface import Invalid
 from zope.interface import implementer
+from zope.interface import providedBy
 from zope.interface.interface import InterfaceClass
 from zope.interface.interfaces import IInterface
 from zope.interface.interfaces import IMethod
-
-from zope.event import notify
 
 from zope.schema._bootstrapinterfaces import ConstraintNotSatisfied
 from zope.schema._bootstrapinterfaces import IBeforeObjectAssignedEvent
@@ -41,8 +40,8 @@ from zope.schema._bootstrapinterfaces import IFromBytes
 from zope.schema._bootstrapinterfaces import IFromUnicode
 from zope.schema._bootstrapinterfaces import IValidatable
 from zope.schema._bootstrapinterfaces import NotAContainer
-from zope.schema._bootstrapinterfaces import NotAnIterator
 from zope.schema._bootstrapinterfaces import NotAnInterface
+from zope.schema._bootstrapinterfaces import NotAnIterator
 from zope.schema._bootstrapinterfaces import RequiredMissing
 from zope.schema._bootstrapinterfaces import SchemaNotCorrectlyImplemented
 from zope.schema._bootstrapinterfaces import SchemaNotFullyImplemented
@@ -54,10 +53,9 @@ from zope.schema._bootstrapinterfaces import TooShort
 from zope.schema._bootstrapinterfaces import TooSmall
 from zope.schema._bootstrapinterfaces import ValidationError
 from zope.schema._bootstrapinterfaces import WrongType
-
-from zope.schema._compat import text_type
-from zope.schema._compat import integer_types
 from zope.schema._compat import PY2
+from zope.schema._compat import integer_types
+from zope.schema._compat import text_type
 
 
 class _NotGiven(object):

@@ -17,11 +17,11 @@ import unittest
 
 from zope.schema.tests.test__bootstrapfields import EqualityTestsMixin
 from zope.schema.tests.test__bootstrapfields import LenTestsMixin
+from zope.schema.tests.test__bootstrapfields import NumberTests
 from zope.schema.tests.test__bootstrapfields import OrderableMissingValueMixin
 from zope.schema.tests.test__bootstrapfields import OrderableTestsMixin
 from zope.schema.tests.test__bootstrapfields import WrongTypeTestsMixin
 
-from zope.schema.tests.test__bootstrapfields import NumberTests
 
 # pylint:disable=protected-access
 # pylint:disable=too-many-lines
@@ -43,8 +43,8 @@ class BytesTests(EqualityTestsMixin,
         return IBytes
 
     def _getTargetInterfaces(self):
-        from zope.schema.interfaces import IFromUnicode
         from zope.schema.interfaces import IFromBytes
+        from zope.schema.interfaces import IFromUnicode
         return [self._getTargetInterface(), IFromUnicode, IFromBytes]
 
     def test_validate_wrong_types(self):
@@ -160,8 +160,8 @@ class BytesLineTests(EqualityTestsMixin,
         return IBytesLine
 
     def _getTargetInterfaces(self):
-        from zope.schema.interfaces import IFromUnicode
         from zope.schema.interfaces import IFromBytes
+        from zope.schema.interfaces import IFromUnicode
         return [self._getTargetInterface(), IFromUnicode, IFromBytes]
 
     def test_validate_wrong_types(self):
@@ -440,6 +440,7 @@ class TimedeltaTests(OrderableMissingValueMixin,
 
     def test_validate_required(self):
         from datetime import timedelta
+
         from zope.schema.interfaces import RequiredMissing
         field = self._makeOne()
         field.validate(timedelta(minutes=15))
@@ -477,6 +478,7 @@ class TimeTests(OrderableMissingValueMixin,
 
     def test_validate_required(self):
         from datetime import time
+
         from zope.schema.interfaces import RequiredMissing
         field = self._makeOne()
         field.validate(time(12, 15, 37))
@@ -585,8 +587,9 @@ class ChoiceTests(EqualityTestsMixin,
 
     def test_bind_w_voc_not_ICSB(self):
         from zope.interface import implementer
-        from zope.schema.interfaces import ISource
+
         from zope.schema.interfaces import IBaseVocabulary
+        from zope.schema.interfaces import ISource
 
         @implementer(IBaseVocabulary)
         @implementer(ISource)
@@ -601,6 +604,7 @@ class ChoiceTests(EqualityTestsMixin,
 
     def test_bind_w_voc_is_ICSB(self):
         from zope.interface import implementer
+
         from zope.schema.interfaces import IContextSourceBinder
         from zope.schema.interfaces import ISource
 
@@ -623,6 +627,7 @@ class ChoiceTests(EqualityTestsMixin,
 
     def test_bind_w_voc_is_ICSB_but_not_ISource(self):
         from zope.interface import implementer
+
         from zope.schema.interfaces import IContextSourceBinder
 
         @implementer(IContextSourceBinder)
@@ -750,6 +755,7 @@ class ChoiceTests(EqualityTestsMixin,
 
     def test__validate_source_is_ICSB_unbound(self):
         from zope.interface import implementer
+
         from zope.schema.interfaces import IContextSourceBinder
 
         @implementer(IContextSourceBinder)
@@ -762,8 +768,9 @@ class ChoiceTests(EqualityTestsMixin,
 
     def test__validate_source_is_ICSB_bound(self):
         from zope.interface import implementer
-        from zope.schema.interfaces import IContextSourceBinder
+
         from zope.schema.interfaces import ConstraintNotSatisfied
+        from zope.schema.interfaces import IContextSourceBinder
         from zope.schema.tests.test_vocabulary import _makeSampleVocabulary
 
         @implementer(IContextSourceBinder)
@@ -795,8 +802,8 @@ class URITests(EqualityTestsMixin,
         return IURI
 
     def _getTargetInterfaces(self):
-        from zope.schema.interfaces import IFromUnicode
         from zope.schema.interfaces import IFromBytes
+        from zope.schema.interfaces import IFromUnicode
         return [self._getTargetInterface(), IFromUnicode, IFromBytes]
 
     def test_validate_wrong_types(self):
@@ -868,8 +875,8 @@ class PythonIdentifierTests(EqualityTestsMixin,
         return PythonIdentifier
 
     def _getTargetInterfaces(self):
-        from zope.schema.interfaces import IFromUnicode
         from zope.schema.interfaces import IFromBytes
+        from zope.schema.interfaces import IFromUnicode
         return [self._getTargetInterface(), IFromUnicode, IFromBytes]
 
     def _getTargetInterface(self):
@@ -917,8 +924,8 @@ class DottedNameTests(EqualityTestsMixin,
         return IDottedName
 
     def _getTargetInterfaces(self):
-        from zope.schema.interfaces import IFromUnicode
         from zope.schema.interfaces import IFromBytes
+        from zope.schema.interfaces import IFromUnicode
         return [self._getTargetInterface(), IFromUnicode, IFromBytes]
 
     def test_ctor_defaults(self):
@@ -1042,8 +1049,8 @@ class IdTests(EqualityTestsMixin,
         return IId
 
     def _getTargetInterfaces(self):
-        from zope.schema.interfaces import IFromUnicode
         from zope.schema.interfaces import IFromBytes
+        from zope.schema.interfaces import IFromUnicode
         return [self._getTargetInterface(), IFromUnicode, IFromBytes]
 
     def test_validate_wrong_types(self):
@@ -1127,8 +1134,9 @@ class InterfaceFieldTests(EqualityTestsMixin,
         return IInterfaceField
 
     def test_validate_wrong_types(self):
-        from zope.interface.interfaces import IInterface
         from datetime import date
+
+        from zope.interface.interfaces import IInterface
 
         field = self._makeOne()
         self.assertAllRaiseWrongType(
@@ -1158,6 +1166,7 @@ class InterfaceFieldTests(EqualityTestsMixin,
 
     def test_validate_required(self):
         from zope.interface import Interface
+
         from zope.schema.interfaces import RequiredMissing
 
         class DummyInterface(Interface):
@@ -1258,9 +1267,9 @@ class CollectionTests(EqualityTestsMixin,
         self.assertEqual(bound.unique, True)
 
     def test__validate_wrong_contained_type(self):
+        from zope.schema._bootstrapfields import Text
         from zope.schema.interfaces import WrongContainedType
         from zope.schema.interfaces import WrongType
-        from zope.schema._bootstrapfields import Text
         text = Text()
         absc = self._makeOne(text)
         with self.assertRaises(WrongContainedType) as exc:
@@ -1275,9 +1284,9 @@ class CollectionTests(EqualityTestsMixin,
         self.assertIs(wct.errors[0].expected_type, text._type)
 
     def test__validate_miss_uniqueness(self):
+        from zope.schema._bootstrapfields import Text
         from zope.schema.interfaces import NotUnique
         from zope.schema.interfaces import WrongType
-        from zope.schema._bootstrapfields import Text
 
         text = Text()
         absc = self._makeOne(text, True)
@@ -1568,9 +1577,9 @@ class MappingTests(EqualityTestsMixin,
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def test_validate_invalid_key_type(self):
+        from zope.schema._bootstrapfields import Int
         from zope.schema.interfaces import WrongContainedType
         from zope.schema.interfaces import WrongType
-        from zope.schema._bootstrapfields import Int
         field = self._makeOne(key_type=Int())
         field.validate({})
         field.validate({1: 'b', 2: 'd'})
@@ -1587,9 +1596,9 @@ class MappingTests(EqualityTestsMixin,
         self.assertIs(field.key_type._type, wct.errors[0].expected_type)
 
     def test_validate_invalid_value_type(self):
+        from zope.schema._bootstrapfields import Int
         from zope.schema.interfaces import WrongContainedType
         from zope.schema.interfaces import WrongType
-        from zope.schema._bootstrapfields import Int
         field = self._makeOne(value_type=Int())
         field.validate({})
         field.validate({'b': 1, 'd': 2})
@@ -1727,8 +1736,8 @@ class NativeStringTests(EqualityTestsMixin,
         return INativeString
 
     def _getTargetInterfaces(self):
-        from zope.schema.interfaces import IFromUnicode
         from zope.schema.interfaces import IFromBytes
+        from zope.schema.interfaces import IFromUnicode
         return [self._getTargetInterface(), IFromUnicode, IFromBytes]
 
     def test_fromBytes(self):
@@ -1756,8 +1765,8 @@ class NativeStringLineTests(EqualityTestsMixin,
         return INativeStringLine
 
     def _getTargetInterfaces(self):
-        from zope.schema.interfaces import IFromUnicode
         from zope.schema.interfaces import IFromBytes
+        from zope.schema.interfaces import IFromUnicode
         return [self._getTargetInterface(), IFromUnicode, IFromBytes]
 
     def test_fromBytes(self):
@@ -1790,6 +1799,7 @@ class StrippedNativeStringLineTests(NativeStringLineTests):
 
 def _makeSampleVocabulary():
     from zope.interface import implementer
+
     from zope.schema.interfaces import IVocabulary
 
     @implementer(IVocabulary)
