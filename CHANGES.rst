@@ -2,7 +2,7 @@
  Changes
 =========
 
-6.2.1 (unreleased)
+6.2.1 (2022-09-14)
 ==================
 
 - Fix outsized integer test values that break tests on newer Python versions.
