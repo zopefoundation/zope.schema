@@ -5,13 +5,15 @@
 6.2.1 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Fix outsized integer test values that break tests on newer Python versions.
+  (`#115 <https://github.com/zopefoundation/zope.schema/issues/115`_)
 
 
 6.2.0 (2021-10-18)
 ==================
 
 - Add support for Python 3.10.
+
 
 6.1.1 (2021-10-13)
 ==================

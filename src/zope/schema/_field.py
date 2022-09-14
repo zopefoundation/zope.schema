@@ -298,7 +298,7 @@ class Float(Real):
         Traceback (most recent call last):
         ...
         InvalidFloatLiteral: invalid literal for float(): 1/2
-        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256))
+        >>> f.fromUnicode(str(2**11234) + '.' + str(2**256))
         ... # doctest: +ELLIPSIS
         inf
         >>> f.fromUnicode("not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
@@ -322,7 +322,7 @@ class Float(Real):
         Traceback (most recent call last):
         ...
         InvalidFloatLiteral: invalid literal for float(): 1/2
-        >>> f.fromBytes((str(2**31234) + '.' + str(2**256)).encode('ascii'))
+        >>> f.fromBytes((str(2**11234) + '.' + str(2**256)).encode('ascii'))
         ... # doctest: +ELLIPSIS
         inf
         >>> f.fromBytes(b"not a number") # doctest: +IGNORE_EXCEPTION_DETAIL

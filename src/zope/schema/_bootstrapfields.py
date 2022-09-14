@@ -689,9 +689,9 @@ class Number(Orderable, Field):
         (1+0j)
         >>> f.fromUnicode(u"1/2")
         Fraction(1, 2)
-        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256))
+        >>> f.fromUnicode(str(2**11234) + '.' + str(2**256))
         ... # doctest: +ELLIPSIS
-        Decimal('234...936')
+        Decimal('590...936')
         >>> f.fromUnicode(u"not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
@@ -709,9 +709,9 @@ class Number(Orderable, Field):
         (1+0j)
         >>> f.fromBytes(b"1/2")
         Fraction(1, 2)
-        >>> f.fromBytes((str(2**31234) + '.' + str(2**256)).encode('ascii'))
+        >>> f.fromBytes((str(2**11234) + '.' + str(2**256)).encode('ascii'))
         ... # doctest: +ELLIPSIS
-        Decimal('234...936')
+        Decimal('590...936')
         >>> f.fromBytes(b"not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
@@ -786,7 +786,7 @@ class Complex(Number):
         (1+0j)
         >>> f.fromUnicode(u"1/2")
         Fraction(1, 2)
-        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256))
+        >>> f.fromUnicode(str(2**11234) + '.' + str(2**256))
         ... # doctest: +ELLIPSIS
         inf
         >>> f.fromUnicode(u"not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
@@ -806,7 +806,7 @@ class Complex(Number):
         (1+0j)
         >>> f.fromBytes(b"1/2")
         Fraction(1, 2)
-        >>> f.fromBytes((str(2**31234) + '.' + str(2**256)).encode('ascii'))
+        >>> f.fromBytes((str(2**11234) + '.' + str(2**256)).encode('ascii'))
         ... # doctest: +ELLIPSIS
         inf
         >>> f.fromBytes(b"not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
@@ -840,7 +840,7 @@ class Real(Complex):
         InvalidNumberLiteral: Invalid literal for Fraction: '1+0j'
         >>> f.fromUnicode("1/2")
         Fraction(1, 2)
-        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256))
+        >>> f.fromUnicode(str(2**11234) + '.' + str(2**256))
         ... # doctest: +ELLIPSIS
         inf
         >>> f.fromUnicode("not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
@@ -874,9 +874,9 @@ class Rational(Real):
         Traceback (most recent call last):
         ...
         InvalidNumberLiteral: Invalid literal for Fraction: '1+0j'
-        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256))
+        >>> f.fromUnicode(str(2**11234) + '.' + str(2**256))
         ... # doctest: +ELLIPSIS
-        Fraction(777..., 330...)
+        Fraction(195..., 330...)
         >>> f.fromUnicode("not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
@@ -960,9 +960,9 @@ class Decimal(Number):
         Traceback (most recent call last):
         ...
         InvalidDecimalLiteral: Invalid literal for Decimal(): 1/2
-        >>> f.fromUnicode(str(2**31234) + '.' + str(2**256))
+        >>> f.fromUnicode(str(2**11234) + '.' + str(2**256))
         ... # doctest: +ELLIPSIS
-        Decimal('2349...936')
+        Decimal('5901...936')
         >>> f.fromUnicode("not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
@@ -984,9 +984,9 @@ class Decimal(Number):
         Traceback (most recent call last):
         ...
         InvalidDecimalLiteral: Invalid literal for Decimal(): 1/2
-        >>> f.fromBytes((str(2**31234) + '.' + str(2**256)).encode("ascii"))
+        >>> f.fromBytes((str(2**11234) + '.' + str(2**256)).encode("ascii"))
         ... # doctest: +ELLIPSIS
-        Decimal('2349...936')
+        Decimal('5901...936')
         >>> f.fromBytes(b"not a number") # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
