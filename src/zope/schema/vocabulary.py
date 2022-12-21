@@ -19,7 +19,6 @@ from zope.interface import directlyProvides
 from zope.interface import implementer
 from zope.interface import providedBy
 
-from zope.schema._compat import text_type
 from zope.schema.interfaces import ITitledTokenizedTerm
 from zope.schema.interfaces import ITokenizedTerm
 from zope.schema.interfaces import ITreeVocabulary
@@ -51,23 +50,18 @@ class SimpleTerm(object):
         self.value = value
         if token is None:
             token = value
-        # In Python 3 str(bytes) returns str(repr(bytes)), which is not what
-        # we want here. On the other hand, we want to try to keep the token as
-        # readable as possible. On both 2 and 3, self.token should be a native
-        # string (ASCIILine).
+        # str(bytes) returns str(repr(bytes)), which is not what we want
+        # here. On the other hand, we want to try to keep the token as
+        # readable as possible. self.token should be a native string
+        # (ASCIILine).
         if isinstance(token, bytes):
             token = token.decode('raw_unicode_escape')
-        elif not isinstance(token, (str, text_type)):
+        elif not isinstance(token, str):
             # Nothing we recognize as intended to be textual data.
             # Get its str() as promised
             token = str(token)
-
-        if isinstance(token, text_type):  # pragma: PY2
-            token = token.encode('ascii', 'backslashreplace')
-        # Token should be bytes at this point. Now back to native string,
-        # if needed.
-        if not isinstance(token, str):    # pragma: PY2
-            token = token.decode('ascii')
+        # Escape any non-ASCII characters.
+        token = token.encode('ascii', 'backslashreplace').decode('ascii')
         self.token = token
         self.title = title
         if title is not None:

@@ -944,9 +944,8 @@ class TextTests(EqualityTestsMixin,
         return IText
 
     def test_ctor_defaults(self):
-        from zope.schema._compat import text_type
         txt = self._makeOne()
-        self.assertEqual(txt._type, text_type)
+        self.assertEqual(txt._type, str)
 
     def test_validate_wrong_types(self):
         field = self._makeOne()
@@ -1344,9 +1343,8 @@ class IntTests(IntegralTests):
         return IInt
 
     def test_ctor_defaults(self):
-        from zope.schema._compat import integer_types
         txt = self._makeOne()
-        self.assertEqual(txt._type, integer_types)
+        self.assertEqual(txt._type, int)
 
 
 class DecimalTests(NumberTests):
@@ -1587,7 +1585,6 @@ class ObjectTests(EqualityTestsMixin,
         from zope.interface import implementer
 
         from zope.schema._bootstrapfields import Text
-        from zope.schema._compat import text_type
         from zope.schema.interfaces import RequiredMissing
         from zope.schema.interfaces import SchemaNotCorrectlyImplemented
         from zope.schema.interfaces import WrongType
@@ -1623,7 +1620,7 @@ class ObjectTests(EqualityTestsMixin,
         self.assertEqual(err.args, ('foo',))
         err = errors[1]
         self.assertIsInstance(err, WrongType)
-        self.assertEqual(err.args, (1, text_type, 'bar'))
+        self.assertEqual(err.args, (1, str, 'bar'))
 
     def test__validate_w_value_providing_schema(self):
         from zope.interface import implementer
@@ -1963,12 +1960,10 @@ class DummyInst(object):
 
 
 def test_suite():
-    from zope.testing.renormalizing import IGNORE_EXCEPTION_MODULE_IN_PYTHON2
-
     import zope.schema._bootstrapfields
     suite = unittest.defaultTestLoader.loadTestsFromName(__name__)
     suite.addTests(doctest.DocTestSuite(
         zope.schema._bootstrapfields,
-        optionflags=doctest.ELLIPSIS | IGNORE_EXCEPTION_MODULE_IN_PYTHON2
+        optionflags=doctest.ELLIPSIS
     ))
     return suite

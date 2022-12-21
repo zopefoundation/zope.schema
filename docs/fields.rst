@@ -22,7 +22,7 @@ Bytes
 -----
 
 :class:`zope.schema.Bytes` fields contain binary data, represented
-as a sequence of bytes (``str`` in Python2, ``bytes`` in Python3).
+as a sequence of ``bytes``.
 
 Conversion from Unicode:
 

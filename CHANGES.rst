@@ -2,11 +2,14 @@
  Changes
 =========
 
-6.2.2 (unreleased)
+7.0.0 (unreleased)
 ==================
 
-
 - Add support for Python 3.11.
+
+- Drop support for Python 2.7, 3.5, 3.6.
+
+- Drop ``zope.schema._compat`` module.
 
 6.2.1 (2022-09-14)
 ==================
