@@ -15,13 +15,8 @@
 """
 __docformat__ = 'restructuredtext'
 
-try:
-    from collections import abc
-except ImportError:  # pragma: PY2
-    # Python 2
-    import collections as abc
-
 import re
+from collections import abc
 from datetime import date
 from datetime import datetime
 from datetime import time
@@ -53,11 +48,6 @@ from zope.schema._bootstrapfields import Real
 from zope.schema._bootstrapfields import Text
 from zope.schema._bootstrapfields import TextLine
 from zope.schema._bootstrapfields import _NotGiven
-from zope.schema._compat import PY3
-from zope.schema._compat import binary_type
-from zope.schema._compat import make_binary
-from zope.schema._compat import string_types
-from zope.schema._compat import text_type
 from zope.schema.fieldproperty import FieldProperty
 from zope.schema.interfaces import IASCII
 from zope.schema.interfaces import IURI
@@ -174,19 +164,18 @@ class implementer_if_needed(object):
 @implementer(ISourceText)
 class SourceText(Text):
     __doc__ = ISourceText.__doc__
-    _type = text_type
+    _type = str
 
 
 @implementer(IBytes, IFromUnicode, IFromBytes)
 class Bytes(MinMaxLen, Field):
     __doc__ = IBytes.__doc__
-
-    _type = binary_type
+    _type = bytes
 
     def fromUnicode(self, value):
         """ See IFromUnicode.
         """
-        return self.fromBytes(make_binary(value))
+        return self.fromBytes(value.encode('ascii'))
 
     def fromBytes(self, value):
         self.validate(value)
@@ -194,7 +183,7 @@ class Bytes(MinMaxLen, Field):
 
 
 @implementer_if_needed(INativeString, IFromUnicode, IFromBytes)
-class NativeString(Text if PY3 else Bytes):
+class NativeString(Text):
     """
     A native string is always the type `str`.
 
@@ -208,11 +197,10 @@ class NativeString(Text if PY3 else Bytes):
     """
     _type = str
 
-    if PY3:  # pragma: no branch
-        def fromBytes(self, value):
-            value = value.decode('utf-8')
-            self.validate(value)
-            return value
+    def fromBytes(self, value):
+        value = value.decode('utf-8')
+        self.validate(value)
+        return value
 
 
 @implementer(IASCII)
@@ -237,7 +225,7 @@ class BytesLine(Bytes):
 
 
 @implementer_if_needed(INativeStringLine, IFromUnicode, IFromBytes)
-class NativeStringLine(TextLine if PY3 else BytesLine):
+class NativeStringLine(TextLine):
     """
     A native string is always the type `str`; this field excludes
     newlines.
@@ -252,11 +240,10 @@ class NativeStringLine(TextLine if PY3 else BytesLine):
     """
     _type = str
 
-    if PY3:  # pragma: no branch
-        def fromBytes(self, value):
-            value = value.decode('utf-8')
-            self.validate(value)
-            return value
+    def fromBytes(self, value):
+        value = value.decode('utf-8')
+        self.validate(value)
+        return value
 
 
 @implementer(IASCIILine)
@@ -397,7 +384,7 @@ class Choice(Field):
     def __init__(self, values=None, vocabulary=None, source=None, **kw):
         """Initialize object."""
         if vocabulary is not None:
-            if (not isinstance(vocabulary, string_types)
+            if (not isinstance(vocabulary, str)
                     and not IBaseVocabulary.providedBy(vocabulary)):
                 raise ValueError('vocabulary must be a string or implement '
                                  'IBaseVocabulary')
@@ -420,7 +407,7 @@ class Choice(Field):
         self.vocabularyName = None
         if values is not None:
             self.vocabulary = SimpleVocabulary.fromValues(values)
-        elif isinstance(vocabulary, string_types):
+        elif isinstance(vocabulary, str):
             self.vocabularyName = vocabulary
         else:
             if (not ISource.providedBy(vocabulary)
@@ -500,17 +487,15 @@ class _StrippedNativeStringLine(NativeStringLine):
 
     def fromUnicode(self, value):
         v = value.strip()
-        # On Python 2, self._type is bytes, so we need to encode
-        # unicode down to ASCII bytes. On Python 3, self._type is
-        # unicode, but we don't want to allow non-ASCII values, to match
-        # Python 2 (our regexs would reject that anyway.)
+        # self._type is unicode, but we don't want to allow non-ASCII
+        # values, to match the old behaviour on Python 2 (our regexes would
+        # reject that anyway).
         try:
             v = v.encode('ascii')  # bytes
         except UnicodeEncodeError:
             raise self._invalid_exc_type(value).with_field_and_value(
                 self, value)
-        if not isinstance(v, self._type):  # pragma: no branch
-            v = v.decode('ascii')
+        v = v.decode('ascii')
         self.validate(v)
         return v
 

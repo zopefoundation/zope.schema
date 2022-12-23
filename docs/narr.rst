@@ -98,8 +98,7 @@ occurs a ``ValidationError`` will be raised; for example:
 
 .. doctest::
 
-   >>> from zope.schema._compat import non_native_string
-   >>> url_bound.validate(non_native_string('http://zope.org/foo'))
+   >>> url_bound.validate(b'http://zope.org/foo')
    Traceback (most recent call last):
    ...
    WrongType: ...

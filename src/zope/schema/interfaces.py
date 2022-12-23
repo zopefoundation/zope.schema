@@ -59,7 +59,6 @@ from zope.schema._bootstrapinterfaces import TooSmall
 from zope.schema._bootstrapinterfaces import ValidationError
 from zope.schema._bootstrapinterfaces import WrongContainedType
 from zope.schema._bootstrapinterfaces import WrongType
-from zope.schema._compat import PY3
 from zope.schema._messageid import _
 
 
@@ -420,7 +419,7 @@ class IText(IMinMaxLen, IIterable, IField):
 
 
 # for things which are of the str type on both Python 2 and 3
-class INativeString(IText if PY3 else IBytes):
+class INativeString(IText):
     """
     A field that always contains the native `str` type.
 
@@ -454,7 +453,7 @@ class ITextLine(IText):
     """Field containing a unicode string without newlines."""
 
 
-class INativeStringLine(ITextLine if PY3 else IBytesLine):
+class INativeStringLine(ITextLine):
     """
     A field that always contains the native `str` type, without any newlines.
 
@@ -613,8 +612,7 @@ class IIntegral(IRational):
 
 class IInt(IIntegral):
     """
-    Field containing exactly the native class :class:`int` (or, on
-    Python 2, ``long``).
+    Field containing exactly the native class :class:`int`.
 
     .. seealso:: :class:`zope.schema.Int`
     """
@@ -918,8 +916,7 @@ class ITokenizedTerm(ITerm):
         "token",
         """Token which can be used to represent the value on a stream.
 
-        The value of this attribute must be a non-empty 7-bit native string
-        (i.e., the ``str`` type on both Python 2 and 3).
+        The value of this attribute must be a non-empty 7-bit ``str``.
         Control characters, including newline, are not allowed.
         """)
 

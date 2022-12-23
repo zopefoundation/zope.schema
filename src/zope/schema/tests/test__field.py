@@ -112,12 +112,11 @@ class ASCIITests(EqualityTestsMixin,
         return IASCII
 
     def test_validate_wrong_types(self):
-        from zope.schema._compat import non_native_string
         field = self._makeOne()
         self.assertAllRaiseWrongType(
             field,
             field._type,
-            non_native_string(''),
+            b'',
             1,
             1.0,
             (),
@@ -222,12 +221,11 @@ class ASCIILineTests(EqualityTestsMixin,
         return IASCIILine
 
     def test_validate_wrong_types(self):
-        from zope.schema._compat import non_native_string
         field = self._makeOne()
         self.assertAllRaiseWrongType(
             field,
             field._type,
-            non_native_string(''),
+            b'',
             1,
             1.0,
             (),
@@ -807,12 +805,11 @@ class URITests(EqualityTestsMixin,
         return [self._getTargetInterface(), IFromUnicode, IFromBytes]
 
     def test_validate_wrong_types(self):
-        from zope.schema._compat import non_native_string
         field = self._makeOne()
         self.assertAllRaiseWrongType(
             field,
             field._type,
-            non_native_string(''),
+            b'',
             1,
             1.0,
             (),
@@ -948,12 +945,11 @@ class DottedNameTests(EqualityTestsMixin,
         self.assertEqual(dotted.max_dots, 2)
 
     def test_validate_wrong_types(self):
-        from zope.schema._compat import non_native_string
         field = self._makeOne()
         self.assertAllRaiseWrongType(
             field,
             field._type,
-            non_native_string(''),
+            b'',
             1,
             1.0,
             (),
@@ -1054,12 +1050,11 @@ class IdTests(EqualityTestsMixin,
         return [self._getTargetInterface(), IFromUnicode, IFromBytes]
 
     def test_validate_wrong_types(self):
-        from zope.schema._compat import non_native_string
         field = self._makeOne()
         self.assertAllRaiseWrongType(
             field,
             field._type,
-            non_native_string(''),
+            b'',
             1,
             1.0,
             (),

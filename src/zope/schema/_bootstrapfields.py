@@ -53,9 +53,6 @@ from zope.schema._bootstrapinterfaces import TooShort
 from zope.schema._bootstrapinterfaces import TooSmall
 from zope.schema._bootstrapinterfaces import ValidationError
 from zope.schema._bootstrapinterfaces import WrongType
-from zope.schema._compat import PY2
-from zope.schema._compat import integer_types
-from zope.schema._compat import text_type
 
 
 class _NotGiven(object):
@@ -524,7 +521,7 @@ class MinMaxLen(object):
 @implementer(IFromUnicode)
 class Text(MinMaxLen, Field):
     """A field containing text used for human discourse."""
-    _type = text_type
+    _type = str
     unicode_normalization = 'NFC'
 
     def __init__(self,  *args, **kw):
@@ -552,7 +549,7 @@ class Text(MinMaxLen, Field):
         zope.schema._bootstrapinterfaces.ConstraintNotSatisfied:
             (u'foo spam', '')
         """
-        if isinstance(value, text_type):
+        if isinstance(value, str):
             if self.unicode_normalization:
                 value = unicodedata.normalize(
                     self.unicode_normalization, value)
@@ -759,13 +756,8 @@ class Number(Orderable, Field):
         finally:
             last_exc = None
 
-    # On Python 2, native strings are byte strings, which is
-    # what the converters expect, so we don't need to do any decoding.
-    if PY2:  # pragma: PY2
-        fromBytes = fromUnicode
-    else:    # pragma: PY3
-        def fromBytes(self, value):
-            return self.fromUnicode(value.decode('utf-8'))
+    def fromBytes(self, value):
+        return self.fromUnicode(value.decode('utf-8'))
 
 
 class Complex(Number):
@@ -930,7 +922,7 @@ class Int(Integral):
     """A field representing a native integer type. and implementing
     :class:`zope.schema.interfaces.IInt`.
     """
-    _type = integer_types
+    _type = int
     _unicode_converters = (int,)
 
 
