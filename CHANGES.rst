@@ -11,6 +11,9 @@
 
 - Drop ``zope.schema._compat`` module.
 
+- Fix test deprecation warning on Python 3.11.
+  (`#112 <https://github.com/zopefoundation/zope.schema/issues/112>`_)
+
 6.2.1 (2022-09-14)
 ==================
 
