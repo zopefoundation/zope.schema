@@ -47,7 +47,6 @@ class InterfaceConformanceTestsMixin(object):
         __traceback_info__ = cls
         for iface in self._getTargetInterfaces():
             verifyClass(iface, cls)
-        return verifyClass
 
     def test_instance_conforms_to_iface(self):
         from zope.interface.verify import verifyObject
@@ -55,7 +54,6 @@ class InterfaceConformanceTestsMixin(object):
         __traceback_info__ = instance
         for iface in self._getTargetInterfaces():
             verifyObject(iface, instance)
-        return verifyObject
 
     def test_iface_is_first_in_sro(self):
         from zope.interface import implementedBy
@@ -1229,17 +1227,20 @@ class NumberTests(EqualityTestsMixin,
         return INumber
 
     def test_class_conforms_to_iface(self):
+        from zope.interface.verify import verifyClass
+
         from zope.schema._bootstrapinterfaces import IFromBytes
         from zope.schema._bootstrapinterfaces import IFromUnicode
-        verifyClass = super(NumberTests, self).test_class_conforms_to_iface()
+        super(NumberTests, self).test_class_conforms_to_iface()
         verifyClass(IFromUnicode, self._getTargetClass())
         verifyClass(IFromBytes, self._getTargetClass())
 
     def test_instance_conforms_to_iface(self):
+        from zope.interface.verify import verifyObject
+
         from zope.schema._bootstrapinterfaces import IFromBytes
         from zope.schema._bootstrapinterfaces import IFromUnicode
-        verifyObject = (
-            super(NumberTests, self).test_instance_conforms_to_iface())
+        super(NumberTests, self).test_instance_conforms_to_iface()
         verifyObject(IFromUnicode, self._makeOne())
         verifyObject(IFromBytes, self._makeOne())
 
