@@ -5,7 +5,8 @@
 7.0.1 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Fix fallback when ``zope.i18nmessageid`` is not installed (regression
+  introduced in 7.0.0).
 
 
 7.0.0 (2023-01-01)
