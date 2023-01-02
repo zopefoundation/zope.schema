@@ -14,7 +14,7 @@
 
 try:
     from zope.i18nmessageid import MessageFactory
-except ImportError:  # pragma: no cover
-    MessageFactory = str
-else:  # pragma: no cover
+except ImportError:
+    _ = str
+else:
     _ = MessageFactory("zope")
