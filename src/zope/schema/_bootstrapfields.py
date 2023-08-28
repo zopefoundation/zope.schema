@@ -322,7 +322,7 @@ class Field(Attribute):
         if self is other:
             return True
 
-        if type(self) != type(other) or self.interface != other.interface:
+        if type(self) is not type(other) or self.interface != other.interface:
             return False
 
         # should have the same properties
