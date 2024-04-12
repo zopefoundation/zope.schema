@@ -23,7 +23,7 @@
    :alt: Code Coverage
 
 Schemas extend the notion of interfaces to detailed descriptions of
-Attributes (but not methods).  Every schema is an interface and
+``Attributes`` (but not methods).  Every schema is an interface and
 specifies the public fields of an object.  A *field* roughly
 corresponds to an attribute of a Python object.  But a Field provides
 space for at least a title and a description.  It can also constrain
