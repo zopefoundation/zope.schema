@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 ##############################################################################
 # Copyright (c) 2002 Zope Foundation and Contributors.
 # All Rights Reserved.
@@ -141,7 +140,7 @@ classImplementsFirst(Decimal, IDecimal)
 classImplementsFirst(Object, IObject)
 
 
-class implementer_if_needed(object):
+class implementer_if_needed:
     # Helper to make sure we don't redundantly implement
     # interfaces already inherited. Doing so tends to produce
     # problems with the C3 order. This is used when we cannot
@@ -154,8 +153,7 @@ class implementer_if_needed(object):
         ifaces_needed = []
         implemented = implementedBy(cls)
         ifaces_needed = [
-            iface
-            for iface in self._ifaces
+            iface for iface in self._ifaces
             if not implemented.isOrExtends(iface)
         ]
         return implementer(*ifaces_needed)(cls)
@@ -208,7 +206,7 @@ class ASCII(NativeString):
     __doc__ = IASCII.__doc__
 
     def _validate(self, value):
-        super(ASCII, self)._validate(value)
+        super()._validate(value)
         if not value:
             return
         if not max(map(ord, value)) < 128:
@@ -319,7 +317,7 @@ class Float(Real):
 
     """
     _type = float
-    _unicode_converters = (float,)
+    _unicode_converters = (float, )
     _validation_error = InvalidFloatLiteral
 
 
@@ -329,7 +327,7 @@ class Datetime(Orderable, Field):
     _type = datetime
 
     def __init__(self, *args, **kw):
-        super(Datetime, self).__init__(*args, **kw)
+        super().__init__(*args, **kw)
 
 
 @implementer(IDate)
@@ -338,11 +336,10 @@ class Date(Orderable, Field):
     _type = date
 
     def _validate(self, value):
-        super(Date, self)._validate(value)
+        super()._validate(value)
         if isinstance(value, datetime):
-            raise WrongType(
-                value, self._type, self.__name__
-            ).with_field_and_value(self, value)
+            raise WrongType(value, self._type,
+                            self.__name__).with_field_and_value(self, value)
 
 
 @implementer(ITimedelta)
@@ -357,22 +354,18 @@ class Time(Orderable, Field):
     _type = time
 
 
-class MissingVocabularyError(ValidationError,
-                             ValueError,
-                             LookupError):
+class MissingVocabularyError(ValidationError, ValueError, LookupError):
     """Raised when a named vocabulary cannot be found."""
     # Subclasses ValueError and LookupError for backwards compatibility
 
 
-class InvalidVocabularyError(ValidationError,
-                             ValueError,
-                             TypeError):
+class InvalidVocabularyError(ValidationError, ValueError, TypeError):
     """Raised when the vocabulary is not an ISource."""
+
     # Subclasses TypeError and ValueError for backwards compatibility
 
     def __init__(self, vocabulary):
-        super(InvalidVocabularyError, self).__init__(
-            "Invalid vocabulary %r" % (vocabulary,))
+        super().__init__("Invalid vocabulary {!r}".format(vocabulary))
 
 
 @implementer(IChoice, IFromUnicode)
@@ -395,13 +388,9 @@ class Choice(Field):
             vocabulary = source
 
         if (values is None and vocabulary is None):
-            raise ValueError(
-                "You must specify either values or vocabulary."
-            )
+            raise ValueError("You must specify either values or vocabulary.")
         if values is not None and vocabulary is not None:
-            raise ValueError(
-                "You cannot specify both values and vocabulary."
-            )
+            raise ValueError("You cannot specify both values and vocabulary.")
 
         self.vocabulary = None
         self.vocabularyName = None
@@ -421,7 +410,7 @@ class Choice(Field):
         # registered vocabulary.
         self._init_field = (bool(self.vocabularyName) or
                             IContextSourceBinder.providedBy(self.vocabulary))
-        super(Choice, self).__init__(**kw)
+        super().__init__(**kw)
         self._init_field = False
 
     source = property(lambda self: self.vocabulary)
@@ -440,9 +429,9 @@ class Choice(Field):
                 vocabulary = vr.get(self.context, self.vocabularyName)
             except LookupError:
                 raise MissingVocabularyError(
-                    "Can't validate value without vocabulary named %r" % (
-                        self.vocabularyName,)
-                ).with_field_and_value(self, value)
+                    "Can't validate value without vocabulary named"
+                    f" {self.vocabularyName!r}").with_field_and_value(
+                        self, value)
 
         if not ISource.providedBy(vocabulary):
             raise InvalidVocabularyError(vocabulary).with_field_and_value(
@@ -452,7 +441,7 @@ class Choice(Field):
 
     def bind(self, context):
         """See zope.schema._bootstrapinterfaces.IField."""
-        clone = super(Choice, self).bind(context)
+        clone = super().bind(context)
         # Eagerly get registered vocabulary if needed;
         # once that's done, just return it
         vocabulary = clone.vocabulary = clone._resolve_vocabulary(None)
@@ -469,12 +458,12 @@ class Choice(Field):
         # Pass all validations during initialization
         if self._init_field:
             return
-        super(Choice, self)._validate(value)
+        super()._validate(value)
         vocabulary = self._resolve_vocabulary(value)
         if value not in vocabulary:
-            raise ConstraintNotSatisfied(
-                value, self.__name__
-            ).with_field_and_value(self, value)
+            raise ConstraintNotSatisfied(value,
+                                         self.__name__).with_field_and_value(
+                                             self, value)
 
 
 # Both of these are inherited from the parent; re-declaring them
@@ -528,7 +517,7 @@ class URI(_StrippedNativeStringLine):
     """
 
     def _validate(self, value):
-        super(URI, self)._validate(value)
+        super()._validate(value)
         if _isuri(value):
             return
 
@@ -574,7 +563,7 @@ class PythonIdentifier(_StrippedNativeStringLine):
     """
 
     def _validate(self, value):
-        super(PythonIdentifier, self)._validate(value)
+        super()._validate(value)
         if value and not _is_identifier(value):
             raise InvalidValue(value).with_field_and_value(self, value)
 
@@ -614,24 +603,24 @@ class DottedName(_StrippedNativeStringLine):
             self.max_dots = int(self.max_dots)
             if self.max_dots < self.min_dots:
                 raise ValueError("max_dots cannot be less than min_dots")
-        super(DottedName, self).__init__(*args, **kw)
+        super().__init__(*args, **kw)
 
     def _validate(self, value):
         """
 
         """
-        super(DottedName, self)._validate(value)
+        super()._validate(value)
         if not _isdotted(value):
             raise InvalidDottedName(value).with_field_and_value(self, value)
         dots = value.count(".")
         if dots < self.min_dots:
             raise InvalidDottedName(
-                "too few dots; %d required" % self.min_dots, value
-            ).with_field_and_value(self, value)
+                "too few dots; %d required" % self.min_dots,
+                value).with_field_and_value(self, value)
         if self.max_dots is not None and dots > self.max_dots:
             raise InvalidDottedName(
-                "too many dots; no more than %d allowed" % self.max_dots, value
-            ).with_field_and_value(self, value)
+                "too many dots; no more than %d allowed" % self.max_dots,
+                value).with_field_and_value(self, value)
 
 
 @implementer(IId)
@@ -647,7 +636,7 @@ class Id(_StrippedNativeStringLine):
     _invalid_exc_type = InvalidId
 
     def _validate(self, value):
-        super(Id, self)._validate(value)
+        super()._validate(value)
         if _isuri(value):
             return
         if _isdotted(value) and "." in value:
@@ -661,12 +650,10 @@ class InterfaceField(Field):
     __doc__ = IInterfaceField.__doc__
 
     def _validate(self, value):
-        super(InterfaceField, self)._validate(value)
+        super()._validate(value)
         if not IInterface.providedBy(value):
-            raise NotAnInterface(
-                value,
-                self.__name__
-            ).with_field_and_value(self, value)
+            raise NotAnInterface(value, self.__name__).with_field_and_value(
+                self, value)
 
 
 def _validate_sequence(value_type, value, errors=None):
@@ -744,7 +731,7 @@ class Collection(MinMaxLen, Iterable):
     unique = False
 
     def __init__(self, value_type=_NotGiven, unique=_NotGiven, **kw):
-        super(Collection, self).__init__(**kw)
+        super().__init__(**kw)
         # whine if value_type is not a field
         if value_type is not _NotGiven:
             self.value_type = value_type
@@ -757,7 +744,7 @@ class Collection(MinMaxLen, Iterable):
 
     def bind(self, context):
         """See zope.schema._bootstrapinterfaces.IField."""
-        clone = super(Collection, self).bind(context)
+        clone = super().bind(context)
         # binding value_type is necessary for choices with named vocabularies,
         # and possibly also for other fields.
         if clone.value_type is not None:
@@ -765,13 +752,13 @@ class Collection(MinMaxLen, Iterable):
         return clone
 
     def _validate(self, value):
-        super(Collection, self)._validate(value)
+        super()._validate(value)
         errors = _validate_sequence(self.value_type, value)
         if errors:
             try:
-                raise WrongContainedType(
-                    errors, self.__name__
-                ).with_field_and_value(self, value)
+                raise WrongContainedType(errors,
+                                         self.__name__).with_field_and_value(
+                                             self, value)
             finally:
                 # Break cycles
                 del errors
@@ -822,7 +809,7 @@ class _AbstractSet(Collection):
     unique = True
 
     def __init__(self, *args, **kwargs):
-        super(_AbstractSet, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if not self.unique:  # set members are always unique
             raise TypeError(
                 "__init__() got an unexpected keyword argument 'unique'")
@@ -851,7 +838,7 @@ class Mapping(MinMaxLen, Iterable):
     value_type = None
 
     def __init__(self, key_type=None, value_type=None, **kw):
-        super(Mapping, self).__init__(**kw)
+        super().__init__(**kw)
         # whine if key_type or value_type is not a field
         if key_type is not None and not IField.providedBy(key_type):
             raise ValueError("'key_type' must be field instance.")
@@ -861,7 +848,7 @@ class Mapping(MinMaxLen, Iterable):
         self.value_type = value_type
 
     def _validate(self, value):
-        super(Mapping, self)._validate(value)
+        super()._validate(value)
         errors = []
         if self.value_type:
             errors = _validate_sequence(self.value_type, value.values(),
@@ -870,16 +857,16 @@ class Mapping(MinMaxLen, Iterable):
 
         if errors:
             try:
-                raise WrongContainedType(
-                    errors, self.__name__
-                ).with_field_and_value(self, value)
+                raise WrongContainedType(errors,
+                                         self.__name__).with_field_and_value(
+                                             self, value)
             finally:
                 # Break cycles
                 del errors
 
     def bind(self, object):
         """See zope.schema._bootstrapinterfaces.IField."""
-        clone = super(Mapping, self).bind(object)
+        clone = super().bind(object)
         # binding value_type is necessary for choices with named vocabularies,
         # and possibly also for other fields.
         if clone.key_type is not None:

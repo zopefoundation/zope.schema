@@ -34,7 +34,7 @@ class FieldReadAccessorTests(unittest.TestCase):
     def test_ctor_not_created_inside_interface(self):
         from zope.schema import Text
 
-        field = Text(title=u'Hmm')
+        field = Text(title='Hmm')
         wrapped = self._makeOne(field)
         self.assertTrue(wrapped.field is field)
         self.assertEqual(wrapped.__name__, '')  # __name__ set when in iface
@@ -45,7 +45,7 @@ class FieldReadAccessorTests(unittest.TestCase):
 
         from zope.schema import Text
 
-        field = Text(title=u'Hmm')
+        field = Text(title='Hmm')
 
         class IFoo(Interface):
             getter = self._makeOne(field)
@@ -120,7 +120,7 @@ class FieldReadAccessorTests(unittest.TestCase):
             getter = self._makeOne()
         getter = IFoo['getter']
 
-        class Foo(object):
+        class Foo:
             pass
         self.assertRaises(AttributeError, getter.get, Foo())
 
@@ -131,7 +131,7 @@ class FieldReadAccessorTests(unittest.TestCase):
             getter = self._makeOne()
         getter = IFoo['getter']
 
-        class Foo(object):
+        class Foo:
             def getter(self):
                 return '123'
         self.assertEqual(getter.get(Foo()), '123')
@@ -143,7 +143,7 @@ class FieldReadAccessorTests(unittest.TestCase):
             getter = self._makeOne()
         getter = IFoo['getter']
 
-        class Foo(object):
+        class Foo:
             pass
         self.assertEqual(getter.query(Foo()), None)
 
@@ -154,7 +154,7 @@ class FieldReadAccessorTests(unittest.TestCase):
             getter = self._makeOne()
         getter = IFoo['getter']
 
-        class Foo(object):
+        class Foo:
             pass
         self.assertEqual(getter.query(Foo(), 234), 234)
 
@@ -165,7 +165,7 @@ class FieldReadAccessorTests(unittest.TestCase):
             getter = self._makeOne()
         getter = IFoo['getter']
 
-        class Foo(object):
+        class Foo:
             def getter(self):
                 return '123'
 
@@ -181,7 +181,7 @@ class FieldReadAccessorTests(unittest.TestCase):
             getter = self._makeOne(field)
         getter = IFoo['getter']
 
-        class Foo(object):
+        class Foo:
             def getter(self):
                 raise AssertionError("Not called")
         self.assertRaises(TypeError, getter.set, Foo(), '456')
@@ -193,7 +193,7 @@ class FieldReadAccessorTests(unittest.TestCase):
             getter = self._makeOne()
         getter = IFoo['getter']
 
-        class Foo(object):
+        class Foo:
             def getter(self):
                 raise AssertionError("Not called")
 
@@ -208,7 +208,7 @@ class FieldReadAccessorTests(unittest.TestCase):
         getter = IFoo['getter']
         _called_with = []
 
-        class Writer(object):
+        class Writer:
             pass
 
         writer = Writer()
@@ -217,7 +217,7 @@ class FieldReadAccessorTests(unittest.TestCase):
         # pylint:enable=attribute-defined-outside-init
         getter.writer = writer
 
-        class Foo(object):
+        class Foo:
             def setMe(self, value):
                 _called_with.append(value)
 
@@ -253,7 +253,7 @@ class FieldWriteAccessorTests(unittest.TestCase):
     def test_ctor_not_created_inside_interface(self):
         from zope.schema import Text
 
-        field = Text(title=u'Hmm')
+        field = Text(title='Hmm')
         wrapped = self._makeOne(field)
         self.assertTrue(wrapped.field is field)
         self.assertEqual(wrapped.__name__, '')  # __name__ set when in iface
@@ -264,7 +264,7 @@ class FieldWriteAccessorTests(unittest.TestCase):
 
         from zope.schema import Text
 
-        field = Text(title=u'Hmm')
+        field = Text(title='Hmm')
 
         class IFoo(Interface):
             setter = self._makeOne(field)
@@ -298,7 +298,7 @@ class Test_accessors(unittest.TestCase):
 
         from zope.schema import Text
 
-        field = Text(title=u'Hmm', readonly=True)
+        field = Text(title='Hmm', readonly=True)
 
         class IFoo(Interface):
             getter, = self._callFUT(field)
@@ -319,7 +319,7 @@ class Test_accessors(unittest.TestCase):
 
         from zope.schema import Text
 
-        field = Text(title=u'Hmm')
+        field = Text(title='Hmm')
 
         class IFoo(Interface):
             getter, setter = self._callFUT(field)

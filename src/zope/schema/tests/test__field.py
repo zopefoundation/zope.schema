@@ -52,7 +52,7 @@ class BytesTests(EqualityTestsMixin,
         self.assertAllRaiseWrongType(
             field,
             field._type,
-            u'',
+            '',
             1,
             1.0,
             (),
@@ -65,7 +65,7 @@ class BytesTests(EqualityTestsMixin,
     def test_validate_w_invalid_default(self):
 
         from zope.schema.interfaces import ValidationError
-        self.assertRaises(ValidationError, self._makeOne, default=u'')
+        self.assertRaises(ValidationError, self._makeOne, default='')
 
     def test_validate_not_required(self):
 
@@ -86,12 +86,12 @@ class BytesTests(EqualityTestsMixin,
 
     def test_fromUnicode_miss(self):
         byt = self._makeOne()
-        self.assertRaises(UnicodeEncodeError, byt.fromUnicode, u'\x81')
+        self.assertRaises(UnicodeEncodeError, byt.fromUnicode, '\x81')
 
     def test_fromUnicode_hit(self):
         byt = self._makeOne()
-        self.assertEqual(byt.fromUnicode(u''), b'')
-        self.assertEqual(byt.fromUnicode(u'DEADBEEF'), b'DEADBEEF')
+        self.assertEqual(byt.fromUnicode(''), b'')
+        self.assertEqual(byt.fromUnicode('DEADBEEF'), b'DEADBEEF')
 
     def test_fromBytes(self):
         field = self._makeOne()
@@ -168,7 +168,7 @@ class BytesLineTests(EqualityTestsMixin,
         self.assertAllRaiseWrongType(
             field,
             field._type,
-            u'',
+            '',
             1,
             1.0,
             (),
@@ -299,16 +299,16 @@ class FloatTests(NumberTests):
     def test_fromUnicode_miss(self):
 
         flt = self._makeOne()
-        self.assertRaises(ValueError, flt.fromUnicode, u'')
-        self.assertRaises(ValueError, flt.fromUnicode, u'abc')
-        self.assertRaises(ValueError, flt.fromUnicode, u'14.G')
+        self.assertRaises(ValueError, flt.fromUnicode, '')
+        self.assertRaises(ValueError, flt.fromUnicode, 'abc')
+        self.assertRaises(ValueError, flt.fromUnicode, '14.G')
 
     def test_fromUnicode_hit(self):
 
         flt = self._makeOne()
-        self.assertEqual(flt.fromUnicode(u'0'), 0.0)
-        self.assertEqual(flt.fromUnicode(u'1.23'), 1.23)
-        self.assertEqual(flt.fromUnicode(u'1.23e6'), 1230000.0)
+        self.assertEqual(flt.fromUnicode('0'), 0.0)
+        self.assertEqual(flt.fromUnicode('1.23'), 1.23)
+        self.assertEqual(flt.fromUnicode('1.23e6'), 1230000.0)
 
 
 class DatetimeTests(OrderableMissingValueMixin,
@@ -334,7 +334,7 @@ class DatetimeTests(OrderableMissingValueMixin,
         self.assertAllRaiseWrongType(
             field,
             field._type,
-            u'',
+            '',
             1,
             1.0,
             (),
@@ -357,9 +357,9 @@ class DatetimeTests(OrderableMissingValueMixin,
 
     MIN = datetime.datetime(2000, 10, 1)
     MAX = datetime.datetime(2000, 10, 4)
-    TOO_BIG = tuple((datetime.datetime(2000, 10, x) for x in (5, 6)))
-    TOO_SMALL = tuple((datetime.datetime(2000, 9, x) for x in (5, 6)))
-    VALID = tuple((datetime.datetime(2000, 10, x) for x in (1, 2, 3, 4)))
+    TOO_BIG = tuple(datetime.datetime(2000, 10, x) for x in (5, 6))
+    TOO_SMALL = tuple(datetime.datetime(2000, 9, x) for x in (5, 6))
+    VALID = tuple(datetime.datetime(2000, 10, x) for x in (1, 2, 3, 4))
 
 
 class DateTests(OrderableMissingValueMixin,
@@ -384,7 +384,7 @@ class DateTests(OrderableMissingValueMixin,
         self.assertAllRaiseWrongType(
             field,
             field._type,
-            u'',
+            '',
             1,
             1.0,
             (),
@@ -409,9 +409,9 @@ class DateTests(OrderableMissingValueMixin,
 
     MIN = datetime.date(2000, 10, 1)
     MAX = datetime.date(2000, 10, 4)
-    TOO_BIG = tuple((datetime.date(2000, 10, x) for x in (5, 6)))
-    TOO_SMALL = tuple((datetime.date(2000, 9, x) for x in (5, 6)))
-    VALID = tuple((datetime.date(2000, 10, x) for x in (1, 2, 3, 4)))
+    TOO_BIG = tuple(datetime.date(2000, 10, x) for x in (5, 6))
+    TOO_SMALL = tuple(datetime.date(2000, 9, x) for x in (5, 6))
+    VALID = tuple(datetime.date(2000, 10, x) for x in (1, 2, 3, 4))
 
 
 class TimedeltaTests(OrderableMissingValueMixin,
@@ -484,9 +484,9 @@ class TimeTests(OrderableMissingValueMixin,
 
     MIN = datetime.time(12, 10, 1)
     MAX = datetime.time(12, 10, 4)
-    TOO_BIG = tuple((datetime.time(12, 10, x) for x in (5, 6)))
-    TOO_SMALL = tuple((datetime.time(12, 9, x) for x in (5, 6)))
-    VALID = tuple((datetime.time(12, 10, x) for x in (1, 2, 3, 4)))
+    TOO_BIG = tuple(datetime.time(12, 10, x) for x in (5, 6))
+    TOO_SMALL = tuple(datetime.time(12, 9, x) for x in (5, 6))
+    VALID = tuple(datetime.time(12, 10, x) for x in (1, 2, 3, 4))
 
 
 class ChoiceTests(EqualityTestsMixin,
@@ -511,7 +511,7 @@ class ChoiceTests(EqualityTestsMixin,
                 and 'source' not in kwargs):
             from zope.schema.vocabulary import SimpleVocabulary
             kwargs['vocabulary'] = SimpleVocabulary.fromValues([1, 2, 3])
-        return super(ChoiceTests, self)._makeOneFromClass(cls, *args, **kwargs)
+        return super()._makeOneFromClass(cls, *args, **kwargs)
 
     def _getTargetInterface(self):
         from zope.schema.interfaces import IChoice
@@ -545,7 +545,7 @@ class ChoiceTests(EqualityTestsMixin,
         self.assertEqual(sorted(choose.source.by_value.keys()), [1, 2])
 
     def test_ctor_w_unicode_non_ascii_values(self):
-        values = [u'K\xf6ln', u'D\xfcsseldorf', 'Bonn']
+        values = ['K\xf6ln', 'D\xfcsseldorf', 'Bonn']
         choose = self._makeOne(values=values)
         self.assertEqual(sorted(choose.vocabulary.by_value.keys()),
                          sorted(values))
@@ -591,7 +591,7 @@ class ChoiceTests(EqualityTestsMixin,
 
         @implementer(IBaseVocabulary)
         @implementer(ISource)
-        class Vocab(object):
+        class Vocab:
             def __init__(self):
                 pass
 
@@ -608,7 +608,7 @@ class ChoiceTests(EqualityTestsMixin,
 
         @implementer(IContextSourceBinder)
         @implementer(ISource)
-        class Vocab(object):
+        class Vocab:
             def __init__(self, context):
                 self.context = context
 
@@ -629,7 +629,7 @@ class ChoiceTests(EqualityTestsMixin,
         from zope.schema.interfaces import IContextSourceBinder
 
         @implementer(IContextSourceBinder)
-        class Vocab(object):
+        class Vocab:
             def __init__(self, context):
                 self.context = context
 
@@ -646,22 +646,22 @@ class ChoiceTests(EqualityTestsMixin,
     def test_fromUnicode_miss(self):
         from zope.schema.interfaces import ConstraintNotSatisfied
 
-        flt = self._makeOne(values=(u'foo', u'bar', u'baz'))
-        self.assertRaises(ConstraintNotSatisfied, flt.fromUnicode, u'')
-        self.assertRaises(ConstraintNotSatisfied, flt.fromUnicode, u'abc')
+        flt = self._makeOne(values=('foo', 'bar', 'baz'))
+        self.assertRaises(ConstraintNotSatisfied, flt.fromUnicode, '')
+        self.assertRaises(ConstraintNotSatisfied, flt.fromUnicode, 'abc')
         with self.assertRaises(ConstraintNotSatisfied) as exc:
-            flt.fromUnicode(u'1.4G')
+            flt.fromUnicode('1.4G')
 
         cns = exc.exception
         self.assertIs(cns.field, flt)
-        self.assertEqual(cns.value, u'1.4G')
+        self.assertEqual(cns.value, '1.4G')
 
     def test_fromUnicode_hit(self):
 
-        flt = self._makeOne(values=(u'foo', u'bar', u'baz'))
-        self.assertEqual(flt.fromUnicode(u'foo'), u'foo')
-        self.assertEqual(flt.fromUnicode(u'bar'), u'bar')
-        self.assertEqual(flt.fromUnicode(u'baz'), u'baz')
+        flt = self._makeOne(values=('foo', 'bar', 'baz'))
+        self.assertEqual(flt.fromUnicode('foo'), 'foo')
+        self.assertEqual(flt.fromUnicode('bar'), 'bar')
+        self.assertEqual(flt.fromUnicode('baz'), 'baz')
 
     def test__validate_int(self):
         from zope.schema.interfaces import ConstraintNotSatisfied
@@ -676,7 +676,7 @@ class ChoiceTests(EqualityTestsMixin,
         choice = self._makeOne(values=['a', 'c'])
         choice._validate('a')  # doesn't raise
         choice._validate('c')  # doesn't raise
-        choice._validate(u'c')  # doesn't raise
+        choice._validate('c')  # doesn't raise
         self.assertRaises(ConstraintNotSatisfied, choice._validate, 'd')
 
     def test__validate_tuple(self):
@@ -714,7 +714,7 @@ class ChoiceTests(EqualityTestsMixin,
         # we do the same thing
         from zope.schema.vocabulary import setVocabularyRegistry
 
-        class Reg(object):
+        class Reg:
             def get(self, *args):
                 raise LookupError
 
@@ -726,7 +726,7 @@ class ChoiceTests(EqualityTestsMixin,
         context = object()
         choice = self._makeOne(vocabulary='vocab')
 
-        class Reg(object):
+        class Reg:
             called_with = ()
 
             def get(self, *args):
@@ -757,7 +757,7 @@ class ChoiceTests(EqualityTestsMixin,
         from zope.schema.interfaces import IContextSourceBinder
 
         @implementer(IContextSourceBinder)
-        class SampleContextSourceBinder(object):
+        class SampleContextSourceBinder:
             def __call__(self, context):
                 raise AssertionError("This is not called")
 
@@ -772,7 +772,7 @@ class ChoiceTests(EqualityTestsMixin,
         from zope.schema.tests.test_vocabulary import _makeSampleVocabulary
 
         @implementer(IContextSourceBinder)
-        class SampleContextSourceBinder(object):
+        class SampleContextSourceBinder:
             def __call__(self, context):
                 return _makeSampleVocabulary()
 
@@ -849,7 +849,7 @@ class URITests(EqualityTestsMixin,
     def test_fromUnicode_ok(self):
 
         field = self._makeOne()
-        self.assertEqual(field.fromUnicode(u'http://example.com/'),
+        self.assertEqual(field.fromUnicode('http://example.com/'),
                          'http://example.com/')
 
     def test_fromUnicode_invalid(self):
@@ -857,10 +857,10 @@ class URITests(EqualityTestsMixin,
         from zope.schema.interfaces import InvalidURI
 
         field = self._makeOne()
-        self.assertRaises(InvalidURI, field.fromUnicode, u'')
-        self.assertRaises(InvalidURI, field.fromUnicode, u'abc')
+        self.assertRaises(InvalidURI, field.fromUnicode, '')
+        self.assertRaises(InvalidURI, field.fromUnicode, 'abc')
         self.assertRaises(ConstraintNotSatisfied,
-                          field.fromUnicode, u'http://example.com/\nDAV:')
+                          field.fromUnicode, 'http://example.com/\nDAV:')
 
 
 class PythonIdentifierTests(EqualityTestsMixin,
@@ -882,16 +882,16 @@ class PythonIdentifierTests(EqualityTestsMixin,
 
     def test_fromUnicode_empty(self):
         pi = self._makeOne()
-        self.assertEqual(pi.fromUnicode(u''), '')
+        self.assertEqual(pi.fromUnicode(''), '')
 
     def test_fromUnicode_normal(self):
         pi = self._makeOne()
-        self.assertEqual(pi.fromUnicode(u'normal'), 'normal')
+        self.assertEqual(pi.fromUnicode('normal'), 'normal')
 
     def test_fromUnicode_strips_ws(self):
         pi = self._makeOne()
-        self.assertEqual(pi.fromUnicode(u'   '), '')
-        self.assertEqual(pi.fromUnicode(u' normal  '), 'normal')
+        self.assertEqual(pi.fromUnicode('   '), '')
+        self.assertEqual(pi.fromUnicode(' normal  '), 'normal')
 
     def test__validate_miss(self):
         from zope.schema.interfaces import InvalidValue
@@ -1007,29 +1007,29 @@ class DottedNameTests(EqualityTestsMixin,
 
     def test_fromUnicode_dotted_name_ok(self):
         field = self._makeOne()
-        self.assertEqual(field.fromUnicode(u'dotted.name'), 'dotted.name')
+        self.assertEqual(field.fromUnicode('dotted.name'), 'dotted.name')
 
         # Underscores are allowed in any component
-        self.assertEqual(field.fromUnicode(u'dotted._name'), 'dotted._name')
-        self.assertEqual(field.fromUnicode(u'_leading_underscore'),
+        self.assertEqual(field.fromUnicode('dotted._name'), 'dotted._name')
+        self.assertEqual(field.fromUnicode('_leading_underscore'),
                          '_leading_underscore')
-        self.assertEqual(field.fromUnicode(u'_dotted.name'), '_dotted.name')
-        self.assertEqual(field.fromUnicode(u'_dotted._name'), '_dotted._name')
+        self.assertEqual(field.fromUnicode('_dotted.name'), '_dotted.name')
+        self.assertEqual(field.fromUnicode('_dotted._name'), '_dotted._name')
 
     def test_fromUnicode_invalid(self):
         from zope.schema.interfaces import ConstraintNotSatisfied
         from zope.schema.interfaces import InvalidDottedName
 
         field = self._makeOne()
-        self.assertRaises(InvalidDottedName, field.fromUnicode, u'')
+        self.assertRaises(InvalidDottedName, field.fromUnicode, '')
         with self.assertRaises(InvalidDottedName) as exc:
-            field.fromUnicode(u'\u2603')
+            field.fromUnicode('\u2603')
         invalid = exc.exception
         self.assertIs(invalid.field, field)
-        self.assertEqual(invalid.value, u'\u2603')
+        self.assertEqual(invalid.value, '\u2603')
 
         self.assertRaises(ConstraintNotSatisfied,
-                          field.fromUnicode, u'http://example.com/\nDAV:')
+                          field.fromUnicode, 'http://example.com/\nDAV:')
 
 
 class IdTests(EqualityTestsMixin,
@@ -1096,24 +1096,24 @@ class IdTests(EqualityTestsMixin,
     def test_fromUnicode_url_ok(self):
 
         field = self._makeOne()
-        self.assertEqual(field.fromUnicode(u'http://example.com/'),
+        self.assertEqual(field.fromUnicode('http://example.com/'),
                          'http://example.com/')
 
     def test_fromUnicode_dotted_name_ok(self):
 
         field = self._makeOne()
-        self.assertEqual(field.fromUnicode(u'dotted.name'), 'dotted.name')
+        self.assertEqual(field.fromUnicode('dotted.name'), 'dotted.name')
 
     def test_fromUnicode_invalid(self):
         from zope.schema.interfaces import ConstraintNotSatisfied
         from zope.schema.interfaces import InvalidId
 
         field = self._makeOne()
-        self.assertRaises(InvalidId, field.fromUnicode, u'')
-        self.assertRaises(InvalidId, field.fromUnicode, u'abc')
-        self.assertRaises(InvalidId, field.fromUnicode, u'\u2603')
+        self.assertRaises(InvalidId, field.fromUnicode, '')
+        self.assertRaises(InvalidId, field.fromUnicode, 'abc')
+        self.assertRaises(InvalidId, field.fromUnicode, '\u2603')
         self.assertRaises(ConstraintNotSatisfied,
-                          field.fromUnicode, u'http://example.com/\nDAV:')
+                          field.fromUnicode, 'http://example.com/\nDAV:')
 
 
 class InterfaceFieldTests(EqualityTestsMixin,
@@ -1137,7 +1137,7 @@ class InterfaceFieldTests(EqualityTestsMixin,
         self.assertAllRaiseWrongType(
             field,
             IInterface,
-            u'',
+            '',
             b'',
             1,
             1.0,
@@ -1220,7 +1220,7 @@ class CollectionTests(EqualityTestsMixin,
 
         # Actual implementation works
         @interface.implementer(IValueType)
-        class ValueType(object):
+        class ValueType:
             "The value type"
 
         field.validate(self._makeCollection([ValueType()]))
@@ -1238,7 +1238,7 @@ class CollectionTests(EqualityTestsMixin,
         self.assertEqual(absc.unique, True)
 
     def test_ctor_w_non_field_value_type(self):
-        class NotAField(object):
+        class NotAField:
             pass
         self.assertRaises(ValueError, self._makeOne, NotAField)
 
@@ -1286,12 +1286,12 @@ class CollectionTests(EqualityTestsMixin,
         text = Text()
         absc = self._makeOne(text, True)
         with self.assertRaises((NotUnique, WrongType)) as exc:
-            absc.validate([u'a', u'a'])
+            absc.validate(['a', 'a'])
 
         not_uniq = exc.exception
         self.assertIs(not_uniq.field, absc)
         self.assertEqual(not_uniq.value,
-                         [u'a', u'a'])
+                         ['a', 'a'])
 
     def test_validate_min_length(self):
         field = self._makeOne(min_length=2)
@@ -1412,22 +1412,22 @@ class TupleTests(SequenceTests):
     def test_mutable_sequence(self):
         from zope.schema.interfaces import WrongType
         with self.assertRaises(WrongType):
-            super(TupleTests, self).test_mutable_sequence()
+            super().test_mutable_sequence()
 
     def test_sequence(self):
         from zope.schema.interfaces import WrongType
         with self.assertRaises(WrongType):
-            super(TupleTests, self).test_sequence()
+            super().test_sequence()
 
     def test_validate_wrong_types(self):
         field = self._makeOne()
         self.assertAllRaiseWrongType(
             field,
             field._type,
-            u'',
+            '',
             b'',
             [])
-        super(TupleTests, self).test_validate_wrong_types()
+        super().test_validate_wrong_types()
 
 
 class MutableSequenceTests(SequenceTests):
@@ -1445,15 +1445,15 @@ class MutableSequenceTests(SequenceTests):
         self.assertAllRaiseWrongType(
             field,
             field._type,
-            u'',
+            '',
             b'',
             ())
-        super(MutableSequenceTests, self).test_validate_wrong_types()
+        super().test_validate_wrong_types()
 
     def test_sequence(self):
         from zope.schema.interfaces import WrongType
         with self.assertRaises(WrongType):
-            super(MutableSequenceTests, self).test_sequence()
+            super().test_sequence()
 
 
 class ListTests(MutableSequenceTests):
@@ -1469,7 +1469,7 @@ class ListTests(MutableSequenceTests):
     def test_mutable_sequence(self):
         from zope.schema.interfaces import WrongType
         with self.assertRaises(WrongType):
-            super(ListTests, self).test_mutable_sequence()
+            super().test_mutable_sequence()
 
 
 class SetTests(WrongTypeTestsMixin,
@@ -1497,7 +1497,7 @@ class SetTests(WrongTypeTestsMixin,
         self.assertAllRaiseWrongType(
             field,
             field._type,
-            u'',
+            '',
             b'',
             1,
             1.0,
@@ -1546,7 +1546,7 @@ class MappingTests(EqualityTestsMixin,
         self.assertAllRaiseWrongType(
             field,
             field._type,
-            u'',
+            '',
             b'',
             1,
             1.0,
@@ -1699,7 +1699,7 @@ class MutableMappingTests(MappingTests):
     def test_mapping(self):
         from zope.schema.interfaces import WrongType
         with self.assertRaises(WrongType):
-            super(MutableMappingTests, self).test_mapping()
+            super().test_mapping()
 
 
 class DictTests(MutableMappingTests):
@@ -1715,7 +1715,7 @@ class DictTests(MutableMappingTests):
     def test_mutable_mapping(self):
         from zope.schema.interfaces import WrongType
         with self.assertRaises(WrongType):
-            super(DictTests, self).test_mutable_mapping()
+            super().test_mutable_mapping()
 
 
 class NativeStringTests(EqualityTestsMixin,
@@ -1742,9 +1742,9 @@ class NativeStringTests(EqualityTestsMixin,
 
     def test_fromUnicode(self):
         field = self._makeOne()
-        self.assertIsInstance(field.fromUnicode(u''), str)
-        self.assertEqual(field.fromUnicode(u''), '')
-        self.assertEqual(field.fromUnicode(u'DEADBEEF'), 'DEADBEEF')
+        self.assertIsInstance(field.fromUnicode(''), str)
+        self.assertEqual(field.fromUnicode(''), '')
+        self.assertEqual(field.fromUnicode('DEADBEEF'), 'DEADBEEF')
 
 
 class NativeStringLineTests(EqualityTestsMixin,
@@ -1771,9 +1771,9 @@ class NativeStringLineTests(EqualityTestsMixin,
 
     def test_fromUnicode(self):
         field = self._makeOne()
-        self.assertIsInstance(field.fromUnicode(u''), str)
-        self.assertEqual(field.fromUnicode(u''), '')
-        self.assertEqual(field.fromUnicode(u'DEADBEEF'), 'DEADBEEF')
+        self.assertIsInstance(field.fromUnicode(''), str)
+        self.assertEqual(field.fromUnicode(''), '')
+        self.assertEqual(field.fromUnicode('DEADBEEF'), 'DEADBEEF')
 
 
 class StrippedNativeStringLineTests(NativeStringLineTests):
@@ -1785,7 +1785,7 @@ class StrippedNativeStringLineTests(NativeStringLineTests):
     def test_strips(self):
         field = self._makeOne()
         self.assertEqual(field.fromBytes(b' '), '')
-        self.assertEqual(field.fromUnicode(u' '), '')
+        self.assertEqual(field.fromUnicode(' '), '')
 
     def test_iface_is_first_in_sro(self):
         self.skipTest("Not applicable; we inherit implementation but have no "
@@ -1798,7 +1798,7 @@ def _makeSampleVocabulary():
     from zope.schema.interfaces import IVocabulary
 
     @implementer(IVocabulary)
-    class SampleVocabulary(object):
+    class SampleVocabulary:
 
         def __iter__(self):
             raise AssertionError("Not implemented")

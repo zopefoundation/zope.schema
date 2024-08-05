@@ -24,7 +24,7 @@ class FieldEqualityTests(unittest.TestCase):
         from zope.schema import Text
 
         def _makeOne(cls):
-            return cls(title=u"Foo", description=u"Bar")
+            return cls(title="Foo", description="Bar")
 
         for cls in (Int, Text):
             self.assertEqual(_makeOne(cls), _makeOne(cls))

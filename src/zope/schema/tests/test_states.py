@@ -39,25 +39,25 @@ class StateSelectionTest(unittest.TestCase):
 
         class IBirthInfo(Interface):
             state1 = Choice(
-                title=u'State of Birth',
-                description=u'The state in which you were born.',
+                title='State of Birth',
+                description='The state in which you were born.',
                 vocabulary="states",
                 default="AL",
                 )
             state2 = Choice(
-                title=u'State of Birth',
-                description=u'The state in which you were born.',
+                title='State of Birth',
+                description='The state in which you were born.',
                 vocabulary="states",
                 default="AL",
                 )
             state3 = Choice(
-                title=u'Favorite State',
-                description=u'The state you like the most.',
+                title='Favorite State',
+                description='The state you like the most.',
                 vocabulary=StateVocabulary(),
                 )
             state4 = Choice(
-                title=u"Name",
-                description=u"The name of your new state",
+                title="Name",
+                description="The name of your new state",
                 vocabulary="states",
                 )
         return IBirthInfo

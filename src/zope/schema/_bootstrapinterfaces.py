@@ -69,7 +69,7 @@ class ValidationError(zope.interface.Invalid):
     __hash__ = zope.interface.Invalid.__hash__  # python3
 
     def __repr__(self):  # pragma: no cover
-        return '%s(%s)' % (
+        return '{}({})'.format(
             self.__class__.__name__,
             ', '.join(repr(arg) for arg in self.args))
 
@@ -129,7 +129,7 @@ class OutOfBounds(ValidationError):
         """
         OutOfBounds(value, bound)
         """
-        super(OutOfBounds, self).__init__(value, bound, *args)
+        super().__init__(value, bound, *args)
         self.value = value
         self.bound = bound
 
@@ -206,7 +206,7 @@ class WrongContainedType(ValidationError):
         .. versionchanged:: 4.7.0
            Added named arguments to the constructor, and the `errors` property.
         """
-        super(WrongContainedType, self).__init__(errors, name, *args)
+        super().__init__(errors, name, *args)
         self.errors = errors
 
 
@@ -230,7 +230,7 @@ class SchemaNotCorrectlyImplemented(WrongContainedType):
         .. versionchanged:: 4.7.0
            Added named arguments to the constructor.
         """
-        super(SchemaNotCorrectlyImplemented, self).__init__(
+        super().__init__(
             errors, name, *args)
         self.schema_errors = schema_errors
         self.invariant_errors = invariant_errors
@@ -254,7 +254,7 @@ class SchemaNotProvided(ValidationError):
         .. versionchanged:: 4.7.0
            Added named arguments to the constructor and the `schema` property.
         """
-        super(SchemaNotProvided, self).__init__(schema, value, *args)
+        super().__init__(schema, value, *args)
         self.schema = schema
         self.value = value
 
@@ -276,7 +276,7 @@ class NotAnInterface(WrongType, SchemaNotProvided):
     expected_type = IInterface
 
     def __init__(self, value, name):
-        super(NotAnInterface, self).__init__(value, IInterface, name)
+        super().__init__(value, IInterface, name)
 
 
 class IFromUnicode(zope.interface.Interface):
@@ -348,7 +348,7 @@ class IValidatable(zope.interface.Interface):
         """
 
 
-class NO_VALUE(object):
+class NO_VALUE:
     def __repr__(self):  # pragma: no cover
         return '<NO_VALUE>'
 

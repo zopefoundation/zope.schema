@@ -13,7 +13,7 @@ class Test__is_field(unittest.TestCase):
         self.assertEqual(self._callFUT(0.0), False)
         self.assertEqual(self._callFUT(True), False)
         self.assertEqual(self._callFUT(b''), False)
-        self.assertEqual(self._callFUT(u''), False)
+        self.assertEqual(self._callFUT(''), False)
         self.assertEqual(self._callFUT(()), False)
         self.assertEqual(self._callFUT([]), False)
         self.assertEqual(self._callFUT({}), False)
@@ -38,7 +38,7 @@ class Test__is_field(unittest.TestCase):
 
         from zope.schema.interfaces import IField
 
-        class Foo(object):
+        class Foo:
             pass
 
         foo = Foo()

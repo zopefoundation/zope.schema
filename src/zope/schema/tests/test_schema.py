@@ -24,18 +24,18 @@ def _makeSchema():
 
     class ISchemaTest(Interface):
         title = Bytes(
-            title=u"Title",
-            description=u"Title",
+            title="Title",
+            description="Title",
             default=b"",
             required=True)
         description = Bytes(
-            title=u"Description",
-            description=u"Description",
+            title="Description",
+            description="Description",
             default=b"",
             required=True)
         spam = Bytes(
-            title=u"Spam",
-            description=u"Spam",
+            title="Spam",
+            description="Spam",
             default=b"",
             required=True)
     return ISchemaTest
@@ -49,8 +49,8 @@ def _makeDerivedSchema():
 
     class ISchemaTestSubclass(base):
         foo = Bytes(
-            title=u'Foo',
-            description=u'Fooness',
+            title='Foo',
+            description='Fooness',
             default=b"",
             required=False)
     return ISchemaTestSubclass
@@ -231,9 +231,9 @@ class Test_getSchemaValidationErrors(unittest.TestCase):
             foo = Text()
             bar = Text()
 
-        class Obj(object):
-            foo = u'Foo'
-            bar = u'Bar'
+        class Obj:
+            foo = 'Foo'
+            bar = 'Bar'
 
         errors = self._callFUT(IWithFields, Obj())
         self.assertEqual(len(errors), 0)
@@ -264,7 +264,7 @@ class Test_getSchemaValidationErrors(unittest.TestCase):
         class IWithMinium(Interface):
             value = Int(required=True, min=0)
 
-        class Obj(object):
+        class Obj:
             value = -1
 
         errors = self._callFUT(IWithMinium, Obj())

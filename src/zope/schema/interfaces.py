@@ -226,14 +226,14 @@ class IField(IValidatable):
     title = TextLine(
         title=_("Title"),
         description=_("A short summary or label"),
-        default=u"",
+        default="",
         required=False,
         )
 
     description = Text(
         title=_("Description"),
         description=_("A description of the field"),
-        default=u"",
+        default="",
         required=False,
         )
 

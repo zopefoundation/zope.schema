@@ -21,7 +21,7 @@ import unittest
 # pylint:disable=attribute-defined-outside-init
 
 
-class InterfaceConformanceTestsMixin(object):
+class InterfaceConformanceTestsMixin:
 
     def _getTargetClass(self):
         raise NotImplementedError
@@ -112,8 +112,8 @@ class EqualityTestsMixin(InterfaceConformanceTestsMixin):
         # Hash equality does not imply equal objects.
         # Our implementation only considers property names,
         # not values. That's OK, a dict still does the right thing.
-        field1 = self._makeOne(title=u'foo')
-        field2 = self._makeOne(title=u'bar')
+        field1 = self._makeOne(title='foo')
+        field2 = self._makeOne(title='bar')
         self.assertIsNot(field1, field2)
         self.assertNotEqual(field1, field2)
         self.assertEqual(hash(field1), hash(field2))
@@ -149,7 +149,7 @@ class EqualityTestsMixin(InterfaceConformanceTestsMixin):
         self.assertFalse(left != right)
 
 
-class OrderableMissingValueMixin(object):
+class OrderableMissingValueMixin:
     mvm_missing_value = -1
     mvm_default = 0
 
@@ -169,7 +169,7 @@ class OrderableMissingValueMixin(object):
         self.assertEqual(self.mvm_missing_value, field.missing_value)
 
 
-class OrderableTestsMixin(object):
+class OrderableTestsMixin:
 
     def assertRaisesTooBig(self, field, value):
         from zope.schema.interfaces import TooBig
@@ -221,7 +221,7 @@ class OrderableTestsMixin(object):
             self.assertRaisesTooBig(field, value)
 
 
-class LenTestsMixin(object):
+class LenTestsMixin:
 
     def assertRaisesTooLong(self, field, value):
         from zope.schema.interfaces import TooLong
@@ -244,7 +244,7 @@ class LenTestsMixin(object):
         self.assertEqual(TooShort.TOO_SMALL, ex.violation_direction)
 
 
-class WrongTypeTestsMixin(object):
+class WrongTypeTestsMixin:
 
     def assertRaisesWrongType(self, field_or_meth, expected_type,
                               *args, **kwargs):
@@ -442,7 +442,7 @@ class FieldTests(EqualityTestsMixin,
         # value_type and key_type are automatically picked up
         field.value_type = self._makeOne()
         # Make sure the formatting works also with fields that have a title
-        field.key_type = self._makeOne(title=u'Key Type')
+        field.key_type = self._makeOne(title='Key Type')
         doc = field.getDoc()
         self.assertIn('.. rubric:: Key Type', doc)
         self.assertIn('.. rubric:: Value Type', doc)
@@ -477,8 +477,8 @@ class FieldTests(EqualityTestsMixin,
         )
 
         field = self._makeOne(
-            title=u'A title',
-            description=u"""Multiline description.
+            title='A title',
+            description="""Multiline description.
 
         Some lines have leading whitespace.
 
@@ -513,14 +513,14 @@ class FieldTests(EqualityTestsMixin,
 
         msg_factory = MessageFactory('zope')
 
-        description = msg_factory(u"""Multiline description.
+        description = msg_factory("""Multiline description.
 
         Some lines have leading whitespace.
 
         It gets stripped.
         """)
 
-        title = msg_factory(u'A title')
+        title = msg_factory('A title')
 
         field = self._makeOne(title=title, description=description)
 
@@ -551,7 +551,7 @@ class FieldTests(EqualityTestsMixin,
 
         description = None
 
-        title = u'A title'
+        title = 'A title'
 
         field = self._makeOne(title=title, description=description)
 
@@ -573,10 +573,10 @@ class FieldTests(EqualityTestsMixin,
     def test_ctor_defaults(self):
 
         field = self._makeOne()
-        self.assertEqual(field.__name__, u'')
-        self.assertEqual(field.__doc__, u'')
-        self.assertEqual(field.title, u'')
-        self.assertEqual(field.description, u'')
+        self.assertEqual(field.__name__, '')
+        self.assertEqual(field.__doc__, '')
+        self.assertEqual(field.title, '')
+        self.assertEqual(field.description, '')
         self.assertEqual(field.required, True)
         self.assertEqual(field.readonly, False)
         self.assertEqual(field.constraint(object()), True)
@@ -587,27 +587,27 @@ class FieldTests(EqualityTestsMixin,
 
     def test_ctor_w_title_wo_description(self):
 
-        field = self._makeOne(u'TITLE')
-        self.assertEqual(field.__name__, u'')
-        self.assertEqual(field.__doc__, u'TITLE')
-        self.assertEqual(field.title, u'TITLE')
-        self.assertEqual(field.description, u'')
+        field = self._makeOne('TITLE')
+        self.assertEqual(field.__name__, '')
+        self.assertEqual(field.__doc__, 'TITLE')
+        self.assertEqual(field.title, 'TITLE')
+        self.assertEqual(field.description, '')
 
     def test_ctor_wo_title_w_description(self):
 
-        field = self._makeOne(description=u'DESC')
-        self.assertEqual(field.__name__, u'')
-        self.assertEqual(field.__doc__, u'DESC')
-        self.assertEqual(field.title, u'')
-        self.assertEqual(field.description, u'DESC')
+        field = self._makeOne(description='DESC')
+        self.assertEqual(field.__name__, '')
+        self.assertEqual(field.__doc__, 'DESC')
+        self.assertEqual(field.title, '')
+        self.assertEqual(field.description, 'DESC')
 
     def test_ctor_w_both_title_and_description(self):
 
-        field = self._makeOne(u'TITLE', u'DESC', u'NAME')
-        self.assertEqual(field.__name__, u'NAME')
-        self.assertEqual(field.__doc__, u'TITLE\n\nDESC')
-        self.assertEqual(field.title, u'TITLE')
-        self.assertEqual(field.description, u'DESC')
+        field = self._makeOne('TITLE', 'DESC', 'NAME')
+        self.assertEqual(field.__name__, 'NAME')
+        self.assertEqual(field.__doc__, 'TITLE\n\nDESC')
+        self.assertEqual(field.title, 'TITLE')
+        self.assertEqual(field.description, 'DESC')
 
     def test_ctor_order_madness(self):
         klass = self._getTargetClass()
@@ -822,7 +822,7 @@ class ContainerTests(EqualityTestsMixin,
     def test__validate_collection_but_not_iterable(self):
         cont = self._makeOne()
 
-        class Dummy(object):
+        class Dummy:
             def __contains__(self, item):
                 raise AssertionError("Not called")
         cont._validate(Dummy())  # doesn't raise
@@ -830,7 +830,7 @@ class ContainerTests(EqualityTestsMixin,
     def test__validate_not_collection_but_iterable(self):
         cont = self._makeOne()
 
-        class Dummy(object):
+        class Dummy:
             def __iter__(self):
                 return iter(())
         cont._validate(Dummy())  # doesn't raise
@@ -857,7 +857,7 @@ class IterableTests(ContainerTests):
         from zope.schema._bootstrapinterfaces import NotAnIterator
         itr = self._makeOne()
 
-        class Dummy(object):
+        class Dummy:
             def __contains__(self, item):
                 raise AssertionError("Not called")
         dummy = Dummy()
@@ -968,18 +968,18 @@ class TextTests(EqualityTestsMixin,
     def test_validate_not_required(self):
 
         field = self._makeOne(required=False)
-        field.validate(u'')
-        field.validate(u'abc')
-        field.validate(u'abc\ndef')
+        field.validate('')
+        field.validate('abc')
+        field.validate('abc\ndef')
         field.validate(None)
 
     def test_validate_required(self):
         from zope.schema.interfaces import RequiredMissing
 
         field = self._makeOne()
-        field.validate(u'')
-        field.validate(u'abc')
-        field.validate(u'abc\ndef')
+        field.validate('')
+        field.validate('abc')
+        field.validate('abc\ndef')
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def test_fromUnicode_miss(self):
@@ -988,7 +988,7 @@ class TextTests(EqualityTestsMixin,
         self.assertRaisesWrongType(txt.fromUnicode, txt._type, deadbeef)
 
     def test_fromUnicode_hit(self):
-        deadbeef = u'DEADBEEF'
+        deadbeef = 'DEADBEEF'
         txt = self._makeOne()
         self.assertEqual(txt.fromUnicode(deadbeef), deadbeef)
 
@@ -1068,24 +1068,24 @@ class TextLineTests(EqualityTestsMixin,
     def test_validate_not_required(self):
 
         field = self._makeOne(required=False)
-        field.validate(u'')
-        field.validate(u'abc')
+        field.validate('')
+        field.validate('abc')
         field.validate(None)
 
     def test_validate_required(self):
         from zope.schema.interfaces import RequiredMissing
 
         field = self._makeOne()
-        field.validate(u'')
-        field.validate(u'abc')
+        field.validate('')
+        field.validate('abc')
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def test_constraint(self):
 
         field = self._makeOne()
-        self.assertEqual(field.constraint(u''), True)
-        self.assertEqual(field.constraint(u'abc'), True)
-        self.assertEqual(field.constraint(u'abc\ndef'), False)
+        self.assertEqual(field.constraint(''), True)
+        self.assertEqual(field.constraint('abc'), True)
+        self.assertEqual(field.constraint('abc\ndef'), False)
 
 
 class PasswordTests(EqualityTestsMixin,
@@ -1118,16 +1118,16 @@ class PasswordTests(EqualityTestsMixin,
     def test_validate_not_required(self):
 
         field = self._makeOne(required=False)
-        field.validate(u'')
-        field.validate(u'abc')
+        field.validate('')
+        field.validate('abc')
         field.validate(None)
 
     def test_validate_required(self):
         from zope.schema.interfaces import RequiredMissing
 
         field = self._makeOne()
-        field.validate(u'')
-        field.validate(u'abc')
+        field.validate('')
+        field.validate('abc')
         self.assertRaises(RequiredMissing, field.validate, None)
 
     def test_validate_unchanged_not_already_set(self):
@@ -1146,9 +1146,9 @@ class PasswordTests(EqualityTestsMixin,
     def test_constraint(self):
 
         field = self._makeOne()
-        self.assertEqual(field.constraint(u''), True)
-        self.assertEqual(field.constraint(u'abc'), True)
-        self.assertEqual(field.constraint(u'abc\ndef'), False)
+        self.assertEqual(field.constraint(''), True)
+        self.assertEqual(field.constraint('abc'), True)
+        self.assertEqual(field.constraint('abc\ndef'), False)
 
 
 class BoolTests(EqualityTestsMixin,
@@ -1200,17 +1200,17 @@ class BoolTests(EqualityTestsMixin,
     def test_fromUnicode_miss(self):
 
         txt = self._makeOne()
-        self.assertEqual(txt.fromUnicode(u''), False)
-        self.assertEqual(txt.fromUnicode(u'0'), False)
-        self.assertEqual(txt.fromUnicode(u'1'), False)
-        self.assertEqual(txt.fromUnicode(u'False'), False)
-        self.assertEqual(txt.fromUnicode(u'false'), False)
+        self.assertEqual(txt.fromUnicode(''), False)
+        self.assertEqual(txt.fromUnicode('0'), False)
+        self.assertEqual(txt.fromUnicode('1'), False)
+        self.assertEqual(txt.fromUnicode('False'), False)
+        self.assertEqual(txt.fromUnicode('false'), False)
 
     def test_fromUnicode_hit(self):
 
         txt = self._makeOne()
-        self.assertEqual(txt.fromUnicode(u'True'), True)
-        self.assertEqual(txt.fromUnicode(u'true'), True)
+        self.assertEqual(txt.fromUnicode('True'), True)
+        self.assertEqual(txt.fromUnicode('true'), True)
 
 
 class NumberTests(EqualityTestsMixin,
@@ -1231,7 +1231,7 @@ class NumberTests(EqualityTestsMixin,
 
         from zope.schema._bootstrapinterfaces import IFromBytes
         from zope.schema._bootstrapinterfaces import IFromUnicode
-        super(NumberTests, self).test_class_conforms_to_iface()
+        super().test_class_conforms_to_iface()
         verifyClass(IFromUnicode, self._getTargetClass())
         verifyClass(IFromBytes, self._getTargetClass())
 
@@ -1240,7 +1240,7 @@ class NumberTests(EqualityTestsMixin,
 
         from zope.schema._bootstrapinterfaces import IFromBytes
         from zope.schema._bootstrapinterfaces import IFromUnicode
-        super(NumberTests, self).test_instance_conforms_to_iface()
+        super().test_instance_conforms_to_iface()
         verifyObject(IFromUnicode, self._makeOne())
         verifyObject(IFromBytes, self._makeOne())
 
@@ -1321,16 +1321,16 @@ class IntegralTests(RationalTests):
 
     def test_fromUnicode_miss(self):
         txt = self._makeOne()
-        self.assertRaises(ValueError, txt.fromUnicode, u'')
-        self.assertRaises(ValueError, txt.fromUnicode, u'False')
-        self.assertRaises(ValueError, txt.fromUnicode, u'True')
+        self.assertRaises(ValueError, txt.fromUnicode, '')
+        self.assertRaises(ValueError, txt.fromUnicode, 'False')
+        self.assertRaises(ValueError, txt.fromUnicode, 'True')
 
     def test_fromUnicode_hit(self):
 
         txt = self._makeOne()
-        self.assertEqual(txt.fromUnicode(u'0'), 0)
-        self.assertEqual(txt.fromUnicode(u'1'), 1)
-        self.assertEqual(txt.fromUnicode(u'-1'), -1)
+        self.assertEqual(txt.fromUnicode('0'), 0)
+        self.assertEqual(txt.fromUnicode('1'), 1)
+        self.assertEqual(txt.fromUnicode('-1'), -1)
 
 
 class IntTests(IntegralTests):
@@ -1385,23 +1385,23 @@ class DecimalTests(NumberTests):
     def test_fromUnicode_miss(self):
         from zope.schema.interfaces import ValidationError
         flt = self._makeOne()
-        self.assertRaises(ValueError, flt.fromUnicode, u'')
-        self.assertRaises(ValueError, flt.fromUnicode, u'abc')
+        self.assertRaises(ValueError, flt.fromUnicode, '')
+        self.assertRaises(ValueError, flt.fromUnicode, 'abc')
         with self.assertRaises(ValueError) as exc:
-            flt.fromUnicode(u'1.4G')
+            flt.fromUnicode('1.4G')
 
         value_error = exc.exception
         self.assertIs(value_error.field, flt)
-        self.assertEqual(value_error.value, u'1.4G')
+        self.assertEqual(value_error.value, '1.4G')
         self.assertIsInstance(value_error, ValidationError)
 
     def test_fromUnicode_hit(self):
         from decimal import Decimal
 
         flt = self._makeOne()
-        self.assertEqual(flt.fromUnicode(u'0'), Decimal('0.0'))
-        self.assertEqual(flt.fromUnicode(u'1.23'), Decimal('1.23'))
-        self.assertEqual(flt.fromUnicode(u'12345.6'), Decimal('12345.6'))
+        self.assertEqual(flt.fromUnicode('0'), Decimal('0.0'))
+        self.assertEqual(flt.fromUnicode('1.23'), Decimal('1.23'))
+        self.assertEqual(flt.fromUnicode('12345.6'), Decimal('12345.6'))
 
 
 class ObjectTests(EqualityTestsMixin,
@@ -1427,7 +1427,7 @@ class ObjectTests(EqualityTestsMixin,
     def _makeOneFromClass(self, cls, schema=None, *args, **kw):
         if schema is None:
             schema = self._makeSchema()
-        return super(ObjectTests, self)._makeOneFromClass(
+        return super()._makeOneFromClass(
             cls, schema, *args, **kw)
 
     def _makeSchema(self, **kw):
@@ -1477,13 +1477,13 @@ class ObjectTests(EqualityTestsMixin,
         IUnit['members'].value_type.schema = IPerson
 
         @implementer(IUnit)
-        class Unit(object):
+        class Unit:
             def __init__(self, person, person_list):
                 self.boss = person
                 self.members = person_list
 
         @implementer(IPerson)
-        class Person(object):
+        class Person:
             def __init__(self, unit):
                 self.unit = unit
 
@@ -1543,7 +1543,7 @@ class ObjectTests(EqualityTestsMixin,
         schema = self._makeSchema(foo=Text(), bar=Text())
 
         @implementer(schema)
-        class Broken(object):
+        class Broken:
             pass
 
         objf = self._makeOne(schema)
@@ -1592,7 +1592,7 @@ class ObjectTests(EqualityTestsMixin,
         schema = self._makeSchema(foo=Text(), bar=Text())
 
         @implementer(schema)
-        class Broken(object):
+        class Broken:
             foo = None
             bar = 1
 
@@ -1636,9 +1636,9 @@ class ObjectTests(EqualityTestsMixin,
         )
 
         @implementer(schema)
-        class OK(object):
-            foo = u'Foo'
-            bar = u'Bar'
+        class OK:
+            foo = 'Foo'
+            bar = 'Bar'
             baz = 2
         objf = self._makeOne(schema)
         objf.validate(OK())  # doesn't raise
@@ -1712,9 +1712,9 @@ class ObjectTests(EqualityTestsMixin,
         )
 
         @implementer(schema)
-        class OK(object):
-            foo = u'Foo'
-            bar = u'Bar'
+        class OK:
+            foo = 'Foo'
+            bar = 'Bar'
             baz = 2
         log = []
         subscribers.append(log.append)
@@ -1743,13 +1743,13 @@ class ObjectTests(EqualityTestsMixin,
         )
 
         @implementer(schema)
-        class OK(object):
-            def __init__(self, foo=u'Foo', bar=u'Bar', baz=2):
+        class OK:
+            def __init__(self, foo='Foo', bar='Bar', baz=2):
                 self.foo = foo
                 self.bar = bar
                 self.baz = baz
         ok1 = OK()
-        ok2 = OK(u'Foo2', u'Bar2', 3)
+        ok2 = OK('Foo2', 'Bar2', 3)
         log = []
         subscribers.append(log.append)
 
@@ -1782,7 +1782,7 @@ class ObjectTests(EqualityTestsMixin,
 
             @invariant
             def check_foo(self):
-                if self.foo == u'bar':
+                if self.foo == 'bar':
                     raise Invalid("Foo is not valid")
 
             @invariant
@@ -1791,8 +1791,8 @@ class ObjectTests(EqualityTestsMixin,
                     raise Invalid("Bar is not valid")
 
         @implementer(ISchema)
-        class Obj(object):
-            foo = u''
+        class Obj:
+            foo = ''
             bar = b''
 
         field = self._makeOne(ISchema)
@@ -1801,7 +1801,7 @@ class ObjectTests(EqualityTestsMixin,
         # Fine at first
         field.validate(inst)
 
-        inst.foo = u'bar'
+        inst.foo = 'bar'
         errors = self._getErrors(field.validate, inst)
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0].args[0], "Foo is not valid")
@@ -1813,7 +1813,7 @@ class ObjectTests(EqualityTestsMixin,
         self.assertEqual(errors[0].args[0], "Bar is not valid")
 
         # Both invalid
-        inst.foo = u'bar'
+        inst.foo = 'bar'
         errors = self._getErrors(field.validate, inst)
         self.assertEqual(len(errors), 2)
         errors.sort(key=lambda i: i.args)
@@ -1845,7 +1845,7 @@ class ObjectTests(EqualityTestsMixin,
 
         # Actual implementation works
         @interface.implementer(IValueType)
-        class ValueType(object):
+        class ValueType:
             "The value type"
 
         field.validate(ValueType())
@@ -1867,7 +1867,7 @@ class ObjectTests(EqualityTestsMixin,
         from zope.schema.vocabulary import SimpleVocabulary
 
         @implementer(IContextSourceBinder)
-        class EnumContext(object):
+        class EnumContext:
             def __call__(self, context):
                 return SimpleVocabulary.fromValues(list(context))
 
@@ -1879,7 +1879,7 @@ class ObjectTests(EqualityTestsMixin,
             non_field = Attribute("An attribute")
 
         @implementer(IMultipleChoice)
-        class Choices(object):
+        class Choices:
 
             def __init__(self, choices):
                 self.choices = choices
@@ -1891,10 +1891,10 @@ class ObjectTests(EqualityTestsMixin,
                 return iter(range(5))
 
         class IFavorites(Interface):
-            fav = Object(title=u"Favorites number", schema=IMultipleChoice)
+            fav = Object(title="Favorites number", schema=IMultipleChoice)
 
         @implementer(IFavorites)
-        class Favorites(object):
+        class Favorites:
             fav = FieldProperty(IFavorites['fav'])
 
         # must not raise
@@ -1949,7 +1949,7 @@ class ObjectTests(EqualityTestsMixin,
         self.assertIn(":Must Provide: :class:", doc)
 
 
-class DummyInst(object):
+class DummyInst:
     missing_value = object()
 
     def __init__(self, exc=None):
