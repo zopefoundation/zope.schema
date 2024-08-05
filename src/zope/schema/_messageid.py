@@ -14,7 +14,7 @@
 
 try:
     from zope.i18nmessageid import MessageFactory
-except ImportError:
+except ImportError:  # Cannot be ModuleNotFoundError.
     _ = str
 else:
     _ = MessageFactory("zope")

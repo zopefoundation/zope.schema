@@ -28,7 +28,7 @@ _marker = object()
 
 
 @interface.implementer(interfaces.IFieldUpdatedEvent)
-class FieldUpdatedEvent(object):
+class FieldUpdatedEvent:
 
     def __init__(self, obj, field, old_value, new_value):
         self.object = obj
@@ -44,7 +44,7 @@ class FieldUpdatedEvent(object):
         lambda self, new_value: setattr(self, 'object', new_value))
 
 
-class FieldProperty(object):
+class FieldProperty:
     """Computed attributes based on schema fields
 
     Field properties provide default values, data validation and error messages
@@ -112,7 +112,7 @@ def createFieldProperties(schema, omit=[]):
         frame.f_locals[name] = FieldProperty(schema[name])
 
 
-class FieldPropertyStoredThroughField(object):
+class FieldPropertyStoredThroughField:
 
     def __init__(self, field, name=None):
         if name is None:

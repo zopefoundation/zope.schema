@@ -55,7 +55,7 @@ from zope.schema._bootstrapinterfaces import ValidationError
 from zope.schema._bootstrapinterfaces import WrongType
 
 
-class _NotGiven(object):
+class _NotGiven:
 
     def __repr__(self):  # pragma: no cover
         return "<Not Given>"
@@ -64,7 +64,7 @@ class _NotGiven(object):
 _NotGiven = _NotGiven()
 
 
-class ValidatedProperty(object):
+class ValidatedProperty:
 
     def __init__(self, name, check=None, allow_none=False):
         self._name = name
@@ -123,7 +123,7 @@ def getFields(schema):
     return fields
 
 
-class _DocStringHelpers(object):
+class _DocStringHelpers:
     # Namespace object to hold methods related to ReST formatting
     # docstrings
 
@@ -164,11 +164,11 @@ class _DocStringHelpers(object):
         if mod in ('zope.schema._bootstrapfields', 'zope.schema._field'):
             mod = 'zope.schema'
         mod += '.' if mod else ''
-        return ':class:`%s%s`' % (mod, kind.__name__)
+        return ':class:`{}{}`'.format(mod, kind.__name__)
 
     @classmethod
     def make_field(cls, name, value):
-        return ":%s: %s" % (name, value)
+        return ":{}: {}".format(name, value)
 
     @classmethod
     def make_class_field(cls, name, kind):
@@ -176,7 +176,7 @@ class _DocStringHelpers(object):
             return cls.make_field(name, cls.make_class_directive(kind))
         if not isinstance(kind, tuple):  # pragma: no cover
             raise TypeError(
-                "make_class_field() can't handle kind %r" % (kind,))
+                "make_class_field() can't handle kind {!r}".format(kind))
         return cls.make_field(
             name,
             ', '.join([cls.make_class_directive(t) for t in kind]))
@@ -213,7 +213,7 @@ class Field(Attribute):
     interface = None
     _Element__tagged_values = None
 
-    def __init__(self, title=u'', description=u'', __name__='',
+    def __init__(self, title='', description='', __name__='',
                  required=True, readonly=False, constraint=None, default=None,
                  defaultFactory=None, missing_value=__missing_value_marker):
         """Pass in field values as keyword parameters.
@@ -247,18 +247,18 @@ class Field(Attribute):
         # strings, but don't overwrite the original, we need to
         # preserve it (it could be a MessageID).
         doc_description = '\n'.join(
-            _DocStringHelpers.docstring_to_lines(description or u'')[:-1]
+            _DocStringHelpers.docstring_to_lines(description or '')[:-1]
         )
 
         if title:
             if doc_description:
-                __doc__ = "%s\n\n%s" % (title, doc_description)
+                __doc__ = "{}\n\n{}".format(title, doc_description)
             else:
                 __doc__ = title
         elif description:
             __doc__ = doc_description
 
-        super(Field, self).__init__(__name__, __doc__)
+        super().__init__(__name__, __doc__)
         self.title = title
         self.description = description
         self.required = required
@@ -420,7 +420,7 @@ class Field(Attribute):
         return lines
 
     def getDoc(self):
-        doc = super(Field, self).getDoc()
+        doc = super().getDoc()
         lines = _DocStringHelpers.docstring_to_lines(doc)
         lines += self.getExtraDocLines()
         lines.append('')
@@ -431,7 +431,7 @@ class Field(Attribute):
 class Container(Field):
 
     def _validate(self, value):
-        super(Container, self)._validate(value)
+        super()._validate(value)
 
         if not hasattr(value, '__contains__'):
             try:
@@ -446,7 +446,7 @@ class Container(Field):
 class Iterable(Container):
 
     def _validate(self, value):
-        super(Iterable, self)._validate(value)
+        super()._validate(value)
 
         # See if we can get an iterator for it
         try:
@@ -455,7 +455,7 @@ class Iterable(Container):
             raise NotAnIterator(value).with_field_and_value(self, value)
 
 
-class Orderable(object):
+class Orderable:
     """Values of ordered fields can be sorted.
 
     They can be restricted to a range of values.
@@ -473,7 +473,7 @@ class Orderable(object):
         self.min = None
         self.max = None
 
-        super(Orderable, self).__init__(**kw)
+        super().__init__(**kw)
 
         # Now really set min and max
         self.min = min
@@ -484,7 +484,7 @@ class Orderable(object):
         self.default = default
 
     def _validate(self, value):
-        super(Orderable, self)._validate(value)
+        super()._validate(value)
 
         if self.min is not None and value < self.min:
             raise TooSmall(value, self.min).with_field_and_value(self, value)
@@ -493,7 +493,7 @@ class Orderable(object):
             raise TooBig(value, self.max).with_field_and_value(self, value)
 
 
-class MinMaxLen(object):
+class MinMaxLen:
     """Expresses constraints on the length of a field.
 
     MinMaxLen is a mixin used in combination with Field.
@@ -504,10 +504,10 @@ class MinMaxLen(object):
     def __init__(self, min_length=0, max_length=None, **kw):
         self.min_length = min_length
         self.max_length = max_length
-        super(MinMaxLen, self).__init__(**kw)
+        super().__init__(**kw)
 
     def _validate(self, value):
-        super(MinMaxLen, self)._validate(value)
+        super()._validate(value)
 
         if self.min_length is not None and len(value) < self.min_length:
             raise TooShort(value, self.min_length).with_field_and_value(
@@ -527,7 +527,7 @@ class Text(MinMaxLen, Field):
     def __init__(self,  *args, **kw):
         self.unicode_normalization = kw.pop(
             'unicode_normalization', self.unicode_normalization)
-        super(Text, self).__init__(*args, **kw)
+        super().__init__(*args, **kw)
 
     def fromUnicode(self, value):
         """
@@ -581,7 +581,7 @@ class Password(TextLine):
         """
         if value is self.UNCHANGED_PASSWORD:
             return
-        super(Password, self).set(context, value)
+        super().set(context, value)
 
     def validate(self, value):
         try:
@@ -591,7 +591,7 @@ class Password(TextLine):
         if value is self.UNCHANGED_PASSWORD and existing:
             # Allow the UNCHANGED_PASSWORD value, if a password is set already
             return
-        return super(Password, self).validate(value)
+        return super().validate(value)
 
 
 @implementer(IFromUnicode, IFromBytes)
@@ -994,7 +994,7 @@ class Decimal(Number):
 class _ObjectsBeingValidated(threading.local):
 
     def __init__(self):
-        super(_ObjectsBeingValidated, self).__init__()
+        super().__init__()
         self.ids_being_validated = set()
 
 
@@ -1123,16 +1123,16 @@ class Object(Field):
 
         self.schema = schema
         self.validate_invariants = kw.pop('validate_invariants', True)
-        super(Object, self).__init__(**kw)
+        super().__init__(**kw)
 
     def getExtraDocLines(self):
-        lines = super(Object, self).getExtraDocLines()
+        lines = super().getExtraDocLines()
         lines.append(_DocStringHelpers.make_class_field(
             "Must Provide", self.schema))
         return lines
 
     def _validate(self, value):
-        super(Object, self)._validate(value)
+        super()._validate(value)
 
         # schema has to be provided by value
         if not self.schema.providedBy(value):
@@ -1173,11 +1173,11 @@ class Object(Field):
         # The event subscribers are allowed to replace the object, thus we need
         # to replace our previous value.
         value = event.object
-        super(Object, self).set(object, value)
+        super().set(object, value)
 
 
 @implementer(IBeforeObjectAssignedEvent)
-class BeforeObjectAssignedEvent(object):
+class BeforeObjectAssignedEvent:
     """An object is going to be assigned to an attribute on another object."""
 
     def __init__(self, object, name, context):

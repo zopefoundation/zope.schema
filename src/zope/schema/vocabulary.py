@@ -31,7 +31,7 @@ _marker = object()
 
 
 @implementer(ITokenizedTerm)
-class SimpleTerm(object):
+class SimpleTerm:
     """
     Simple tokenized term used by SimpleVocabulary.
 
@@ -74,11 +74,8 @@ class SimpleTerm(object):
         if not isinstance(other, SimpleTerm):
             return False
 
-        return (
-            self.value == other.value
-            and self.token == other.token
-            and self.title == other.title
-        )
+        return (self.value == other.value and self.token == other.token
+                and self.title == other.title)
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -88,7 +85,7 @@ class SimpleTerm(object):
 
 
 @implementer(IVocabularyTokenized)
-class SimpleVocabulary(object):
+class SimpleVocabulary:
     """
     Vocabulary that works from a sequence of terms.
 
@@ -118,11 +115,11 @@ class SimpleVocabulary(object):
         for term in self._terms:
             if not swallow_dupes:
                 if term.value in self.by_value:
-                    raise ValueError(
-                        'term values must be unique: %s' % repr(term.value))
+                    raise ValueError('term values must be unique: %s' %
+                                     repr(term.value))
                 if term.token in self.by_token:
-                    raise ValueError(
-                        'term tokens must be unique: %s' % repr(term.token))
+                    raise ValueError('term tokens must be unique: %s' %
+                                     repr(term.token))
             self.by_value[term.value] = term
             self.by_token[term.token] = term
         if interfaces:
@@ -145,8 +142,7 @@ class SimpleVocabulary(object):
         .. versionchanged:: 4.6.0
             Allow passing in triples to set item titles.
         """
-        terms = [cls.createTerm(item[1], item[0], *item[2:])
-                 for item in items]
+        terms = [cls.createTerm(item[1], item[0], *item[2:]) for item in items]
         return cls(terms, *interfaces)
 
     @classmethod
@@ -211,10 +207,8 @@ class SimpleVocabulary(object):
         if not isinstance(other, SimpleVocabulary):
             return False
 
-        return (
-            self._terms == other._terms
-            and providedBy(self) == providedBy(other)
-        )
+        return (self._terms == other._terms
+                and providedBy(self) == providedBy(other))
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -237,7 +231,7 @@ def _createTermTree(ttree, dict_):
 
 
 @implementer(ITreeVocabulary)
-class TreeVocabulary(object):
+class TreeVocabulary:
     """ Vocabulary that relies on a tree (i.e nested) structure.
     """
     # The default implementation uses a dict to create the tree structure. This
@@ -366,19 +360,17 @@ class TreeVocabulary(object):
             token = getattr(term, 'token')
 
             if value in self.term_by_value:
-                raise ValueError(
-                    "Term values must be unique: '%s'" % value)
+                raise ValueError("Term values must be unique: '%s'" % value)
 
             if token in self.term_by_token:
-                raise ValueError(
-                    "Term tokens must be unique: '%s'" % token)
+                raise ValueError("Term tokens must be unique: '%s'" % token)
 
             self.term_by_value[value] = term
             self.term_by_token[token] = term
 
             if value not in self.path_by_value:  # pragma: no branch
-                self.path_by_value[value] = self._getPathToTreeNode(self,
-                                                                    value)
+                self.path_by_value[value] = self._getPathToTreeNode(
+                    self, value)
             self._populateIndexes(tree[term])
 
     def getTerm(self, value):
@@ -428,16 +420,17 @@ class VocabularyRegistryError(LookupError):
 
     .. seealso:: `VocabularyRegistry`
     """
+
     def __init__(self, name):
         self.name = name
-        super(VocabularyRegistryError, self).__init__(str(self))
+        super().__init__(str(self))
 
     def __str__(self):
         return "unknown vocabulary: %r" % self.name
 
 
 @implementer(IVocabularyRegistry)
-class VocabularyRegistry(object):
+class VocabularyRegistry:
     """
     Default implementation of
     :class:`zope.schema.interfaces.IVocabularyRegistry`.
@@ -454,7 +447,7 @@ class VocabularyRegistry(object):
     `zope.vocabularyregistry
     <https://pypi.org/project/zope.vocabularyregistry/>`_.
     """
-    __slots__ = ('_map',)
+    __slots__ = ('_map', )
 
     def __init__(self):
         self._map = {}
@@ -500,7 +493,7 @@ def _clear():
 
 try:
     from zope.testing.cleanup import addCleanUp
-except ImportError:  # pragma: no cover
+except ModuleNotFoundError:  # pragma: no cover
     # don't have that part of Zope
     pass
 else:  # pragma: no cover

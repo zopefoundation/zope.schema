@@ -69,8 +69,8 @@ class SimpleTermTests(unittest.TestCase):
 
     def test_unicode_non_ascii_value(self):
         from zope.schema.interfaces import ITitledTokenizedTerm
-        term = self._makeOne(u'Snowman \u2603')
-        self.assertEqual(term.value, u'Snowman \u2603')
+        term = self._makeOne('Snowman \u2603')
+        self.assertEqual(term.value, 'Snowman \u2603')
         self.assertEqual(term.token, 'Snowman \\u2603')
         self.assertFalse(ITitledTokenizedTerm.providedBy(term))
 
@@ -259,7 +259,7 @@ class SimpleVocabularyTests(unittest.TestCase):
             self.assertEqual(str(e), "term values must be unique: 'one'")
 
     def test_overriding_createTerm(self):
-        class MyTerm(object):
+        class MyTerm:
             def __init__(self, value):
                 self.value = value
                 self.token = repr(value)
@@ -718,11 +718,11 @@ def _makeSampleVocabulary():
 
     from zope.schema.interfaces import IVocabulary
 
-    class SampleTerm(object):
+    class SampleTerm:
         pass
 
     @implementer(IVocabulary)
-    class SampleVocabulary(object):
+    class SampleVocabulary:
 
         def __iter__(self):
             raise AssertionError("Not called")
