@@ -17,7 +17,7 @@ fail-under = 100
 
 [coverage-run]
 additional-config = [
-    "omit = src/zope/__init__.py",
+    "omit = [src/zope/__init__.py]",
     ]
 
 [check-manifest]
