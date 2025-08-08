@@ -228,14 +228,14 @@ class IField(IValidatable):
         description=_("A short summary or label"),
         default="",
         required=False,
-        )
+    )
 
     description = Text(
         title=_("Description"),
         description=_("A description of the field"),
         default="",
         required=False,
-        )
+    )
 
     required = Bool(
         title=_("Required"),
@@ -252,13 +252,13 @@ class IField(IValidatable):
         title=_("Default Value"),
         description=_("""The field default value may be None or a legal
                         field value""")
-        )
+    )
 
     missing_value = Field(
         title=_("Missing Value"),
         description=_("""If input for this Field is missing, and that's ok,
                           then this is the value to use""")
-        )
+    )
 
     order = Int(
         title=_("Field Order"),
@@ -272,7 +272,7 @@ class IField(IValidatable):
         """),
         required=True,
         readonly=True,
-        )
+    )
 
     def constraint(value):
         """Check a customized constraint on the value.
@@ -351,13 +351,13 @@ class IMinMax(IOrderable):
         title=_("Start of the range"),
         required=False,
         default=None
-        )
+    )
 
     max = Field(
         title=_("End of the range (including the value itself)"),
         required=False,
         default=None
-        )
+    )
 
 
 class IMinMaxLen(ILen):
@@ -399,7 +399,7 @@ class IBool(IField):
         title=_("Default Value"),
         description=_("""The field default value may be None or a legal
                         field value""")
-        )
+    )
     required = Bool(
         title=_("Required"),
         description=(_("Tells whether a field requires its value to exist.")),
@@ -486,19 +486,19 @@ class INumber(IMinMax, IField):
         title=_("Start of the range"),
         required=False,
         default=None
-        )
+    )
 
     max = Number(
         title=_("End of the range (including the value itself)"),
         required=False,
         default=None
-        )
+    )
 
     default = Number(
         title=_("Default Value"),
         description=_("""The field default value may be None or a legal
                         field value""")
-        )
+    )
 
 
 class IComplex(INumber):
@@ -512,19 +512,19 @@ class IComplex(INumber):
         title=_("Start of the range"),
         required=False,
         default=None
-        )
+    )
 
     max = Complex(
         title=_("End of the range (including the value itself)"),
         required=False,
         default=None
-        )
+    )
 
     default = Complex(
         title=_("Default Value"),
         description=_("""The field default value may be None or a legal
                         field value""")
-        )
+    )
 
 
 class IReal(IComplex):
@@ -538,19 +538,19 @@ class IReal(IComplex):
         title=_("Start of the range"),
         required=False,
         default=None
-        )
+    )
 
     max = Real(
         title=_("End of the range (including the value itself)"),
         required=False,
         default=None
-        )
+    )
 
     default = Real(
         title=_("Default Value"),
         description=_("""The field default value may be None or a legal
                         field value""")
-        )
+    )
 
 
 class IRational(IReal):
@@ -565,19 +565,19 @@ class IRational(IReal):
         title=_("Start of the range"),
         required=False,
         default=None
-        )
+    )
 
     max = Rational(
         title=_("End of the range (including the value itself)"),
         required=False,
         default=None
-        )
+    )
 
     default = Rational(
         title=_("Default Value"),
         description=_("""The field default value may be None or a legal
                         field value""")
-        )
+    )
 
 
 class IIntegral(IRational):
@@ -591,19 +591,19 @@ class IIntegral(IRational):
         title=_("Start of the range"),
         required=False,
         default=None
-        )
+    )
 
     max = Integral(
         title=_("End of the range (including the value itself)"),
         required=False,
         default=None
-        )
+    )
 
     default = Integral(
         title=_("Default Value"),
         description=_("""The field default value may be None or a legal
                         field value""")
-        )
+    )
 
 
 ##
@@ -621,19 +621,19 @@ class IInt(IIntegral):
         title=_("Start of the range"),
         required=False,
         default=None
-        )
+    )
 
     max = Int(
         title=_("End of the range (including the value itself)"),
         required=False,
         default=None
-        )
+    )
 
     default = Int(
         title=_("Default Value"),
         description=_("""The field default value may be None or a legal
                         field value""")
-        )
+    )
 
 
 class IFloat(IReal):
@@ -654,19 +654,19 @@ class IDecimal(INumber):
         title=_("Start of the range"),
         required=False,
         default=None
-        )
+    )
 
     max = Decimal(
         title=_("End of the range (including the value itself)"),
         required=False,
         default=None
-        )
+    )
 
     default = Decimal(
         title=_("Default Value"),
         description=_("""The field default value may be None or a legal
                         field value""")
-        )
+    )
 
 ###
 # End numbers
@@ -726,13 +726,13 @@ class IDottedName(INativeStringLine):
         required=True,
         min=0,
         default=0
-        )
+    )
 
     max_dots = Int(
         title=_("Maximum number of dots (should not be less than min_dots)"),
         required=False,
         default=None
-        )
+    )
 
 
 class IPythonIdentifier(INativeStringLine):
@@ -754,14 +754,14 @@ class IChoice(IField):
                       "object that provides values for this field."),
         required=False,
         default=None
-        )
+    )
 
     vocabularyName = TextLine(
         title=_("Vocabulary name"),
         description=_("Vocabulary name to lookup in the vocabulary registry"),
         required=False,
         default=None
-        )
+    )
 
 
 # Collections:

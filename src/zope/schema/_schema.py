@@ -65,7 +65,7 @@ def getValidationErrors(schema, value):
     schema_error_dict, invariant_errors = get_validation_errors(
         schema,
         value,
-        )
+    )
 
     if not schema_error_dict and not invariant_errors:
         # Valid! Yay!

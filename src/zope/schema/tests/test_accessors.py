@@ -36,7 +36,7 @@ class FieldReadAccessorTests(unittest.TestCase):
 
         field = Text(title='Hmm')
         wrapped = self._makeOne(field)
-        self.assertTrue(wrapped.field is field)
+        self.assertIs(wrapped.field, field)
         self.assertEqual(wrapped.__name__, '')  # __name__ set when in iface
         self.assertEqual(wrapped.__doc__, 'get Hmm')
 
@@ -234,8 +234,8 @@ class FieldReadAccessorTests(unittest.TestCase):
         context = object()
         bound = getter.bind(context)
         self.assertEqual(bound.__name__, 'getter')
-        self.assertTrue(isinstance(bound.field, getter.field.__class__))
-        self.assertTrue(bound.field.context is context)
+        self.assertIsInstance(bound.field, getter.field.__class__)
+        self.assertIs(bound.field.context, context)
 
 
 class FieldWriteAccessorTests(unittest.TestCase):
@@ -255,7 +255,7 @@ class FieldWriteAccessorTests(unittest.TestCase):
 
         field = Text(title='Hmm')
         wrapped = self._makeOne(field)
-        self.assertTrue(wrapped.field is field)
+        self.assertIs(wrapped.field, field)
         self.assertEqual(wrapped.__name__, '')  # __name__ set when in iface
         self.assertEqual(wrapped.__doc__, 'set Hmm')
 

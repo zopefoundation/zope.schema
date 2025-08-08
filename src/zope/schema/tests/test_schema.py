@@ -65,9 +65,9 @@ class Test_getFields(unittest.TestCase):
     def test_simple(self):
         fields = self._callFUT(_makeSchema())
 
-        self.assertTrue('title' in fields)
-        self.assertTrue('description' in fields)
-        self.assertTrue('spam' in fields)
+        self.assertIn('title', fields)
+        self.assertIn('description', fields)
+        self.assertIn('spam', fields)
 
         # test whether getName() has the right value
         for key, value in fields.items():
@@ -76,10 +76,10 @@ class Test_getFields(unittest.TestCase):
     def test_derived(self):
         fields = self._callFUT(_makeDerivedSchema())
 
-        self.assertTrue('title' in fields)
-        self.assertTrue('description' in fields)
-        self.assertTrue('spam' in fields)
-        self.assertTrue('foo' in fields)
+        self.assertIn('title', fields)
+        self.assertIn('description', fields)
+        self.assertIn('spam', fields)
+        self.assertIn('foo', fields)
 
         # test whether getName() has the right value
         for key, value in fields.items():
@@ -116,17 +116,17 @@ class Test_getFieldNames(unittest.TestCase):
     def test_simple(self):
         names = self._callFUT(_makeSchema())
         self.assertEqual(len(names), 3)
-        self.assertTrue('title' in names)
-        self.assertTrue('description' in names)
-        self.assertTrue('spam' in names)
+        self.assertIn('title', names)
+        self.assertIn('description', names)
+        self.assertIn('spam', names)
 
     def test_derived(self):
         names = self._callFUT(_makeDerivedSchema())
         self.assertEqual(len(names), 4)
-        self.assertTrue('title' in names)
-        self.assertTrue('description' in names)
-        self.assertTrue('spam' in names)
-        self.assertTrue('foo' in names)
+        self.assertIn('title', names)
+        self.assertIn('description', names)
+        self.assertIn('spam', names)
+        self.assertIn('foo', names)
 
 
 class Test_getFieldNamesInOrder(unittest.TestCase):

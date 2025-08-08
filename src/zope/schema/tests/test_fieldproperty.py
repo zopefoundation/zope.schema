@@ -83,7 +83,7 @@ class FieldPropertyTests(_Base, _Integration):
         field = Text(__name__='testing')
         cname = self._getTargetClass().__name__
         prop = self._makeOne(field)
-        self.assertTrue(getattr(prop, '_%s__field' % cname) is field)
+        self.assertIs(getattr(prop, '_%s__field' % cname), field)
         self.assertEqual(getattr(prop, '_%s__name' % cname), 'testing')
         self.assertEqual(prop.__name__, 'testing')
         self.assertEqual(prop.description, field.description)
@@ -103,7 +103,7 @@ class FieldPropertyTests(_Base, _Integration):
         )
         cname = self._getTargetClass().__name__
         prop = self._makeOne(field, name='override')
-        self.assertTrue(getattr(prop, '_%s__field' % cname) is field)
+        self.assertIs(getattr(prop, '_%s__field' % cname), field)
         self.assertEqual(getattr(prop, '_%s__name' % cname), 'override')
         self.assertEqual(prop.description, field.description)
         self.assertEqual(prop.default, field.default)
@@ -155,7 +155,7 @@ class FieldPropertyTests(_Base, _Integration):
         class Foo:
             testing = prop
 
-        self.assertTrue(Foo.testing is prop)
+        self.assertIs(Foo.testing, prop)
 
     def test___get___from_instance_pseudo_field_wo_default(self):
         class _Faux:
@@ -284,7 +284,7 @@ class FieldPropertyTests(_Base, _Integration):
         )
         self.assertEqual(len(log), 6)
         event = log[0]
-        self.assertTrue(isinstance(event, FieldUpdatedEvent))
+        self.assertIsInstance(event, FieldUpdatedEvent)
         self.assertTrue(verifyObject(IFieldUpdatedEvent, event))
         self.assertEqual(event.object, field)
         self.assertEqual(event.old_value, 0)
@@ -325,7 +325,7 @@ class FieldPropertyTests(_Base, _Integration):
         foo.testing = 'Foo'
         self.assertEqual(len(log), 2)
         event = log[1]
-        self.assertTrue(isinstance(event, FieldUpdatedEvent))
+        self.assertIsInstance(event, FieldUpdatedEvent)
         self.assertTrue(verifyObject(IFieldUpdatedEvent, event))
         self.assertEqual(event.object, foo)
         self.assertEqual(event.field, field)
@@ -362,8 +362,8 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
         field = Text(__name__='testing')
         cname = self._getTargetClass().__name__
         prop = self._makeOne(field)
-        self.assertTrue(isinstance(prop.field, field.__class__))
-        self.assertFalse(prop.field is field)
+        self.assertIsInstance(prop.field, field.__class__)
+        self.assertIsNot(prop.field, field)
         self.assertEqual(prop.field.__name__, '__st_testing_st')
         self.assertEqual(prop.__name__, '__st_testing_st')
         self.assertEqual(getattr(prop, '_%s__name' % cname), 'testing')
@@ -384,8 +384,8 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
         )
         cname = self._getTargetClass().__name__
         prop = self._makeOne(field, name='override')
-        self.assertTrue(isinstance(prop.field, field.__class__))
-        self.assertFalse(prop.field is field)
+        self.assertIsInstance(prop.field, field.__class__)
+        self.assertIsNot(prop.field, field)
         self.assertEqual(prop.field.__name__, '__st_testing_st')
         self.assertEqual(prop.__name__, '__st_testing_st')
         self.assertEqual(getattr(prop, '_%s__name' % cname), 'override')
@@ -417,7 +417,7 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
         prop = self._makeOne()
         field = Text(__name__='testing')
         value = prop.getValue(foo, field)
-        self.assertTrue(value is _marker)
+        self.assertIs(value, _marker)
 
     def test_getValue_hit(self):
         from zope.schema import Text
@@ -443,7 +443,7 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
         field = Text(__name__='testing')
         default = object()
         value = prop.queryValue(foo, field, default)
-        self.assertTrue(value is default)
+        self.assertIs(value, default)
 
     def test_queryValue_hit(self):
         from zope.schema import Text
@@ -465,7 +465,7 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
         class Foo:
             testing = prop
 
-        self.assertTrue(Foo.testing is prop)
+        self.assertIs(Foo.testing, prop)
 
     def test___get___from_instance_pseudo_field_wo_default(self):
         class _Faux:
@@ -612,7 +612,7 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
         foo.testing = 'Foo'
         self.assertEqual(len(log), 2)
         event = log[1]
-        self.assertTrue(isinstance(event, FieldUpdatedEvent))
+        self.assertIsInstance(event, FieldUpdatedEvent)
         self.assertEqual(event.object, foo)
         self.assertEqual(event.field, field)
         self.assertEqual(event.old_value, 'Bar')
@@ -642,7 +642,7 @@ class FieldPropertyStoredThroughFieldTests(_Base, _Integration):
             ['min_length', 'max_length', 'title', 'description', 'required',
              'readonly'])
         event = log[0]
-        self.assertTrue(isinstance(event, FieldUpdatedEvent))
+        self.assertIsInstance(event, FieldUpdatedEvent)
         self.assertEqual(event.object, field)
         self.assertEqual(event.old_value, 0)
         self.assertEqual(event.new_value, 0)
@@ -676,9 +676,9 @@ class CreateFieldPropertiesTests(unittest.TestCase):
         class Dummy:
             createFieldProperties(schema)
 
-        self.assertTrue(isinstance(Dummy.title, FieldProperty))
-        self.assertTrue(isinstance(Dummy.date, FieldProperty))
-        self.assertTrue(Dummy.date._FieldProperty__field is schema['date'])
+        self.assertIsInstance(Dummy.title, FieldProperty)
+        self.assertIsInstance(Dummy.date, FieldProperty)
+        self.assertIs(Dummy.date._FieldProperty__field, schema['date'])
 
     def test_fields_in_omit_are_not_created_on_class(self):
         from zope.schema.fieldproperty import createFieldProperties
