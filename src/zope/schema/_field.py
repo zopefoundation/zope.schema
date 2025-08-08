@@ -365,7 +365,7 @@ class InvalidVocabularyError(ValidationError, ValueError, TypeError):
     # Subclasses TypeError and ValueError for backwards compatibility
 
     def __init__(self, vocabulary):
-        super().__init__("Invalid vocabulary {!r}".format(vocabulary))
+        super().__init__(f"Invalid vocabulary {vocabulary!r}")
 
 
 @implementer(IChoice, IFromUnicode)

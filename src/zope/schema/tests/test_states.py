@@ -43,23 +43,23 @@ class StateSelectionTest(unittest.TestCase):
                 description='The state in which you were born.',
                 vocabulary="states",
                 default="AL",
-                )
+            )
             state2 = Choice(
                 title='State of Birth',
                 description='The state in which you were born.',
                 vocabulary="states",
                 default="AL",
-                )
+            )
             state3 = Choice(
                 title='Favorite State',
                 description='The state you like the most.',
                 vocabulary=StateVocabulary(),
-                )
+            )
             state4 = Choice(
                 title="Name",
                 description="The name of your new state",
                 vocabulary="states",
-                )
+            )
         return IBirthInfo
 
     def test_default_presentation(self):
@@ -83,7 +83,7 @@ class StateSelectionTest(unittest.TestCase):
         L = list(vocab)
         for term in L:
             count += 1
-            self.assertTrue(term.value in vocab)
+            self.assertIn(term.value, vocab)
         self.assertEqual(count, len(vocab))
         # make sure we get the same values the second time around:
         L = [term.value for term in L]
@@ -99,6 +99,6 @@ class StateSelectionTest(unittest.TestCase):
         schema = self._makeSchema()
         field = schema.getDescriptionFor("state3")
         bound = field.bind(None)
-        self.assertTrue(bound.vocabularyName is None)
+        self.assertIsNone(bound.vocabularyName)
         self.assertTrue(verifyObject(IVocabulary, bound.vocabulary))
-        self.assertTrue("AL" in bound.vocabulary)
+        self.assertIn("AL", bound.vocabulary)

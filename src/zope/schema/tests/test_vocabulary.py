@@ -143,8 +143,8 @@ class SimpleVocabularyTests(unittest.TestCase):
         for value, term in zip(VALUES, vocabulary):
             self.assertEqual(term.value, value)
         for value in VALUES:
-            self.assertTrue(value in vocabulary)
-        self.assertFalse('ABC' in vocabulary)
+            self.assertIn(value, vocabulary)
+        self.assertNotIn('ABC', vocabulary)
         for term in vocabulary:
             self.assertIs(vocabulary.getTerm(term.value), term)
             self.assertIs(vocabulary.getTermByToken(term.token), term)
@@ -213,7 +213,7 @@ class SimpleVocabularyTests(unittest.TestCase):
         VALUES = [1, 4, 2, 9]
         for value in VALUES:
             term = self._getTargetClass().createTerm(value)
-            self.assertTrue(isinstance(term, SimpleTerm))
+            self.assertIsInstance(term, SimpleTerm)
             self.assertEqual(term.value, value)
             self.assertEqual(term.token, str(value))
 
@@ -554,18 +554,18 @@ class TreeVocabularyTests(unittest.TestCase):
                         'Austria' in tv2 and
                         'Bavaria' in tv2)
 
-        self.assertTrue('bav' not in tv2)
-        self.assertTrue('foo' not in tv2)
-        self.assertTrue({} not in tv2)  # not hashable
+        self.assertNotIn('bav', tv2)
+        self.assertNotIn('foo', tv2)
+        self.assertNotIn({}, tv2)  # not hashable
 
         tv3 = self.tree_vocab_3()
         self.assertTrue('database' in tv3 and
                         'security' in tv3 and
                         'services' in tv3)
 
-        self.assertTrue('Services' not in tv3)
-        self.assertTrue('Database' not in tv3)
-        self.assertTrue({} not in tv3)  # not hashable
+        self.assertNotIn('Services', tv3)
+        self.assertNotIn('Database', tv3)
+        self.assertNotIn({}, tv3)  # not hashable
 
     def test_values_and_items(self):
         for v in (self.tree_vocab_2(), self.tree_vocab_3()):
@@ -584,8 +584,8 @@ class TreeVocabularyTests(unittest.TestCase):
     def test_get_term(self):
         for v in (self.tree_vocab_2(), self.tree_vocab_3()):
             for term in v:
-                self.assertTrue(v.getTerm(term.value) is term)
-                self.assertTrue(v.getTermByToken(term.token) is term)
+                self.assertIs(v.getTerm(term.value), term)
+                self.assertIs(v.getTermByToken(term.token), term)
             self.assertRaises(LookupError, v.getTerm, 'non-present-value')
             self.assertRaises(LookupError,
                               v.getTermByToken, 'non-present-token')
@@ -702,7 +702,7 @@ class RegistryTests(unittest.TestCase):
         from zope.schema.vocabulary import setVocabularyRegistry
         r = _makeDummyRegistry()
         setVocabularyRegistry(r)
-        self.assertTrue(getVocabularyRegistry() is r)
+        self.assertIs(getVocabularyRegistry(), r)
 
     def test_getVocabularyRegistry(self):
         from zope.schema.interfaces import IVocabularyRegistry

@@ -132,13 +132,13 @@ class EqualityTestsMixin(InterfaceConformanceTestsMixin):
             pass
         right = self._makeOneFromClass(Derived)
         self.assertNotEqual(left, right)
-        self.assertTrue(left != right)
+        self.assertNotEqual(left, right)
 
     def test___eq___same_type_different_attrs(self):
         left = self._makeOne(required=True)
         right = self._makeOne(required=False)
         self.assertNotEqual(left, right)
-        self.assertTrue(left != right)
+        self.assertNotEqual(left, right)
 
     def test___eq___same_type_same_attrs(self):
         left = self._makeOne()
@@ -146,7 +146,7 @@ class EqualityTestsMixin(InterfaceConformanceTestsMixin):
 
         right = self._makeOne()
         self.assertEqual(left, right)
-        self.assertFalse(left != right)
+        self.assertEqual(left, right)
 
 
 class OrderableMissingValueMixin:
@@ -1456,13 +1456,13 @@ class ObjectTests(EqualityTestsMixin,
                 title=_("Boss"),
                 description=_("Boss description"),
                 required=False,
-                )
+            )
             members = List(
                 value_type=Object(schema=Interface),
                 title=_("Member List"),
                 description=_("Member list description"),
                 required=False,
-                )
+            )
 
         class IPerson(Interface):
             """A schema that participate to a cycle"""
@@ -1471,7 +1471,7 @@ class ObjectTests(EqualityTestsMixin,
                 title=_("Unit"),
                 description=_("Unit description"),
                 required=False,
-                )
+            )
 
         IUnit['boss'].schema = IPerson
         IUnit['members'].value_type.schema = IPerson

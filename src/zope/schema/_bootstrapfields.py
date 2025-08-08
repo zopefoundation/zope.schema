@@ -164,11 +164,11 @@ class _DocStringHelpers:
         if mod in ('zope.schema._bootstrapfields', 'zope.schema._field'):
             mod = 'zope.schema'
         mod += '.' if mod else ''
-        return ':class:`{}{}`'.format(mod, kind.__name__)
+        return f':class:`{mod}{kind.__name__}`'
 
     @classmethod
     def make_field(cls, name, value):
-        return ":{}: {}".format(name, value)
+        return f":{name}: {value}"
 
     @classmethod
     def make_class_field(cls, name, kind):
@@ -176,7 +176,7 @@ class _DocStringHelpers:
             return cls.make_field(name, cls.make_class_directive(kind))
         if not isinstance(kind, tuple):  # pragma: no cover
             raise TypeError(
-                "make_class_field() can't handle kind {!r}".format(kind))
+                f"make_class_field() can't handle kind {kind!r}")
         return cls.make_field(
             name,
             ', '.join([cls.make_class_directive(t) for t in kind]))
@@ -252,7 +252,7 @@ class Field(Attribute):
 
         if title:
             if doc_description:
-                __doc__ = "{}\n\n{}".format(title, doc_description)
+                __doc__ = f"{title}\n\n{doc_description}"
             else:
                 __doc__ = title
         elif description:
@@ -524,7 +524,7 @@ class Text(MinMaxLen, Field):
     _type = str
     unicode_normalization = 'NFC'
 
-    def __init__(self,  *args, **kw):
+    def __init__(self, *args, **kw):
         self.unicode_normalization = kw.pop(
             'unicode_normalization', self.unicode_normalization)
         super().__init__(*args, **kw)

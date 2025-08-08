@@ -540,7 +540,7 @@ class ChoiceTests(EqualityTestsMixin,
     def test_ctor_w_values(self):
         from zope.schema.vocabulary import SimpleVocabulary
         choose = self._makeOne(values=[1, 2])
-        self.assertTrue(isinstance(choose.vocabulary, SimpleVocabulary))
+        self.assertIsInstance(choose.vocabulary, SimpleVocabulary)
         self.assertEqual(sorted(choose.vocabulary.by_value.keys()), [1, 2])
         self.assertEqual(sorted(choose.source.by_value.keys()), [1, 2])
 
@@ -563,8 +563,8 @@ class ChoiceTests(EqualityTestsMixin,
     def test_ctor_w_preconstructed_vocabulary(self):
         v = _makeSampleVocabulary()
         choose = self._makeOne(vocabulary=v)
-        self.assertTrue(choose.vocabulary is v)
-        self.assertTrue(choose.vocabularyName is None)
+        self.assertIs(choose.vocabulary, v)
+        self.assertIsNone(choose.vocabularyName)
 
     def test_bind_w_preconstructed_vocabulary(self):
         from zope.schema.interfaces import ValidationError
