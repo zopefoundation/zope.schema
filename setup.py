@@ -20,7 +20,6 @@
 """
 import os
 
-from setuptools import find_packages
 from setuptools import setup
 
 
@@ -39,7 +38,7 @@ REQUIRES = [
 TESTS_REQUIRE = [
     'zope.i18nmessageid',
     'zope.testing',
-    'zope.testrunner',
+    'zope.testrunner >= 6.4',
 ]
 
 
@@ -52,9 +51,6 @@ setup(
     author='Zope Foundation and Contributors',
     author_email='zope-dev@zope.dev',
     long_description=(read('README.rst') + '\n\n' + read('CHANGES.rst')),
-    packages=find_packages('src'),
-    package_dir={'': 'src'},
-    namespace_packages=['zope', ],
     install_requires=REQUIRES,
     keywords="zope3 schema field interface typing",
     classifiers=[
