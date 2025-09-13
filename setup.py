@@ -29,7 +29,6 @@ def read(*rnames):
 
 
 REQUIRES = [
-    'setuptools',
     'zope.interface >= 5.0.0',
     'zope.event',
 ]
