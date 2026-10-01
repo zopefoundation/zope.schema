@@ -846,6 +846,18 @@ class URITests(EqualityTestsMixin,
         self.assertRaises(ConstraintNotSatisfied,
                           field.validate, 'http://example.com/\nDAV:')
 
+    def test_validate_scheme_rejects_stray_chars(self):
+        # The scheme character class used to be written as
+        # ``[a-zA-z0-9+.-]``, where the ``A-z`` sub-range spans the
+        # ASCII characters between 'Z' and 'a' as well (`[`, `\`, `]`,
+        # `^`, `_`, and the backtick), so a "scheme" containing any of
+        # those was incorrectly accepted.
+        from zope.schema.interfaces import InvalidURI
+        field = self._makeOne()
+        for value in ('ab[cd:value', 'ab]cd:value', 'ab^cd:value',
+                      'ab_cd:value', 'ab`cd:value', 'ab\\cd:value'):
+            self.assertRaises(InvalidURI, field.validate, value)
+
     def test_fromUnicode_ok(self):
 
         field = self._makeOne()
@@ -1092,6 +1104,16 @@ class IdTests(EqualityTestsMixin,
         self.assertRaises(InvalidId, field.validate, '\xab\xde')
         self.assertRaises(ConstraintNotSatisfied,
                           field.validate, 'http://example.com/\nDAV:')
+
+    def test_validate_scheme_rejects_stray_chars(self):
+        # Id falls back to the same URI scheme regex as the URI field,
+        # so it inherited the same ``A-z`` typo; a value that is
+        # neither a dotted name nor a real URI but merely contains one
+        # of the stray characters before a colon used to slip through.
+        from zope.schema.interfaces import InvalidId
+        field = self._makeOne()
+        for value in ('ab[cd:value', 'ab^cd:value', 'ab_cd:value'):
+            self.assertRaises(InvalidId, field.validate, value)
 
     def test_fromUnicode_url_ok(self):
 

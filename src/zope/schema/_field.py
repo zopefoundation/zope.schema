@@ -492,7 +492,7 @@ class _StrippedNativeStringLine(NativeStringLine):
         return self.fromUnicode(value.decode('ascii'))
 
 
-_isuri = r"[a-zA-z0-9+.-]+:"  # scheme
+_isuri = r"[a-zA-Z0-9+.-]+:"  # scheme
 _isuri += r"\S*$"  # non space (should be pickier)
 _isuri = re.compile(_isuri).match
 
