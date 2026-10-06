@@ -5,7 +5,10 @@
 8.2 (unreleased)
 ================
 
-- Nothing changed yet.
+- Fix the ``URI`` and ``Id`` fields accepting a scheme with stray
+  characters (``[``, ``\``, ``]``, ``^``, ``_``, backtick) before the
+  colon, caused by a typo in the scheme regex (``A-z`` instead of
+  ``A-Z``).
 
 
 8.1 (2025-10-26)
