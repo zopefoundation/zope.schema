@@ -5,6 +5,8 @@
 8.2 (unreleased)
 ================
 
+- Add support for Python 3.14, 3.15.
+
 - Drop support for Python 3.10, 3.9.
 
 - Fix the ``URI`` and ``Id`` fields accepting a scheme with stray
