@@ -66,7 +66,7 @@ result must implement ISource and will be used as the source.
 
    >>> _my_binder_called = []
    >>> def my_binder(context):
-   ...     _my_binder_called.append(context)   
+   ...     _my_binder_called.append(context)
    ...     source = MySource()
    ...     source.divisor = context.divisor
    ...     return source
