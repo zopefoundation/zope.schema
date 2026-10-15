@@ -110,19 +110,19 @@ you can see how well the tests cover the code:
    ...
    Name                               Stmts   Miss  Cover   Missing
    ----------------------------------------------------------------
-   zope.schema                           43      0   100%   
-   zope.schema._bootstrapfields         213      0   100%   
-   zope.schema._bootstrapinterfaces      40      0   100%   
-   zope.schema._compat                    4      0   100%   
-   zope.schema._field                   425      0   100%   
-   zope.schema._messageid                 2      0   100%   
-   zope.schema._schema                   45      0   100%   
-   zope.schema.accessors                 50      0   100%   
-   zope.schema.fieldproperty             63      0   100%   
-   zope.schema.interfaces               156      0   100%   
-   zope.schema.vocabulary               166      0   100%   
+   zope.schema                           43      0   100%
+   zope.schema._bootstrapfields         213      0   100%
+   zope.schema._bootstrapinterfaces      40      0   100%
+   zope.schema._compat                    4      0   100%
+   zope.schema._field                   425      0   100%
+   zope.schema._messageid                 2      0   100%
+   zope.schema._schema                   45      0   100%
+   zope.schema.accessors                 50      0   100%
+   zope.schema.fieldproperty             63      0   100%
+   zope.schema.interfaces               156      0   100%
+   zope.schema.vocabulary               166      0   100%
    ----------------------------------------------------------------
-   TOTAL                               1207      0   100%   
+   TOTAL                               1207      0   100%
    ----------------------------------------------------------------------
    Ran 410 tests in 1.677s
 
@@ -207,7 +207,7 @@ tool designed to run tests against multiple Python versions.  It creates
 a ``virtualenv`` for each configured version, installs the current package
 and configured dependencies into each ``virtualenv``, and then runs the
 configured commands.
-   
+
 :mod:`zope.schema` configures the following :mod:`tox` environments via
 its ``tox.ini`` file:
 

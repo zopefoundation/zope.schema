@@ -1,9 +1,8 @@
-# Generated from:
-# https://github.com/zopefoundation/meta/tree/master/config/pure-python
-
+# Generated with zope.meta (https://zopemeta.readthedocs.io/) from:
+# https://github.com/zopefoundation/meta/tree/master/src/zope/meta/pure-python
 [build-system]
 requires = [
-    "setuptools == 78.1.1",
+    "setuptools >= 78.1.1,< 82",
     "wheel",
 ]
 build-backend = "setuptools.build_meta"
@@ -11,7 +10,7 @@ build-backend = "setuptools.build_meta"
 [tool.coverage.run]
 branch = true
 source = ["zope.schema"]
-omit = ["src/zope/__init__.py"]
+omit = "[src/zope/__init__.py]"
 
 [tool.coverage.report]
 fail_under = 100
