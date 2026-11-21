@@ -43,7 +43,7 @@ TESTS_REQUIRE = [
 
 setup(
     name='zope.schema',
-    version=read('version.txt').strip(),
+    version='8.2.dev0',
     url='https://github.com/zopefoundation/zope.schema',
     license='ZPL-2.1',
     description='zope.interface extension for defining data schemas',
