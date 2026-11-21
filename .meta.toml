@@ -16,11 +16,6 @@ with-free-threaded-python = false
 [coverage]
 fail-under = 100
 
-[coverage-run]
-additional-config = [
-    "omit = [src/zope/__init__.py]",
-    ]
-
 [check-manifest]
 additional-ignores = [
     "docs/_static",
