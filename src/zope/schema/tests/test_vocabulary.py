@@ -426,11 +426,11 @@ class TreeVocabularyTests(unittest.TestCase):
         )
 
         self.assertEqual(
-            [k.token for k in vocab[[k for k in vocab.keys()][0]].keys()],
+            [k.token for k in vocab[[*vocab.keys()][0]].keys()],
             ['2', '3']
         )
         self.assertEqual(
-            [k.token for k in vocab[[k for k in vocab.keys()][1]].keys()],
+            [k.token for k in vocab[[*vocab.keys()][1]].keys()],
             ['5', '6']
         )
 
@@ -439,22 +439,22 @@ class TreeVocabularyTests(unittest.TestCase):
         # term_by_value, term_by_value and path_by_value.
         tv2 = self.tree_vocab_2()
         self.assertEqual(
-            [k for k in sorted(tv2.term_by_value.keys())],
+            [*sorted(tv2.term_by_value.keys())],
             ['Ausserfern', 'Austria', 'Bavaria', 'Germany', 'Regions', 'Tyrol']
         )
 
         self.assertEqual(
-            [k for k in sorted(tv2.term_by_token.keys())],
+            [*sorted(tv2.term_by_token.keys())],
             ['auss', 'aut', 'bav', 'ger', 'regions', 'tyr']
         )
 
         self.assertEqual(
-            [k for k in sorted(tv2.path_by_value.keys())],
+            [*sorted(tv2.path_by_value.keys())],
             ['Ausserfern', 'Austria', 'Bavaria', 'Germany', 'Regions', 'Tyrol']
         )
 
         self.assertEqual(
-            [k for k in sorted(tv2.path_by_value.values())],
+            [*sorted(tv2.path_by_value.values())],
             [
                 ['Regions'],
                 ['Regions', 'Austria'],
@@ -466,7 +466,7 @@ class TreeVocabularyTests(unittest.TestCase):
         )
 
         self.assertEqual(
-            [k for k in sorted(self.tree_vocab_3().term_by_value.keys())],
+            [*sorted(self.tree_vocab_3().term_by_value.keys())],
             [
                 'check_in',
                 'communication_network',
@@ -484,7 +484,7 @@ class TreeVocabularyTests(unittest.TestCase):
         )
 
         self.assertEqual(
-            [k for k in sorted(self.tree_vocab_3().term_by_token.keys())],
+            [*sorted(self.tree_vocab_3().term_by_token.keys())],
             [
                 'check_in',
                 'communication_network',
@@ -502,7 +502,7 @@ class TreeVocabularyTests(unittest.TestCase):
         )
 
         self.assertEqual(
-            [k for k in sorted(self.tree_vocab_3().path_by_value.values())],
+            [*sorted(self.tree_vocab_3().path_by_value.values())],
             [
                 ['infrastructure'],
                 ['infrastructure', 'communication_network'],
@@ -570,10 +570,10 @@ class TreeVocabularyTests(unittest.TestCase):
     def test_values_and_items(self):
         for v in (self.tree_vocab_2(), self.tree_vocab_3()):
             for term in v:
-                self.assertEqual([i for i in v.values()],
-                                 [i for i in v._terms.values()])
-                self.assertEqual([i for i in v.items()],
-                                 [i for i in v._terms.items()])
+                self.assertEqual([*v.values()],
+                                 [*v._terms.values()])
+                self.assertEqual([*v.items()],
+                                 [*v._terms.items()])
 
     def test_get(self):
         for v in [self.tree_vocab_2(), self.tree_vocab_3()]:
