@@ -16,29 +16,7 @@
 # When developing and releasing this package, please follow the documented
 # Zope Toolkit policies as described by this documentation.
 ##############################################################################
-"""Setup for zope.schema package
-"""
-import os
-
 from setuptools import setup
-
-
-def read(*rnames):
-    with open(os.path.join(os.path.dirname(__file__), *rnames)) as f:
-        return f.read()
-
-
-REQUIRES = [
-    'zope.interface >= 5.0.0',
-    'zope.event',
-]
-
-
-TESTS_REQUIRE = [
-    'zope.i18nmessageid',
-    'zope.testing',
-    'zope.testrunner >= 6.4',
-]
 
 
 # See pyproject.toml for package metadata
